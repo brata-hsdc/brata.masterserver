@@ -137,9 +137,10 @@ function create_t_event($dbh) {
 
 function create_v_scores($dbh) {
 	$status = $dbh->exec("create view v_scores as "
-			."select T.name team, E.stationId, S.type Station ,sum(E.points) score from t_event E "
+			."select T.name team, E.stationId Station, ST.shortName name ,sum(E.points) score from t_event E "
 			."left join t_team T on E.teamid=T.OID " 
-			."left join t_station S on E.stationid=S.oid "
+			."left join t_station S on E.stationid=S.OID "
+			."left join t_stationtype ST on E.stationid=ST.OID "
 			."group by E.teamid,E.stationId order by E.teamid"
 	);
 
@@ -210,8 +211,8 @@ function _resetdb() {
     create_t_event         ($dbh);
     
 //    create_v_duration($dbh);
-    //create_v_scores($dbh);
-    //create_v_leaderboard($dbh);
+    create_v_scores($dbh);
+    create_v_leaderboard($dbh);
 
     $admin = new User();
     $admin->set('username',"admin");
@@ -221,7 +222,7 @@ function _resetdb() {
     $admin->setRoll(USER::ROLL_ADMIN);
     $admin->create();
     
-    $stationNames = explode(",","Register,REG,Start,STR,Crack The Safe,CTS,Find Secret Lab,FSL,Defuse Hypermutation Bomb,HMB,Catch Provessor Aardvark,CPA,Extra,EXT");
+    $stationNames = explode(",","Crack The Safe,CTS,Find Secret Lab,FSL,Defuse Hypermutation Bomb,HMB,Catch Provessor Aardvark,CPA,Extra,EXT");
     for ($i=0;$i<count($stationNames);$i+=2)
     {
     	$stationType = new StationType();
