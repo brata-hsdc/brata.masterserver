@@ -1,0 +1,78 @@
+<?php
+class Station extends ModelEx {
+
+  const TYPE_BAD = 0;
+  const TYPE_STR = 1;	
+  const TYPE_CTS = 2;
+  const TYPE_FSL = 3;
+  const TYPE_HMB = 4;
+  const TYPE_CPA = 5;
+  const TYPE_EXT = 6;
+  const TYPE_END = 7;
+  
+
+  static private function isSelected($value, $selectValue) {
+  	return $value == $selectValue ? " selected " : "";
+  }
+  static function getTypesAsHtmlOptions($selectValue) {
+  	return
+  	"<option " . Station::isSelected(Station::TYPE_BAD, $selectValue) . "value=" . Station::TYPE_BAD . "> Select one"
+   ."<option " . Station::isSelected(Station::TYPE_STR, $selectValue) . "value=" . Station::TYPE_STR . "> Start"
+   ."<option " . Station::isSelected(Station::TYPE_CTS, $selectValue) . "value=" . Station::TYPE_CTS . "> Crack Safe"
+   ."<option " . Station::isSelected(Station::TYPE_FSL, $selectValue) . "value=" . Station::TYPE_FSL . "> Find Lab"
+   ."<option " . Station::isSelected(Station::TYPE_HMB, $selectValue) . "value=" . Station::TYPE_HMB . "> Bomb"
+   ."<option " . Station::isSelected(Station::TYPE_CPA, $selectValue) . "value=" . Station::TYPE_CPA . "> Capture"
+   ."<option " . Station::isSelected(Station::TYPE_EXT, $selectValue) . "value=" . Station::TYPE_EXT . "> Extra Credit"								
+   ."<option " . Station::isSelected(Station::TYPE_END, $selectValue) . "value=" . Station::TYPE_END . "> End";
+  }
+  static function getTypeAsText($value) {
+  	switch ($value)
+  	{
+  		case Station::TYPE_STR: return "start";
+  		case Station::TYPE_CTS: return "crack the safe";
+  		case Station::TYPE_FSL: return "find the secret lab";
+  		case Station::TYPE_HMB: return "defuse hyper mutation bomb";
+  		case Station::TYPE_CPA: return "capture professor aardvark";
+  		case Station::TYPE_EXT: return "extra credit";
+  		case Station::TYPE_END: return "end";
+  		default: return "Error - unknown station type";
+  	}
+  }
+  
+  
+  function __construct($oid=0,$cid=0) {
+    parent::__construct('OID','CID','t_station'); 
+    $this->rs['OID'] = $oid;
+    $this->rs['CID'] = $cid;
+    $this->rs['name'] = '';
+    $this->rs['type'] = Station::TYPE_BAD;
+    $this->rs['gpsLocation'] = '';
+    $this->rs['description'] = '';
+    if ($oid && $cid)
+    $this->retrieve($oid,$cid);
+  }
+  
+  static function getStationNameFromId($stationId) {
+    $station = new Station($stationId,-1);
+    return $station->get('name');
+  }
+  
+  
+  static function getAllAsHTMLOptions($stationId=-1) {
+    $station = new Station();
+    $aray = $station->retrieve_many();
+    $options ="";
+    foreach ($aray as $station) {
+      $stationOID = $station->get('OID');
+      $selected = $station->rs['OID'] == sationId ? "selected" : "";
+      $options .= '<option value='. $stationOID. ' ' . $selected . '>' . $station->get("name");
+    }
+    return $options;
+  }
+  
+  static function getAllOrderByName() {
+    $station = new Station();
+    return $station->retrieve_many("OID !=0 order by name group by type");
+
+  }
+}

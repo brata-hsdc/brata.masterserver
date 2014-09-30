@@ -1,0 +1,10 @@
+<?php
+$SYSCONFIG_WEBFOLDER='/sandboxes/composer/';
+$SYSCONFIG_WEBDOMAIN='http://ivirtualwriter.com';
+$SYSCONFIG_DBHOST='ivirtualcomposer.db.5551453.hostedresource.com';
+$SYSCONFIG_DBNAME='ivirtualcomposer';
+$SYSCONFIG_DBUSER='ivirtualcomposer';
+$SYSCONFIG_DBPASS='Jordan234';
+$SYSCONFIG_DEBUG=1;
+$SYSCONFIG_SENDMAIL=1;
+$SYSCONFIG_PAYPAL_RETURN='http://ivirtualwriter.com';

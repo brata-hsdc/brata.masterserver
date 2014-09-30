@@ -1,0 +1,10 @@
+<?php
+$SYSCONFIG_WEBFOLDER='/sandboxes/webtest/';
+$SYSCONFIG_WEBDOMAIN='http://ivirtualwriter.com';
+$SYSCONFIG_DBHOST='ivirtualtestsite.db.5551453.hostedresource.com';
+$SYSCONFIG_DBNAME='ivirtualtestsite';
+$SYSCONFIG_DBUSER='ivirtualtestsite';
+$SYSCONFIG_DBPASS='Jordan234';
+$SYSCONFIG_DEBUG=1;
+$SYSCONFIG_SENDMAIL=1;
+$SYSCONFIG_PAYPAL_RETURN='http://ivirtualwriter.com';

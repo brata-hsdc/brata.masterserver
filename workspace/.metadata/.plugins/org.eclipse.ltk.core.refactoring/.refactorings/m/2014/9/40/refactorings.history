@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename source module &apos;app/models.WayPoint.php&apos; to &apos;Waypoint.php&apos;&#x0A;- Original element: &apos;app/models\WayPoint.php&apos;&#x0A;- Renamed element: &apos;app/models\Waypoint.php&apos;" description="Rename source module &apos;WayPoint.php&apos;" flags="589830" id="org.eclipse.dltk.ui.rename.sourcemodule" input="/&lt;app\/models{WayPoint.php" name="Waypoint.php" stamp="1411996324964" version="1.0"/>
+</session>

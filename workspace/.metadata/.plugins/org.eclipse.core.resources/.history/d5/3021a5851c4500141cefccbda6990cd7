@@ -1,0 +1,256 @@
+<?php
+class ErrorInfo extends Exception
+{
+  function __construct($dbh,$msg=null) {
+    parent::__construct(ErrorInfo::makeMessage($dbh,$msg));
+  }
+  static function makeMessage($dbh,$msg) {
+    $msg = ($msg == null) ? "Error - " : $msg . " Error - ";
+    $e = $dbh->errorInfo();
+    return $msg . $e[0] . " ". $e[1] . " " .$e[2];
+  }
+}
+
+function create_t_station($dbh) {
+  $status = $dbh->exec(
+	"CREATE TABLE `t_station` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+  	`name` varchar(255) NOT NULL,
+  	`type` int(10) unsigned NOT NULL default '0',	
+ 	`gpsLocation` varchar(255) NOT NULL,
+  	`description` varchar(255) NOT NULL,
+  	PRIMARY KEY  (`OID`)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_station");
+}
+
+function create_t_team($dbh) {
+	$status = $dbh->exec(
+			"CREATE TABLE `t_team` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+  	`name` varchar(255) NOT NULL,
+ 	`school` varchar(255) NOT NULL,
+  	PRIMARY KEY  (`OID`)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_team");
+}
+
+function create_t_school($dbh) {
+	$status = $dbh->exec(
+			"CREATE TABLE `t_school` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+  	`name` varchar(255) NOT NULL,
+ 	`mascot` varchar(255) NOT NULL,
+  	`logo` varchar(255) NOT NULL,
+  	PRIMARY KEY  (`OID`)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_school");
+}
+
+function create_t_user($dbh)
+{
+  $status = $dbh->exec(
+	"CREATE TABLE `t_user` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+  	`permissions` int(10) unsigned NOT NULL default '0',
+  	`username` varchar(255) NOT NULL,
+  	`passwordHash` varchar(40) NOT NULL,
+  	`email` varchar(255) NOT NULL,  	
+  	`fullname` varchar(255) NOT NULL,	
+  	`created_dt` DATETIME NOT NULL,
+  	PRIMARY KEY  (`OID`),
+ 	CONSTRAINT `user_email_unique` UNIQUE KEY (`email`),
+  	CONSTRAINT `user_username_unique` UNIQUE KEY (`username`)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_user");
+
+}
+
+function create_t_event($dbh) {
+	$status = $dbh->exec(
+	"CREATE TABLE `t_event` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+    `created_dt` DATETIME NOT NULL,
+  	`teamId` int(10) unsigned NOT NULL,
+  	`stationId` int(10) unsigned NOT NULL default '0',
+ 	`type` int(10) NOT NULL,
+	`points` int(10) NOT NULL,			
+  	`description` varchar(255) NOT NULL,
+  	PRIMARY KEY  (`OID`),"
+	." CONSTRAINT `fk_teamId` FOREIGN KEY (`teamId`) REFERENCES `t_team` (`OID`),"
+    ." CONSTRAINT `fk_stationId` FOREIGN KEY (`stationId`) REFERENCES `t_station` (`OID`)"
+	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_event");
+}
+
+function create_v_subtotal($dbh) {
+	$status = $dbh->exec("create view v_subtotal as "
+			."select teamid,stationId,sum(points) subtotal from t_event group by teamid,stationId"
+	);
+
+	if ($status === false) throw new ErrorInfo($dbh,"v_subtotal");
+}
+
+function create_v_total($dbh) {
+	$status = $dbh->exec("create view v_total as "
+	   ."select teamid,sum(subtotal) total from "
+	   ."(select teamid,stationId,sum(points) subtotal from t_event group by teamid,stationId) x group by teamid"
+	);
+
+	if ($status === false) throw new ErrorInfo($dbh,"v_total");
+}
+
+
+function create_v_duration($dbh) {
+	$status = $dbh->exec("create view v_duration as "
+			 ."select t1.teamid,t1.stationid,timediff(stop,start) "
+             ."from "
+             ."(SELECT teamid,stationid,min(created_dt) AS 'start' FROM t_event GROUP BY teamid,stationid) t1 "
+             ."left join "
+             ."(SELECT teamid,stationid,max(created_dt) AS 'stop' FROM t_event GROUP BY teamid,stationid) t2 "
+             ."on "
+             ." t1.teamid = t2.teamid and t1.stationid = t2.stationid"
+	         );
+
+	if ($status === false) throw new ErrorInfo($dbh,"v_duration");
+}
+
+
+function dropView($dbh, $view) {
+  if ($dbh->exec("DROP VIEW if exists ".$view) === false) {
+    throw new ErrorInfo($dbh,"dropView " . $view);
+  }
+}
+function dropTable($dbh, $table) {
+  if ($dbh->exec("DROP table if exists ".$table) === false) {
+    throw new ErrorInfo($dbh,"dropTable " . $table);
+  }
+}
+function _resetdb() {
+	
+	if ( !isset($_POST['dataOption']) ) {
+		echo "error";
+		exit;
+	}
+	$dataOption = $_POST['dataOption'];
+
+  try
+  {
+    $dbh=getdbh();
+
+    $list = explode(",","v_duration,v_total,v_subtotal");
+    foreach ($list as $view) dropView($dbh, $view);
+
+
+    $list = explode(",", "t_event,t_user,t_station,t_team,t_school");
+    foreach ($list as $table) dropTable($dbh, $table);
+
+    create_t_user          ($dbh);
+    create_t_station       ($dbh);
+    create_t_team          ($dbh);
+    create_t_school        ($dbh);
+    create_t_event         ($dbh);
+    
+//    create_v_duration($dbh);
+    create_v_subtotal($dbh);
+//    create_v_total($dbh);
+
+    $admin = new User();
+    $admin->set('username',"admin");
+    $admin->setPassword('pass');
+    $admin->set('email',"dcarreir@harris.com");
+    $admin->set('fullname',"administrator");
+    $admin->setRoll(USER::ROLL_ADMIN);
+    $admin->create();
+    
+    if ($dataOption == 0) {
+        redirect('mgmt_main','Database Initialized without test data!');
+        return;
+    }
+
+    for ($i=1;$i < 21; $i++) {
+      $user = new User();
+      $user->set('username','user'.$i);
+      $user->setPassword('pass'.$i);
+      $user->set('email','email'.$i."@harris.com");
+      $user->set('fullname','User #'.$i);
+      if ($user->create()===false) echo "Create user $i failed";
+    }
+
+    $numStations=2;
+    for ($i=1; $i<=$numStations; $i++)
+    {
+      $station = new Station();
+      $station->set("name", "testStation $i");
+      $station->set("gpsLocation", "no where");
+      $station->select("description","a test station");
+      if ($station->create() === false) echo "Create Station $i failed";
+    }
+    
+    $names   = explode(",", "Tigers,Bulldogs");
+    $school = explode(",","Bayside High,Valley High");
+    for ($i=0; $i<count($names);$i++)
+    {
+      $team = new Team();
+      $team->set("name",$names[$i]);
+      $team->set("school",$school[$i]);
+      if ($team->create() === false) echo "Create Team $i failed";
+    }
+
+    for ($s=1; $s<=$numStations; $s++)
+    {
+      for ($t=0; $t<count($names);$t++)
+      {
+    	  $event = new Event();
+    	  $time = time();
+    	  $event->set('created_dt',unixToMySQL($time));
+    	  $event->set('teamId',$t);
+    	  $event->set('stationId',$s);
+    	  $event->set('type',Event::TYPE_ARRIVE);
+    	  $event->set('points',0);
+    	  $event->set('description',"Arrive");
+    	  if ($event->create() === false) echo "Create Arrive event $s,$t failed";
+
+    	  if ($t == 2)
+    	  {
+    	    $event->set("OID",0); $event->set("CID",0); $time += 5;
+    	    $event->set('created_dt',unixToMySQL($time));
+    	    $event->set('type',Event::TYPE_SOLUTION);
+    	    $event->set('points',-1);
+    	    $event->set('description',"Incorrect Solution");
+    	    if ($event->create() === false) echo "Create Incorrect Solution event $s,$t failed";
+    	  }
+    	     	  
+    	  $event->set("OID",0); $event->set("CID",0); $time += 5;
+    	  $event->set('created_dt',unixToMySQL($time));
+    	  $event->set('type',Event::TYPE_SOLUTION);
+    	  $event->set('points',20);
+    	  $event->set('description',"Correct Solution");    	  
+    	  if ($event->create() === false) echo "Create Correct Solution event $s,$t failed";
+	  
+    	  $event->set("OID",0); $event->set("CID",0); $time += 5;
+    	  $event->set('type',Event::TYPE_LEAVE,$time);
+    	  $event->set('description',"Leave");
+    	  if ($event->create() === false) echo "Create Leave event $s,$t failed";
+      }
+    }
+        
+    redirect('mgmt_main','Database Initialized test data!');
+    
+  }
+  catch(ErrorInfo $e)
+  {
+    echo $e->getMessage();
+  }
+
+}

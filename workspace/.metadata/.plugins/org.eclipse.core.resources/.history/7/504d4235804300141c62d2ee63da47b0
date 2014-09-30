@@ -1,0 +1,8 @@
+<?php 
+header("Content-Type: text/plain");
+header("Expires: " . gmdate('D, d M Y H:i:s \G\M\T') );
+header("Cache-Control: no-cache");
+header("Pragma: no-cache");
+if *isset($jsonString)) header("Content-Type: application/json");
+
+echo isset($jsonString) ? $jsonString : '';

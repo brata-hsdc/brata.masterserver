@@ -1,0 +1,21 @@
+<?php
+include_once "app/controllers/rest-v0/functions.php";
+function _rpiconnect()
+{
+	
+	$jsonObject =json_decode(file_get_contents( 'php://input' ), true, 0);
+	if (jsonObject === false) {
+		echo "bad json";
+		return;
+	}
+	echo "OK";
+	// output
+	jsonRestHeaders();
+	$arr = array('a' => "1", 'b' => array("b.1"=> 4.0, "b.2"=> 4.1), 'c' => 3, 'd' => 4, 'e' => array(1,2,3,4));
+	echo json_encode($arr);
+	
+	//$dbh = getdbh();
+	//$stmt = $dbh->query('SELECT count(OID) total FROM t_user');
+	//$total=$stmt->fetchColumn();
+//echo "test v0 $total";
+}

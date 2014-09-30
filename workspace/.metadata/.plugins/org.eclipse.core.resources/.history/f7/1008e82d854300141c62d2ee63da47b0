@@ -1,0 +1,12 @@
+<?php
+include_once "app/controllers/rest-v0/functions.php";
+function _rpiconnect()
+{
+	$arr = array('a' => 1, 'b' => 2, 'c' => 3, 'd' => 4, 'e' => 5);
+	echo json_encode($arr);
+	
+	//$dbh = getdbh();
+	//$stmt = $dbh->query('SELECT count(OID) total FROM t_user');
+	//$total=$stmt->fetchColumn();
+//echo "test v0 $total";
+}

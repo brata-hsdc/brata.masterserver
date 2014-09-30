@@ -1,0 +1,7 @@
+<?php
+include_once "app/controllers/rest-v0/functions.php";
+function _rpiconnect()
+{
+	$dbh = getdbh();
+echo "test v0";
+}

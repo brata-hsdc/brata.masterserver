@@ -1,0 +1,10 @@
+<?php
+$SYSCONFIG_WEBFOLDER='/sandboxes/iphone/';
+$SYSCONFIG_WEBDOMAIN='http://ivirtualwriter.com';
+$SYSCONFIG_DBHOST='ivirtualiphone.db.5551453.hostedresource.com';
+$SYSCONFIG_DBNAME='ivirtualiphone';
+$SYSCONFIG_DBUSER='ivirtualiphone';
+$SYSCONFIG_DBPASS='Jordan234';
+$SYSCONFIG_DEBUG=1;
+$SYSCONFIG_SENDMAIL=1;
+$SYSCONFIG_PAYPAL_RETURN='http://ivirtualwriter.com';

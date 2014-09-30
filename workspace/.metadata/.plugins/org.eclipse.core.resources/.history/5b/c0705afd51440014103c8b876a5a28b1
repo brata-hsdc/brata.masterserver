@@ -1,0 +1,20 @@
+<?php
+include_once "app/controllers/rest-v0/functions.php";
+function _rpiconnect()
+{
+	$x = file_get_contents( 'php://input' );
+	$jsonObject =json_decode($x, true);
+	if ($jsonObject === NULL) {
+		header('HTTP/1.1 400 Bad Request invalid json', true, 400);
+		echo '{ "error": "invalid json" }';
+		return;
+	}
+	// output
+	$dbh = getdbh();
+	$stmt = $dbh->query('SELECT count(OID) total FROM t_user');
+	$total=$stmt->fetchColumn();
+	$arr = array('total' => $total, 'b' => array("b.1"=> 4.0, "b.2"=> 4.1), 'c' => 3, 'd' => 4, 'e' => array(1,2,3,4));
+	jsonResponseHeaders();
+	echo json_encode($arr);
+	
+}

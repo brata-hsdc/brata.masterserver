@@ -1,0 +1,39 @@
+<?php
+class School extends ModelEx {
+
+  function __construct($oid=0,$cid=0) {
+    parent::__construct('OID','CID','t_school'); 
+    $this->rs['OID'] = $oid;
+    $this->rs['CID'] = $cid;
+    $this->rs['name'] = '';
+    $this->rs['mascot'] = '';
+    $this->rs['logo'] = 'todo';
+    if ($oid && $cid)
+    $this->retrieve($oid,$cid);
+  }
+  /* todo if needed
+  static function getStationNameFromId($stationId) {
+    $station = new Station($stationId,-1);
+    return $station->get('name');
+  }
+  
+  
+  static function getAllAsHTMLOptions($stationId=-1) {
+    $station = new Station();
+    $aray = $station->retrieve_many();
+    $options ="";
+    foreach ($aray as $station) {
+      $stationOID = $station->get('OID');
+      $selected = $station->rs['OID'] == sationId ? "selected" : "";
+      $options .= '<option value='. $stationOID. ' ' . $selected . '>' . $station->get("name");
+    }
+    return $options;
+  }
+  
+  static function getAllOrderByName() {
+    $station = new Station();
+    return $station->retrieve_many("OID !=0 order by name");
+
+  }
+  */
+}

@@ -1,0 +1,6 @@
+<?php
+include_once "rest-v0/functions.php";
+function _rpiconnect()
+{
+echo "test v0";
+}

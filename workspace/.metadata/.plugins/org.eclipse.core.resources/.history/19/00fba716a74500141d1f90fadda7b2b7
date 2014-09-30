@@ -1,0 +1,36 @@
+<?php
+function makeTypeList($currentType) {
+	return '<select name="shcoolId">'
+		. Station::getTypeAsHTMLOptions($currentType)
+		. '</select>';
+}
+?>
+<form method="post" action="<?=$actionUrl?>">
+<input type="hidden" name="OID" value="<?php echo $object->get('OID')?>" />
+<input type="hidden" name="CID" value="<?php echo $object->get('CID')?>" />
+	<table>
+		<tr><th colspan="2"><?php echo $form_heading?></th></tr>
+		<tr>
+			<td>Station Name</td>
+			<td><input type="text" name="name" style="width:150px" value="<?php echo $object->get('name')?>" /></td>
+		</tr>
+			<tr>
+			<td>Station type</td>
+			<td><?php echo makeTypeList($object->get('type')) ?> </td>
+		</tr>	
+		<tr>
+			<td>GPS Location</td>
+			<td><input type="text" name="gpsLocation" style="width:150px" value="<?php echo $object->get('gpsLocation')?>" /></td>
+		</tr>		
+		<tr>
+			<td>Description</td>
+			<td><input type="text" name="description" style="width:150px" value="<?php echo $object->get('description')?>" /></td>
+		</tr>	
+		<tr>
+			<td colspan="2" style="text-align:right">
+	     	<input type="button" value="<?=$cancelLabel?>" onclick="location.href='<?=$cancelUrl ?>' " />
+			<input type="button" value="<?=$actionLabel?>" onclick="validateForm(this.form);return false;" /></td>
+		</tr>
+		
+	</table>
+</form>

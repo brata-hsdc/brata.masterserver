@@ -1,0 +1,37 @@
+<?php
+// output headers for json respone
+function jsonResponseHeaders()
+{
+  header("Content-Type: application/json");
+  header("Expires: " . gmdate('D, d M Y H:i:s \G\M\T') );
+  header("Cache-Control: no-cache");
+  header("Pragma: no-cache");
+}
+
+// call this when we get and invalid request
+function sendBadJsonResponse($msg="invalid json")
+{
+	header("HTTP/1.1 400 Bad Request $msg", true, 400);
+	echo '{ "error": "invalid json" }';
+	return NULL;
+}
+//
+function getJsonObjectFromRequest()
+{	
+  if(!isset($_SERVER['CONTENT_TYPE']))                return sendBadJsonResponse("missing content-type");
+  if ($_SERVER['CONTENT_TYPE'] != "application/json") return sendBadJsonResponse("content-type not json");
+  
+  $jsonObject =json_decode(file_get_contents( 'php://input' ), true);
+  var_dump($jsonObject);
+  if ($jsonObject != NULL) return $jsonObject;
+  
+  sendBadJsonResponse("invalid json");
+  return NULL;
+
+}
+//
+function sendJsonObject($jsonObject)
+{
+	jsonResponseHeaders();
+	echo json_encode($jsonObject);
+}

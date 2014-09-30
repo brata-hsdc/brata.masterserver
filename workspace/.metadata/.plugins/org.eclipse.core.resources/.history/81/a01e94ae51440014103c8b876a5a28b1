@@ -1,0 +1,8 @@
+<?php
+function jsonResponseHeaders()
+{
+header("Content-Type: application/json");
+header("Expires: " . gmdate('D, d M Y H:i:s \G\M\T') );
+header("Cache-Control: no-cache");
+header("Pragma: no-cache");
+}

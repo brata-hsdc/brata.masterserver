@@ -1,0 +1,56 @@
+<?php
+$authuid=isset($_SESSION['authuid']) ? $_SESSION['authuid'] : 0;
+$pagetitle=isset($pagename) ? $GLOBALS['sitename'].' - '.$pagename : $GLOBALS['sitename'];
+$foot[]=getjAlert();
+
+header("Content-Type: text/html; charset=UTF-8");
+header("Expires: " . gmdate('D, d M Y H:i:s \G\M\T') );
+header("Cache-Control: no-cache");
+header("Pragma: no-cache");
+?>
+<!DOCTYPE html>
+<html>
+<title><?php echo $pagetitle?></title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Bootstrap -->
+<link href="<?php echo myUrl('css/bootstrap.min.css')?>" rel="stylesheet" media="screen">
+<?php echo (isset($head) && is_array($head)) ? implode("\n",$head) : ''?>
+</head>
+<body>
+<div class="row-fluid"><div class="span12"><h1><a href="/m">M</a> - The Master Server</h1></div></div>
+
+<div class="row-fluid"><div class="span12">
+<!--  top bar -->
+    <ul class="nav nav-pills pull-right" >
+    <li><a href="<?php echo myUrl('mgmt_main/about/whatsnew')?>">What's New</a></li>
+    <li><a href="<?php echo myUrl('mgmt_main/about/todo')?>">To Do</a></li>
+    <li><a href="<?php echo myUrl('mgmt_main/about/version')?>">Version</a></li>    
+<?php
+  if (loginIsMgmt())
+    echo '<li><a href="'.myUrl('ops/mgmt_logout').'">Logout</a></li>'."\n";
+  else
+    echo '<li><a href="'.myUrl('mgmt_main/login').'">Login</a></li>'."\n";  
+?>
+    </ul>
+</div></div>
+<div class="row-fluid">
+   <div class="span4">
+   <!--  right side -->
+    <h3>Manage</h3>
+    <ul>      
+<li>right</li>      
+    </ul>
+  </div> <!-- end right side -->
+   <div class="span8"><!-- left side -->
+   <p>left</p>
+   </div> <!-- end left side -->
+</div>
+<div class="row-fluid"><div class="span12">
+<!-- footer -->
+<?php echo (isset($foot) && is_array($foot)) ? implode("\n",$foot) : ''?>
+<!-- end footer -->
+</div></div>
+<script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+<script src="<?php echo myUrl('js/bootstrap.min.js')?>"></script>
+</body>
+</html>

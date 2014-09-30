@@ -1,0 +1,10 @@
+<?php
+$SYSCONFIG_WEBFOLDER='/isms/';
+$SYSCONFIG_WEBDOMAIN='http://ivirtualwriter.com';
+$SYSCONFIG_DBHOST='ivirtualwebsite.db.5551453.hostedresource.com';
+$SYSCONFIG_DBNAME='ivirtualwebsite';
+$SYSCONFIG_DBUSER='ivirtualwebsite';
+$SYSCONFIG_DBPASS='Jordan234';
+$SYSCONFIG_DEBUG=1;
+$SYSCONFIG_SENDMAIL=1;
+$SYSCONFIG_PAYPAL_RETURN='http://ivirtualwriter.com';

@@ -1,0 +1,14 @@
+<?php
+class StationType extends ModelEx {
+
+  
+  function __construct($oid=0,$cid=0) {
+    parent::__construct('OID','CID','t_stationtype'); 
+    $this->rs['OID'] = $oid;
+    $this->rs['CID'] = $cid;
+    $this->rs['name'] = '';
+    $this->rs['instruction'] = -1;
+    if ($oid && $cid)
+    $this->retrieve($oid,$cid);
+  }
+}

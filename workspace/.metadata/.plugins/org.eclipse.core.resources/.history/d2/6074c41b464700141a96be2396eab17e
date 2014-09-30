@@ -1,0 +1,38 @@
+<?php
+class StationType extends ModelEx {
+
+  
+  function __construct($oid=0,$cid=0) {
+    parent::__construct('OID','CID','t_stationtype'); 
+    $this->rs['OID'] = $oid;
+    $this->rs['CID'] = $cid;
+    $this->rs['longName'] = '';
+    $this->rs['shortName'] = '';
+    $this->rs['instructions'] = -1;
+    if ($oid && $cid)
+    $this->retrieve($oid,$cid);
+  }
+
+
+  static function getFromShortname($shortName) {
+    $type = new StationType();
+    return $type->retrieve_one("shortName = ?", $shortName);
+  }
+  
+  static function getAllAsHTMLOptions($oid=-1) {
+    $type = new StationType();
+    $aray = $type->retrieve_many();
+    $options ="";
+    foreach ($aray as $item) {
+      $selected = $item->get('OID') == $oid ? "selected" : "";
+      $options .= '<option value='. $item->get('OID'). ' ' . $selected . '>' . $item->get("longName");
+    }
+    return $options;
+  }
+  
+
+  static function getAllOrderByName() {
+    $item = new StationType();
+    return $item->retrieve_many("OID !=0 order by longName");
+
+  }}
