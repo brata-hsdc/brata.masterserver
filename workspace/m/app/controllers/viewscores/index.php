@@ -14,7 +14,7 @@ function _make_html_table($view,$item,$urlPrefix,&$data) {
 	$dbh=getdbh();
 
 	//view
-	$fields="Team,Station,Score";
+	$fields="Team,Station,Name,Score";
 	$stmt = $dbh->query("SELECT $fields FROM $view");
 	if ($stmt === false) {
 		var_dump($dbh->errorInfo());
@@ -23,10 +23,7 @@ function _make_html_table($view,$item,$urlPrefix,&$data) {
 	$tablearr[]=explode(',',$fields);
 	while ($rs = $stmt->fetch(PDO::FETCH_ASSOC)) {
 		$row=null;
-		foreach ($tablearr[0] as $f) {
-			if ($f=="Station")
-			  $row[]=htmlspecialchars(Station::getTypeAsText($rs[$f]));
-			else	
+		foreach ($tablearr[0] as $f) {	
 			  $row[]=htmlspecialchars($rs[$f]);
 		}
 		$tablearr[]=$row;
