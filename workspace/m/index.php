@@ -18,8 +18,8 @@ $GLOBALS['SETTINGS_TAXFAXNUMBER'] = $SETTINGS_TAXFAXNUMBER;
 // Debug
 //===============================================
 ini_set('display_errors','On');
-//error_reporting(E_ALL);
-error_reporting(E_ALL ^ E_STRICT);
+error_reporting(E_ALL);
+//error_reporting(E_ALL ^ E_STRICT);
 
 //===============================================
 // mod_rewrite
