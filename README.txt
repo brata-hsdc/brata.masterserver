@@ -27,6 +27,8 @@ subfolder, so make sure you don't want to preserve it when running the script.
 
 This will create a m.zip file in the current directory.
 
+NOTE: The .htaccess file under workspace/m was not copied. (TODO)
+
 
 #---
 # Install
@@ -38,6 +40,7 @@ Install the application into your Web server's document root:
    $ sudo mkdir -m 755 m
    $ cd m
    $ sudo unzip /opt/designchallenge2015/brata.masterserver/packaging/m.zip
+   $ sudo cp -a /opt/designchallenge2015/brata.masterserver/workspace/m/.htaccess .
 
 To upgrade with future releases:
 
@@ -46,12 +49,25 @@ To upgrade with future releases:
    $ sudo mkdir -m 755 m
    $ cd m
    $ sudo unzip /opt/designchallenge2015/brata.masterserver/packaging/m.zip
+   $ sudo cp -a /opt/designchallenge2015/brata.masterserver/workspace/m/.htaccess .
 
 
-<strike>
 #---
 # Run
 #---
+
+Restart Apache if desired, but not required:
+
+   $ sudo /etc/init.d/apache2 restart
+
+In a Web browser, navigate to:
+
+   http://localhost/m/
+
+TODO: 404 Not Found.
+
+
+<strike>
 
 To run unit tests:
 

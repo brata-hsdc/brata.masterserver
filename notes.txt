@@ -68,14 +68,36 @@ ConfigGen:
 
 Set up LAMP stack:
 
+   Reference: https://www.digitalocean.com/community/tutorials/how-to-set-up-mod_rewrite
+
    $ sudo apt-get install apache2 php5 mysql-client mysql-server libapache2-mod-auth-mysql php5-mysql
 //tomcat6 vsftpd 
 
       MySQL root password: raspberry
 
+TODO: Is this needed to set-up mod_rewrite?
+\\\\\TODO: BEGIN SNIPPET/////
+
+   $ cd /etc/apache2/sites-available
+   $ sudo vi default
+
+Inside "<Directory /var/www/>", find:
+
+      AllowOverride None
+
+Change to:
+
+      AllowOverride All
+
+Save and exit.
+
+   $ sudo /etc/init.d/apache2 restart
+
+/////TODO: END SNIPPET\\\\\
 
    $ cd /var/www
    $ ls index.html
+
 
 Install InfoZIP:
 
