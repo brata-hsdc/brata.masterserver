@@ -6,6 +6,7 @@ class RPI extends ModelEx {
     $this->rs['OID'] = $oid;
     $this->rs['CID'] = $cid;
     $this->rs['URL'] = '';
+    $this->rs['debug'] ='';
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }

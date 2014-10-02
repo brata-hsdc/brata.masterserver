@@ -25,6 +25,19 @@ function create_t_stationtype($dbh) {
 	if ($status === false) throw new ErrorInfo($dbh,"t_stationtype");
 }
 
+function create_t_rpi($dbh) {
+	$status = $dbh->exec(
+	"CREATE TABLE `t_rpi` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+  	`URL` varchar(255) NOT NULL,
+	`debug` varchar(255) NOT NULL,
+  	PRIMARY KEY  (`OID`)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_rpi");
+}
+
 function create_t_waypoint($dbh) {
 	$status = $dbh->exec(
 			"CREATE TABLE `t_waypoint` ( "
@@ -198,7 +211,7 @@ function _resetdb() {
     foreach ($list as $view) dropView($dbh, $view);
 
 
-    $list = explode(",", "t_event,t_user,t_waypoint,t_message,t_station,t_stationtype,t_team,t_school");
+    $list = explode(",", "t_event,t_user,t_rpi,t_waypoint,t_message,t_station,t_stationtype,t_team,t_school");
     foreach ($list as $table) dropTable($dbh, $table);
 
     create_t_user          ($dbh);
@@ -209,6 +222,7 @@ function _resetdb() {
     create_t_school        ($dbh);
     create_t_team          ($dbh);
     create_t_event         ($dbh);
+    create_t_rpi           ($dbh);
     
 //    create_v_duration($dbh);
     create_v_scores($dbh);
