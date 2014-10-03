@@ -20,6 +20,8 @@ card:
    mv /var /var.old
    mkdir /var
 
+TODO: Apache log directory gets wiped on reboot; need to create /var/log/apache2 on boot-up.
+
 Clean-up Install Archives:
 
    $ sudo apt-get clean
@@ -70,14 +72,29 @@ Set up LAMP stack:
 
    Reference: https://www.digitalocean.com/community/tutorials/how-to-set-up-mod_rewrite
 
-   $ sudo apt-get install apache2 php5 mysql-client mysql-server libapache2-mod-auth-mysql php5-mysql
-//tomcat6 vsftpd 
+   $ sudo apt-get install apache2 php5 mysql-client mysql-server libapache2-mod-auth-mysql php5-mysql php5-curl
+//TODO? tomcat6 vsftpd 
 
       MySQL root password: raspberry
 
-TODO: Is this needed to set-up mod_rewrite?
-\\\\\TODO: BEGIN SNIPPET/////
+Notes:
+ * MySql like most RDBMS have their own username and passwords. Remember this
+   password. You'll need it later.
+ * Sometimes there is a seperate script you need to run to secure your install.
+   This script will ask you to create a root DB password.
+ * The php5-mysql package documentation states that it includes the pdo_mysql
+   module. This is the one we need.
 
+Verify the landing page is visible from a Web browser: http://localhost
+
+<TODO Added="True">
+mod_rewrite, PHP-PDO
+</TODO>
+
+
+Set-up mod_rewrite:
+
+   $ sudo a2enmod rewrite
    $ cd /etc/apache2/sites-available
    $ sudo vi default
 
@@ -91,13 +108,18 @@ Change to:
 
 Save and exit.
 
-   $ sudo /etc/init.d/apache2 restart
-
-/////TODO: END SNIPPET\\\\\
+   $ sudo service apache2 restart
 
    $ cd /var/www
    $ ls index.html
 
+Verify the landing page is visible from a Web browser: http://localhost
+
+Create the "m" database:
+
+   $ mysql -u root -p
+   mysql> create database m;
+   mysql> quit;
 
 Install InfoZIP:
 
