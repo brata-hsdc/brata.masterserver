@@ -47,6 +47,7 @@ Create new folder and unzip.
    $ sudo mkdir -m 755 m
    $ cd m
    $ sudo unzip /opt/designchallenge2015/brata.masterserver/packaging/m.zip
+   $ sudo chown www-data:www-data sysconfig_data.php
 
 Restart Apache:
 
@@ -89,6 +90,12 @@ server farm the Database host name may be something other than localhost.
 
 Press Submit Query. The page will transition to a Setup Complete page.
 
+In your Web browser, navigate to:
+
+   http://localhost/m/mgmt_main/resetdb
+
+Press the Reset Database button.
+
 
 #---
 # Run
@@ -98,7 +105,10 @@ In a Web browser, navigate to:
 
    http://localhost/m/
 
-TODO: 404 Not Found.
+Login using the credential specified on the page.
+
+On the Manage side bar along the left-hand side, click Device Testing > Test
+Contact.
 
 
 <TODO Added="True">
