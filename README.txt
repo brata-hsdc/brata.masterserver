@@ -90,11 +90,20 @@ server farm the Database host name may be something other than localhost.
 
 Press Submit Query. The page will transition to a Setup Complete page.
 
-In your Web browser, navigate to:
+In a Web browser, navigate to:
 
-   http://localhost/m/mgmt_main/resetdb
+   http://localhost/m/
 
-Press the Reset Database button.
+On the Manage side bar along the left-hand side, click Reset Database.
+
+The first time, leave drop-down at No Test Data and press the Reset Database
+button. With this, we should be able to log-in at the main page to verify all
+the database configuration and prior installation are correct.
+
+Once everything is verified, repeat with With Test Data selected in the
+drop-down and press the Reset Database button. This can take some time to build
+all the test data. Once complete, a working app should be available with test
+data to develop against.
 
 
 #---
@@ -110,16 +119,6 @@ Login using the credential specified on the page.
 On the Manage side bar along the left-hand side, click Device Testing > Test
 Contact.
 
-
-<TODO Added="True">
-Once you are on the landing page (you should be in debug mode) you shoud set a link called reset database.
-
-Click reset database and you'll have a form to select the test data option.  First I create the DB with no test data to verify that I have the DB name, user name, password etc correct.  If you get an error go
-back to the setup.php and check your work and/or verify your install.
-
-If all is well go back to reset database and use the test data option.
-This will take a bit of time to build all thet test data if all goes well you should have a working app with test data for you to develop agains.
-</TODO>
 
 
 
