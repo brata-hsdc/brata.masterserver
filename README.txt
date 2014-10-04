@@ -1,5 +1,7 @@
 This document provides a quick description of how to build, install, and
-run the application.
+run the application. Refer to the RaspberryPiGub page on the project wiki
+for instructions on setting up hardware and a build environment prior to
+proceeding with this document.
 
 #---
 # Build
