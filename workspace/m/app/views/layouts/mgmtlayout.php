@@ -45,7 +45,8 @@ $foot[]=getjAlert();
       <li><a href="<?php echo myUrl('mgmt_waypoint/manage')?>">Way Points</a></li>
       <li><a href="<?php echo myUrl('mgmt_message/manage')?>">Messages</a></li>
       <li><a href="<?php echo myUrl('mgmt_stationtype/manage')?>">Station Types</a></li>
-      <li><a href="<?php echo myUrl('mgmt_station/manage')?>">Stations</a></li>      
+      <li><a href="<?php echo myUrl('mgmt_station/manage')?>">Stations</a></li>
+      <li><a href="<?php echo myUrl('mgmt_rpi/manage')?>">rPI</a></li> 
       <li><a href="<?php echo myUrl('mgmt_user/manage')?> ">Users</a></li>
       <li><a href="<?php echo myUrl('mgmt_website/manage')?>">Web Site</a></li>
       <li>Below is for Public Access</li>      

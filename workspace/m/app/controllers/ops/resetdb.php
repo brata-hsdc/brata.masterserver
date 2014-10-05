@@ -11,33 +11,6 @@ class ErrorInfo extends Exception
   }
 }
 
-function create_t_stationtype($dbh) {
-	$status = $dbh->exec(
-			"CREATE TABLE `t_stationtype` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
-  	`longName` varchar(255) NOT NULL,
-	`shortName` varchar(255) NOT NULL,			
- 	`instructions` varchar(255) NOT NULL,
-  	PRIMARY KEY  (`OID`)
-	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
-	);
-	if ($status === false) throw new ErrorInfo($dbh,"t_stationtype");
-}
-
-function create_t_rpi($dbh) {
-	$status = $dbh->exec(
-	"CREATE TABLE `t_rpi` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
-  	`URL` varchar(255) NOT NULL,
-	`debug` varchar(255) NOT NULL,
-  	PRIMARY KEY  (`OID`)
-	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
-	);
-	if ($status === false) throw new ErrorInfo($dbh,"t_rpi");
-}
-
 function create_t_waypoint($dbh) {
 	$status = $dbh->exec(
 			"CREATE TABLE `t_waypoint` ( "
@@ -52,19 +25,50 @@ function create_t_waypoint($dbh) {
 	if ($status === false) throw new ErrorInfo($dbh,"t_station");
 }
 
+function create_t_stationtype($dbh) {
+	$status = $dbh->exec(
+			"CREATE TABLE `t_stationtype` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+  	`longName` varchar(255) NOT NULL,
+	`shortName` varchar(255) NOT NULL,			
+ 	`instructions` varchar(255) NOT NULL,
+  	PRIMARY KEY  (`OID`)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_stationtype");
+}
+
 function create_t_station($dbh) {
-  $status = $dbh->exec(
-	"CREATE TABLE `t_station` ( "
-  	."`OID` int(10) unsigned NOT NULL auto_increment, "
-  	."`CID` int(10) unsigned NOT NULL default '0', "
-  	."`typeId` int(10) unsigned NOT NULL, "	
-  	."`name` varchar(255) NOT NULL, "
-  	."`description` varchar(255) NOT NULL, "
-  	."PRIMARY KEY  (`OID`), "
-  	." CONSTRAINT `fk_typeId` FOREIGN KEY (`typeId`) REFERENCES `t_stationtype` (`OID`) "
-	.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	$status = $dbh->exec(
+			"CREATE TABLE `t_station` ( "
+			."`OID` int(10) unsigned NOT NULL auto_increment, "
+			."`CID` int(10) unsigned NOT NULL default '0', "
+			."`typeId` int(10) unsigned NOT NULL, "
+			."`skey` varchar(255), "
+			."`name` varchar(255) NOT NULL, "
+			."`description` varchar(255) NOT NULL, "
+			."PRIMARY KEY  (`OID`), "
+			."CONSTRAINT `rpi_key_unique` UNIQUE KEY (`skey`), "
+			."CONSTRAINT `fk_typeId` FOREIGN KEY (`typeId`) REFERENCES `t_stationtype` (`OID`) "
+			.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
 	if ($status === false) throw new ErrorInfo($dbh,"t_station");
+}
+
+function create_t_rpi($dbh) {
+	$status = $dbh->exec(
+	"CREATE TABLE `t_rpi` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+	`skey` varchar(255) NOT NULL, 
+  	`URL` varchar(255) NOT NULL, 
+	`debug` varchar(255) NOT NULL, 
+  	PRIMARY KEY  (`OID`), 
+	CONSTRAINT `rpi_key_unique` UNIQUE KEY (`skey`)
+	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_rpi");
 }
 
 function create_t_message($dbh) {
@@ -279,7 +283,8 @@ function _resetdb() {
     {
       $type = StationType::getFromShortname($stationNames[$i]);
       $station = new Station();
-      $station->set("name", "stestStation $i");
+      $station->set("name", "testStation $i");
+      $station->set("skey", "key$i");
       $station->set("description", "testStation $i description");
       $station->set("typeId", $type->get("OID"));
       if ($station->create() === false) echo "Create Station $i failed";

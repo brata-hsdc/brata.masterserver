@@ -8,6 +8,7 @@ class Station extends ModelEx {
     $this->rs['CID'] = $cid;
     $this->rs['typeId'] = -1;
     $this->rs['name'] = "";
+    $this->rs['skey'] = "";
     $this->rs['description'] = "";  
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
