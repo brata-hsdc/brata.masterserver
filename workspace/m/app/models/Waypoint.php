@@ -12,4 +12,9 @@ class Waypoint extends ModelEx {
     $this->retrieve($oid,$cid);
   }
   
+  static function getFromLatLng($lat,$lng) {
+  	$waypoint = new Waypoint();
+  	return $waypoint->retrieve_one('lat=? and lng=?',array($lat,$lng));
+  }
+  
 }

@@ -16,8 +16,8 @@ function create_t_waypoint($dbh) {
 			"CREATE TABLE `t_waypoint` ( "
 			."`OID` int(10) unsigned NOT NULL auto_increment, "
 			."`CID` int(10) unsigned NOT NULL default '0', "
-			."`lat` varchar(255) NOT NULL, "
-			."`lng` varchar(255) NOT NULL, "
+			."`lat` decimal(12,8) NOT NULL, "
+			."`lng` decimal(12,8) NOT NULL, "
 			."`description` varchar(255) NOT NULL, "
 			."PRIMARY KEY  (`OID`) "
 			.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
@@ -61,11 +61,11 @@ function create_t_rpi($dbh) {
 	"CREATE TABLE `t_rpi` (
   	`OID` int(10) unsigned NOT NULL auto_increment,
   	`CID` int(10) unsigned NOT NULL default '0',
-	`skey` varchar(255) NOT NULL, 
+	`stationId` int(10) unsigned NOT NULL, 
   	`URL` varchar(255) NOT NULL, 
 	`debug` varchar(255) NOT NULL, 
   	PRIMARY KEY  (`OID`), 
-	CONSTRAINT `rpi_key_unique` UNIQUE KEY (`skey`)
+	CONSTRAINT FOREIGN KEY (`stationId`) REFERENCES `t_station` (`OID`) ON DELETE CASCADE		
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
 	if ($status === false) throw new ErrorInfo($dbh,"t_rpi");
@@ -273,10 +273,10 @@ function _resetdb() {
 
     for ($i=0;$i < 20; $i++) {
     	$item = new Waypoint();
-    	$item->set('lat',"lat $i");
-    	$item->set('lng',"lng $i");
+    	$item->set('lat',$i);
+    	$item->set('lng',$i);
     	$item->set('description',"waypoint $i");
-    	if ($item->create()===false) echo "Create waypint $i failed";
+    	if ($item->create()===false) echo "Create waypoint $i failed";
     }
     $stationNames = explode(",", "CTS,FSL");
     for ($i=0; $i<count($stationNames); $i++)

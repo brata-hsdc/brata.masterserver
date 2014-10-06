@@ -13,8 +13,16 @@ class Station extends ModelEx {
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
+  
+  // map the given typeId into its text falue
   static function getTypeAsText($typeId) {
   	$stationType = new StationType($typeId,-1);
   	return $stationType->get('shortName');
   } 
+  
+  // fetch the Station object for the given skey
+  static function getFromKey($skey) {
+  	$station = new Station();
+  	return $station->retrieve_one("skey=?", $skey);
+  }
 }

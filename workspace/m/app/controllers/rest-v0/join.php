@@ -5,25 +5,27 @@
 //	"station_key": "97531",
 //	"station_type": "hmb",
 //	"station_callback_url": "http://192.168.0.2:9876"
-
-include_once "app/controllers/rest-v0/json_functions.php";
+require(APP_PATH.'inc/rest_functions.php');
+require(APP_PATH.'inc/json_functions.php');
+//
 function _join($key=null)
 {
 	if ($key === null) {
-		json_sendBadRequestResponse("missing station_key");
+		rest_sendBadRequestResponse(400,"missing station_key");
 	}
-	$json = json_getObjectFromRequest("PUT");
+	$json = json_getObjectFromRequest("POST");
 	//if ($json === NULL) return;
 	json_checkMembers("message_version,station_type,station_callback_url", $json);
 	
+	$station= Station::getFromKey($key);
+	if ($station === false) rest_sendBadRequestResponse(400,"invalid key");
 	// output
-	$dbh = getdbh();
 	$rpi = new RPI();
-	$rpi->set('key',$key);
+	$rpi->set('stationId',$station->get('OID'));
 	$rpi->set('URL',$json['station_callback_url']);
 	$rpi->set('debug',json_encode($json));
 	if ($rpi->create() === false) {
-	   json_sendBadRequestResponse("duplicate station_key");
+	   rest_sendBadRequestResponse(500,"create faled");
 	}
 	json_sendObject($json);
 }

@@ -1,17 +1,10 @@
 <?php
-// output headers for json respone
-function json_CacheHeaders()
-{
-  header("Expires: " . gmdate('D, d M Y H:i:s \G\M\T') );
-  header("Cache-Control: no-cache");
-  header("Pragma: no-cache");
-}
 
 // call this when we get and invalid request
 function json_sendBadRequestResponse($stsmsg="invalid json",$jsonmsg=null)
 
 {
-	json_CacheHeaders();
+	rest_CacheHeaders();
 	header("HTTP/1.1 400 Bad Request $stsmsg", true, 400);
 	if ($jsonmsg != null)
 	{
@@ -53,7 +46,7 @@ function json_checkMembers($fields, &$json)
 //
 function json_sendObject($jsonObject)
 {
-	json_CacheHeaders();
+	rest_CacheHeaders();
 	header("Content-Type: application/json");
 	echo json_encode($jsonObject);
 }
