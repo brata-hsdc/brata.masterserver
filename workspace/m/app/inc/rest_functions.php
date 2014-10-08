@@ -15,3 +15,9 @@ function rest_sendBadRequestResponse($sts,$stsmsg)
 	header("HTTP/1.1 $sts Bad Request $stsmsg", true, $sts);
 	die;
 }
+// call signal all is well
+function rest_sendSuccessResponse($sts=200,$stsmsg="OK")
+{
+	rest_CacheHeaders();
+	header("HTTP/1.1 $sts - $stsmsg", true, $sts);
+}

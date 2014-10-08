@@ -27,5 +27,5 @@ function _join($key=null)
 	if ($rpi->create() === false) {
 	   rest_sendBadRequestResponse(500,"create faled");
 	}
-	json_sendObject($json);
+	rest_sendSuccessResponse(202,"Accepted");
 }

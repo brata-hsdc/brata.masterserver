@@ -8,7 +8,7 @@ function _ops_delete($OID=0,$CID=0) {
   if (!loginCheckPermission(USER::MGMT_RPI)) redirect("errors/401");
   $itemName="RPI";
   $urlPrefix="mgmt_rpi";
-  $object=new Message($OID,$CID);
+  $object=new RPI($OID,$CID);
   
   if (!$object->exists())
   $msg="$itemName not found!";
