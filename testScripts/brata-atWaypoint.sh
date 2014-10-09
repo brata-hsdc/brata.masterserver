@@ -14,4 +14,4 @@ fi
 HOST="localhost"
 curl -v -X GET \
  -H "Accept: application/json" \
- http://$HOST/m/brata-v0/atWaypoint/$LAT/$LNG
+ http://$HOST/m/brata-v00/atWaypoint/$LAT/$LNG
