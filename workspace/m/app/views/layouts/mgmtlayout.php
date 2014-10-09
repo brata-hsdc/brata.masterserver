@@ -25,7 +25,8 @@ $foot[]=getjAlert();
     -->
     <li><a href="<?php echo myUrl('mgmt_main/about/whatsnew')?>">What's New</a></li>
     <li><a href="<?php echo myUrl('mgmt_main/about/todo')?>">To Do</a></li>
-    <li><a href="<?php echo myUrl('mgmt_main/about/version')?>">Version</a></li>    
+    <li><a href="<?php echo myUrl('mgmt_main/about/version')?>">Version</a></li>
+    <li><a href="<?php echo myUrl('mgmt_main/about/help')?>">Help</a></li>
 <?php
   if (loginIsMgmt())
     echo '<li><a href="'.myUrl('ops/mgmt_logout').'">Logout</a></li>'."\n";

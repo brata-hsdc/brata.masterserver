@@ -7,8 +7,12 @@
 <p>No Changes</p>
 
 <h2>Public Site</h2>
+Leader Board 
+Score details
 
-<h3>rPI Interface</h3>
+<h2>rPI Interface</h2>
+<h2>Brata Interface</h2>
+
 <p>
 </p>
 
