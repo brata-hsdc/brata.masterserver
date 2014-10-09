@@ -9,6 +9,7 @@ header("HTTP/1.0 404 Not Found");
 <body>
 <h1>Not Found</h1>
 <p>The requested URL was not found on this server.</p>
+<pre><?php echo $msg ?></pre>
 <p>Please go <a href="javascript: history.back(1)">back</a> and try
 again.</p>
 <hr />

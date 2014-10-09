@@ -1,6 +1,6 @@
 <?php
 class pagination {
-  function makePagination($n,$total_rows,$base_url,&$config=null) {
+  static function makePagination($n,$total_rows,$base_url,&$config=null) {
     //defaults
     $c['per_page']         = 10;
     $c['num_links']        = 2;

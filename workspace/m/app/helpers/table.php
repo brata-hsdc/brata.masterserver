@@ -5,7 +5,7 @@
  for the table, row, col and cell respectively
  */
 class table {
-  function makeTable(&$arr,$width='',$arraux='') {
+  static function makeTable(&$arr,$width='',$arraux='') {
     if (!is_array($arr) || !count($arr))
     return 'Empty Table';
     if (!$arraux)
