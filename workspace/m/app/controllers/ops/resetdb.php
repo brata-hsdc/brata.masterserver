@@ -272,11 +272,12 @@ function _resetdb() {
     	if ($message->create()===false) echo "Create Message $i failed";
     }  
 
+    // waypoints
     for ($i=0;$i < 20; $i++) {
     	$item = new Waypoint();
     	$item->set('lat',$i);
     	$item->set('lng',$i);
-    	$item->set('encode', $i%2==0);
+    	$item->set('encode', ($i%2));
     	$item->set('description',"waypoint $i");
     	if ($item->create()===false) echo "Create waypoint $i failed";
     }

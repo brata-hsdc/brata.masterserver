@@ -7,6 +7,7 @@ class Waypoint extends ModelEx {
     $this->rs['CID'] = $cid;
     $this->rs['lat'] = '';
     $this->rs['lng'] = '';
+    $this->rs['encode'] = true;
     $this->rs['description'] = '';
     if ($oid && $cid)
     $this->retrieve($oid,$cid);

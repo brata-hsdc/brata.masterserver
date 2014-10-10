@@ -8,8 +8,8 @@ The management site allows you to CRUD each object manageed by the system.
  <ul>
  <li>Schools - have a name, mascot, and possible a logo if I have time.</li>
  <li>Teams - teams are associated with a school the teamId maintained by M is used to track points</li>
- <li>Way Points - have lat,lng and a description way point id will be added to the QR code and when scaned
-  M will return the associated messsage (TODO have an encryption option)
+ <li>Way Points - have lat,lng,encode and a description way point id will be added to the QR code and when scaned
+  M will return the associated messsage as either plain text or encoded text base on the encode option.
  </li>
  <li>messages - have text and are associated with waypoints (TODO) one of these is send the the waypoint is scanned</li>
  <li>StationType - have a shortName and a long name TODO have instructions for completing the challenge</li>

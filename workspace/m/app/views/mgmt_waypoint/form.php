@@ -1,3 +1,8 @@
+<?php
+function isChecked($value) {
+	return ($value==1) ? 'checked="checked"': '';
+}
+?>
 <form method="post" action="<?=$actionUrl?>">
 <input type="hidden" name="OID" value="<?php echo $object->get('OID')?>" />
 <input type="hidden" name="CID" value="<?php echo $object->get('CID')?>" />
@@ -14,6 +19,10 @@
 		<tr>
 			<td>Lat</td>
 			<td><input type="text" name="description" style="width:150px" value="<?php echo $object->get('description')?>" /></td>
+		</tr>
+		<tr>
+			<td>Encode</td>
+			<td><input type="checkbox" name="encode" style="width:150px" <?php echo isChecked($object->get('encode')) ?> /></td>
 		</tr>
 		<tr>
 			<td colspan="2" style="text-align:right">
