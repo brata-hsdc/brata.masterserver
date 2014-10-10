@@ -18,6 +18,7 @@ function create_t_waypoint($dbh) {
 			."`CID` int(10) unsigned NOT NULL default '0', "
 			."`lat` decimal(12,8) NOT NULL, "
 			."`lng` decimal(12,8) NOT NULL, "
+			."`encode` bool NOT NULL default 1," 
 			."`description` varchar(255) NOT NULL, "
 			."PRIMARY KEY  (`OID`) "
 			.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
@@ -275,6 +276,7 @@ function _resetdb() {
     	$item = new Waypoint();
     	$item->set('lat',$i);
     	$item->set('lng',$i);
+    	$item->set('encode', $i%2==0);
     	$item->set('description',"waypoint $i");
     	if ($item->create()===false) echo "Create waypoint $i failed";
     }
