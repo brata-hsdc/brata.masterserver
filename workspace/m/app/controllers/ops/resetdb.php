@@ -11,11 +11,25 @@ class ErrorInfo extends Exception
   }
 }
 
+function create_t_message($dbh) {
+	$status = $dbh->exec(
+	"CREATE TABLE `t_message` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+  	`text` varchar(255) NOT NULL,
+	`waypointId` int(10) unsigned NOT NULL,		
+  	PRIMARY KEY  (`OID`),
+	CONSTRAINT `fk_waypointId` FOREIGN KEY (`waypointId`) REFERENCES `t_waypoint` (`OID`)			
+	 ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_message");
+}
 function create_t_waypoint($dbh) {
 	$status = $dbh->exec(
 			"CREATE TABLE `t_waypoint` ( "
 			."`OID` int(10) unsigned NOT NULL auto_increment, "
 			."`CID` int(10) unsigned NOT NULL default '0', "
+			."`name` varchar(255) NOT NULL, "
 			."`lat` decimal(12,8) NOT NULL, "
 			."`lng` decimal(12,8) NOT NULL, "
 			."`encode` bool NOT NULL default 1," 
@@ -33,6 +47,7 @@ function create_t_stationtype($dbh) {
   	`CID` int(10) unsigned NOT NULL default '0',
   	`longName` varchar(255) NOT NULL,
 	`shortName` varchar(255) NOT NULL,			
+  	`delay` int(10) unsigned NOT NULL default '60',			
  	`instructions` varchar(255) NOT NULL,
   	PRIMARY KEY  (`OID`)
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
@@ -72,17 +87,6 @@ function create_t_rpi($dbh) {
 	if ($status === false) throw new ErrorInfo($dbh,"t_rpi");
 }
 
-function create_t_message($dbh) {
-	$status = $dbh->exec(
-			"CREATE TABLE `t_message` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
-  	`text` varchar(255) NOT NULL,
-  	PRIMARY KEY  (`OID`)
-	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
-	);
-	if ($status === false) throw new ErrorInfo($dbh,"t_message");
-}
 
 function create_t_school($dbh) {
 	$status = $dbh->exec(
@@ -216,7 +220,7 @@ function _resetdb() {
     foreach ($list as $view) dropView($dbh, $view);
 
 
-    $list = explode(",", "t_event,t_user,t_rpi,t_waypoint,t_message,t_station,t_stationtype,t_team,t_school");
+    $list = explode(",", "t_event,t_user,t_rpi,t_message,t_waypoint,t_station,t_stationtype,t_team,t_school");
     foreach ($list as $table) dropTable($dbh, $table);
 
     create_t_user          ($dbh);
@@ -247,7 +251,7 @@ function _resetdb() {
     	$stationType = new StationType();
     	$stationType->set('longName',$stationNames[$i]);
     	$stationType->set('shortName',$stationNames[$i+1]);
-    	$stationType->set('gpsLocation',"no where");
+    	$stationType->set('delay',60*$i+1);
     	$stationType->set('instructions',"todo");
     	if ($stationType->create()===false) echo "Create StationType $i failed";
     }
@@ -267,19 +271,22 @@ function _resetdb() {
     }
 
     for ($i=1;$i < 21; $i++) {
-    	$message = new Message();
-    	$message->set('text', "message $i");
-    	if ($message->create()===false) echo "Create Message $i failed";
+
     }  
 
-    // waypoints
+    // waypoints & Messages
     for ($i=0;$i < 20; $i++) {
     	$item = new Waypoint();
+    	$item->set('name', "waypoint-$i");
     	$item->set('lat',$i);
     	$item->set('lng',$i);
     	$item->set('encode', ($i%2));
-    	$item->set('description',"waypoint $i");
+    	$item->set('description',"this is waypoint $i");
     	if ($item->create()===false) echo "Create waypoint $i failed";
+    	$message = new Message();
+    	$message->set('waypointId',$item->get("OID"));
+    	$message->set('text', "message $i");
+    	if ($message->create()===false) echo "Create Message $i failed";
     }
     $stationNames = explode(",", "CTS,FSL");
     for ($i=0; $i<count($stationNames); $i++)

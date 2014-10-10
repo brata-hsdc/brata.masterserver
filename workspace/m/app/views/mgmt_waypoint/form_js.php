@@ -1,5 +1,10 @@
 <script type="text/javascript">
   function validateForm(f) {
+	if (f.name.name == "") {
+	        alert("Please enter waypoint name");
+	        f.name.focus();
+	        return false;
+	      }
     if (f.name.lat == "") {
       alert("Please enter waypoint lat");
       f.lat.focus();

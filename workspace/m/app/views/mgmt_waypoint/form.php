@@ -9,6 +9,10 @@ function isChecked($value) {
 	<table>
 		<tr><th colspan="2"><?php echo $form_heading?></th></tr>
 		<tr>
+			<td>Name</td>
+			<td><input type="text" name="name" style="width:150px" value="<?php echo $object->get('name')?>" /></td>
+		</tr>
+		<tr>
 			<td>Lat</td>
 			<td><input type="text" name="lat" style="width:150px" value="<?php echo $object->get('lat')?>" /></td>
 		</tr>	

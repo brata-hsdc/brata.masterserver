@@ -10,6 +10,11 @@
         f.longNnme.focus();
         return false;
       }   
+    if (f.delay.value == "") {
+        alert("Please enter a delay value (numberic)");
+        f.longNnme.focus();
+        return false;
+      } 
     if (f.instructions.value == "") {
         alert("Please enter instructions for this station type");
         f.instructions.focus();

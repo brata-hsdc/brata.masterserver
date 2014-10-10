@@ -1,10 +1,15 @@
 <script type="text/javascript">
   function validateForm(f) {
-    if (f.name.value == "") {
+    if (f.text.value == "") {
       alert("Please enter message text");
-      f.name.focus();
+      f.text.focus();
       return false;
     }
+    if (f.waypointId.value == -1) {
+        alert("Please select a waypoint name");
+        f.waypointId.focus();
+        return false;
+      } 
    
     f.submit();
   }

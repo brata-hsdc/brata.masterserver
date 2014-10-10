@@ -13,6 +13,10 @@
 			<td><input type="text" name="longName" style="width:150px" value="<?php echo $object->get('longName')?>" /></td>
 		</tr>			
 		<tr>
+			<td>Delay</td>
+			<td><input type="text" name="delay" style="width:150px" value="<?php echo $object->get('delay')?>" /></td>
+		</tr>		
+		<tr>
 			<td>Instructions</td>
 			<td><textarea name="instructions" style="width:150px"><?php echo $object->get('instructions')?></textarea></td>
 		</tr>

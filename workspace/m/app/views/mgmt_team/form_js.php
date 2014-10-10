@@ -5,8 +5,8 @@
       f.name.focus();
       return false;
     }
-    if (f.schoolId.value.value == -1) {
-        alert("Please enter a school name");
+    if (f.schoolId.value == -1) {
+        alert("Please select a school");
         f.name.focus();
         return false;
       }   

@@ -31,8 +31,8 @@ function _make_html_table($table,$item,$urlPrefix,$n,&$data) {
 	$data['body'][]=pagination::makePagination($n,$total,myUrl("$urlPrefix/manage"),$GLOBALS['pagination']);
 
 	//table
-	$fields="Text";
-	$stmt = $dbh->query("SELECT OID,CID,$fields FROM $table LIMIT $n,$limit");
+	$fields="waypoint,text";
+	$stmt = $dbh->query("SELECT OID,CID,waypointId,text FROM $table order by waypointId LIMIT $n,$limit");
 	if ($stmt === false) {
 		var_dump($dbh->errorInfo());
 		return;
@@ -43,7 +43,8 @@ function _make_html_table($table,$item,$urlPrefix,$n,&$data) {
 		$CID=$rs['CID'];
 		$row=null;
 		foreach ($tablearr[0] as $f) {
-			$row[]=htmlspecialchars($rs[$f]);
+			if ($f=="waypoint") $row[]=htmlspecialchars(Waypoint::getName($rs['waypointId']));
+			else                $row[]=htmlspecialchars($rs[$f]);
 		}
 		$row[]=	'<a href="'.myUrl("$urlPrefix/edit/$OID/$CID").'">Edit</a> | '.
 				'<a href="javascript:jsconfirm(\'Really Delete '.$item.'?\',\''.
