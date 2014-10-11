@@ -55,6 +55,7 @@ $foot[]=getjAlert();
       <li><a href="<?php echo myUrl('viewscores')?>">View Scores</a></li>
 <?php if ( isDebug() ) { ?>      
       <li>Below is for testing</li>
+      <li><a href="<?php echo myUrl('test_brata/index')?>">Brata Testing</a></li> 
       <li><a href="<?php echo myUrl('test_event/manage')?>">Event Testing</a></li> 
       <li><a href="<?php echo myUrl('device/test_index')?>">Device Testing</a></li> 
       <li><a href="<?php echo myUrl('mgmt_main/resetdb') ?>">Reset Database</a></li>

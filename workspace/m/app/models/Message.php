@@ -10,4 +10,8 @@ class Message extends ModelEx {
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }  
+  static function getFromWaypointId($waypointId) {
+  	$m = new Message();
+  	return $m->retrieve_one("waypointId = ?", $waypointId);
+  }
 }
