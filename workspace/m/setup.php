@@ -13,7 +13,14 @@ function writeSysconfig()
    {
    	   	$errrors .= ", invalid webdomain";
    } 
-
+   if ( !isset($_POST['paypal_return']))
+   {
+   	   	$errrors .= ", invalid paypal_return";
+   } 
+   else if ( $_POST['paypal_return'] =="" )
+   {
+   		$_POST['paypal_return'] = $_POST['webdomain'];
+   }
    if ( !isset($_POST['dbhost']) || $_POST['dbhost'] =="" )
    {
    	   	$errrors .= ", invalid dbhost";
@@ -47,6 +54,7 @@ function writeSysconfig()
       fwrite($fd,"\$SYSCONFIG_DBPASS='".$_POST['dbpass']."';\n");
       fwrite($fd,"\$SYSCONFIG_DEBUG=".$_POST['debug'].";\n");
       fwrite($fd,"\$SYSCONFIG_SENDMAIL=".$_POST['sendmail'].";\n");
+      fwrite($fd,"\$SYSCONFIG_PAYPAL_RETURN='".$_POST['paypal_return']."';\n");      
       fclose($fd);
    }
    return $errors;
@@ -85,6 +93,7 @@ if ( isset($_GET['write']) ) {
 <table>
 <tr><td>Web Folder[with trailing slash]</td><td><input name=webfolder value='<?php echo $SYSCONFIG_WEBFOLDER?>'/></td></tr>
 <tr><td>Web Domain [with NO trailing slash]</td><td><input name=webdomain value='<?php echo $SYSCONFIG_WEBDOMAIN?>' /></td></tr>
+<tr><td>Paypal Return URL [with NO trailing slash]</td><td><input name=paypal_return value='<?php echo $SYSCONFIG_PAYPAL_RETURN?>' /></td></tr>
 <tr><td>Database Host</td><td><input name=dbhost value='<?php echo $SYSCONFIG_DBHOST?>'/></td></tr>
 <tr><td>Database Name</td><td><input name=dbname value='<?php echo $SYSCONFIG_DBNAME?>'/></td></tr>
 <tr><td>Database User</td><td><input name=dbuser value='<?php echo $SYSCONFIG_DBUSER?>'/></td></tr>

@@ -10,6 +10,14 @@ function _ops_sysconfig_update() {
   {
     $errors .= ", invalid webdomain";
   }
+  if ( !isset($_POST['paypal_return']) )
+  {
+    $errors .= ", invalid paypal_return";
+  }
+  else if ($_POST['paypal_return'] == "" )
+  {
+    $_POST['paypal_return'] = $_POST['webdomain'];
+  }
    
   if ( !isset($_POST['dbhost']) || $_POST['dbhost'] =="" )
   {
@@ -44,6 +52,7 @@ function _ops_sysconfig_update() {
     fwrite($fd,"\$SYSCONFIG_DBPASS='".$_POST['dbpass']."';\n");
     fwrite($fd,"\$SYSCONFIG_DEBUG=".$_POST['debug'].";\n");
     fwrite($fd,"\$SYSCONFIG_SENDMAIL=".$_POST['sendmail'].";\n");
+    fwrite($fd,"\$SYSCONFIG_PAYPAL_RETURN='".$_POST['paypal_return']."';\n");
     fclose($fd);
     $errors = "System Configured";
   }

@@ -99,7 +99,15 @@ function saveSetting($setting,$value)
   }
 
 }
-
+function isPaypal() {
+  return isset($GLOBALS['SYSCONFIG_PAYPAL_RETURN']) ?
+  $GLOBALS['SYSCONFIG_PAYPAL_RETURN'] != "*" : false ;
+}
+function myPaypalReturn($url,$ivi) {
+  return isset($GLOBALS['SYSCONFIG_PAYPAL_RETURN']) ?
+  $GLOBALS['SYSCONFIG_PAYPAL_RETURN'] . WEB_FOLDER.$url . "?x=" . urlencode( session_id() )  . "&ivi=".$ivi :
+	  "not set" ;
+}
 //session must have started
 //$uri indicates which uri will activate the alert (substring check)
 function addjAlert($msg,$uri='') {
