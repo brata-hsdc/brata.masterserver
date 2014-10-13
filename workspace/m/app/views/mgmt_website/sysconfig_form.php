@@ -11,11 +11,7 @@ include "sysconfig_data.php";
   <tr>
     <td>Web Domain [with NO trailing slash]</td>
     <td><input name=webdomain value='<?php echo $SYSCONFIG_WEBDOMAIN?>' /></td>
-  </tr>
-    <tr>
-    <td>Paypal Return URL [with NO trailing slash]</td>
-    <td><input name=paypal_return value='<?php echo $SYSCONFIG_PAYPAL_RETURN?>' /></td>
-  </tr>  
+  </tr> 
   <tr>
     <td>Database Host</td>
     <td><input name=dbhost value='<?php echo $SYSCONFIG_DBHOST?>'/></td>

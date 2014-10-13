@@ -12,11 +12,6 @@
         f.webdomain.focus();
         return false;
     }
-
-    if (f.paypal_return.value == "") {
-        f.paypal_return.value = f.webdomain.value;
-    }
-
        
     if (f.dbhost.value == "") {
         alert("Please enter dbhost");
