@@ -47,7 +47,11 @@ $foot[]=getjAlert();
       <li><a href="<?php echo myUrl('mgmt_message/manage')?>">Messages</a></li>
       <li><a href="<?php echo myUrl('mgmt_stationtype/manage')?>">Station Types</a></li>
       <li><a href="<?php echo myUrl('mgmt_station/manage')?>">Stations</a></li>
-      <li><a href="<?php echo myUrl('mgmt_rpi/manage')?>">rPI</a></li> 
+      <li><a href="<?php echo myUrl('mgmt_rpi/manage')?>">rPI</a></li>
+      <li><a href="<?php echo myUrl('mgmt_cts_data/manage')?>">CTS Data</a></li>
+      <li><a href="<?php echo myUrl('mgmt_hmb_data/manage')?>">HMB Data</a></li>
+      <li><a href="<?php echo myUrl('mgmt_cpa_data/manage')?>">CPA Data</a></li>
+      <li><a href="<?php echo myUrl('mgmt_ext_data/manage')?>">EXT Data</a></li>                   
       <li><a href="<?php echo myUrl('mgmt_user/manage')?> ">Users</a></li>
       <li><a href="<?php echo myUrl('mgmt_website/manage')?>">Web Site</a></li>
       <li>Below is for Public Access</li>      

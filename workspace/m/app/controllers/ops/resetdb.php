@@ -157,6 +157,68 @@ function create_t_event($dbh) {
 	if ($status === false) throw new ErrorInfo($dbh,"t_event");
 }
 
+function create_t_cts_data($dbh) {
+	$status = $dbh->exec(
+	"CREATE TABLE `t_cts_data` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+    `_1st` FLOAT NOT NULL,
+	`_2nd` FLOAT NOT NULL,
+	`_3rd` FLOAT NOT NULL,
+    `tolerance` FLOAT NOT NULL,
+  	PRIMARY KEY  (`OID`)"
+	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_cts_data");	
+}
+
+function create_t_hmb_data($dbh) {
+	$status = $dbh->exec(
+	"CREATE TABLE `t_hmb_data` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+    `_1st_on` int unsigned NOT NULL,
+    `_1st_off` int unsigned NOT NULL,
+	`_2nd_on`  int unsigned NOT NULL,
+	`_2nd_off` int unsigned NOT NULL,
+	`_3rd_on`  int unsigned NOT NULL,
+    `_3rd_off` int unsigned NOT NULL,		
+  	PRIMARY KEY  (`OID`)"
+	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_cts_data");
+}
+
+function create_t_cpa_data($dbh) {
+	$status = $dbh->exec(
+	"CREATE TABLE `t_cpa_data` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+	`velocity` int unsigned NOT NULL,
+    `velocity_tolerance` int unsigned NOT NULL,
+    `window_time` int unsigned NOT NULL,
+    `window_time_tolerance` int unsigned NOT NULL,
+    `pulse_width` int unsigned NOT NULL,
+    `pulse_width_tolerance` int unsigned NOT NULL,
+    `combo` int unsigned NOT NULL,
+  	PRIMARY KEY  (`OID`)"
+			." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_cpa_data");
+}
+
+function create_t_ext_data($dbh) {
+	$status = $dbh->exec(
+	"CREATE TABLE `t_ext_data` (
+  	`OID` int(10) unsigned NOT NULL auto_increment,
+  	`CID` int(10) unsigned NOT NULL default '0',
+	`todo` varchar(255) NOT NULL,		
+  	PRIMARY KEY  (`OID`)"
+	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_ext_data");
+}
+
 function create_v_scores($dbh) {
 	$status = $dbh->exec("create view v_scores as "
 			."select T.name team, E.stationId Station, ST.shortName name ,sum(E.points) score from t_event E "
@@ -199,11 +261,13 @@ function dropView($dbh, $view) {
     throw new ErrorInfo($dbh,"dropView " . $view);
   }
 }
+
 function dropTable($dbh, $table) {
   if ($dbh->exec("DROP table if exists ".$table) === false) {
     throw new ErrorInfo($dbh,"dropTable " . $table);
   }
 }
+
 function _resetdb() {
 	
 	if ( !isset($_POST['dataOption']) ) {
@@ -236,6 +300,16 @@ function _resetdb() {
 //    create_v_duration($dbh);
     create_v_scores($dbh);
     create_v_leaderboard($dbh);
+    //
+    //  rPI challenge data
+    //
+    $list = explode(",", "t_cts_data,t_hmb_data,t_cpa_data,t_ext_data");
+    foreach ($list as $table) dropTable($dbh, $table);
+    
+    create_t_cts_data($dbh);
+    create_t_hmb_data($dbh);
+    create_t_cpa_data($dbh);
+    create_t_ext_data($dbh);
 
     $admin = new User();
     $admin->set('username',"admin");

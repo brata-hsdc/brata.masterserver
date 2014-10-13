@@ -14,7 +14,11 @@ class User extends ModelEx {
   const MGMT_TEAM            =  0x0200;    // user can access mgmt_team
   const MGMT_WEBSITE         =  0x0400;    // user can access mgmt_website
   const TEST_EVENT           =  0x0800;    // user can access test_event
-
+  const MGMT_CTS_DATA        =  0x1000;    // user can access CTS data
+  const MGMT_HMB_DATA        =  0x2000;    // user can access HMB data
+  const MGMT_CPA_DATA        =  0x4000;    // user can access CPA data
+  const MGMT_EXT_DATA        =  0x8000;    // user can access EXT data
+  
   // map permissions into rolls
   const ROLL_ADMIN           = 0xFFFF; 	// access all mgmt;
   const ROLL_ADMIN_ASSISTANT = 0xFFFE;  // access mgmt_reviewstories & mgmt_taxtinfo;
