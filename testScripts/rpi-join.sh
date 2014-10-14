@@ -17,4 +17,4 @@ HOST="localhost"
 curl -v -X POST \
  -H "Content-Type: application/json" \
  -d "{ \"message_version\" : \"0\" , \"station_key\" : \"$KEY\" , \"station_type\" : \"$TYP\" , \"station_callback_url\" : \"$URL\" }" \
- http://$HOST/m/rest-v00/join/$KEY
+ http://$HOST/m/rpi-v00/join/$KEY

@@ -52,6 +52,10 @@ class RPI extends ModelEx {
   {
   	return RPI::do_get_request($this->rs['URL']+"/shutdown");
   }
+  static function getFromStationId($stationId) {
+  	$rpi = new RPI();
+  	return $rpi->retrieve_one("stationId=?", $stationId);
+  }
   static function do_get_request($path, $returnTransfer=false)
   {
   	$ch = curl_init($path);

@@ -1,28 +1,31 @@
 <?php
 class Event extends ModelEx {
 
-	const TYPE_BAD    = 0;
-	const TYPE_ARRIVE = 1;
-	const TYPE_SOLUTION  = 2;
-	const TYPE_LEAVE  = 3;
+	const TYPE_BAD     = 0;
+	const TYPE_ARRIVE  = 1;
+	const TYPE_START   = 1;
+	const TYPE_SUBMIT  = 2;
+	const TYPE_END     = 3;
 
 	static private function isSelected($value, $selectValue) {
 		return $value == $selectValue ? " selected " : "";
 	}
 	static function getTypesAsHtmlOptions($selectValue) {
 		return
-		"<option "  . Event::isSelected(Event::TYPE_BAD      , $selectValue) . "value=" . Event::TYPE_BAD      . "> Select one"
-		."<option " . Event::isSelected(Event::TYPE_ARRIVE   , $selectValue) . "value=" . Event::TYPE_ARRIVE   . "> Arrive"
-		."<option " . Event::isSelected(Event::TYPE_SOLUTION , $selectValue) . "value=" . Event::TYPE_SOLUTION . "> Solution"
-		."<option " . Event::isSelected(Event::TYPE_LEAVE    , $selectValue) . "value=" . Event::TYPE_LEAVE    . "> Leave";
+		"<option "  . Event::isSelected(Event::TYPE_BAD    , $selectValue) . "value=" . Event::TYPE_BAD    . "> Select one"
+		."<option " . Event::isSelected(Event::TYPE_ARRIVE , $selectValue) . "value=" . Event::TYPE_ARRIVE . "> Arrive"
+		."<option " . Event::isSelected(Event::TYPE_START  , $selectValue) . "value=" . Event::TYPE_START  . "> Start"
+		."<option " . Event::isSelected(Event::TYPE_SUBMIT , $selectValue) . "value=" . Event::TYPE_SUBMIT . "> Submit"
+		."<option " . Event::isSelected(Event::TYPE_END    , $selectValue) . "value=" . Event::TYPE_END    . "> End";
 	}
 	
 	static function getTypeAsText($value) {
 		switch ($value)
 		{
-			case Event::TYPE_ARRIVE  : return "Arrive";
-			case Event::TYPE_SOLUTION: return "Solution";
-			case Event::TYPE_LEAVE   : return "Leave";
+			case Event::TYPE_ARRIVE : return "Arrive";
+			case Event::TYPE_START  : return "Start";
+			case Event::TYPE_SUBMIT : return "Submit";
+			case Event::TYPE_END    : return "End";
 			default: return "Error - unknown event type";
 			 	
         }	
@@ -41,4 +44,14 @@ class Event extends ModelEx {
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
+  
+  static function makeEvent($type,$teamId,$stationId,$points=0,$description="") {
+  	$o = new Event();
+  	$o->set('type', $type);
+  	$o->set('teamId',$teamId);
+  	$o->set('stationId',$stationId);
+  	$o->set('points',$points);
+  	$o->set('description',$description);
+  	return $o;
+  } 
 }

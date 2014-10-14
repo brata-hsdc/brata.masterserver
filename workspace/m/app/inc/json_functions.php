@@ -44,10 +44,25 @@ function json_checkMembers($fields, &$json)
 }
 
 //
+// writes the json encoded object to the client
+// returns true on success, false otherwise
 function json_sendObject($jsonObject)
 {
 	rest_CacheHeaders();
 	header("Content-Type: application/json");
-	echo json_encode($jsonObject);
+	$string = json_encode($jsonObject);
+	if ($string === false) return false;
+	echo $string;
+	return true;
 }
 
+
+//
+//  merge the given fields into the given jsonObject from the given KissmvcObject
+function json_merge(&$jsonObject, &$object, &$fields)
+{
+	foreach ($fields as $item)
+	{
+		$jsonObject[$item] = $object->get($item);
+	}
+}

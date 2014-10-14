@@ -6,17 +6,23 @@
 //	"station_type": "hmb",
 require(APP_PATH.'inc/json_functions.php');
 //
-function _submit($key=null)
+function _submit($teamId=null,$stationId=null,$points=0)
 {
-	if ($key === null) {
-		json_sendBadRequestResponse("missing station_key");
+	if ($teamId === null) {
+		rest_sendBadRequestResponse(400,"missing teamId");  // doesn't return
 	}
-	$json = json_getObjectFromRequest("POST");
-	//if ($json === NULL) return;
+	if ($stationId === null) {
+		rest_sendBadRequestResponse(400,"missing stationId");  // doesn't return
+	}
+	
+	$json = json_getObjectFromRequest("POST");  // won't return if an error happens
+	
 	json_checkMembers("message_version,station_type,value", $json);
 
-	// output
-	$dbh = getdbh();
-	$rpi->set('key',$key);
+	//@todo calculate points
+	Event::makeEvent(Event::TYPE_SUBMIT, $teamId, $stationId,$points);
+	$rpi = RPI::getFromStationId($stationId);
+	$rpi->start_challenge($teamId);
+     $json = array();  //@todo 
 	json_sendObject($json);
 }
