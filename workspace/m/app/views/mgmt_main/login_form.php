@@ -1,20 +1,8 @@
-<form method="post" action="<?php echo myUrl('ops/mgmt_login')?>">
-<div>
+<form class=form-inline method="post" action="<?php echo myUrl('ops/mgmt_login')?>">
 <input type="hidden" name="LoginForm" value="1" />
-  <table style="width:auto">
-    <thead>
-    <tr><th>LOGIN</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Username<br /><input style="width:120px" type="text" name="username" value="<?php echo $username?>" /></td>
-      </tr>
-      <tr>
-        <td>Password<br /><input style="width:70px" type="password" name="password" value="" />
-        <input class="button" style="width:45px;margin-left:5px" type="submit" name="submit" value="Login" />
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+<label>User name</label>
+<input placeholder="user name" name="username" value="<?php echo $username?>" />
+<label>Password</label>
+<input placeholder="password" type="password" name="password" value="" />
+<button type="submit" class="btn">Login</button>
 </form>

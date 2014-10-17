@@ -25,7 +25,8 @@ $foot[]=getjAlert();
     -->
     <li><a href="<?php echo myUrl('mgmt_main/about/whatsnew')?>">What's New</a></li>
     <li><a href="<?php echo myUrl('mgmt_main/about/todo')?>">To Do</a></li>
-    <li><a href="<?php echo myUrl('mgmt_main/about/version')?>">Version</a></li>    
+    <li><a href="<?php echo myUrl('mgmt_main/about/version')?>">Version</a></li>
+    <li><a href="<?php echo myUrl('mgmt_main/about/help')?>">Help</a></li>
 <?php
   if (loginIsMgmt())
     echo '<li><a href="'.myUrl('ops/mgmt_logout').'">Logout</a></li>'."\n";
@@ -42,8 +43,15 @@ $foot[]=getjAlert();
     <ul>      
       <li><a href="<?php echo myUrl('mgmt_school/manage')?>">Schools</a></li>
       <li><a href="<?php echo myUrl('mgmt_team/manage')?>">Teams</a></li>
+      <li><a href="<?php echo myUrl('mgmt_waypoint/manage')?>">Way Points</a></li>
       <li><a href="<?php echo myUrl('mgmt_message/manage')?>">Messages</a></li>
-      <li><a href="<?php echo myUrl('mgmt_station/manage')?>">Stations</a></li>      
+      <li><a href="<?php echo myUrl('mgmt_stationtype/manage')?>">Station Types</a></li>
+      <li><a href="<?php echo myUrl('mgmt_station/manage')?>">Stations</a></li>
+      <li><a href="<?php echo myUrl('mgmt_rpi/manage')?>">rPI</a></li>
+      <li><a href="<?php echo myUrl('mgmt_cts_data/manage')?>">CTS Data</a></li>
+      <li><a href="<?php echo myUrl('mgmt_hmb_data/manage')?>">HMB Data</a></li>
+      <li><a href="<?php echo myUrl('mgmt_cpa_data/manage')?>">CPA Data</a></li>
+      <li><a href="<?php echo myUrl('mgmt_ext_data/manage')?>">EXT Data</a></li>                   
       <li><a href="<?php echo myUrl('mgmt_user/manage')?> ">Users</a></li>
       <li><a href="<?php echo myUrl('mgmt_website/manage')?>">Web Site</a></li>
       <li>Below is for Public Access</li>      
@@ -51,6 +59,7 @@ $foot[]=getjAlert();
       <li><a href="<?php echo myUrl('viewscores')?>">View Scores</a></li>
 <?php if ( isDebug() ) { ?>      
       <li>Below is for testing</li>
+      <li><a href="<?php echo myUrl('test_brata/index')?>">Brata Testing</a></li> 
       <li><a href="<?php echo myUrl('test_event/manage')?>">Event Testing</a></li> 
       <li><a href="<?php echo myUrl('device/test_index')?>">Device Testing</a></li> 
       <li><a href="<?php echo myUrl('mgmt_main/resetdb') ?>">Reset Database</a></li>

@@ -11,7 +11,7 @@ class table {
     if (!$arraux)
     $arraux=array();
     $auxtable=isset($arraux['table'])?' '.$arraux['table']:'';
-    $s='<table'.($width?' style="width:'.$width.'"':'').$auxtable.'>'."\n";
+    $s='<table class="table table-striped"'.($width?' style="width:'.$width.'"':'').$auxtable.'>'."\n";
     $rown=0;
     foreach ($arr as $row) {
       if ($rown==0)
