@@ -42,7 +42,7 @@ Install the application into your Web server's document root:
 
 Remove or move aside any exising "m" subfolder.
 
-   $ mv m{,_yyyymmdd-HHMM}
+   $ sudo mv m{,_yyyymmdd-HHMM}
 
 Create new folder and unzip.
 
