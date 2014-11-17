@@ -2,7 +2,6 @@
 class Event extends ModelEx {
 
 	const TYPE_BAD     = 0;
-	const TYPE_ARRIVE  = 1;
 	const TYPE_START   = 1;
 	const TYPE_SUBMIT  = 2;
 	const TYPE_END     = 3;
@@ -13,7 +12,6 @@ class Event extends ModelEx {
 	static function getTypesAsHtmlOptions($selectValue) {
 		return
 		"<option "  . Event::isSelected(Event::TYPE_BAD    , $selectValue) . "value=" . Event::TYPE_BAD    . "> Select one"
-		."<option " . Event::isSelected(Event::TYPE_ARRIVE , $selectValue) . "value=" . Event::TYPE_ARRIVE . "> Arrive"
 		."<option " . Event::isSelected(Event::TYPE_START  , $selectValue) . "value=" . Event::TYPE_START  . "> Start"
 		."<option " . Event::isSelected(Event::TYPE_SUBMIT , $selectValue) . "value=" . Event::TYPE_SUBMIT . "> Submit"
 		."<option " . Event::isSelected(Event::TYPE_END    , $selectValue) . "value=" . Event::TYPE_END    . "> End";
@@ -22,7 +20,6 @@ class Event extends ModelEx {
 	static function getTypeAsText($value) {
 		switch ($value)
 		{
-			case Event::TYPE_ARRIVE : return "Arrive";
 			case Event::TYPE_START  : return "Start";
 			case Event::TYPE_SUBMIT : return "Submit";
 			case Event::TYPE_END    : return "End";

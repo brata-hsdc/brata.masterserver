@@ -32,7 +32,6 @@ function create_t_waypoint($dbh) {
 			."`name` varchar(255) NOT NULL, "
 			."`lat` decimal(12,8) NOT NULL, "
 			."`lng` decimal(12,8) NOT NULL, "
-			."`encode` bool NOT NULL default 1," 
 			."`description` varchar(255) NOT NULL, "
 			."PRIMARY KEY  (`OID`) "
 			.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
@@ -61,11 +60,11 @@ function create_t_station($dbh) {
 			."`OID` int(10) unsigned NOT NULL auto_increment, "
 			."`CID` int(10) unsigned NOT NULL default '0', "
 			."`typeId` int(10) unsigned NOT NULL, "
-			."`skey` varchar(255), "
+			."`tag` varchar(255), "
 			."`name` varchar(255) NOT NULL, "
 			."`description` varchar(255) NOT NULL, "
 			."PRIMARY KEY  (`OID`), "
-			."CONSTRAINT `rpi_key_unique` UNIQUE KEY (`skey`), "
+			."CONSTRAINT `rpi_key_unique` UNIQUE KEY (`tag`), "
 			."CONSTRAINT `fk_typeId` FOREIGN KEY (`typeId`) REFERENCES `t_stationtype` (`OID`) "
 			.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -79,8 +78,9 @@ function create_t_rpi($dbh) {
   	`CID` int(10) unsigned NOT NULL default '0',
 	`stationId` int(10) unsigned NOT NULL, 
   	`URL` varchar(255) NOT NULL, 
+	`lastContact` DATETIME NOT NULL,
 	`debug` varchar(255) NOT NULL, 
-  	PRIMARY KEY  (`OID`), 
+  	PRIMARY KEY  (`OID`),
 	CONSTRAINT FOREIGN KEY (`stationId`) REFERENCES `t_station` (`OID`) ON DELETE CASCADE		
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -108,8 +108,10 @@ function create_t_team($dbh) {
   	."`OID` int(10) unsigned NOT NULL auto_increment, "
   	."`CID` int(10) unsigned NOT NULL default '0', "
   	."`name` varchar(255) NOT NULL, "
+    ."`pin`  varchar(5) NOT NULL, "
  	."`schoolId` int(10) unsigned NOT NULL, "
   	."PRIMARY KEY  (`OID`), "
+	."UNIQUE KEY (`pin`), "
 	." CONSTRAINT `fk_schoolId` FOREIGN KEY (`schoolId`) REFERENCES `t_school` (`OID`)"
 	.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -354,7 +356,6 @@ function _resetdb() {
     	$item->set('name', "waypoint-$i");
     	$item->set('lat',$i);
     	$item->set('lng',$i);
-    	$item->set('encode', ($i%2));
     	$item->set('description',"this is waypoint $i");
     	if ($item->create()===false) echo "Create waypoint $i failed";
     	$message = new Message();
@@ -368,7 +369,7 @@ function _resetdb() {
       $type = StationType::getFromShortname($stationNames[$i]);
       $station = new Station();
       $station->set("name", "testStation $i");
-      $station->set("skey", "key$i");
+      $station->set("tag", "tag$i");
       $station->set("description", "testStation $i description");
       $station->set("typeId", $type->get("OID"));
       if ($station->create() === false) echo "Create Station $i failed";
@@ -388,6 +389,7 @@ function _resetdb() {
       $team = new Team();
       $team->set("name",$names[$i]);
       $team->set("schoolId",$i+1);
+      $team->set("pin", Team::generatePIN());
       if ($team->create() === false) echo "Create Team $i failed";
     }
 
@@ -401,31 +403,31 @@ function _resetdb() {
     	  $event->set('created_dt',unixToMySQL($time));
     	  $event->set('teamId',$t);
     	  $event->set('stationId',$s);
-    	  $event->set('type',Event::TYPE_ARRIVE);
+    	  $event->set('type',Event::TYPE_START);
     	  $event->set('points',0);
-    	  $event->set('description',"Arrive");
-    	  if ($event->create() === false) echo "Create Arrive event $s,$t failed";
+    	  $event->set('description',"START");
+    	  if ($event->create() === false) echo "Create start event $s,$t failed";
 
     	  if ($t == 2)
     	  {
     	    $event->set("OID",0); $event->set("CID",0); $time += 5;
     	    $event->set('created_dt',unixToMySQL($time));
-    	    $event->set('type',Event::TYPE_SOLUTION);
+    	    $event->set('type',Event::TYPE_SUBMIT);
     	    $event->set('points',-1);
-    	    $event->set('description',"Incorrect Solution");
-    	    if ($event->create() === false) echo "Create Incorrect Solution event $s,$t failed";
+    	    $event->set('description',"Incorrect");
+    	    if ($event->create() === false) echo "Create submit/incorrect  event $s,$t failed";
     	  }
     	     	  
     	  $event->set("OID",0); $event->set("CID",0); $time += 5;
     	  $event->set('created_dt',unixToMySQL($time));
-    	  $event->set('type',Event::TYPE_SOLUTION);
+    	  $event->set('type',Event::TYPE_SUBMIT);
     	  $event->set('points',20);
     	  $event->set('description',"Correct Solution");    	  
-    	  if ($event->create() === false) echo "Create Correct Solution event $s,$t failed";
+    	  if ($event->create() === false) echo "Create  submit/corredt Solution event $s,$t failed";
 	  
     	  $event->set("OID",0); $event->set("CID",0); $time += 5;
-    	  $event->set('type',Event::TYPE_LEAVE,$time);
-    	  $event->set('description',"Leave");
+    	  $event->set('type',Event::TYPE_END,$time);
+    	  $event->set('description',"eND");
     	  if ($event->create() === false) echo "Create Leave event $s,$t failed";
       }
     }

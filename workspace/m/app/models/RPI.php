@@ -9,6 +9,7 @@ class RPI extends ModelEx {
     $this->rs['CID'] = $cid;
     $this->rs['stationId'] = -1;
     $this->rs['URL'] = '';
+    $this->rs['lastContact'] = "";
     $this->rs['debug'] ='';
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
@@ -39,34 +40,41 @@ class RPI extends ModelEx {
 
   }
   */
-  function start_challenge($teamId) 
-  {
+  function contact() {
+  	$this->rs['lastContact'] = unixToMySQL(time());
+  	$this->update();
+  }
+  
+  function create() {
+  	$this->rs['lastContact'] = unixToMySQL(time());
+  	return parent::create();
+  }
+    
+  function start_challenge($teamId)  {
   	$json = array("teamId"=>$teamId);
   	return RPI::do_post_request($this->rs['URL']+"/start_challenge", $json);
   }
-  function reset()
-  {
+  
+  function reset() {
   	return RPI::do_get_request($this->rs['URL']+"/reset/".RPI::PIN);
   }
-  function shutdown()
-  {
+  function shutdown() {
   	return RPI::do_get_request($this->rs['URL']+"/shutdown");
   }
+  
   static function getFromStationId($stationId) {
   	$rpi = new RPI();
   	return $rpi->retrieve_one("stationId=?", $stationId);
   }
-  static function do_get_request($path, $returnTransfer=false)
-  {
+  
+  static function do_get_request($path, $returnTransfer=false) {
   	$ch = curl_init($path);
   	if ($returnTransfer) curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
   	$retValue = curl_exec($ch);
-  	var_dump($retValue);
   	curl_close($ch);
   	return $retValue;
   }
-  static function do_post_request($path, array $json, $decode=true)
-  {
+  static function do_post_request($path, array $json, $decode=true) {
   	$ch = curl_init($path);
   	$json = json_encode($json);
   	curl_setopt($ch, CURLOPT_CUSTOMREQUEST,"POST");
@@ -79,5 +87,10 @@ class RPI extends ModelEx {
   	curl_close($ch);
   	if ($retValue === false) return false;  // request failed
   	return $decode ? json_decode($retValue,true) : $retValue;     // put the response back into object form
+  }
+  
+  static function getByURL($url) {
+  	$rpi = new RPI();
+  	return $rpi->retrieve_one("URL=?", $url);
   }
 }

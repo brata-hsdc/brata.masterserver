@@ -14,7 +14,7 @@
 
     <tr>
       <td colspan="2" style="text-align:right">
-        <input type="button" value="Close" onclick="location.href='<?=$cancelUrl ?>' " />
+        <input type="button" value="Cancel" onclick="location.href='<?=$cancelUrl ?>' " />
         <input type="Submit" value="Reset Database" /> 
       </td>
     </tr>

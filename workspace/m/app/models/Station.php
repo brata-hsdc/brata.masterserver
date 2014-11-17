@@ -8,7 +8,7 @@ class Station extends ModelEx {
     $this->rs['CID'] = $cid;
     $this->rs['typeId'] = -1;
     $this->rs['name'] = "";
-    $this->rs['skey'] = "";
+    $this->rs['tag'] = "";
     $this->rs['description'] = "";  
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
@@ -21,8 +21,8 @@ class Station extends ModelEx {
   } 
   
   // fetch the Station object for the given skey
-  static function getFromKey($skey) {
+  static function getFromTag($tag) {
   	$station = new Station();
-  	return $station->retrieve_one("skey=?", $skey);
+  	return $station->retrieve_one("tag=?", $tag);
   }
 }

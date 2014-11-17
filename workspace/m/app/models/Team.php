@@ -8,11 +8,19 @@ class Team extends ModelEx {
     $this->rs['CID'] = $cid;
     $this->rs['name'] = '';
     $this->rs['schoolId'] = -1;
+    $this->rs['pin'] = -1;
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
+  
   function getSchoolName() {
   	return School::getSchoolNameFromId($this->rs['schoolId']);
+  }
+  
+  // fetch the Team object for the given pin
+  static function getFromPin($pin) {
+  	$team = new Team();
+  	return $team->retrieve_one("pin='?'", $pin);
   }
   
   static function getNameFromId($id) {
@@ -20,5 +28,23 @@ class Team extends ModelEx {
     return $team->get('name');
   }
   
+  
+  // generate a random pin of the given length, with the last digit a check digit
+  static function generatePIN($length=5) {
+    
+  	$validchars = "0123456789";
+  
+  	$pin  = "";
+  	$counter   = 0;
+  	$sum = 0;
+  
+  	while ($counter < $length-1) {
+  		$atChar = substr($validchars, mt_rand(0, strlen($validchars)-1), 1);
+  	    $pin .= $atChar;
+  		$sum = ($sum + (int)$atChar)%10;  // check digit mod 10
+  		$counter++;
+  	}
+  	return $pin.$sum;
+  }
 
 }
