@@ -112,6 +112,7 @@ function create_t_team($dbh) {
  	."`schoolId` int(10) unsigned NOT NULL, "
   	."PRIMARY KEY  (`OID`), "
 	."UNIQUE KEY (`pin`), "
+	."CONSTRAINT `team-name_unique` UNIQUE KEY (`name`), "			
 	." CONSTRAINT `fk_schoolId` FOREIGN KEY (`schoolId`) REFERENCES `t_school` (`OID`)"
 	.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -164,10 +165,14 @@ function create_t_cts_data($dbh) {
 	"CREATE TABLE `t_cts_data` (
   	`OID` int(10) unsigned NOT NULL auto_increment,
   	`CID` int(10) unsigned NOT NULL default '0',
+	`tag` varchar(255) NOT NULL,
     `_1st` FLOAT NOT NULL,
 	`_2nd` FLOAT NOT NULL,
 	`_3rd` FLOAT NOT NULL,
+	`_4th` FLOAT NOT NULL,
+	`_5th` FLOAT NOT NULL,
     `tolerance` FLOAT NOT NULL,
+	CONSTRAINT `cts_tag_unique` UNIQUE KEY (`tag`),
   	PRIMARY KEY  (`OID`)"
 	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -179,12 +184,9 @@ function create_t_hmb_data($dbh) {
 	"CREATE TABLE `t_hmb_data` (
   	`OID` int(10) unsigned NOT NULL auto_increment,
   	`CID` int(10) unsigned NOT NULL default '0',
-    `_1st_on` int unsigned NOT NULL,
-    `_1st_off` int unsigned NOT NULL,
-	`_2nd_on`  int unsigned NOT NULL,
-	`_2nd_off` int unsigned NOT NULL,
-	`_3rd_on`  int unsigned NOT NULL,
-    `_3rd_off` int unsigned NOT NULL,		
+	`_1st` int unsigned NOT NULL,	
+    `_2nd` int unsigned NOT NULL,
+    `_3rd` int unsigned NOT NULL,		
   	PRIMARY KEY  (`OID`)"
 	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -345,11 +347,7 @@ function _resetdb() {
       $user->set('fullname','User #'.$i);
       if ($user->create()===false) echo "Create user $i failed";
     }
-
-    for ($i=1;$i < 21; $i++) {
-
-    }  
-
+ 
     // waypoints & Messages
     for ($i=0;$i < 20; $i++) {
     	$item = new Waypoint();
@@ -432,7 +430,7 @@ function _resetdb() {
       }
     }
         
-    redirect('mgmt_main','Database Initialized test data!');
+    //redirect('mgmt_main','Database Initialized test data!');
     
   }
   catch(ErrorInfo $e)

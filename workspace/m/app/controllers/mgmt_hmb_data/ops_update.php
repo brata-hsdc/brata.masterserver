@@ -2,7 +2,6 @@
 function _ops_update() {
   $OID=max(0,intval($_POST['OID']));
   $CID=max(0,intval($_POST['CID']));
-  $encode=isset($_POST["encode"]);
   $msg="";
   
   loginRequireMgmt();
@@ -38,7 +37,6 @@ function _ops_update() {
   else 
   {
     $object->merge($_POST);
-    $object->set("encode",$encode);
     transactionBegin();
     if ($object->create() )
     {

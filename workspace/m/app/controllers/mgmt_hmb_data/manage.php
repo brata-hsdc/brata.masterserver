@@ -31,7 +31,7 @@ function _make_html_table($table,$item,$urlPrefix,$n,&$data) {
 	$data['body'][]=pagination::makePagination($n,$total,myUrl("$urlPrefix/manage"),$GLOBALS['pagination']);
 
 	//table
-	$fields="_1st_on,_1st_off,_2nd_on,_2nd_off,_3rd_on,_3rd_off";
+	$fields="_1st,_2nd,_3rd";
 	$stmt = $dbh->query("SELECT OID,CID,$fields FROM $table LIMIT $n,$limit");
 	if ($stmt === false) {
 		var_dump($dbh->errorInfo());
@@ -44,9 +44,10 @@ function _make_html_table($table,$item,$urlPrefix,$n,&$data) {
 		$row=null;
 		foreach ($tablearr[0] as $f) 
 		{
-			$row[]=$f=="encode" ? ($rs[$f]==1?"true":'false'): htmlspecialchars($rs[$f]);
+			$row[]=htmlspecialchars($rs[$f]);
 		}
-		$row[]=	'<a href="'.myUrl("$urlPrefix/edit/$OID/$CID").'">Edit</a> | '.
+		$row[]=	'<a href="'.myUrl("$urlPrefix/show/$OID/$CID").'">Test</a> | '.
+				'<a href="'.myUrl("$urlPrefix/edit/$OID/$CID").'">Edit</a> | '.
 				'<a href="javascript:jsconfirm(\'Really Delete '.$item.'?\',\''.
 		        myUrl("$urlPrefix/ops_delete/$OID/$CID").'\')">Delete</a>';
 		$tablearr[]=$row;

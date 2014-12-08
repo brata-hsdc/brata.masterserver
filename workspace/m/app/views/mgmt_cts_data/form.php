@@ -2,7 +2,11 @@
 <input type="hidden" name="OID" value="<?php echo $object->get('OID')?>" />
 <input type="hidden" name="CID" value="<?php echo $object->get('CID')?>" />
 	<table>
-		<tr><th colspan="2"><?php echo $form_heading?></th></tr>	
+		<tr><th colspan="2"><?php echo $form_heading?></th></tr>
+		<tr>
+			<td>Tag</td>
+			<td><input type="text" name="tag" style="width:150px" value="<?php echo $object->get('tag')?>" /></td>
+		</tr>		
 		<tr>
 			<td>1st</td>
 			<td><input type="text" name="_1st" style="width:150px" value="<?php echo $object->get('_1st')?>" /></td>
@@ -15,6 +19,14 @@
 			<td>3rd</td>
 			<td><input type="text" name="_3rd" style="width:150px" value="<?php echo $object->get('_3rd')?>" /></td>
 		</tr>
+		<tr>
+			<td>4th</td>
+			<td><input type="text" name="_4th" style="width:150px" value="<?php echo $object->get('_4th')?>" /></td>
+		</tr>
+		<tr>
+			<td>5th</td>
+			<td><input type="text" name="_5th" style="width:150px" value="<?php echo $object->get('_5th')?>" /></td>
+		</tr>				
 		<tr>
 			<td>Tolerance</td>
 			<td><input type="text" name="tolerance" style="width:150px" value="<?php echo $object->get('tolerance')?>" /></td>

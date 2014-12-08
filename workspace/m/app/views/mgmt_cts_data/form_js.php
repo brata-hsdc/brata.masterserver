@@ -1,5 +1,11 @@
 <script type="text/javascript">
   function validateForm(f) {
+	  
+	 if (f.tag.value == "") {
+	   alert("Please enter tag");
+	   f.tag.focus();
+	   return false;
+	}
 
     if (f._1st.value == "") {
       alert("Please enter 1st");
@@ -14,6 +20,16 @@
     if (f._3rd.value == "") {
         alert("Please enter 3rd");
         f._3rd.focus();
+        return false;
+      }
+    if (f._4th.value == "") {
+        alert("Please enter 4th");
+        f._4th.focus();
+        return false;
+      }
+    if (f._5th.value == "") {
+        alert("Please enter 5th");
+        f._5th.focus()
         return false;
       }
     if (f.tolerance.value == "") {

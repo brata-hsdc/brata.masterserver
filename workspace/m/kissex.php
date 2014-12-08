@@ -87,4 +87,14 @@ class ModelEx extends KISS_Model  {
 		$result = $dbh->query($sql)->fetchAll();
 		return count($result);
 	}
+	# HACK for Master Server
+	# 
+	function retrieveRandom() {
+		
+		$dbh=$this->getdbh();		
+		$stmt = $dbh->query('SELECT max(oid) FROM '.$this->enquote($this->tablename));
+		$oid=$stmt->fetchColumn();
+	    $oid=rand(0,$oid);
+	    return $this->retrieve($oid,-1);
+	}	
 }
