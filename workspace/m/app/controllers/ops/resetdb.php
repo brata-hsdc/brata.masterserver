@@ -179,6 +179,26 @@ function create_t_cts_data($dbh) {
 	if ($status === false) throw new ErrorInfo($dbh,"t_cts_data");	
 }
 
+function create_t_fsl_data($dbh) {
+	$status = $dbh->exec(
+			"CREATE TABLE `t_fsl_data` ( "
+			."`OID` int(10) unsigned NOT NULL auto_increment, "
+			."`CID` int(10) unsigned NOT NULL default '0', "
+			."`tag` varchar(255) NOT NULL, "
+			."`lat1` decimal(12,8) NOT NULL, "
+			."`lng1` decimal(12,8) NOT NULL, "
+			."`lat2` decimal(12,8) NOT NULL, "
+			."`lng2` decimal(12,8) NOT NULL, "
+			."`lat3` decimal(12,8) NOT NULL, "
+			."`lng3` decimal(12,8) NOT NULL, "	
+			."`rad1` int NOT NULL, "
+			."`rad2` int NOT NULL, "
+			."`rad3` int NOT NULL, "			
+			."PRIMARY KEY  (`OID`) "
+			.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
+	);
+	if ($status === false) throw new ErrorInfo($dbh,"t_station");
+}
 function create_t_hmb_data($dbh) {
 	$status = $dbh->exec(
 	"CREATE TABLE `t_hmb_data` (
@@ -307,10 +327,11 @@ function _resetdb() {
     //
     //  rPI challenge data
     //
-    $list = explode(",", "t_cts_data,t_hmb_data,t_cpa_data,t_ext_data");
+    $list = explode(",", "t_cts_data,t_fsl_data,t_hmb_data,t_cpa_data,t_ext_data");
     foreach ($list as $table) dropTable($dbh, $table);
     
     create_t_cts_data($dbh);
+    create_t_fsl_data($dbh);
     create_t_hmb_data($dbh);
     create_t_cpa_data($dbh);
     create_t_ext_data($dbh);
