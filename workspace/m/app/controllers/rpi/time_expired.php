@@ -6,13 +6,12 @@
 require(APP_PATH.'inc/rest_functions.php');
 require(APP_PATH.'inc/json_functions.php');
 
-function _time_expired($stationId=null,$teamId) {
+function _time_expired($stationId=null) {
 	if ($stationId === null) {
 		rest_sendBadRequestResponse(400,"missing stationId");
 	}
-	if ($teamId === null) {
-		rest_sendBadRequestResponse(400,"missing teamId");
-	}
+	error_log("time expired\n",3,"/var/tmp/m.log");
 	// todo update score?
 	rest_sendBadRequestResponse(501, "not implemented");
+	
 }

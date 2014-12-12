@@ -15,4 +15,11 @@ class CTSData extends ModelEx {
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
+  //
+  //  convert Pulsator tripple to array of on/off pairs
+  //
+  function generateParameters() {
+  	$tmp = array($this->rs['_1st'], $this->rs['_2nd'], $this->rs['_3rd'],$this->rs['_4th'],$this->rs['_5th']);
+  	return array_rand($tmp,3);
+  } 
 }

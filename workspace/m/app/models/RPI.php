@@ -49,9 +49,13 @@ class RPI extends ModelEx {
   	$this->rs['lastContact'] = unixToMySQL(time());
   	return parent::create();
   }
-    
-  function start_challenge($teamId)  {
-  	$json = array("teamId"=>$teamId);
+  
+   // todo generalize this
+  function start_challenge($combo)  {
+  	$json = array("message_version" =>0 , 
+  			"message_timestamp"=> date("Y-m-d HH:i:s"), 
+  			"theatric_delay_ms"=>1000 ,
+  			"cts_combo"=> $combo);
   	return RPI::do_post_request($this->rs['URL']."/start_challenge", $json);
   }
   
@@ -81,6 +85,7 @@ class RPI extends ModelEx {
   static function do_post_request($path, array $json, $decode=true) {
   	$ch = curl_init($path);
   	$json = json_encode($json);
+error_log("do_post sending ".$json,3,"/var/tmp/m.log");  	
   	curl_setopt($ch, CURLOPT_CUSTOMREQUEST,"POST");
   	curl_setopt($ch, CURLOPT_POSTFIELDS,$json);
   	curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
