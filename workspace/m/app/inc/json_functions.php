@@ -17,10 +17,16 @@ function json_sendBadRequestResponse($stsmsg="invalid json",$jsonmsg=null)
 // method expected HTTP method
 function json_getObjectFromRequest($method)
 {
+	error_log("getObjectFromRequest starting\n",3,"/var/tmp/m.log");
+	$rm= $_SERVER['REQUEST_METHOD'];
+	$ct = $_SERVER['CONTENT_TYPE'];
+	error_log("getObjectFromRequest method $rm \n",3,"/var/tmp/m.log");
+	error_log("getObjectFromRequest content type $ct\n",3,"/var/tmp/m.log");
   if ($_SERVER['REQUEST_METHOD'] != $method)          return json_sendBadRequestResponse("incorrect HTTP method");
   if(!isset($_SERVER['CONTENT_TYPE']))                return json_sendBadRequestResponse("missing content-type");
   if ($_SERVER['CONTENT_TYPE'] != "application/json") return json_sendBadRequestResponse("content-type not json");
   $x=file_get_contents( 'php://input');
+  error_log("got $x \n",3,"/var/tmp/m.log");
   $jsonObject =json_decode($x , true);
   if ($jsonObject != NULL) return $jsonObject;  
   json_sendBadRequestResponse("invalid json");
@@ -48,10 +54,12 @@ function json_checkMembers($fields, &$json)
 // returns true on success, false otherwise
 function json_sendObject($jsonObject)
 {
+	error_log("json_sendObject starts\n",3,"/var/tmp/m.log");
 	rest_CacheHeaders();
 	header("Content-Type: application/json");
 	$string = json_encode($jsonObject);
 	if ($string === false) return false;
+	error_log("json_sendObject sends $string \n",3,"/var/tmp/m.log");
 	echo $string;
 	return true;
 }

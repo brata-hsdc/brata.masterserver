@@ -52,14 +52,15 @@ class RPI extends ModelEx {
     
   function start_challenge($teamId)  {
   	$json = array("teamId"=>$teamId);
-  	return RPI::do_post_request($this->rs['URL']+"/start_challenge", $json);
+  	return RPI::do_post_request($this->rs['URL']."/start_challenge", $json);
   }
   
   function reset() {
-  	return RPI::do_get_request($this->rs['URL']+"/reset/".RPI::PIN);
+  	return RPI::do_get_request($this->rs['URL']."/reset/".RPI::PIN);
   }
+  
   function shutdown() {
-  	return RPI::do_get_request($this->rs['URL']+"/shutdown");
+  	return RPI::do_get_request($this->rs['URL']."/shutdown/".RPI::PIN);
   }
   
   static function getFromStationId($stationId) {
@@ -68,9 +69,12 @@ class RPI extends ModelEx {
   }
   
   static function do_get_request($path, $returnTransfer=false) {
+  	var_dump($path);
   	$ch = curl_init($path);
   	if ($returnTransfer) curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
   	$retValue = curl_exec($ch);
+  	//var_dump($retValue);
+  	// todo check return codes
   	curl_close($ch);
   	return $retValue;
   }

@@ -8,7 +8,7 @@ function _ops_reset($OID=0,$CID=0) {
 	if (!loginCheckPermission(USER::MGMT_RPI)) redirect("errors/401");
 	$itemName="RPI";
 	$urlPrefix="mgmt_rpi";
-	$object=new RPI($OID,$CID);
+	$object=new RPI($OID,-1);
 
 	if (!$object->exists())
 		$msg="$itemName not found!";

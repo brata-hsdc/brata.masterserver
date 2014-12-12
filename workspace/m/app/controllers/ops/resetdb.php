@@ -451,7 +451,7 @@ function _resetdb() {
       }
     }
         
-    //redirect('mgmt_main','Database Initialized test data!');
+    redirect('mgmt_main','Database Initialized test data!');
     
   }
   catch(ErrorInfo $e)

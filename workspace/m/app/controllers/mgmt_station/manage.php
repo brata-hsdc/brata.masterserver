@@ -31,8 +31,8 @@ function _make_html_table($table,$item,$urlPrefix,$n,&$data) {
 	$data['body'][]=pagination::makePagination($n,$total,myUrl("$urlPrefix/manage"),$GLOBALS['pagination']);
 
 	//table
-	$fields="type,name,skey,description";
-	$stmt = $dbh->query("SELECT OID,CID,typeId,name,skey,description FROM $table LIMIT $n,$limit");
+	$fields="type,name,tag,description";
+	$stmt = $dbh->query("SELECT OID,CID,typeId,name,tag,description FROM $table LIMIT $n,$limit");
 	if ($stmt === false) {
 		var_dump($dbh->errorInfo());
 		return;

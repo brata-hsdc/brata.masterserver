@@ -1,6 +1,6 @@
 <?php
 function makeTypeList($currentType) {
-	return '<select name="type">'
+	return '<select name="typeId">'
 		."<option value=-1>Select One"	
 		. StationType::getAllAsHTMLOptions($currentType)
 		. '</select>';
@@ -15,6 +15,10 @@ function makeTypeList($currentType) {
 			<td>Station Name</td>
 			<td><input type="text" name="name" style="width:150px" value="<?php echo $object->get('name')?>" /></td>
 		</tr>
+			<tr>
+			<td>Station Tag</td>
+			<td><input type="text" name="tag" style="width:150px" value="<?php echo $object->get('tag')?>" /></td>
+		</tr>	
 			<tr>
 			<td>Station type</td>
 			<td><?php echo makeTypeList($object->get('typeId')) ?> </td>
