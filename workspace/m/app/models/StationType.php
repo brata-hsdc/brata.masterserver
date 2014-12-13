@@ -9,7 +9,9 @@ class StationType extends ModelEx {
     $this->rs['longName'] = '';
     $this->rs['shortName'] = '';
     $this->rs['delay'] = 60;
-    $this->rs['instructions'] = "";
+    $this->rs['instructions'] = "todo";
+    $this->rs['correct_msg'] = "todo";
+    $this->rs['incorrect_msg'] = "todo";
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }

@@ -21,6 +21,14 @@
 			<td><textarea name="instructions" style="width:150px"><?php echo $object->get('instructions')?></textarea></td>
 		</tr>
 		<tr>
+			<td>Correct Message</td>
+			<td><textarea name="correct_msg" style="width:150px"><?php echo $object->get('correct_msg')?></textarea></td>
+		</tr>
+		<tr>
+			<td>Incorrect Message</td>
+			<td><textarea name="incorrect_msg" style="width:150px"><?php echo $object->get('incorrect_msg')?></textarea></td>
+		</tr>				
+		<tr>
 			<td colspan="2" style="text-align:right">
 	     	<input type="button" value="<?=$cancelLabel?>" onclick="location.href='<?=$cancelUrl ?>' " />
 			<input type="button" value="<?=$actionLabel?>" onclick="validateForm(this.form);return false;" /></td>

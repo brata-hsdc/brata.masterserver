@@ -11,34 +11,6 @@ class ErrorInfo extends Exception
   }
 }
 
-function create_t_message($dbh) {
-	$status = $dbh->exec(
-	"CREATE TABLE `t_message` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
-  	`text` varchar(255) NOT NULL,
-	`waypointId` int(10) unsigned NOT NULL,		
-  	PRIMARY KEY  (`OID`),
-	CONSTRAINT `fk_waypointId` FOREIGN KEY (`waypointId`) REFERENCES `t_waypoint` (`OID`)			
-	 ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
-	);
-	if ($status === false) throw new ErrorInfo($dbh,"t_message");
-}
-function create_t_waypoint($dbh) {
-	$status = $dbh->exec(
-			"CREATE TABLE `t_waypoint` ( "
-			."`OID` int(10) unsigned NOT NULL auto_increment, "
-			."`CID` int(10) unsigned NOT NULL default '0', "
-			."`name` varchar(255) NOT NULL, "
-			."`lat` decimal(12,8) NOT NULL, "
-			."`lng` decimal(12,8) NOT NULL, "
-			."`description` varchar(255) NOT NULL, "
-			."PRIMARY KEY  (`OID`) "
-			.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
-	);
-	if ($status === false) throw new ErrorInfo($dbh,"t_station");
-}
-
 function create_t_stationtype($dbh) {
 	$status = $dbh->exec(
 			"CREATE TABLE `t_stationtype` (
@@ -48,6 +20,8 @@ function create_t_stationtype($dbh) {
 	`shortName` varchar(255) NOT NULL,			
   	`delay` int(10) unsigned NOT NULL default '60',			
  	`instructions` varchar(255) NOT NULL,
+	`correct_msg` varchar(255) NOT NULL,
+	`incorrect_msg` varchar(255) NOT NULL,
   	PRIMARY KEY  (`OID`)
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -61,8 +35,6 @@ function create_t_station($dbh) {
 			."`CID` int(10) unsigned NOT NULL default '0', "
 			."`typeId` int(10) unsigned NOT NULL, "
 			."`tag` varchar(255), "
-			."`name` varchar(255) NOT NULL, "
-			."`description` varchar(255) NOT NULL, "
 			."PRIMARY KEY  (`OID`), "
 			."CONSTRAINT `rpi_key_unique` UNIQUE KEY (`tag`), "
 			."CONSTRAINT `fk_typeId` FOREIGN KEY (`typeId`) REFERENCES `t_stationtype` (`OID`) "
@@ -308,14 +280,12 @@ function _resetdb() {
     foreach ($list as $view) dropView($dbh, $view);
 
 
-    $list = explode(",", "t_event,t_user,t_rpi,t_message,t_waypoint,t_station,t_stationtype,t_team,t_school");
+    $list = explode(",", "t_event,t_user,t_rpi,t_station,t_stationtype,t_team,t_school");
     foreach ($list as $table) dropTable($dbh, $table);
 
     create_t_user          ($dbh);
     create_t_stationtype   ($dbh);
     create_t_station       ($dbh);
-    create_t_waypoint      ($dbh);
-    create_t_message       ($dbh);
     create_t_school        ($dbh);
     create_t_team          ($dbh);
     create_t_event         ($dbh);
@@ -350,8 +320,10 @@ function _resetdb() {
     	$stationType = new StationType();
     	$stationType->set('longName',$stationNames[$i]);
     	$stationType->set('shortName',$stationNames[$i+1]);
-    	$stationType->set('delay',60*$i+1);
-    	$stationType->set('instructions',"todo");
+    	$stationType->set('delay',60);
+    	$stationType->set('instructions',"todo instructions ".$i/2);
+    	$stationType->set('correct_msg',"Correct ".$i/2);
+    	$stationType->set('incorrect_msg',"Please try again ".$i/2);
     	if ($stationType->create()===false) echo "Create StationType $i failed";
     }
     
@@ -369,27 +341,12 @@ function _resetdb() {
       if ($user->create()===false) echo "Create user $i failed";
     }
  
-    // waypoints & Messages
-    for ($i=0;$i < 20; $i++) {
-    	$item = new Waypoint();
-    	$item->set('name', "waypoint-$i");
-    	$item->set('lat',$i);
-    	$item->set('lng',$i);
-    	$item->set('description',"this is waypoint $i");
-    	if ($item->create()===false) echo "Create waypoint $i failed";
-    	$message = new Message();
-    	$message->set('waypointId',$item->get("OID"));
-    	$message->set('text', "message $i");
-    	if ($message->create()===false) echo "Create Message $i failed";
-    }
     $stationNames = explode(",", "CTS,FSL");
     for ($i=0; $i<count($stationNames); $i++)
     {
       $type = StationType::getFromShortname($stationNames[$i]);
       $station = new Station();
-      $station->set("name", "testStation $i");
-      $station->set("tag", "tag$i");
-      $station->set("description", "testStation $i description");
+      $station->set("tag", $stationNames.$i);
       $station->set("typeId", $type->get("OID"));
       if ($station->create() === false) echo "Create Station $i failed";
     }
@@ -442,7 +399,7 @@ function _resetdb() {
     	  $event->set('type',Event::TYPE_SUBMIT);
     	  $event->set('points',20);
     	  $event->set('description',"Correct Solution");    	  
-    	  if ($event->create() === false) echo "Create  submit/corredt Solution event $s,$t failed";
+    	  if ($event->create() === false) echo "Create  submit/correct Solution event $s,$t failed";
 	  
     	  $event->set("OID",0); $event->set("CID",0); $time += 5;
     	  $event->set('type',Event::TYPE_END,$time);

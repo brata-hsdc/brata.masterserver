@@ -43,8 +43,6 @@
     <ul>      
       <li><a href="<?php echo myUrl('mgmt_school/manage')?>">Schools</a></li>
       <li><a href="<?php echo myUrl('mgmt_team/manage')?>">Teams</a></li>
-      <li><a href="<?php echo myUrl('mgmt_waypoint/manage')?>">Way Points</a></li>
-      <li><a href="<?php echo myUrl('mgmt_message/manage')?>">Messages</a></li>
       <li><a href="<?php echo myUrl('mgmt_stationtype/manage')?>">Station Types</a></li>
       <li><a href="<?php echo myUrl('mgmt_station/manage')?>">Stations</a></li>
       <li><a href="<?php echo myUrl('mgmt_rpi/manage')?>">rPI</a></li>
