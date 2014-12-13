@@ -20,6 +20,16 @@
         f.instructions.focus();
         return false;
       }
+    if (f.correct_msg.value == "") {
+        alert("Please enter the 'correct' message");
+        f.correct_msg.focus();
+        return false;
+      }
+    if (f.incorrect_msg.value == "") {
+        alert("Please enter the 'incorrect' message");
+        f.incorrect_msg.focus();
+        return false;
+      }
     f.submit();
   }
 </script>

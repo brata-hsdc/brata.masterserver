@@ -313,6 +313,20 @@ function _resetdb() {
     $admin->set('fullname',"administrator");
     $admin->setRoll(USER::ROLL_ADMIN);
     $admin->create();
+
+    $stationType = new StationType();
+    $stationType->set('longName',"Register");
+    $stationType->set('shortName',"REG");
+    $stationType->set('delay',0);
+    $stationType->set('instructions',"Welcome [team-name]");
+    $stationType->set('correct_msg',"not used");
+    $stationType->set('incorrect_msg',"not used");
+    if ($stationType->create()===false) echo "Create StationType 'Register' failed";
+    $station = new Station();
+    $station->set("tag", "REG");
+    $station->set("typeId", $stationType->get("OID"));
+    if ($station->create() === false) echo "Create Station 'REG' failed";
+    
     
     $stationNames = explode(",","Crack The Safe,CTS,Find Secret Lab,FSL,Defuse Hypermutation Bomb,HMB,Catch Provessor Aardvark,CPA,Extra,EXT");
     for ($i=0;$i<count($stationNames);$i+=2)
@@ -331,14 +345,16 @@ function _resetdb() {
         redirect('mgmt_main','Database Initialized without test data!');
         return;
     }
-
+    
+    // generate test data
+    
     for ($i=1;$i < 21; $i++) {
-      $user = new User();
-      $user->set('username','user'.$i);
-      $user->setPassword('pass'.$i);
-      $user->set('email','email'.$i."@harris.com");
-      $user->set('fullname','User #'.$i);
-      if ($user->create()===false) echo "Create user $i failed";
+    	$user = new User();
+    	$user->set('username','user'.$i);
+    	$user->setPassword('pass'.$i);
+    	$user->set('email','email'.$i."@harris.com");
+    	$user->set('fullname','User #'.$i);
+    	if ($user->create()===false) echo "Create user $i failed";
     }
  
     $stationNames = explode(",", "CTS,FSL");
@@ -368,7 +384,7 @@ function _resetdb() {
       $team->set("pin", Team::generatePIN());
       if ($team->create() === false) echo "Create Team $i failed";
     }
-
+/**
     $numStations = 2;
     for ($s=1; $s<=$numStations; $s++)
     {
@@ -407,7 +423,7 @@ function _resetdb() {
     	  if ($event->create() === false) echo "Create Leave event $s,$t failed";
       }
     }
-        
+   **/     
     redirect('mgmt_main','Database Initialized test data!');
     
   }

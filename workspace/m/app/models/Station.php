@@ -15,7 +15,7 @@ class Station extends ModelEx {
   // map the given typeId into its text falue
   static function getTypeAsText($typeId) {
   	$stationType = new StationType($typeId,-1);
-  	return $stationType->get('shortName');
+  	return $stationType->get('longName')."(".$stationType->get('shortName').")";
   } 
   
   // fetch the Station object for the given skey

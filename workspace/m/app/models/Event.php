@@ -1,10 +1,11 @@
 <?php
 class Event extends ModelEx {
 
-	const TYPE_BAD     = 0;
-	const TYPE_START   = 1;
-	const TYPE_SUBMIT  = 2;
-	const TYPE_END     = 3;
+	const TYPE_BAD      = 0;
+	const TYPE_REGISTER = 1;
+	const TYPE_START    = 2;
+	const TYPE_SUBMIT   = 3;
+	const TYPE_END      = 4;
 
 	static private function isSelected($value, $selectValue) {
 		return $value == $selectValue ? " selected " : "";

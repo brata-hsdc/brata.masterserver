@@ -5,11 +5,7 @@
       f.typeId.focus();
       return false;
     }
-    if (f.name.value == "") {
-        alert("Please enter a station name");
-        f.name.focus();
-        return false;
-      }   
+   
     if (f.tag.value == "") {
         alert("Please enter a station name");
         f.description.focus();

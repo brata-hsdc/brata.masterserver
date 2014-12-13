@@ -16,8 +16,9 @@ function _register()
 		rest_sendBadRequestResponse(400,"missing team PIN");  // doesn't return
 	}
 	$teamId = Team::getFromPin($teamPIN);
+	$stationId = StationType::getFromShortname("REG");
 
-	$event = Event::makeEvent(Event::TYPE_START,$teamId, 0); // todo use real id
+	$event = Event::makeEvent(Event::TYPE_REGISTER,$teamId, 0); // todo use real id
 	$event->create();
 	// todo send message to station
 	$json = array('message' => "test");  //@todo what to send to rPI

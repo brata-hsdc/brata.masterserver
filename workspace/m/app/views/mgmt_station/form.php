@@ -12,21 +12,13 @@ function makeTypeList($currentType) {
 	<table>
 		<tr><th colspan="2"><?php echo $form_heading?></th></tr>
 		<tr>
-			<td>Station Name</td>
-			<td><input type="text" name="name" style="width:150px" value="<?php echo $object->get('name')?>" /></td>
-		</tr>
-			<tr>
 			<td>Station Tag</td>
 			<td><input type="text" name="tag" style="width:150px" value="<?php echo $object->get('tag')?>" /></td>
 		</tr>	
 			<tr>
 			<td>Station type</td>
 			<td><?php echo makeTypeList($object->get('typeId')) ?> </td>
-		</tr>			
-		<tr>
-			<td>Description</td>
-			<td><input type="text" name="description" style="width:150px" value="<?php echo $object->get('description')?>" /></td>
-		</tr>	
+		</tr>				
 		<tr>
 			<td colspan="2" style="text-align:right">
 	     	<input type="button" value="<?=$cancelLabel?>" onclick="location.href='<?=$cancelUrl ?>' " />
