@@ -73,7 +73,6 @@ class RPI extends ModelEx {
   }
   
   static function do_get_request($path, $returnTransfer=false) {
-  	var_dump($path);
   	$ch = curl_init($path);
   	if ($returnTransfer) curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
   	$retValue = curl_exec($ch);
@@ -85,7 +84,7 @@ class RPI extends ModelEx {
   static function do_post_request($path, array $json, $decode=true) {
   	$ch = curl_init($path);
   	$json = json_encode($json);
-error_log("do_post sending ".$json,3,"/var/tmp/m.log");  	
+trace("RPI::do_post sending ".$json." to ".$path);  	
   	curl_setopt($ch, CURLOPT_CUSTOMREQUEST,"POST");
   	curl_setopt($ch, CURLOPT_POSTFIELDS,$json);
   	curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
@@ -94,8 +93,13 @@ error_log("do_post sending ".$json,3,"/var/tmp/m.log");
   	);
   	$retValue = curl_exec($ch);
   	curl_close($ch);
-  	if ($retValue === false) return false;  // request failed
-  	return $decode ? json_decode($retValue,true) : $retValue;     // put the response back into object form
+  	if ($retValue === false) {
+  	trace("RPI::do_post failed returning false");
+  	  return false;  // request failed
+    }
+  	$retVal = $decode ? json_decode($retValue,true) : $retValue;     // put the response back into object form
+ trace("RPI::do_post returning ".$retVal);
+  	return $retVal;
   }
   
   static function getByURL($url) {

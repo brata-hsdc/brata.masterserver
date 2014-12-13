@@ -1,20 +1,20 @@
 <?php
+// create mock brata form
 function _index() {
   $urlPrefix="test_brata";
   $data['body'][]='<h2>Brata Testing</h2><br />';
-  //_make_html_table($n,$data); 
-  $fdata['startUrl']=myUrl("$urlPrefix/ops_atwaypoint");
-  $fdata['startLabel']="At Waypoint";
+  $fdata['startUrl']=myUrl("$urlPrefix/sim_start_challenge");
+  $fdata['startLabel']="Start Challenge";
   
-  $fdata['submitUrl']=myUrl("$urlPrefix/ops_atwaypoint")
-  $fdata['submitLabel']="At Waypoint";
+  $fdata['submitUrl']=myUrl("$urlPrefix/sim_submit");
+  $fdata['submitLabel']="Submit";
   
-  $fdata['atwayPointUrl']=array(myUrl("$urlPrefix/ops_atwaypoint"),myUrl("$urlPrefix/ops_submit"));
-  $fdata['aawayPointLabel']="At Waypoint";
+  $fdata['atWayPointUrl']=myUrl("$urlPrefix/sim_atwaypoint");
+  $fdata['atWayPointLabel']="At Waypoint";
   
   $fdata['cancelUrl']=myUrl("$urlPrefix/index");
   $fdata['cancelLabel']="Cancel";
-  $form = View::do_fetch(VIEW_PATH."$urlPrefix/main.php",$fdata);
+  $form = View::do_fetch(VIEW_PATH."$urlPrefix/mock_brata.php",$fdata);
   //$data['head'][]=View::do_fetch(VIEW_PATH."$urlPrefix/form_js.php");
   $data['body'][]=$form;
   View::do_dump(VIEW_PATH.'layouts/mgmtlayout.php',$data);

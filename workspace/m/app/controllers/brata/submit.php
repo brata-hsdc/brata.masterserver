@@ -2,6 +2,7 @@
 //
 //	"teamId": 0,
 //	"message": "",
+require(APP_PATH.'inc/rest_functions.php');
 require(APP_PATH.'inc/json_functions.php');
 //
 function _submit($stationId=null)

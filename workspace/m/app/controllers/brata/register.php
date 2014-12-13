@@ -5,7 +5,7 @@ require(APP_PATH.'inc/rest_functions.php');
 require(APP_PATH.'inc/json_functions.php');
 function _register() 
 {
-	error_log("register\n",3,"/var/tmp/m.log");
+	trace("register");
 	
 	$json = json_getObjectFromRequest("POST");
 	//if ($json === NULL) return;

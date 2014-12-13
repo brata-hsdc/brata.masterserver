@@ -25,4 +25,15 @@ class Station extends ModelEx {
   	$station = new Station();
   	return $station->retrieve_one("tag=?", $tag);
   }
+  // for brata testing only
+  static function getAllAsHTMLOptions($itemSelected=-1) {
+  	$object = new Station();
+  	$aray = $object->retrieve_many();
+  	$options ="";
+  	foreach ($aray as $item) {
+  		$selected = $item->get('tag') == $itemSelected ? "selected" : "";
+  		$options .= '<option value='. $item->get('tag'). ' ' . $selected . '>' . $item->get("tag");
+  	}
+  	return $options;
+  } 
 }

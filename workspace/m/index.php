@@ -20,6 +20,9 @@ $GLOBALS['SETTINGS_TAXFAXNUMBER'] = $SETTINGS_TAXFAXNUMBER;
 ini_set('display_errors','On');
 error_reporting(E_ALL);
 //error_reporting(E_ALL ^ E_STRICT);
+function trace($msg) {
+	error_log($msg."\n",3,"/var/tmp/m.log");
+}
 
 //===============================================
 // mod_rewrite

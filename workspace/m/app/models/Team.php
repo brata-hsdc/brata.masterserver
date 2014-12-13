@@ -46,5 +46,15 @@ class Team extends ModelEx {
   	}
   	return $pin.$sum;
   }
-
+  // for brata testing only
+  static function getAllAsHTMLOptions($itemPIN=-1) {
+  	$object = new Team();
+  	$aray = $object->retrieve_many();
+  	$options ="";
+  	foreach ($aray as $item) {
+  		$selected = $item->rs['pin'] == $itemPIN ? "selected" : "";
+  		$options .= '<option value='. $item->rs['pin']. ' ' . $selected . '>' . $item->get('pin')." - ".$item->get("name");
+  	}
+  	return $options;
+  }
 }
