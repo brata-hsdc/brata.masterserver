@@ -52,7 +52,6 @@
       <li><a href="<?php echo myUrl('mgmt_cpa_data/manage')?>">CPA Data</a></li>
       <li><a href="<?php echo myUrl('mgmt_ext_data/manage')?>">EXT Data</a></li>                   
       <li><a href="<?php echo myUrl('mgmt_user/manage')?> ">Users</a></li>
-      <li><a href="<?php echo myUrl('mgmt_website/manage')?>">Web Site</a></li>
       <li>Below is for Public Access</li>      
       <li><a href="<?php echo myUrl('leader-board/index')?>">View Leader Board</a></li>
       <li><a href="<?php echo myUrl('viewscores')?>">View Scores</a></li>

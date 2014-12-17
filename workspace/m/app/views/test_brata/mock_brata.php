@@ -1,10 +1,38 @@
 <?php
+/*
 function makeWaypointList() {
 	return '<select name="waypointId">'
 		. '<option value=-1>Select One'	
 		. Waypoint::getAllAsHTMLOptions(-1)
 		. '</select>';
 }
+<!--
+<table>
+  <form method="post" action="<?=$atWayPointUrl?>">
+		<tr><th colspan="2">atWaypoint Test</th></tr>
+		<tr>
+			<td>TeamId (a.k.a. team ping)</td>
+			<td><?php echo makeTeamList() ?> </td>
+		</tr>		
+		<tr>
+		<tr>
+			<td>Waypoint Id</td>
+			<td><?php echo makeWaypointList() ?> </td>
+		</tr>			
+		<tr>
+			<td colspan="2" style="text-align:right">
+	     	<input type="button" value="<?=$cancelLabel?>" onclick="location.href='<?=$cancelUrl ?>' " />
+			<input type="button" value="<?=$atWayPointLabel?>" onclick="submit();" /></td>
+		</tr>
+		
+  </form>
+  </table>
+-->
+*
+*
+*
+*
+*/
 function makeStationList() {
 	return '<select name="stationId">'
 			. '<option value=-1>Select One'
@@ -18,6 +46,21 @@ function makeTeamList() {
 					. '</select>';
 }
 ?>
+  <table>
+    <form method="post" action="<?=$registerUrl?>">
+		<tr><th colspan="2">Register</th></tr>
+		<tr>
+			<td>TeamId (a.k.a. team ping)</td>
+			<td><?php echo makeTeamList() ?> </td>
+		</tr>		
+		<tr>
+			<td colspan="2" style="text-align:right">
+	     	<input type="button" value="<?=$cancelLabel?>" onclick="location.href='<?=$cancelUrl ?>' " />
+			<input type="button" value="<?=$registerLabel?>" onclick="submit()" /></td>
+		</tr>	
+  </form>
+</table>
+<hr>
   <table>
     <form method="post" action="<?=$startUrl?>">
 		<tr><th colspan="2">Start Challenge</th></tr>
@@ -57,24 +100,4 @@ function makeTeamList() {
 		
   </form>
 </table>
-<table>
-  <form method="post" action="<?=$atWayPointUrl?>">
-		<tr><th colspan="2">atWaypoint Test</th></tr>
-		<tr>
-			<td>TeamId (a.k.a. team ping)</td>
-			<td><?php echo makeTeamList() ?> </td>
-		</tr>		
-		<tr>
-		<tr>
-			<td>Waypoint Id</td>
-			<td><?php echo makeWaypointList() ?> </td>
-		</tr>			
-		<tr>
-			<td colspan="2" style="text-align:right">
-	     	<input type="button" value="<?=$cancelLabel?>" onclick="location.href='<?=$cancelUrl ?>' " />
-			<input type="button" value="<?=$atWayPointLabel?>" onclick="submit();" /></td>
-		</tr>
-		
-  </form>
-  </table>
 

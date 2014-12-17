@@ -13,7 +13,7 @@ class ErrorInfo extends Exception
 
 function create_t_stationtype($dbh) {
 	$status = $dbh->exec(
-			"CREATE TABLE `t_stationtype` (
+	"CREATE TABLE `t_stationtype` (
   	`OID` int(10) unsigned NOT NULL auto_increment,
   	`CID` int(10) unsigned NOT NULL default '0',
   	`longName` varchar(255) NOT NULL,
@@ -360,10 +360,10 @@ function _resetdb() {
     $stationNames = explode(",", "CTS,FSL");
     for ($i=0; $i<count($stationNames); $i++)
     {
-      $type = StationType::getFromShortname($stationNames[$i]);
+      $stationType = StationType::getFromShortname($stationNames[$i]);
       $station = new Station();
-      $station->set("tag", $stationNames.$i);
-      $station->set("typeId", $type->get("OID"));
+      $station->set("tag", $stationNames[$i]."00");
+      $station->set("typeId", $stationType->get("OID"));
       if ($station->create() === false) echo "Create Station $i failed";
     }
     

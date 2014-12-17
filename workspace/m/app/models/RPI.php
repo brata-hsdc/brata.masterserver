@@ -40,22 +40,18 @@ class RPI extends ModelEx {
 
   }
   */
-  function contact() {
-  	$this->rs['lastContact'] = unixToMySQL(time());
-  	$this->update();
+  function set_contact_data(&$json) {
+  	$this->rs['lastContact']= unixToMySQL(time());
+  	$this->rs['URL'        ]= $json ['station_url'];
+  	$this->rs['debug'      ]= json_encode ( $json );
   }
+ 
   
-  function create() {
-  	$this->rs['lastContact'] = unixToMySQL(time());
-  	return parent::create();
-  }
-  
-   // todo generalize this
-  function start_challenge($combo)  {
+  function start_challenge($parms)  {
   	$json = array("message_version" =>0 , 
   			"message_timestamp"=> date("Y-m-d HH:i:s"), 
-  			"theatric_delay_ms"=>1000 ,
-  			"cts_combo"=> $combo);
+  			"theatric_delay_ms"=>1000 );
+  	array_merge($json,$parms);  // over ride / merge in parms
   	return RPI::do_post_request($this->rs['URL']."/start_challenge", $json);
   }
   
@@ -84,26 +80,22 @@ class RPI extends ModelEx {
   static function do_post_request($path, array $json, $decode=true) {
   	$ch = curl_init($path);
   	$json = json_encode($json);
-trace("RPI::do_post sending ".$json." to ".$path);  	
+trace("sending ".$json." to ".$path,__FILE__,__LINE__,__METHOD__);  	
   	curl_setopt($ch, CURLOPT_CUSTOMREQUEST,"POST");
   	curl_setopt($ch, CURLOPT_POSTFIELDS,$json);
   	curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
   	curl_setopt($ch, CURLOPT_HTTPHEADER,
   	array('Content-Type: application/json','Content-Length: '.strlen($json))
   	);
-  	$retValue = curl_exec($ch);
+  	$retVal = curl_exec($ch);
   	curl_close($ch);
-  	if ($retValue === false) {
-  	trace("RPI::do_post failed returning false");
+  	if ($retVal === false) {
+  	trace("RPI::do_post failed returning false",__FILE__,__LINE__,__METHOD__);
   	  return false;  // request failed
     }
-  	$retVal = $decode ? json_decode($retValue,true) : $retValue;     // put the response back into object form
- trace("RPI::do_post returning ".$retVal);
+trace("returning ".$retVal,__FILE__,__LINE__,__METHOD__);
+  	$retVal = $decode ? json_decode($retVal,true) : $retVal;     // put the response back into object form
   	return $retVal;
   }
   
-  static function getByURL($url) {
-  	$rpi = new RPI();
-  	return $rpi->retrieve_one("URL=?", $url);
-  }
 }

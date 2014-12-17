@@ -9,31 +9,47 @@
 //
 require(APP_PATH.'inc/rest_functions.php');
 require(APP_PATH.'inc/json_functions.php');
+require(APP_PATH.'inc/RestException.php');
 //
-function _join($station_id=null)
-{
-	if ($station_id === false) rest_sendBadRequestResponse(400,"station_id not present");
-	$json = json_getObjectFromRequest("POST");
-	//if ($json === NULL) return;
-	json_checkMembers("message_version,station_type,station_url", $json);
+function _join($station_id = null) {
+	try {
+		if ($station_id === false) { 
+			trace("station_id not present",__FILE__,__LINE__,__METHOD__);
+			throw new RestException( 400, "station_id not present" );
+		}
+		
+		$station = Station::getFromTag ( $station_id );
+		if ($station === false) {
+			trace ( "_join station not found station_id=" . $station_id,__FILE__,__LINE__,__METHOD__ );
+			throw new RestException( 500, "station not found station_id=" . $station_id );
+		}
+		
+		trace ( "tag=" . $station_id . " station OID=" . $station->get ( 'OID' ),__FILE__,__LINE__,__METHOD__ );
+		$json = json_getObjectFromRequest ( "POST" );
+		// if ($json === NULL) return;
+		json_checkMembers ( "message_version,station_type,station_url", $json );
+		
+		$rpi = RPI::getFromStationId($station->get('OID') );
+		if ($rpi === false) 		// new join
+		{
+			// output
+			$rpi = new RPI ();
+			$rpi->set ( 'stationId', $station->get ( 'OID' ) );
+			$rpi->set_contact_data($json);
 
-	$rpi = RPI::getByURL($json['station_url']);
-	if ($rpi === false)  // new join
-	{
-	  $station= Station::getFromTag($json['station_id']);
-
-	  // output
-	  $rpi = new RPI();
-	  $rpi->set('stationId',$station->get('OID'));
-	  $rpi->set('URL',$json['station_url']);
-	  $rpi->set('debug',json_encode($json));
-	  if ($rpi->create() === false) {
-	     rest_sendBadRequestResponse(500,"create faled");
-	  }
+			if ($rpi->create () === false) {
+				trace("create failed",__FILE__,__LINE__,__METHOD__);
+				throw new RestException ( 500, "join create failed" );
+			}
+		} else {
+ 			$rpi->set_contact_data($json);
+			if ($rpi->update() === false){
+				trace("update failed",__FILE__,__LINE__,__METHOD__);
+				throw new RestException(500,"join update failed");
+			}
+		}
+		rest_sendSuccessResponse ( 202, "Accepted" );
+	} catch ( RestException $e ) {
+		rest_sendBadRequestResponse ( $e->statusCode, $e->statusMsg ); // doesn't return
 	}
-	else
-	{
-       $rpi->contact();
-	}
-	rest_sendSuccessResponse(202,"Accepted");
 }

@@ -20,7 +20,7 @@ class Team extends ModelEx {
   // fetch the Team object for the given pin
   static function getFromPin($pin) {
   	$team = new Team();
-  	return $team->retrieve_one("pin='?'", $pin);
+  	return $team->retrieve_one("pin=?", $pin);
   }
   
   static function getNameFromId($id) {

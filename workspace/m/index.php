@@ -6,13 +6,8 @@ define('DBUSER',$SYSCONFIG_DBUSER);
 define('DBPASS',$SYSCONFIG_DBPASS);
 $GLOBALS['SYSCONFIG_DEBUG'] = $SYSCONFIG_DEBUG;
 $GLOBALS['SYSCONFIG_SENDMAIL'] = $SYSCONFIG_SENDMAIL;
-$GLOBALS['SYSCONFIG_PAYPAL_RETURN'] = $SYSCONFIG_PAYPAL_RETURN;
-include_once "settings_data.php";
-$GLOBALS['SETTINGS_MGMT_BANNER'] = $SETTINGS_MGMT_BANNER;
-$GLOBALS['SETTINGS_WRITER_BANNER'] = $SETTINGS_WRITER_BANNER;
-$GLOBALS['SETTINGS_SUPPORTEMAIL'] = $SETTINGS_SUPPORTEMAIL;
-$GLOBALS['SETTINGS_SUPPORTNUMBER'] = $SETTINGS_SUPPORTNUMBER;
-$GLOBALS['SETTINGS_TAXFAXNUMBER'] = $SETTINGS_TAXFAXNUMBER;
+$GLOBALS['LOGLEVEL'] = $SYSCONFIG_LOGLEVEL;
+
 
 //===============================================
 // Debug
@@ -20,8 +15,18 @@ $GLOBALS['SETTINGS_TAXFAXNUMBER'] = $SETTINGS_TAXFAXNUMBER;
 ini_set('display_errors','On');
 error_reporting(E_ALL);
 //error_reporting(E_ALL ^ E_STRICT);
-function trace($msg) {
-	error_log($msg."\n",3,"/var/tmp/m.log");
+define("ERROR",1);
+define("WARN",2);
+define("INFO",3);
+define("DEBUG",4);
+define("TRACE",5);
+function logit($lvl,$file,$line,$fun,$msg) {
+	if ($lvl >= $GLOBALS['LOGLEVEL']) {
+    	error_log($file."|".$line."|".$fun."|".$msg."\n",3,"/var/tmp/m.log");
+	}
+}
+function trace($msg,$file="",$line="",$fun="") {
+	logit(TRACE,$file,$line,$fun,$msg);
 }
 
 //===============================================

@@ -4,23 +4,22 @@ include_once "sysconfig_data.php";
 function writeSysconfig()
 {
   $errors="";
+
+  if ( !isset($_POST['webdomain']) || $_POST[webdomain] =="" )
+  {
+  	$errrors .= ", invalid webdomain";
+  }
   
    if ( !isset($_POST['webfolder']) || $_POST['webfolder'] =="" )
    {
    	$errrors .= ", invalid webfolder";
    }
-   if ( !isset($_POST['webdomain']) || $_POST['webdomain'] =="" )
+ 
+   if ( !isset($_POST['loglevel']))
    {
-   	   	$errrors .= ", invalid webdomain";
-   } 
-   if ( !isset($_POST['paypal_return']))
-   {
-   	   	$errrors .= ", invalid paypal_return";
-   } 
-   else if ( $_POST['paypal_return'] =="" )
-   {
-   		$_POST['paypal_return'] = $_POST['webdomain'];
+   	$errrors .= ", invalid loglevel";
    }
+   
    if ( !isset($_POST['dbhost']) || $_POST['dbhost'] =="" )
    {
    	   	$errrors .= ", invalid dbhost";
@@ -44,17 +43,23 @@ function writeSysconfig()
    
    if ($errors =="")
    {
+      //$fd = fopen("/var/tmp/sysconfig_data.php","w"); // when you can't write directly to sysconfig_data.php ...
       $fd = fopen("sysconfig_data.php","w");
+      if ($fd === false) {
+      	$a= error_get_last();
+      	$errors = "can't open sysconfig_data.php for writing reason=". $a['message'];
+      	return $errors;
+      }
       fwrite($fd,"<?php\n");
-      fwrite($fd,"\$SYSCONFIG_WEBFOLDER='".$_POST['webfolder']."';\n"); 
       fwrite($fd,"\$SYSCONFIG_WEBDOMAIN='".$_POST['webdomain']."';\n");
+      fwrite($fd,"\$SYSCONFIG_WEBFOLDER='".$_POST['webfolder']."';\n"); 
       fwrite($fd,"\$SYSCONFIG_DBHOST='".$_POST['dbhost']."';\n"); 
       fwrite($fd,"\$SYSCONFIG_DBNAME='".$_POST['dbname']."';\n");
       fwrite($fd,"\$SYSCONFIG_DBUSER='".$_POST['dbuser']."';\n");
       fwrite($fd,"\$SYSCONFIG_DBPASS='".$_POST['dbpass']."';\n");
       fwrite($fd,"\$SYSCONFIG_DEBUG=".$_POST['debug'].";\n");
-      fwrite($fd,"\$SYSCONFIG_SENDMAIL=".$_POST['sendmail'].";\n");
-      fwrite($fd,"\$SYSCONFIG_PAYPAL_RETURN='".$_POST['paypal_return']."';\n");      
+      fwrite($fd,"\$SYSCONFIG_SENDMAIL=".$_POST['sendmail'].";\n");      
+      fwrite($fd,"\$SYSCONFIG_LOGLEVEL=".$_POST['loglevel'].";\n");
       fclose($fd);
    }
    return $errors;
@@ -91,15 +96,15 @@ if ( isset($_GET['write']) ) {
 </p>
 <form method="post" action="setup.php?write=1">
 <table>
+<tr><td>Web Domain[with trailing slash]</td><td><input name=webdomain value='<?php echo $SYSCONFIG_WEBDOMAIN?>'/></td></tr>
 <tr><td>Web Folder[with trailing slash]</td><td><input name=webfolder value='<?php echo $SYSCONFIG_WEBFOLDER?>'/></td></tr>
-<tr><td>Web Domain [with NO trailing slash]</td><td><input name=webdomain value='<?php echo $SYSCONFIG_WEBDOMAIN?>' /></td></tr>
-<tr><td>Paypal Return URL [with NO trailing slash]</td><td><input name=paypal_return value='<?php echo $SYSCONFIG_PAYPAL_RETURN?>' /></td></tr>
 <tr><td>Database Host</td><td><input name=dbhost value='<?php echo $SYSCONFIG_DBHOST?>'/></td></tr>
 <tr><td>Database Name</td><td><input name=dbname value='<?php echo $SYSCONFIG_DBNAME?>'/></td></tr>
 <tr><td>Database User</td><td><input name=dbuser value='<?php echo $SYSCONFIG_DBUSER?>'/></td></tr>
 <tr><td>Database Password</td><td><input name=dbpass value='<?php echo $SYSCONFIG_DBPASS?>'/></td></tr>
+<tr><td>Log Level</td><td><input name=loglevel value='<?php echo $SYSCONFIG_LOGLEVEL?>'/></td></tr>
+<tr><td>Send Mail (to new users)</td><td><input type=checkbox name=sendmail value='1' <?php if ($SYSCONFIG_SENDMAIL) echo "checked"; ?> /> </td></tr>
 <tr><td>Debug Mode</td><td><input type=checkbox name=debug value='1' <?php if ($SYSCONFIG_DEBUG) echo "checked"; ?> /> </td></tr>
-<tr><td>Send Mail</td><td><input type=checkbox name=sendmail value='1' <?php if ($SYSCONFIG_SENDMAIL) echo "checked"; ?> /> </td></tr>
 </table>
 <input class="button" type="submit" name=submit />
 </form>

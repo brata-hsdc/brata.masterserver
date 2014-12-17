@@ -9,11 +9,22 @@ function _start_challenge($stationTag=null)
 	if ($stationTag === null) {
 		rest_sendBadRequestResponse(400,"missing stationId");  // doesn't return
 	}
+	
 	$station = Station::getFromTag($stationTag);
 	if ($station === false) {
-		rest_sendBadRequestResponse(404,"can find station stationId=".$stationTag);  // doesn't return		
+		rest_sendBadRequestResponse(404,"can find station stationTag=".$stationTag);  // doesn't return		
+	}
+	
+	$stationType = new StationType($station->get('typeId'),-1);
+	if ($stationType === false ) {
+		trace("can't find station type stationTag = ".$stationTag,__FILE__,__LINE__,__METHOD__);
+		rest_sendBadRequestResponse(500,"can't find station type stationTag=".$stationTag);		
 	}
 	$rpi = RPI::getFromStationId($station->get('OID'));
+	if ($rpi === false) {
+		trace("_start_challenge can't find RPI stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
+		rest_sendBadRequestResponse(500,"can't find RPI stationTag=".$stationTag);
+	}
 		
 	$json = json_getObjectFromRequest("POST");
 	//if ($json === NULL) return;
@@ -22,24 +33,18 @@ function _start_challenge($stationTag=null)
 
 	$team = Team::getFromPin($teamPIN);
 	if ($team === false) {
-		rest_sendBadRequestResponse(404,"team not found PIN=".teamPIN);  // doesn't return
+		trace("_start_challenge can't find team teamPin=".$teamPIN,__FILE__,__LINE__,__METHOD__);
+		rest_sendBadRequestResponse(404,"team not found PIN=".$teamPIN);  // doesn't return
 	}
 	
-	$event = Event::makeEvent(Event::TYPE_START,$teamId, 0); // todo use real id
-	$event->create();
+//	$event = Event::makeEvent(Event::TYPE_START,$team->get('OID'), 0); // 
+//	if ($event->create()===false) {
+//		trace("create event failed",__FILE__,__LINE__,__METHOD__);
+//		rest_sendBadRequestResponse(500, "database create failed");
+//	}
 	// todo send message to station
-	$rpi->
-	$json = array('message' => "test");  //@todo what to send to rPI
+
+	$json = array('message' => $stationType->get('instructions'));
 	json_sendObject($json);
-	
-	$teamId = Team::getFromPin($teamPIN);
-
-	
-	$event = Event::makeEvent(Event::TYPE_START,$teamId, $stationId);
-	$event->create();
-	// forward start to rPI
-
-	$json = array();  //@todo what to send to rPI
-	$rpi->start_challenge($teamId);
 }
 

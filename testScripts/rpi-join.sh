@@ -29,5 +29,5 @@ fi
 HOST="localhost"
 curl -v -X POST \
  -H "Content-Type: application/json" \
- -d "{ \"message_version\" : \"0\" , \"station_id\" : \"$ID\" , \"station_type\" : \"$TYP\" , \"station_url\" : \"$URL\" }" \
- http://$HOST/m/rpi/join/
+ -d "{ \"message_version\" : \"0\" , \"station_type\" : \"$TYP\" , \"station_url\" : \"$URL\" }" \
+ http://$HOST/m/rpi/join/$ID

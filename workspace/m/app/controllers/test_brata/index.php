@@ -3,6 +3,10 @@
 function _index() {
   $urlPrefix="test_brata";
   $data['body'][]='<h2>Brata Testing</h2><br />';
+
+  $fdata['registerUrl']=myUrl("$urlPrefix/sim_register");
+  $fdata['registerLabel']="Register";
+  
   $fdata['startUrl']=myUrl("$urlPrefix/sim_start_challenge");
   $fdata['startLabel']="Start Challenge";
   

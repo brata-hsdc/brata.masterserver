@@ -1,6 +1,12 @@
 <?php
 class StationType extends ModelEx {
 
+ const STATION_TYPE_REG = 0;
+ const STATION_TYPE_CTS = 1;
+ const STATION_TYPE_FSL = 2;
+ const STATION_TYPE_HMB = 3;
+ const STATION_TYPE_CPA = 4;
+ const STATION_TYPE_EXT = 5;
   
   function __construct($oid=0,$cid=0) {
     parent::__construct('OID','CID','t_stationtype'); 

@@ -12,18 +12,20 @@ class Event extends ModelEx {
 	}
 	static function getTypesAsHtmlOptions($selectValue) {
 		return
-		"<option "  . Event::isSelected(Event::TYPE_BAD    , $selectValue) . "value=" . Event::TYPE_BAD    . "> Select one"
-		."<option " . Event::isSelected(Event::TYPE_START  , $selectValue) . "value=" . Event::TYPE_START  . "> Start"
-		."<option " . Event::isSelected(Event::TYPE_SUBMIT , $selectValue) . "value=" . Event::TYPE_SUBMIT . "> Submit"
-		."<option " . Event::isSelected(Event::TYPE_END    , $selectValue) . "value=" . Event::TYPE_END    . "> End";
+		"<option "  . Event::isSelected(Event::TYPE_BAD      , $selectValue) . "value=" . Event::TYPE_BAD    . "> Select one"
+		."<option " . Event::isSelected(Event::TYPE_REGISTER , $selectValue) . "value=" . Event::TYPE_REGISTER . "> Register"
+		."<option " . Event::isSelected(Event::TYPE_START    , $selectValue) . "value=" . Event::TYPE_START  . "> Start"
+		."<option " . Event::isSelected(Event::TYPE_SUBMIT   , $selectValue) . "value=" . Event::TYPE_SUBMIT . "> Submit"
+		."<option " . Event::isSelected(Event::TYPE_END      , $selectValue) . "value=" . Event::TYPE_END    . "> End";
 	}
 	
 	static function getTypeAsText($value) {
 		switch ($value)
 		{
-			case Event::TYPE_START  : return "Start";
-			case Event::TYPE_SUBMIT : return "Submit";
-			case Event::TYPE_END    : return "End";
+			case Event::TYPE_REGISTER : return "Register";
+			case Event::TYPE_START    : return "Start";
+			case Event::TYPE_SUBMIT   : return "Submit";
+			case Event::TYPE_END      : return "End";
 			default: return "Error - unknown event type";
 			 	
         }	

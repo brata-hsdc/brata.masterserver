@@ -5,22 +5,29 @@ require(APP_PATH.'inc/rest_functions.php');
 require(APP_PATH.'inc/json_functions.php');
 function _register() 
 {
-	trace("register");
+	trace("start",__FILE__,__LINE__,__METHOD__);
 	
 	$json = json_getObjectFromRequest("POST");
 	//if ($json === NULL) return;
 	json_checkMembers("team_id,message", $json);
     $teamPIN = $json['team_id'];
 	if ($teamPIN === null) {
-		error_log("missing PIN\n",3,"/var/tmp/m.log");
+		trace("missing PIN",__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(400,"missing team PIN");  // doesn't return
 	}
-	$teamId = Team::getFromPin($teamPIN);
-	$stationId = StationType::getFromShortname("REG");
+	$team = Team::getFromPin($teamPIN);
+	if ($team === false) {
+		trace("_can't find team PIN=".$teamPIN,__FILE__,__LINE__,__METHOD__);
+		rest_sendBadRequestResponse(404,"missing can' fint team PIN=".$teamPIN);  // doesn't return
+	}
+	$stationType = StationType::getFromShortname("REG");
+	if ($stationType === false) {
+		trace("can't find REG station",__FILE__,__LINE__,__METHOD__);
+		rest_sendBadRequestResponse(500, "can't fing REG station");
+	}
 
-	$event = Event::makeEvent(Event::TYPE_REGISTER,$teamId, 0); // todo use real id
-	$event->create();
-	// todo send message to station
-	$json = array('message' => "test");  //@todo what to send to rPI
+	$event = Event::makeEvent(Event::TYPE_REGISTER,$team->get('OID'), $stationType->get('OID'));
+	$tmp = $event->create();
+	$json = array('message' => $stationType->get('instructions'));
 	json_sendObject($json);
 }
