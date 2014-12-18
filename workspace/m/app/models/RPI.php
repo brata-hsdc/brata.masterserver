@@ -49,10 +49,12 @@ class RPI extends ModelEx {
   
   function start_challenge($parms)  {
   	$json = array("message_version" =>0 , 
-  			"message_timestamp"=> date("Y-m-d HH:i:s"), 
+  			"message_timestamp"=> date("Y-m-d H:i:s"), 
   			"theatric_delay_ms"=>1000 );
-  	array_merge($json,$parms);  // over ride / merge in parms
-  	return RPI::do_post_request($this->rs['URL']."/start_challenge", $json);
+  	$json = array_merge($json,$parms);  // over ride / merge in parms
+  	trace(json_encode($json),__FILE__,__LINE__,__METHOD__);
+  	return true;
+  	//return RPI::do_post_request($this->rs['URL']."/start_challenge", $json);
   }
   
   function reset() {

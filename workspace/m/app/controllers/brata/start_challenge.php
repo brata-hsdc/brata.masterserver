@@ -43,6 +43,8 @@ function _start_challenge($stationTag=null)
 //		rest_sendBadRequestResponse(500, "database create failed");
 //	}
 	// todo send message to station
+	$parms =array("cts_combo" => [1,2,3]);
+	$rpi->start_challenge($parms);
 
 	$json = array('message' => $stationType->get('instructions'));
 	json_sendObject($json);
