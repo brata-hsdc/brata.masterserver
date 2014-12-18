@@ -70,15 +70,15 @@ ripped all the unused bits out.)
 
    Label                                      Field Value
    ------------------------------------------ -----------------------------
+   Web Domain [with NO trailing slash]        http://localhost
    Web Folder[with trailing slash]            /m/
-   Web Domain [with NO trailing slash]        http://metsys.dlinkddns.com
-   Paypal Return URL [with NO trailing slash] *
    Database Host                              localhost
    Database Name                              m
    Database User                              root
    Database Password                          $$##zxcv
+   Log Level                                  5
+   Send Mail (to new users)                   [checked]
    Debug Mode                                 [checked]
-   Send Mail                                  [checked]
 
 Set the following:
 
@@ -118,8 +118,31 @@ In a Web browser, navigate to:
 
 Login using the credential specified on the page.
 
+<strike>
 On the Manage side bar along the left-hand side, click Device Testing > Test
 Contact.
+</strike>
+
+On the Manage side bar along the left-hand side, click Stations > CTS00 > Edit
+
+Modify to match what's in the station config. Then submit.
+
+Join from station.
+
+Manage > CTS Data > Add new CTS Data
+   Enter five angles for wooden prop in degrees
+
+On the Manage side bar along the left-hand side, click rPi.
+
+See records for all joined rPi's.
+
+Send messages from here.
+
+On the Manage side bar along the left-hand side, click Brata Testing.
+
+Pick the team, pick the station.
+
+$ tail -f /var/tmp/m.log
 
 
 
