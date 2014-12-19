@@ -1,6 +1,7 @@
 <?php
 class StationType extends ModelEx {
 
+ const STATION_TYPE_BAD = -1;
  const STATION_TYPE_REG = 0;
  const STATION_TYPE_CTS = 1;
  const STATION_TYPE_FSL = 2;
@@ -12,20 +13,21 @@ class StationType extends ModelEx {
     parent::__construct('OID','CID','t_stationtype'); 
     $this->rs['OID'] = $oid;
     $this->rs['CID'] = $cid;
+    $this->rs['typeCode'] = StationType::STATION_TYPE_BAD;
     $this->rs['longName'] = '';
-    $this->rs['shortName'] = '';
     $this->rs['delay'] = 60;
     $this->rs['instructions'] = "todo";
     $this->rs['correct_msg'] = "todo";
     $this->rs['incorrect_msg'] = "todo";
+    $this->rs['failed_msg'] = "todo";
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
 
 // return the StationType object for the given "short" name 
-  static function getFromShortname($shortName) {
+  static function getFromTypeCode($typeCode) {
     $type = new StationType();
-    return $type->retrieve_one("shortName = ?", $shortName);
+    return $type->retrieve_one("typeCode = ?", $typeCode);
   }
   
   static function getAllAsHTMLOptions($oid=-1) {
