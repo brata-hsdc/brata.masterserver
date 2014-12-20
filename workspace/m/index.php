@@ -75,7 +75,7 @@ $GLOBALS['pagination']['cur_tag_close'] = '</span>';
 $GLOBALS['pagination']['first_link'] = '&lt;&lt;';
 $GLOBALS['pagination']['last_link'] = '&gt;&gt;';
 $GLOBALS['pagination']['num_links'] = 2;
-$GLOBALS['pagination']['per_page'] = 5;
+$GLOBALS['pagination']['per_page'] = 25;
 
 //===============================================
 // Uncaught Exception Handling

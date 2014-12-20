@@ -17,7 +17,7 @@ function create_t_stationtype($dbh) {
   	`OID` int(10) unsigned NOT NULL auto_increment,
   	`CID` int(10) unsigned NOT NULL default '0',
 	`typeCode` int(10) NOT NULL,
-	`longName` varchar(255) NOT NULL,		
+	`name` varchar(255) NOT NULL,		
   	`delay` int(10) unsigned NOT NULL default '60',			
  	`instructions` varchar(255) NOT NULL,
 	`correct_msg` varchar(255) NOT NULL,
@@ -219,7 +219,7 @@ function create_t_ext_data($dbh) {
 
 function create_v_scores($dbh) {
 	$status = $dbh->exec("create view v_scores as "
-			."select T.name team, E.stationId Station, ST.longName name ,sum(E.points) score from t_event E "
+			."select T.name team, E.stationId Station, ST.name name ,sum(E.points) score from t_event E "
 			."left join t_team T on E.teamid=T.OID " 
 			."left join t_station S on E.stationid=S.OID "
 			."left join t_stationtype ST on E.stationid=ST.OID "
@@ -316,19 +316,19 @@ function _resetdb() {
     $admin->setRoll(USER::ROLL_ADMIN);
     $admin->create();
 
-    
-    
     $stationNames = array("Register","Crack The Safe","Find Secret Lab",
     		"Defuse Hypermutation Bomb","Catch Provessor Aardvark","Extra"
     );
+    
     $stationCodes = array(
     		StationType::STATION_TYPE_REG,StationType::STATION_TYPE_CTS,StationType::STATION_TYPE_FSL,
     		StationType::STATION_TYPE_HMB,StationType::STATION_TYPE_CPA, StationType::STATION_TYPE_EXT
-    );    
+    );
+    
     for ($i=0;$i<count($stationNames);$i++)
     {
     	$stationType = new StationType();
-    	$stationType->set('longName',$stationNames[$i]);
+    	$stationType->set('name',$stationNames[$i]);
     	$stationType->set('typeCode',$stationCodes[$i]);
     	$stationType->set('delay',60);
     	$stationType->set('instructions',"todo instructions ".$i);
@@ -337,6 +337,7 @@ function _resetdb() {
     	$stationType->set('failed_msg',"failed ".$i);
     	if ($stationType->create()===false) echo "Create StationType $i failed";
     }
+    
     $stationType = StationType::getFromTypeCode(StationType::STATION_TYPE_REG);
     $station = new Station();
     $station->set("tag", "REG");

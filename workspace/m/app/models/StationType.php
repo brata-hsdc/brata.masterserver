@@ -14,7 +14,7 @@ class StationType extends ModelEx {
     $this->rs['OID'] = $oid;
     $this->rs['CID'] = $cid;
     $this->rs['typeCode'] = StationType::STATION_TYPE_BAD;
-    $this->rs['longName'] = '';
+    $this->rs['name'] = '';
     $this->rs['delay'] = 60;
     $this->rs['instructions'] = "todo";
     $this->rs['correct_msg'] = "todo";
@@ -27,7 +27,7 @@ class StationType extends ModelEx {
 // return the StationType object for the given "short" name 
   static function getFromTypeCode($typeCode) {
     $type = new StationType();
-    return $type->retrieve_one("typeCode = ?", $typeCode);
+    return $type->retrieve_one("typeCode=?", array($typeCode));
   }
   
   static function getAllAsHTMLOptions($oid=-1) {
@@ -40,10 +40,5 @@ class StationType extends ModelEx {
     }
     return $options;
   }
+}
   
-
-  static function getAllOrderByName() {
-    $item = new StationType();
-    return $item->retrieve_many("OID !=0 order by longName");
-
-  }}
