@@ -53,8 +53,9 @@ class RPI extends ModelEx {
   			"theatric_delay_ms"=>1000 );
   	$json = array_merge($json,$parms);  // over ride / merge in parms
   	trace(json_encode($json),__FILE__,__LINE__,__METHOD__);
-  	return true;
-  	//return RPI::do_post_request($this->rs['URL']."/start_challenge", $json);
+  	// todo remove this is just for testing don't send it URL start with test
+  	if (substr($this->rs['URL'],0,4) == "test") return true;
+  	return RPI::do_post_request($this->rs['URL']."/start_challenge", $json);
   }
   
   function reset() {

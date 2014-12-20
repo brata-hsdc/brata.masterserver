@@ -16,13 +16,16 @@ function create_t_stationtype($dbh) {
 	"CREATE TABLE `t_stationtype` (
   	`OID` int(10) unsigned NOT NULL auto_increment,
   	`CID` int(10) unsigned NOT NULL default '0',
-  	`longName` varchar(255) NOT NULL,
-	`shortName` varchar(255) NOT NULL,			
+	`typeCode` int(10) NOT NULL,
+	`name` varchar(255) NOT NULL,
+	`hasrPI` bool NOT NULL default false,				
   	`delay` int(10) unsigned NOT NULL default '60',			
  	`instructions` varchar(255) NOT NULL,
 	`correct_msg` varchar(255) NOT NULL,
 	`incorrect_msg` varchar(255) NOT NULL,
-  	PRIMARY KEY  (`OID`)
+	`failed_msg` varchar(255) NOT NULL,
+  	PRIMARY KEY  (`OID`),
+	CONSTRAINT `typeCode_unique` UNIQUE KEY (`typeCode`)
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
 	if ($status === false) throw new ErrorInfo($dbh,"t_stationtype");
@@ -217,7 +220,7 @@ function create_t_ext_data($dbh) {
 
 function create_v_scores($dbh) {
 	$status = $dbh->exec("create view v_scores as "
-			."select T.name team, E.stationId Station, ST.shortName name ,sum(E.points) score from t_event E "
+			."select T.name team, E.stationId Station, ST.name name ,sum(E.points) score from t_event E "
 			."left join t_team T on E.teamid=T.OID " 
 			."left join t_station S on E.stationid=S.OID "
 			."left join t_stationtype ST on E.stationid=ST.OID "
@@ -314,32 +317,38 @@ function _resetdb() {
     $admin->setRoll(USER::ROLL_ADMIN);
     $admin->create();
 
-    $stationType = new StationType();
-    $stationType->set('longName',"Register");
-    $stationType->set('shortName',"REG");
-    $stationType->set('delay',0);
-    $stationType->set('instructions',"Welcome [team-name]");
-    $stationType->set('correct_msg',"not used");
-    $stationType->set('incorrect_msg',"not used");
-    if ($stationType->create()===false) echo "Create StationType 'Register' failed";
+    $stationNames = array("Register","Crack The Safe","Find Secret Lab",
+    		"Defuse Hypermutation Bomb","Catch Provessor Aardvark","Extra"
+    );
+    
+    $stationCodes = array(
+    		StationType::STATION_TYPE_REG,StationType::STATION_TYPE_CTS,StationType::STATION_TYPE_FSL,
+    		StationType::STATION_TYPE_HMB,StationType::STATION_TYPE_CPA, StationType::STATION_TYPE_EXT
+    );
+    
+    $stationHasrPI = array(
+    		false,true,false,true,true, false
+    );
+    
+    for ($i=0;$i<count($stationNames);$i++)
+    {
+    	$stationType = new StationType();
+    	$stationType->set('name',$stationNames[$i]);
+    	$stationType->set('typeCode',$stationCodes[$i]);
+    	$stationType->set('hasrPI',$stationHasrPI[$i]);
+    	$stationType->set('delay',60);
+    	$stationType->set('instructions',"todo instructions ".$i);
+    	$stationType->set('correct_msg',"Correct ".$i);
+    	$stationType->set('incorrect_msg',"Please try again ".$i);
+    	$stationType->set('failed_msg',"failed ".$i);
+    	if ($stationType->create()===false) echo "Create StationType $i failed";
+    }
+    
+    $stationType = StationType::getFromTypeCode(StationType::STATION_TYPE_REG);
     $station = new Station();
     $station->set("tag", "REG");
     $station->set("typeId", $stationType->get("OID"));
     if ($station->create() === false) echo "Create Station 'REG' failed";
-    
-    
-    $stationNames = explode(",","Crack The Safe,CTS,Find Secret Lab,FSL,Defuse Hypermutation Bomb,HMB,Catch Provessor Aardvark,CPA,Extra,EXT");
-    for ($i=0;$i<count($stationNames);$i+=2)
-    {
-    	$stationType = new StationType();
-    	$stationType->set('longName',$stationNames[$i]);
-    	$stationType->set('shortName',$stationNames[$i+1]);
-    	$stationType->set('delay',60);
-    	$stationType->set('instructions',"todo instructions ".$i/2);
-    	$stationType->set('correct_msg',"Correct ".$i/2);
-    	$stationType->set('incorrect_msg',"Please try again ".$i/2);
-    	if ($stationType->create()===false) echo "Create StationType $i failed";
-    }
     
     if ($dataOption == 0) {
         redirect('mgmt_main','Database Initialized without test data!');
@@ -357,12 +366,13 @@ function _resetdb() {
     	if ($user->create()===false) echo "Create user $i failed";
     }
  
-    $stationNames = explode(",", "CTS,FSL");
-    for ($i=0; $i<count($stationNames); $i++)
+    $stationTags = array("cpa","fsl");
+    $stationCodes = array(StationType::STATION_TYPE_CPA,StationType::STATION_TYPE_FSL);
+    for ($i=0; $i<count($stationCodes); $i++)
     {
-      $stationType = StationType::getFromShortname($stationNames[$i]);
+      $stationType = StationType::getFromTypeCode($stationCodes[$i]);
       $station = new Station();
-      $station->set("tag", $stationNames[$i]."00");
+      $station->set("tag", $stationTags[$i]."00");
       $station->set("typeId", $stationType->get("OID"));
       if ($station->create() === false) echo "Create Station $i failed";
     }
