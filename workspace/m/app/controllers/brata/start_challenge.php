@@ -20,6 +20,7 @@ function _start_challenge($stationTag=null)
 		trace("can't find station type stationTag = ".$stationTag,__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(500,"can't find station type stationTag=".$stationTag);		
 	}
+	
 	$rpi = RPI::getFromStationId($station->get('OID'));
 	if ($rpi === false) {
 		trace("_start_challenge can't find RPI stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
@@ -37,14 +38,14 @@ function _start_challenge($stationTag=null)
 		rest_sendBadRequestResponse(404,"team not found PIN=".$teamPIN);  // doesn't return
 	}
 	
-//	$event = Event::makeEvent(Event::TYPE_START,$team->get('OID'), 0); // 
-//	if ($event->create()===false) {
-//		trace("create event failed",__FILE__,__LINE__,__METHOD__);
-//		rest_sendBadRequestResponse(500, "database create failed");
-//	}
-	// todo send message to station
 	$parms =array("cts_combo" => [1,2,3]);
 	$rpi->start_challenge($parms);
+	
+	$event = Event::makeEvent(Event::TYPE_START,$team->get('OID'), $station->get('OID'),0,json_encode($parms)); //
+	if ($event->create()===false) {
+		trace("create event failed",__FILE__,__LINE__,__METHOD__);
+		rest_sendBadRequestResponse(500, "database create failed");
+	}
 
 	$json = array('message' => $stationType->get('instructions'));
 	json_sendObject($json);
