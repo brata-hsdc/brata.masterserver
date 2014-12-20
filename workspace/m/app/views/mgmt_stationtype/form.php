@@ -13,6 +13,10 @@
 			<td><input readonly type="text" name="name" style="width:150px" value="<?php echo $object->get('name')?>" /></td>
 		</tr>			
 		<tr>
+			<td>Has rPI(read only)</td>
+			<td><input readonly type="text" name="hasrPI" style="width:150px" value="<?php echo $object->get('hasrPI')?>" /></td>
+		</tr>		
+		<tr>
 			<td>Delay</td>
 			<td><input type="text" name="delay" style="width:150px" value="<?php echo $object->get('delay')?>" /></td>
 		</tr>		

@@ -17,7 +17,8 @@ function create_t_stationtype($dbh) {
   	`OID` int(10) unsigned NOT NULL auto_increment,
   	`CID` int(10) unsigned NOT NULL default '0',
 	`typeCode` int(10) NOT NULL,
-	`name` varchar(255) NOT NULL,		
+	`name` varchar(255) NOT NULL,
+	`hasrPI` bool NOT NULL default false,				
   	`delay` int(10) unsigned NOT NULL default '60',			
  	`instructions` varchar(255) NOT NULL,
 	`correct_msg` varchar(255) NOT NULL,
@@ -325,11 +326,16 @@ function _resetdb() {
     		StationType::STATION_TYPE_HMB,StationType::STATION_TYPE_CPA, StationType::STATION_TYPE_EXT
     );
     
+    $stationHasrPI = array(
+    		false,true,false,true,true, false
+    );
+    
     for ($i=0;$i<count($stationNames);$i++)
     {
     	$stationType = new StationType();
     	$stationType->set('name',$stationNames[$i]);
     	$stationType->set('typeCode',$stationCodes[$i]);
+    	$stationType->set('hasrPI',$stationHasrPI[$i]);
     	$stationType->set('delay',60);
     	$stationType->set('instructions',"todo instructions ".$i);
     	$stationType->set('correct_msg',"Correct ".$i);

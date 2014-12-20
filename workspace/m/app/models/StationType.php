@@ -15,6 +15,7 @@ class StationType extends ModelEx {
     $this->rs['CID'] = $cid;
     $this->rs['typeCode'] = StationType::STATION_TYPE_BAD;
     $this->rs['name'] = '';
+    $this->rs['hasrPI'] = false;
     $this->rs['delay'] = 60;
     $this->rs['instructions'] = "todo";
     $this->rs['correct_msg'] = "todo";
