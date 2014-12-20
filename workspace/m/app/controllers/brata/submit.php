@@ -24,15 +24,20 @@ function _submit($stationTag=null)
 		rest_sendBadRequestResponse(500,"can't find station type stationTag=".$stationTag);		
 	}
 	
-	$rpi = RPI::getFromStationId($station->get('OID'));
-	if ($rpi === false) {
-		trace("_start_challenge can't find RPI stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
-		rest_sendBadRequestResponse(500,"can't find RPI stationTag=".$stationTag);
+	if ($stationType->get('hasrPI'))
+	{
+	  $rpi = RPI::getFromStationId($station->get('OID'));
+	  if ($rpi === false) {
+		  trace("_start_challenge can't find RPI stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
+		  rest_sendBadRequestResponse(500,"can't find RPI stationTag=".$stationTag);
+	  }
+	} else {
+		$rpi = null;
 	}
 	
 	$json = json_getObjectFromRequest("POST");  // won't return if an error happens
 	
-	json_checkMembers("message,teamId", $json);
+	json_checkMembers("message,team_id", $json);
 
 	$isCorrect = false;
 	$challengeComplete = false;
@@ -44,9 +49,15 @@ function _submit($stationTag=null)
           break;
 	}
 	
+	$team = Team::getFromPin($json['team_id']);
+	if ($team === false) {
+		trace("can't find team from team ".$json['team_id']);
+		//todo fail here
+	}
 	//@todo calculate points
-	Event::makeEvent(Event::TYPE_SUBMIT, $teamId, $stationId,$points);
+	$points = 0;
+	Event::makeEvent(Event::TYPE_SUBMIT, $team->get('OID'), $station->get('OID'),$points);
 	//$rpi->start_challenge($teamId);
-     $json = array();  //@todo 
+     $json = array("message"=>"test ".$stationTag);  //@todo 
 	json_sendObject($json);
 }
