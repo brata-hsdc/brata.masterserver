@@ -20,7 +20,7 @@ function _register()
 		trace("_can't find team PIN=".$teamPIN,__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(404,"missing can' fint team PIN=".$teamPIN);  // doesn't return
 	}
-	$stationType = StationType::getFromShortname("REG");
+	$stationType = StationType::getFromTypeCode(StationType::STATION_TYPE_REG);
 	if ($stationType === false) {
 		trace("can't find REG station",__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(500, "can't fing REG station");

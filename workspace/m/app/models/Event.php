@@ -53,5 +53,15 @@ class Event extends ModelEx {
   	$o->set('points',$points);
   	$o->set('description',$description);
   	return $o;
+  }
+  //todo recode to use team state object
+  static function teamIdAtStation($stationId) {
+	$dbh=getdbh();
+	$stmt = $dbh->query("SELECT teamId,max(created_dt) total FROM $this->tablename where stationId=$stationId");
+	return $stmt->fetchColumn();
+  }
+  static function countEvents($type,$teamId,$stationId) {
+  	$o = new Event();
+  	return $o->count("type=? and stationId=? and teamId=?", array($type,$teamId,$stationId));
   } 
 }

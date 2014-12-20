@@ -21,12 +21,15 @@ function _start_challenge($stationTag=null)
 		rest_sendBadRequestResponse(500,"can't find station type stationTag=".$stationTag);		
 	}
 	
-	$rpi = RPI::getFromStationId($station->get('OID'));
-	if ($rpi === false) {
-		trace("_start_challenge can't find RPI stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
-		rest_sendBadRequestResponse(500,"can't find RPI stationTag=".$stationTag);
-	}
-		
+	if ($stationType->get('hasrPI')) {
+		$rpi = RPI::getFromStationId($station->get('OID'));
+		if ($rpi === false) {
+			trace("_start_challenge can't find RPI stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
+			rest_sendBadRequestResponse(500,"can't find RPI stationTag=".$stationTag);
+		}
+	} else {
+		$rpi=null;
+	}	
 	$json = json_getObjectFromRequest("POST");
 	//if ($json === NULL) return;
 	json_checkMembers("team_id,message", $json);
@@ -38,10 +41,21 @@ function _start_challenge($stationTag=null)
 		rest_sendBadRequestResponse(404,"team not found PIN=".$teamPIN);  // doesn't return
 	}
 	
-	$parms =array("cts_combo" => [1,2,3]);
-	$rpi->start_challenge($parms);
+	$parms = null;
+	switch($stationType->get('typeCode'))
+	{
+		case StationType::STATION_TYPE_CTS:
+	        $parms =array("cts_combo" => [1,2,3]);
+	        break;
+	    case StationType::STATION_TYPE_CPA:
+	        	$parms =array("cpa_velocity" => 6000, "cpa_velocity_tolerance_ms"=>0,
+	        	"cpa_window_time_ms"=>8000, "cpa_window_time_tolerance_ms"=>100,
+	        	"cpa_pulse_width_ms"=>10, "cpa_pulse_width_tolerance_ms"=>20);
+	        	break;
+	}
+	if ($rpi!=null) $rpi->start_challenge($stationType->get('delay'),$parms);
 	
-	$event = Event::makeEvent(Event::TYPE_START,$team->get('OID'), $station->get('OID'),0,json_encode($parms)); //
+	$event = Event::makeEvent(Event::TYPE_START,$team->get('OID'), $station->get('OID'),0); //
 	if ($event->create()===false) {
 		trace("create event failed",__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(500, "database create failed");

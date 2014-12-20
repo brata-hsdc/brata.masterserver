@@ -48,7 +48,7 @@ function _join($station_id = null) {
 				throw new RestException(500,"join update failed");
 			}
 		}
-		rest_sendSuccessResponse ( 202, "Accepted" );
+		rest_sendSuccessResponse ( 202, "Accepted","Hello World" );
 	} catch ( RestException $e ) {
 		rest_sendBadRequestResponse ( $e->statusCode, $e->statusMsg ); // doesn't return
 	}

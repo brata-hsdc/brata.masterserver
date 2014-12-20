@@ -10,20 +10,55 @@
 require(APP_PATH.'inc/rest_functions.php');
 require(APP_PATH.'inc/json_functions.php');
 //
-function _submit($stationId=null)
+function _submit($stationTag=null)
 {
-	if ($stationId === null) {
-		rest_sendBadRequestResponse(400,"missing stationId");  // doesn't return
+	if ($stationTag === null) {
+		trace("missing station id");
+		rest_sendBadRequestResponse(401,"missing stationId");  // doesn't return
 	}
 	
-	$json = json_getObjectFromRequest("POST");
-	//if ($json === NULL) return;
-	json_checkMembers("message_version,message_timestamp,candidate_answer,is_correct,fail_message", $json);
+	$station = Station::getFromTag($stationTag);
+	if ($station === false) {
+		trace("can't find station from tag");
+		rest_sendBadRequestResponse(404,"can find station stationTag=".$stationTag);  // doesn't return		
+	}
+	
+	$stationType = new StationType($station->get('typeId'),-1);
+	if ($stationType === false ) {
+		trace("can't find station type stationTag = ".$stationTag,__FILE__,__LINE__,__METHOD__);
+		rest_sendBadRequestResponse(500,"can't find station type stationTag=".$stationTag);		
+	}
+	
+	$rpi = RPI::getFromStationId($station->get('OID'));
+	if ($rpi === false) {
+		trace("_start_challenge can't find RPI stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
+		rest_sendBadRequestResponse(500,"can't find RPI stationTag=".$stationTag);
+	}
+	
+	$json = json_getObjectFromRequest("POST");  // won't return if an error happens
+	
+	json_checkMembers("candidate_answer,is_correct,fail_message", $json);
+
+	// for CTS candidate_answer is array of three
+	// for CPA candidate_answer is text hit in/out of window
+	switch($stationType->get('typeCode'))
+	{
+		case StationType::STATION_TYPE_CTS:
+			break;
+		case StationType::STATION_TYPE_CPA:
+			break;
+		
+	}
+	$points = ($json['is_correct']) ? 3 : -1;
+	$count = Event::countEvents(Event::TYPE_SUBMIT, $teamId, $station->get('OID'));
 
 	//@todo calculate points
 	Event::makeEvent(Event::TYPE_SUBMIT, $teamId, $stationId,$points);
-	$rpi = RPI::getFromStationId($stationId);
-	//$rpi->start_challenge($teamId);
-	$json = array();  //@todo
+	$json = array("message_version" =>0 ,
+			"message_timestamp"=> date("Y-m-d H:i:s"),
+			"theatric_delay_ms"=>$stationType->get('delay') ,
+			"challenge_complete"=>false
+	);
+	
 	json_sendObject($json);
 }

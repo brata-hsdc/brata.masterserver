@@ -41,6 +41,7 @@ function json_checkMembers($fields, &$json)
 		$missing = $missing ?  $missing.",".$name : $name;
 	}
 	if ($missing == null) return true;
+	trace("missing $missing",__FILE__,__LINE__,__METHOD__);
 	json_sendBadRequestResponse("missing $missing");  // does not return
 }
 
@@ -49,7 +50,6 @@ function json_checkMembers($fields, &$json)
 // returns true on success, false otherwise
 function json_sendObject($jsonObject)
 {
-trace("json_sendObject starts",__FILE__,__LINE__,__METHOD__);
 	rest_CacheHeaders();
 	header("Content-Type: application/json");
 	$string = json_encode($jsonObject);

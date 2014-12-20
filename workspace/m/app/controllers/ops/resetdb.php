@@ -346,7 +346,7 @@ function _resetdb() {
     
     $stationType = StationType::getFromTypeCode(StationType::STATION_TYPE_REG);
     $station = new Station();
-    $station->set("tag", "REG");
+    $station->set("tag", "reg00");
     $station->set("typeId", $stationType->get("OID"));
     if ($station->create() === false) echo "Create Station 'REG' failed";
     
