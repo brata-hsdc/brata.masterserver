@@ -45,9 +45,9 @@ function _make_html_table($table,$item,$urlPrefix,$n,&$data) {
 		foreach ($tablearr[0] as $f) {
 			$row[]=htmlspecialchars($rs[$f]);
 		}
-		$row[]=	'<a href="'.myUrl("$urlPrefix/edit/$OID/$CID").'">Edit</a> | '.
-				'<a href="javascript:jsconfirm(\'Really Delete '.$item.'?\',\''.
-		        myUrl("$urlPrefix/ops_delete/$OID/$CID").'\')">Delete</a>';
+		$row[]=	'<a href="'.myUrl("$urlPrefix/edit/$OID/$CID").'">Edit</a>';// | '.
+				//'<a href="javascript:jsconfirm(\'Really Delete '.$item.'?\',\''.
+		        //myUrl("$urlPrefix/ops_delete/$OID/$CID").'\')">Delete</a>';
 		$tablearr[]=$row;
 	};
 	$data['body'][]=table::makeTable($tablearr);
