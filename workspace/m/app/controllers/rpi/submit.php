@@ -49,11 +49,12 @@ function _submit($stationTag=null)
 			break;
 		
 	}
+	$team = new Team(0,-1); // todo get real team 
 	$points = ($json['is_correct']) ? 3 : -1;
-	$count = Event::countEvents(Event::TYPE_SUBMIT, $teamId, $station->get('OID'));
+	$count = Event::countEvents(Event::TYPE_SUBMIT, $team->get('OID'), $station->get('OID'));
 
 	//@todo calculate points
-	Event::makeEvent(Event::TYPE_SUBMIT, $teamId, $stationId,$points);
+	Event::makeEvent(Event::TYPE_SUBMIT, $team->get('OID'), $station->get('OID'),$points);
 	$json = array("message_version" =>0 ,
 			"message_timestamp"=> date("Y-m-d H:i:s"),
 			"theatric_delay_ms"=>$stationType->get('delay') ,
