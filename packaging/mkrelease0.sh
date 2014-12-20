@@ -14,7 +14,7 @@
 #  limitations under the License.
 # ------------------------------------------------------------------------------
 #
-#  Create the relese archive needed to deploy on a remote host 
+#  Create the release archive needed to deploy on a remote host 
 #
 #
 
