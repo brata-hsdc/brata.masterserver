@@ -36,7 +36,7 @@ class StationType extends ModelEx {
     $options ="";
     foreach ($aray as $item) {
       $selected = $item->get('OID') == $oid ? "selected" : "";
-      $options .= '<option value='. $item->get('OID'). ' ' . $selected . '>' . $item->get("longName");
+      $options .= '<option value='. $item->get('OID'). ' ' . $selected . '>' . $item->get("name");
     }
     return $options;
   }
