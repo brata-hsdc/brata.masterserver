@@ -2,8 +2,8 @@
   function validateForm(f) {
    
     if (f.delay.value == "") {
-        alert("Please enter a delay value (numberic)");
-        f.longNnme.focus();
+        alert("Please enter a delay value (numeric)");
+        f.delay.focus();
         return false;
       } 
     if (f.instructions.value == "") {
@@ -11,19 +11,19 @@
         f.instructions.focus();
         return false;
       }
-    if (f.correct_msg.value == "") {
-        alert("Please enter the 'correct' message");
-        f.correct_msg.focus();
-        return false;
-      }
-    if (f.incorrect_msg.value == "") {
-        alert("Please enter the 'incorrect' message");
-        f.incorrect_msg.focus();
+    if (f.success_msg.value == "") {
+        alert("Please enter the 'success' message");
+        f.success_msg.focus();
         return false;
       }
     if (f.failed_msg.value == "") {
         alert("Please enter the 'failed' message");
         f.failed_msg.focus();
+        return false;
+      }
+    if (f.retry_msg.value == "") {
+        alert("Please enter the 'retry' message");
+        f.retry_msg.focus();
         return false;
       }
     f.submit();

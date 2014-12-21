@@ -25,16 +25,16 @@
 			<td><textarea name="instructions" style="width:150px"><?php echo $object->get('instructions')?></textarea></td>
 		</tr>
 		<tr>
-			<td>Correct Message</td>
-			<td><textarea name="correct_msg" style="width:150px"><?php echo $object->get('correct_msg')?></textarea></td>
-		</tr>
-		<tr>
-			<td>Incorrect Message</td>
-			<td><textarea name="incorrect_msg" style="width:150px"><?php echo $object->get('incorrect_msg')?></textarea></td>
+			<td>Success Message</td>
+			<td><textarea name="success_msg" style="width:150px"><?php echo $object->get('success_msg')?></textarea></td>
 		</tr>
 		<tr>
 			<td>Failed Message</td>
 			<td><textarea name="failed_msg" style="width:150px"><?php echo $object->get('failed_msg')?></textarea></td>
+		</tr>
+		<tr>
+			<td>Retry Message</td>
+			<td><textarea name="retry_msg" style="width:150px"><?php echo $object->get('retry_msg')?></textarea></td>
 		</tr>
 		<tr>
 			<td colspan="2" style="text-align:right">

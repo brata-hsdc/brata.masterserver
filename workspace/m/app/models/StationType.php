@@ -17,14 +17,28 @@ class StationType extends ModelEx {
     $this->rs['name'] = '';
     $this->rs['hasrPI'] = false;
     $this->rs['delay'] = 60;
-    $this->rs['instructions'] = "todo";
-    $this->rs['correct_msg'] = "todo";
-    $this->rs['incorrect_msg'] = "todo";
-    $this->rs['failed_msg'] = "todo";
+    $this->rs['instructions'] = "todo - instructions";
+    $this->rs['success_msg'] = "todo - success message";
+    $this->rs['failed_msg'] = "todo - failed message";
+    $this->rs['retry_msg'] = "todo - retry message";
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
-
+ 
+  // helper for resetdb
+  static function makeStationType($typeCode,$name,$hasrPI,$delay,$instructions,$success_msg,$failed_msg,$retry_msg)
+  {
+  	$o = new StationType();
+  	$o->set('typeCode'    , $typeCode);
+  	$o->set('name'        , $name);
+  	$o->set('hasrPI'      , $hasrPI);
+  	$o->set('delay'       , $delay);
+  	$o->set('instructions', $instructions);
+  	$o->set('success_msg' , $success_msg);
+  	$o->set('failed_msg'  , $failed_msg);
+  	$o->set('retry_msg'   , $retry_msg);
+  	return $o->create();  	
+  }
 // return the StationType object for the given "short" name 
   static function getFromTypeCode($typeCode) {
     $type = new StationType();

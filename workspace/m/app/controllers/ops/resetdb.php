@@ -21,9 +21,9 @@ function create_t_stationtype($dbh) {
 	`hasrPI` bool NOT NULL default false,				
   	`delay` int(10) unsigned NOT NULL default '60',			
  	`instructions` varchar(255) NOT NULL,
-	`correct_msg` varchar(255) NOT NULL,
-	`incorrect_msg` varchar(255) NOT NULL,
+	`success_msg` varchar(255) NOT NULL,
 	`failed_msg` varchar(255) NOT NULL,
+	`retry_msg` varchar(255) NOT NULL,
   	PRIMARY KEY  (`OID`),
 	CONSTRAINT `typeCode_unique` UNIQUE KEY (`typeCode`)
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
@@ -39,8 +39,8 @@ function create_t_station($dbh) {
 			."`typeId` int(10) unsigned NOT NULL, "
 			."`tag` varchar(255), "
 			."PRIMARY KEY  (`OID`), "
-			."CONSTRAINT `rpi_key_unique` UNIQUE KEY (`tag`), "
-			."CONSTRAINT `fk_typeId` FOREIGN KEY (`typeId`) REFERENCES `t_stationtype` (`OID`) "
+			."CONSTRAINT `rpi_tag_unique` UNIQUE KEY (`tag`), "
+			."CONSTRAINT `fk_typeId` FOREIGN KEY (`typeId`) REFERENCES `t_stationtype` (`OID`) ON DELETE CASCADE"
 			.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
 	if ($status === false) throw new ErrorInfo($dbh,"t_station");
@@ -71,7 +71,8 @@ function create_t_school($dbh) {
   	`name` varchar(255) NOT NULL,
  	`mascot` varchar(255) NOT NULL,
   	`logo` int(10) unsigned NULL,
-  	PRIMARY KEY  (`OID`)
+  	PRIMARY KEY  (`OID`),
+	CONSTRAINT `school_name_unique` UNIQUE KEY (`name`)
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
 	if ($status === false) throw new ErrorInfo($dbh,"t_school");
@@ -87,8 +88,8 @@ function create_t_team($dbh) {
  	."`schoolId` int(10) unsigned NOT NULL, "
   	."PRIMARY KEY  (`OID`), "
 	."UNIQUE KEY (`pin`), "
-	."CONSTRAINT `team-name_unique` UNIQUE KEY (`name`), "			
-	." CONSTRAINT `fk_schoolId` FOREIGN KEY (`schoolId`) REFERENCES `t_school` (`OID`)"
+	."CONSTRAINT `team_name_unique` UNIQUE KEY (`name`), "			
+	." CONSTRAINT `fk_schoolId` FOREIGN KEY (`schoolId`) REFERENCES `t_school` (`OID`) ON DELETE CASCADE "
 	.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
 	if ($status === false) throw new ErrorInfo($dbh,"t_team");
@@ -185,7 +186,7 @@ function create_t_hmb_data($dbh) {
   	PRIMARY KEY  (`OID`)"
 	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
-	if ($status === false) throw new ErrorInfo($dbh,"t_cts_data");
+	if ($status === false) throw new ErrorInfo($dbh,"t_hmb_data");
 }
 
 function create_t_cpa_data($dbh) {
@@ -329,26 +330,36 @@ function _resetdb() {
     $stationHasrPI = array(
     		false,true,false,true,true, false
     );
+    $stationCount = array(1,6,1,6,6,1);
+    $stationTags = array("reg","cts","fsl","hmb","cpa","ext");
     
     for ($i=0;$i<count($stationNames);$i++)
     {
-    	$stationType = new StationType();
-    	$stationType->set('name',$stationNames[$i]);
-    	$stationType->set('typeCode',$stationCodes[$i]);
-    	$stationType->set('hasrPI',$stationHasrPI[$i]);
-    	$stationType->set('delay',60);
-    	$stationType->set('instructions',"todo instructions ".$i);
-    	$stationType->set('correct_msg',"Correct ".$i);
-    	$stationType->set('incorrect_msg',"Please try again ".$i);
-    	$stationType->set('failed_msg',"failed ".$i);
-    	if ($stationType->create()===false) echo "Create StationType $i failed";
+    	$stationType = StationType::makeStationType($stationCodes[$i], 
+    			$stationNames[$i],
+    			$stationHasrPI[$i], 
+    			60*1000, 
+    			"Instructions for $stationNames[$i]", 
+    			"Success Message for $stationNames[$i]",
+    			"Failed message for $stationNames[$i]",
+    			"Retry message for $stationNames[$i]"
+    			);
+    			
+    	if ($stationType===false) echo "Create StationType $stationNames[$i] failed";
+    	
+    	// now create the station instances
+    	echo "count = $stationCount[$i]";
+    	for ($j=0; $j<$stationCount[$i];$j++) {
+    	   $station = new Station();
+    	   $tag = sprintf("%s%02d",$stationTags[$i],$j+1);
+    	   echo "tag=$tag &sp";
+    	   $station->set("tag", $tag);
+    	   $station->set("typeId", $stationType->get("OID"));
+    	   if ($station->create() === false) echo "Create Station $tag failed";
+    	}
     }
     
-    $stationType = StationType::getFromTypeCode(StationType::STATION_TYPE_REG);
-    $station = new Station();
-    $station->set("tag", "reg00");
-    $station->set("typeId", $stationType->get("OID"));
-    if ($station->create() === false) echo "Create Station 'REG' failed";
+
     
     if ($dataOption == 0) {
         redirect('mgmt_main','Database Initialized without test data!');
@@ -434,7 +445,7 @@ function _resetdb() {
       }
     }
    **/     
-    redirect('mgmt_main','Database Initialized test data!');
+   redirect('mgmt_main','Database Initialized test data!');
     
   }
   catch(ErrorInfo $e)
