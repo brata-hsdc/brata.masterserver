@@ -24,13 +24,13 @@ function makeTeamList() {
 ?>
   <table>
   <tr><th>Last Response from M</th></tr>
-  <tr><td><?php echo htmlspecialchars(mock_get_to_brata_response()) ?></td></tr>
+  <tr><td><?php echo htmlspecialchars(mock_get_to_rpi_response()) ?></td></tr>
   </table>
   <table>
     <form method="post" action="<?=$registerUrl?>">
 		<tr><th colspan="2">Register</th></tr>
 		<tr>
-			<td>TeamId (a.k.a. team ping)</td>
+			<td>TeamId (a.k.a. team pin)</td>
 			<td><?php echo makeTeamList() ?> </td>
 		</tr>		
 		<tr>
@@ -45,11 +45,11 @@ function makeTeamList() {
     <form method="post" action="<?=$startUrl?>">
 		<tr><th colspan="2">Start Challenge</th></tr>
 		<tr>
-			<td>TeamId (a.k.a. team ping)</td>
+			<td>TeamId (a.k.a. team pin)</td>
 			<td><?php echo makeTeamList() ?> </td>
 		</tr>		
 		<tr>
-			<td>StationId (a.k.a. station Tag)</td>
+			<td>StationId (a.k.a. station Tag -- remeber to check for rPI Joins!)</td>
 			<td><?php echo makeStationList() ?> </td>
 		</tr>	
 		<tr>

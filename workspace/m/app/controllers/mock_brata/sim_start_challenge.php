@@ -10,5 +10,5 @@ function _sim_start_challenge()
    trace("json ".$json);
    if ($json === false) mock_set_to_brata("error");
    else                 mock_set_to_brata(json_encode($json));
-   redirect("test_brata/index","done with start challenge");
+   redirect("mock_brata/index","done with start challenge");
 }

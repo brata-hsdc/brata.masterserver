@@ -1,8 +1,8 @@
 <?php
 // create mock brata form
 function _index() {
-  $urlPrefix="test_brata";
-  $data['body'][]='<h2>Brata Testing</h2><br />';
+  $urlPrefix="mock_brata";
+  $data['body'][]='<h2>Mock Brata</h2><br />';
 
   $fdata['registerUrl']=myUrl("$urlPrefix/sim_register");
   $fdata['registerLabel']="Register";

@@ -8,5 +8,5 @@ function _sim_register()
    $json = RPI::do_post_request("http://localhost/m/brata/register/reg00", $json);
    if ($json === false) mock_set_to_brata("error");
    else                 mock_set_to_brata(json_encode($json));
-   redirect("test_brata/index","done with register ");
+   redirect("mock_brata/index","done with register ");
 }

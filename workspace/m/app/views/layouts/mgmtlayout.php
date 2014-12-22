@@ -57,9 +57,9 @@
       <li><a href="<?php echo myUrl('viewscores')?>">View Scores</a></li>
 <?php if ( isDebug() ) { ?>      
       <li>Below is for testing</li>
-      <li><a href="<?php echo myUrl('test_brata/index')?>">Brata Testing</a></li> 
+      <li><a href="<?php echo myUrl('mock_brata/index')?>">Mock Brata</a></li> 
+      <li><a href="<?php echo myUrl('mock_rpi/index')?>">Mock rPI</a></li> 
       <li><a href="<?php echo myUrl('test_event/manage')?>">Event Testing</a></li> 
-      <li><a href="<?php echo myUrl('device/test_index')?>">Device Testing</a></li> 
       <li><a href="<?php echo myUrl('mgmt_main/resetdb') ?>">Reset Database</a></li>
 <?php  } ?>      
     </ul></div><!-- end right side -->

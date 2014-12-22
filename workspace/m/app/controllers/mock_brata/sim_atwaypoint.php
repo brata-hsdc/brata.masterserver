@@ -7,5 +7,5 @@ function _sim_atwaypoint()
    $json = array("team_id"=>$teamId, "message" => "");
    // hack just to reuse do_post_request code
    RPI::do_post_request("http://localhost/m/brata/at_waypoint/".$waypointId, $json);
-   redirect("test_brata/index","done with sim_atwaypoint");
+   redirect("mock_brata/index","done with sim_atwaypoint");
 };
