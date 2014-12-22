@@ -20,6 +20,7 @@ into a standard location, run the following
    $ cd /opt/designchallenge2015
    $ git clone https://code.google.com/p/brata.masterserver/
 
+<strike>
 The script will begin by deleting any m.zip file that exists in the packaging
 subfolder, so make sure you don't want to preserve it when running the script.
 
@@ -30,12 +31,14 @@ This will delete and recreate a m.zip file in the current directory. The .zip
 format is required for both free servers. There is also a mkrelease0.sh with a
 different directory structure since the other free server needs slightly
 different packaging.
+</strike>
 
 
 #---
 # Install
 #---
 
+<strike>
 Install the application into your Web server's document root:
 
    $ cd /var/www
@@ -49,6 +52,13 @@ Create new folder and unzip.
    $ sudo mkdir -m 755 m
    $ cd m
    $ sudo unzip /opt/designchallenge2015/brata.masterserver/packaging/m.zip
+</strike>
+
+No installation is necessary; simply redirect the Apache configuration to
+look at the workspace folder as the document root as described in the GUB,
+then run the following:
+
+   $ cd /opt/designchallenge2015/brata.masterserver/workspace/m
    $ sudo chown www-data:www-data sysconfig_data.php
 
 Restart Apache:
