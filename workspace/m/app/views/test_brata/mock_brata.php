@@ -1,4 +1,5 @@
 <?php
+require(APP_PATH.'inc/mock_functions.php');
 /*
 function makeWaypointList() {
 	return '<select name="waypointId">'
@@ -6,32 +7,7 @@ function makeWaypointList() {
 		. Waypoint::getAllAsHTMLOptions(-1)
 		. '</select>';
 }
-<!--
-<table>
-  <form method="post" action="<?=$atWayPointUrl?>">
-		<tr><th colspan="2">atWaypoint Test</th></tr>
-		<tr>
-			<td>TeamId (a.k.a. team ping)</td>
-			<td><?php echo makeTeamList() ?> </td>
-		</tr>		
-		<tr>
-		<tr>
-			<td>Waypoint Id</td>
-			<td><?php echo makeWaypointList() ?> </td>
-		</tr>			
-		<tr>
-			<td colspan="2" style="text-align:right">
-	     	<input type="button" value="<?=$cancelLabel?>" onclick="location.href='<?=$cancelUrl ?>' " />
-			<input type="button" value="<?=$atWayPointLabel?>" onclick="submit();" /></td>
-		</tr>
-		
-  </form>
-  </table>
--->
-*
-*
-*
-*
+
 */
 function makeStationList() {
 	return '<select name="stationId">'
@@ -46,6 +22,10 @@ function makeTeamList() {
 					. '</select>';
 }
 ?>
+  <table>
+  <tr><th>Last Response from M</th></tr>
+  <tr><td><?php echo htmlspecialchars(mock_get_to_brata_response()) ?></td></tr>
+  </table>
   <table>
     <form method="post" action="<?=$registerUrl?>">
 		<tr><th colspan="2">Register</th></tr>

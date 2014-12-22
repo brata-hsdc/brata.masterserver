@@ -88,9 +88,12 @@ class RPI extends ModelEx {
   	$ch = curl_init($path);
   	if ($returnTransfer) curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
   	$retValue = curl_exec($ch);
-  	//var_dump($retValue);
-  	// todo check return codes
+  	$code = curl_getinfo($ch,CURLINFO_HTTP_CODE);
   	curl_close($ch);
+  	if ($code < 200 || $code >=300) {
+  		trace("unexpected HTTP code $code",__FILE__,__LINE__,__METHOD__);
+  		return false;
+  	}
   	return $retValue;
   }
   static function do_post_request($path, array $json, $decode=true) {
@@ -104,10 +107,15 @@ trace("sending ".$json." to ".$path,__FILE__,__LINE__,__METHOD__);
   	array('Content-Type: application/json','Content-Length: '.strlen($json))
   	);
   	$retVal = curl_exec($ch);
+  	$code = curl_getinfo($ch,CURLINFO_HTTP_CODE);
   	curl_close($ch);
   	if ($retVal === false) {
   	trace("RPI::do_post failed returning false",__FILE__,__LINE__,__METHOD__);
   	  return false;  // request failed
+    }
+    if ($code < 200 || $code >= 300) {
+    	trace("unexpected HTTP code $code $s",__FILE__,__LINE__,__METHOD__);
+    	return false;
     }
 trace("returning ".$retVal,__FILE__,__LINE__,__METHOD__);
   	$retVal = $decode ? json_decode($retVal,true) : $retVal;     // put the response back into object form

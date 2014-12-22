@@ -1,4 +1,5 @@
 <?php
+require(APP_PATH.'inc/mock_functions.php');
 function _sim_atwaypoint()
 {
    $waypointId = $_POST['waypointId'];
