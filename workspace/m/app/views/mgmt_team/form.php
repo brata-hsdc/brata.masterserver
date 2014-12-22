@@ -12,6 +12,10 @@ function makeOptionList($currentType) {
 	<table>
 		<tr><th colspan="2"><?php echo $form_heading?></th></tr>
 		<tr>
+			<td>Team Pin</td>
+			<td><input type="text" readonly style="width:150px" value="<?php echo $object->get('pin')?>" /></td>
+		</tr>
+		<tr>
 			<td>Team Name</td>
 			<td><input type="text" name="name" style="width:150px" value="<?php echo $object->get('name')?>" /></td>
 		</tr>

@@ -36,15 +36,20 @@ function _ops_update() {
   else 
   {
     $object->merge($_POST);
-    $object->set('pin',Team::generatePIN()); // TODO check for pin conlision
-    transactionBegin();
-    if ($object->create() )
-    {
-      transactionCommit();
-      $msg="$itemName created!";
+    for($retry=0;$retry<PIN_RETRY_MAX;$retry++) {
+    	$pin = Team::generatePIN();
+    	if (Team::getFromPin($pin) === false) { // not a duplicate
+          $object->set('pin',$pin);
+          transactionBegin();
+          if ($object->create() !== false)
+          {
+            transactionCommit();
+            $msg="$itemName created!";
+            break;
+          }
+    	}
     }
-    else
-    {
+    if ($retry >= PIN_RETRY_MAX) {
       transactionRollback();
       $msg="$itemName Create failed";
     }

@@ -8,7 +8,7 @@ class Team extends ModelEx {
     $this->rs['CID'] = $cid;
     $this->rs['name'] = '';
     $this->rs['schoolId'] = -1;
-    $this->rs['pin'] = "00000";
+    $this->rs['pin'] = "generated";
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }

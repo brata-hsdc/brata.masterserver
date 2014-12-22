@@ -6,7 +6,7 @@
 
 <h2>Management Site</h2>
 <p>CRUD for station type,station instances,schools,teams</p>
-<p>Team CRUD includs generating random 5 digit pin for each team<p>
+<p>Team CRUD includes generating random 5 digit pin for each team<p>
 
 <h2>Public Site</h2>
 (all features depreciated due to new requirments)

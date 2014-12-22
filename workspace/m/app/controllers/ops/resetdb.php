@@ -400,10 +400,25 @@ function _resetdb() {
     for ($i=0; $i<count($names);$i++)
     {
       $team = new Team();
-      $team->set("name",$names[$i]);
-      $team->set("schoolId",$i+1);
-      $team->set("pin", Team::generatePIN());
-      if ($team->create() === false) echo "Create Team $i failed";
+
+      for($retry=0;$retry<PIN_RETRY_MAX;$retry++) {
+        $pin = Team::generatePIN();
+        if (Team::getFromPin($pin) === false) {
+        	$team->set("name",$names[$i]);
+        	$team->set("schoolId",$i+1);
+        	$team->set("pin", $pin);
+        	transactionBegin();
+        	if ($team->create() !== false) {
+        		transactionCommit();
+        		break ; // not a duplicate
+            } else {
+              transactionRollback();            	
+            }
+        }
+      }
+      if ($retry >= PIN_RETRY_MAX) {
+      	echo "Create Team $i failed";
+      }
     }
 /**
     $numStations = 2;
