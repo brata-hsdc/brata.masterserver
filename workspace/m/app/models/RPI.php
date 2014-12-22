@@ -114,7 +114,7 @@ trace("sending ".$json." to ".$path,__FILE__,__LINE__,__METHOD__);
   	  return false;  // request failed
     }
     if ($code < 200 || $code >= 300) {
-    	trace("unexpected HTTP code $code $s",__FILE__,__LINE__,__METHOD__);
+    	trace("unexpected HTTP code $code ",__FILE__,__LINE__,__METHOD__);
     	return false;
     }
 trace("returning ".$retVal,__FILE__,__LINE__,__METHOD__);

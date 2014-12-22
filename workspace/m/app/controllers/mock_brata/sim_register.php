@@ -6,7 +6,7 @@ function _sim_register()
    $json = array("team_id"=>$teamId, "message" => "hello");
    // hack just to reuse do_post_request code
    $json = RPI::do_post_request("http://localhost/m/brata/register/reg00", $json);
-   if ($json === false) mock_set_to_brata("error");
-   else                 mock_set_to_brata(json_encode($json));
+   if ($json === false) mock_set_brata_response("error");
+   else                 mock_set_brata_response(json_encode($json));
    redirect("mock_brata/index","done with register ");
 }

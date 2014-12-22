@@ -24,7 +24,7 @@ function makeTeamList() {
 ?>
   <table>
   <tr><th>Last Response from M</th></tr>
-  <tr><td><?php echo htmlspecialchars(mock_get_to_rpi_response()) ?></td></tr>
+  <tr><td><?php echo htmlspecialchars(mock_get_brata_response()) ?></td></tr>
   </table>
   <table>
     <form method="post" action="<?=$registerUrl?>">

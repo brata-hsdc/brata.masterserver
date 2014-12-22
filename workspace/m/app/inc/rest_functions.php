@@ -20,7 +20,7 @@ function rest_sendSuccessResponse($sts=200,$stsmsg="OK",$body=null)
 {
 	rest_CacheHeaders();
 	header("HTTP/1.1 $sts - $stsmsg", true, $sts);
-	if (body != null) {
+	if ($body != null) {
 		trace("sending ".$body,__FILE__,__LINE__,__METHOD__);
 		echo $body;
 	}

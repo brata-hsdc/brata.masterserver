@@ -4,10 +4,10 @@ function _sim_join()
 {
    $stationId = $_POST['stationId'];
    $stationType = $_POST['stationType'];
-   $json = array("message_versoion"=>0, "station_type"=>$stationType,"station_url"=>$_POST['station_url']);
+   $json = array("message_version"=>0, "station_type"=>$stationType,"station_url"=>$_POST['station_url']);
    // hack just to reuse do_post_request code
-   $json = RPI::do_post_request("http://localhost/m/brata/register/$stationId", $json);
-   if ($json === false) mock_set_to_brata("error");
-   else                 mock_set_to_brata(json_encode($json));
-   redirect("mock_brata/index","done with register ");
+   $json = RPI::do_post_request("http://localhost/m/rpi/join/$stationId", $json);
+   if ($json === false) mock_set_rpi_response("error");
+   else                 mock_set_rpi_response(json_encode($json));
+   redirect("mock_rpi/index","done with join ");
 }
