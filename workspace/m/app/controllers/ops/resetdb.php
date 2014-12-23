@@ -219,6 +219,16 @@ function create_t_ext_data($dbh) {
 	if ($status === false) throw new ErrorInfo($dbh,"t_ext_data");
 }
 
+function create_v_stationfinder($dbh) {
+   $status = $dbh->exec("create view v_stationfinder as "
+   		."select S.tag,T.hasrPI,R.stationId,R.URL,S.typeId,T.name from t_rpi R "
+   		."left join t_station S on S.OID=R.stationId "
+   		."left join t_stationtype T on S.typeId=T.OID"
+   		);
+   
+    if ($status === false) throw new ErrorInfo($dbh,"v_stationfinder");
+}
+
 function create_v_scores($dbh) {
 	$status = $dbh->exec("create view v_scores as "
 			."select T.name team, E.stationId Station, ST.name name ,sum(E.points) score from t_event E "
@@ -280,7 +290,7 @@ function _resetdb() {
   {
     $dbh=getdbh();
 
-    $list = explode(",","v_duration,v_leaderboard,v_scores");
+    $list = explode(",","v_stationfinder,v_duration,v_leaderboard,v_scores");
     foreach ($list as $view) dropView($dbh, $view);
 
 
@@ -298,6 +308,7 @@ function _resetdb() {
 //    create_v_duration($dbh);
     create_v_scores($dbh);
     create_v_leaderboard($dbh);
+    create_v_stationfinder($dbh);
     //
     //  rPI challenge data
     //

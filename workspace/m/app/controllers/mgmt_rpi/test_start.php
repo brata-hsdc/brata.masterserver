@@ -1,4 +1,12 @@
 <?php
+/* test finder
+function _test_start($OID=0,$CID=0) {
+	$object=new RPI($OID,-1);
+	$station = new Station($object->get('stationId'),-1);
+	$finder = new StationFinder($station->get('tag'));
+	var_dump($finder);	
+}*/
+
 function _test_start($OID=0,$CID=0) {
 	$OID=max(0,intval($OID));
 	$CID=max(0,intval($CID));
@@ -18,5 +26,5 @@ function _test_start($OID=0,$CID=0) {
       var_dump($combo);
       $object->start_challenge($combo);
 	}
-	//redirect("$urlPrefix/manage",$msg);
+	redirect("$urlPrefix/manage",$msg);
 }
