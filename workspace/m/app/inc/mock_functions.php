@@ -8,7 +8,7 @@ function mock_get_brata_response() {
 	else return "none";
 }
 function mock_set_rpi_response($torPI) {
-	$_SESSION['mock_rpi'] = $torPIB;
+	$_SESSION['mock_rpi'] = $torPI;
 }
 function mock_get_rpi_response() {
 	if (isset($_SESSION['mock_rpi'])) return $_SESSION['mock_rpi'];
