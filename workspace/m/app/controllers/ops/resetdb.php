@@ -1,4 +1,9 @@
 <?php
+// team finder
+//select E.teamId,TT.pin,S.OID stationId, max(typeCode) stationType from t_event E left join t_station S on E.stationId = S.OID left join t_stationtype T on S.typeId=T.OID left join t_team TT  on E.teamId=TT.OID where E.type = 2 group by teamId;
+//select E.teamId,TT.pin,S.OID stationId, max(typeCode) stationType from t_event E left join t_station S on E.stationId = S.OID left join t_stationtype T on S.typeId=T.OID left join t_team TT  on E.teamId=TT.OID where E.type = 2 group by teamId;
+
+
 class ErrorInfo extends Exception
 {
   function __construct($dbh,$msg=null) {
@@ -431,7 +436,7 @@ function _resetdb() {
       	echo "Create Team $i failed";
       }
     }
-/**
+
     $numStations = 2;
     for ($s=1; $s<=$numStations; $s++)
     {
@@ -470,7 +475,6 @@ function _resetdb() {
     	  if ($event->create() === false) echo "Create Leave event $s,$t failed";
       }
     }
-   **/     
    redirect('mgmt_main','Database Initialized test data!');
     
   }
