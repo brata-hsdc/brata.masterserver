@@ -38,21 +38,21 @@ class Event extends ModelEx {
     $this->rs['created_dt'] = unixToMySQL(time());
     $this->rs['teamId'] = '';
     $this->rs['stationId'] = '';
-    $this->rs['type'] = Event::TYPE_BAD;
+    $this->rs['eventType'] = Event::TYPE_BAD;
     $this->rs['points'] = 0;
-    $this->rs['description'] = '';
+    $this->rs['data'] = '';
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
   
-  static function makeEvent($type,$teamId,$stationId,$points=0,$description="") {
+  static function createEvent($eventType,$team,$station,$points,$data="") {
   	$o = new Event();
-  	$o->set('type', $type);
-  	$o->set('teamId',$teamId);
-  	$o->set('stationId',$stationId);
+  	$o->set('eventType', $eventType);
+  	$o->set('teamId',$team->get('OID'));
+  	$o->set('stationId',$station->get('OID'));
   	$o->set('points',$points);
-  	$o->set('description',$description);
-  	return $o;
+  	$o->set('data',$data);
+  	return $o->create();
   }
   //todo recode to use team state object
   static function teamIdAtStation($stationId) {

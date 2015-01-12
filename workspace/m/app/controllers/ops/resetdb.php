@@ -15,7 +15,16 @@ class ErrorInfo extends Exception
     return $msg . $e[0] . " ". $e[1] . " " .$e[2];
   }
 }
+function createStations($stationCount,$tag,$typeId) {
 
+	for ($j=0; $j<$stationCount;$j++) {
+		$station = new Station();
+		$tmp = sprintf("%s%02d",$tag,$j+1);
+		$station->set("tag", $tmp);
+		$station->set("typeId", $typeId);
+		if ($station->create() === false) echo "Create Station $tag failed";
+	}	
+}
 function create_t_stationtype($dbh) {
 	$status = $dbh->exec(
 	"CREATE TABLE `t_stationtype` (
@@ -130,9 +139,9 @@ function create_t_event($dbh) {
     `created_dt` DATETIME NOT NULL,
   	`teamId` int(10) unsigned NOT NULL,
   	`stationId` int(10) unsigned NOT NULL default '0',
- 	`type` int(10) NOT NULL,
+ 	`eventType` int(10) NOT NULL,
 	`points` int(10) NOT NULL,			
-  	`description` varchar(255) NOT NULL,
+  	`data` varchar(255) NOT NULL,
   	PRIMARY KEY  (`OID`),"
 	." CONSTRAINT `fk_teamId` FOREIGN KEY (`teamId`) REFERENCES `t_team` (`OID`),"
     ." CONSTRAINT `fk_stationId` FOREIGN KEY (`stationId`) REFERENCES `t_station` (`OID`)"
@@ -311,9 +320,9 @@ function _resetdb() {
     create_t_rpi           ($dbh);
     
 //    create_v_duration($dbh);
-    create_v_scores($dbh);
-    create_v_leaderboard($dbh);
-    create_v_stationfinder($dbh);
+    ///create_v_scores($dbh);
+    ///create_v_leaderboard($dbh);
+    ///create_v_stationfinder($dbh);
     //
     //  rPI challenge data
     //
@@ -333,49 +342,68 @@ function _resetdb() {
     $admin->set('fullname',"administrator");
     $admin->setRoll(USER::ROLL_ADMIN);
     $admin->create();
-
-    $stationNames = array("Register","Crack The Safe","Find Secret Lab",
-    		"Defuse Hypermutation Bomb","Catch Provessor Aardvark","Extra"
+        
+    $stationType = StationType::makeStationType(StationType::STATION_TYPE_REG, "Register", false, 0,
+       "Hello [team] you have been successfully registered and my start the competition",
+       "If you see this message there was an internal error 1",
+       "If you see this message there was an internal error 2",
+       "If you see this message there was an internal error 3"
     );
     
-    $stationCodes = array(
-    		StationType::STATION_TYPE_REG,StationType::STATION_TYPE_CTS,StationType::STATION_TYPE_FSL,
-    		StationType::STATION_TYPE_HMB,StationType::STATION_TYPE_CPA, StationType::STATION_TYPE_EXT
-    );
-    
-    $stationHasrPI = array(
-    		false,true,false,true,true, false
-    );
-    $stationCount = array(1,6,1,6,6,1);
-    $stationTags = array("reg","cts","fsl","hmb","cpa","ext");
-    
-    for ($i=0;$i<count($stationNames);$i++)
-    {
-    	$stationType = StationType::makeStationType($stationCodes[$i], 
-    			$stationNames[$i],
-    			$stationHasrPI[$i], 
-    			60*1000, 
-    			"Instructions for $stationNames[$i]", 
-    			"Success Message for $stationNames[$i]",
-    			"Failed message for $stationNames[$i]",
-    			"Retry message for $stationNames[$i]"
-    			);
-    			
-    	if ($stationType===false) echo "Create StationType $stationNames[$i] failed";
+    if ($stationType===false) echo "Create StationType REG failed";
+    else createStations(1,"reg",$stationType->get('OID'));
     	
-    	// now create the station instances
-    	echo "count = $stationCount[$i]";
-    	for ($j=0; $j<$stationCount[$i];$j++) {
-    	   $station = new Station();
-    	   $tag = sprintf("%s%02d",$stationTags[$i],$j+1);
-    	   echo "tag=$tag &sp";
-    	   $station->set("tag", $tag);
-    	   $station->set("typeId", $stationType->get("OID"));
-    	   if ($station->create() === false) echo "Create Station $tag failed";
-    	}
-    }
-    
 
+    $stationType = StationType::makeStationType(StationType::STATION_TYPE_CTS,"Crack The Safe"            ,true, 0,
+      "Welcome, [team] Your first assignment is to break into Professor Aardvark's safe where you will find the first clue to his Secret Laboratory. Measure the interior angles and pick the three correct angles for the safe combination. Good luck! [clue=rrsG]",
+      "Success! Go quickly to the next team queue.",
+       "You have failed the challenge. Go quickly to the next team queue.",
+       "No luck, better try again!"
+    );
+    if ($stationType===false) echo "Create StationType CTS failed";
+    else createStations(6,"cts",$stationType->get('OID'));
+    
+    $stationType = StationType::makeStationType(StationType::STATION_TYPE_FSL,"Find Secret Lab"           ,false, 0,
+       "Find and scan the first marker at [waypoint-lat=+dd.dddddd] [waypoint-lon=+dd.dddddd].",
+       "Success! Find and scan the 2nd marker at [waypoint-lat=+dd.dddddd] [waypoint-lon=+dd.dddddd].",
+       "Too bad, you failed. Find and scan the second marker at [waypoint-lat=+dd.dddddd] [waypoint-lon=+dd.dddddd].",
+       "Wrong first marker, try again!"
+    		
+    		//Success! Go quickly to the next team queue.
+    		//Wrong Secret Laboratory marker, try again!
+    		//Too bad, you failed. Go quickly to the next team queue.
+    );
+    if ($stationType===false) echo "Create StationType FSL failed";
+    else createStations(1,"fsl",$stationType->get('OID'));
+    
+     $stationType = StationType::makeStationType(StationType::STATION_TYPE_HMB,"Defuse Hypermutation Bomb" ,false, 0,
+     	"The HMB has been triggered! Send the Energy Pulsator cycle time quickly!",
+     	"Success! Go quickly to the next team queue.",
+     	"Oops. Enough said. Go quickly to the next team queue.",
+     	"Nope, better try again!"
+    );
+    if ($stationType===false) echo "Create StationType HMB failed";
+    else createStations(6,"hmb",$stationType->get('OID'));
+    
+     $stationType = StationType::makeStationType(StationType::STATION_TYPE_CPA,"Catch Provessor Aardvark"   ,true, 0,
+       "PA is trying to escape. Quickly measure [fence=d] [building=d] and scan Start QR Code.",
+     		
+     		//"Watch now as the professor attempts to escape. Get him!"
+     		"Success! Go quickly to the team finish area.",
+     		"Professor Aardvark has escaped. Oh well. Go quickly to the team finish area.",
+     		"Miss! Try again!"
+    );
+    if ($stationType===false) echo "Create StationType CPA failed";
+    else createStations(6,"cpa",$stationType->get('OID'));
+    
+    $stationType = StationType::makeStationType(StationType::STATION_TYPE_EXT,"Extra"                     ,false, 0,
+     "You have 20 (TBR) minutes to provide the tower location and height. Good luck. [waypoint1-lat=+dd.dddddd] [waypoint1-lon=+dd.dddddd] [waypoint2-lat=+dd.dddddd] [waypoint2-lon=+dd.dddddd] [waypoint3-lat=+dd.dddddd] [waypoint3-lon=+dd.dddddd]",
+      "success",
+      "failed",
+      "retry"
+    );
+    if ($stationType===false) echo "Create StationType EXT failed";
+    else createStations(1,"ext",$stationType->get('OID'));
     
     if ($dataOption == 0) {
         redirect('mgmt_main','Database Initialized without test data!');
@@ -392,17 +420,6 @@ function _resetdb() {
     	$user->set('fullname','User #'.$i);
     	if ($user->create()===false) echo "Create user $i failed";
     }
- 
-    $stationTags = array("cpa","fsl");
-    $stationCodes = array(StationType::STATION_TYPE_CPA,StationType::STATION_TYPE_FSL);
-    for ($i=0; $i<count($stationCodes); $i++)
-    {
-      $stationType = StationType::getFromTypeCode($stationCodes[$i]);
-      $station = new Station();
-      $station->set("tag", $stationTags[$i]."00");
-      $station->set("typeId", $stationType->get("OID"));
-      if ($station->create() === false) echo "Create Station $i failed";
-    }
     
     $names   = explode(",", "Tigers,Bulldogs");
     $schools = explode(",","Bayside High,Valley High");
@@ -413,69 +430,27 @@ function _resetdb() {
     	$school->set("mascot",$names[$i]);
     	if ($school->create() === false) echo "Create School $i failed";
     }
+    $names   = explode(",", "Tigers,Bulldogs");
+    $pins = explode(",","00001,00002");
     for ($i=0; $i<count($names);$i++)
     {
       $team = new Team();
-
-      for($retry=0;$retry<PIN_RETRY_MAX;$retry++) {
-        $pin = Team::generatePIN();
-        if (Team::getFromPin($pin) === false) {
-        	$team->set("name",$names[$i]);
-        	$team->set("schoolId",$i+1);
-        	$team->set("pin", $pin);
-        	transactionBegin();
-        	if ($team->create() !== false) {
-        		transactionCommit();
-        		break ; // not a duplicate
-            } else {
-              transactionRollback();            	
-            }
-        }
-      }
-      if ($retry >= PIN_RETRY_MAX) {
-      	echo "Create Team $i failed";
-      }
+      $team->set("name",$names[$i]);
+      $team->set("schoolId",$i+1);  // hack we know the order the schools were added
+      $team->set("pin", $pins[$i]); 
+      if ($team->create() === false) echo "Create team $i failed";
     }
 
-    $numStations = 2;
-    for ($s=1; $s<=$numStations; $s++)
+    $events = array(
+    	array('pin'=>"00001", 'tag'=>"cts01", 'retries'=>1 ),
+        array('pin'=>"00002", 'tag'=>"cts02", 'retries'=>1 )
+    );
+    foreach ( $events as $event )
     {
-      for ($t=1; $t<=count($names);$t++)
-      {
-    	  $event = new Event();
-    	  $time = time();
-    	  $event->set('created_dt',unixToMySQL($time));
-    	  $event->set('teamId',$t);
-    	  $event->set('stationId',$s);
-    	  $event->set('type',Event::TYPE_START);
-    	  $event->set('points',0);
-    	  $event->set('description',"START");
-    	  if ($event->create() === false) echo "Create start event $s,$t failed";
-
-    	  if ($t == 2)
-    	  {
-    	    $event->set("OID",0); $event->set("CID",0); $time += 5;
-    	    $event->set('created_dt',unixToMySQL($time));
-    	    $event->set('type',Event::TYPE_SUBMIT);
-    	    $event->set('points',-1);
-    	    $event->set('description',"Incorrect");
-    	    if ($event->create() === false) echo "Create submit/incorrect  event $s,$t failed";
-    	  }
-    	     	  
-    	  $event->set("OID",0); $event->set("CID",0); $time += 5;
-    	  $event->set('created_dt',unixToMySQL($time));
-    	  $event->set('type',Event::TYPE_SUBMIT);
-    	  $event->set('points',20);
-    	  $event->set('description',"Correct Solution");    	  
-    	  if ($event->create() === false) echo "Create  submit/correct Solution event $s,$t failed";
-	  
-    	  $event->set("OID",0); $event->set("CID",0); $time += 5;
-    	  $event->set('type',Event::TYPE_END,$time);
-    	  $event->set('description',"eND");
-    	  if ($event->create() === false) echo "Create Leave event $s,$t failed";
-      }
+    	x($event);
+    	
     }
-   redirect('mgmt_main','Database Initialized test data!');
+   //redirect('mgmt_main','Database Initialized test data!');
     
   }
   catch(ErrorInfo $e)
@@ -483,4 +458,10 @@ function _resetdb() {
     echo $e->getMessage();
   }
 
+}
+function x($e)
+{
+	$team = Team::getFromPin($e['pin']);
+	$station = Station::getFromTag($e['tag']);
+	$r = Event::createEvent(Event::TYPE_START, $team, $station, 0);
 }

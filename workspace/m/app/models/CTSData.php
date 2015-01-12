@@ -1,6 +1,9 @@
 <?php
+define (XLATE,"BCDGHJKLMNPQRSTVWZbcdghjkmnpqrstvwz");
+define (XLATE_LNG,strlen(XLATE));
+
 class CTSData extends ModelEx {
-		
+	
   function __construct($oid=0,$cid=0) {
     parent::__construct('OID','CID','t_cts_data'); 
     $this->rs['OID'] = $oid;
@@ -22,4 +25,17 @@ class CTSData extends ModelEx {
   	$tmp = array($this->rs['_1st'], $this->rs['_2nd'], $this->rs['_3rd'],$this->rs['_4th'],$this->rs['_5th']);
   	return array_rand($tmp,3);
   } 
+
+
+  static function hash($parms) {
+
+	(int)$h = ((($parms[0]*127) + $parms[1])*127) + $parms[2];
+	var_dump($h);
+	$rVal="";
+	for ( $i = 0; $i < 4; $i++ ) {
+	  $rVal .= substr(XLATE,$h % XLATE_LNG,1);
+	  (int)$h = $h / XLATE_LNG;
+	}
+	return $rVal;
+  }
 }

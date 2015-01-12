@@ -20,14 +20,15 @@ function _register()
 		trace("_can't find team PIN=".$teamPIN,__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(404,"missing can' fint team PIN=".$teamPIN);  // doesn't return
 	}
-	$stationType = StationType::getFromTypeCode(StationType::STATION_TYPE_REG);
-	if ($stationType === false) {
-		trace("can't find REG station",__FILE__,__LINE__,__METHOD__);
-		rest_sendBadRequestResponse(500, "can't fing REG station");
+	$station = Station::getRegistrationStation();
+	if ($station === false) {
+		trace("can't find registration station",__FILE__,__LINE__,__METHOD__);
+		rest_sendBadRequestResponse(500, "can't fing registration station");
 	}
 
-	$event = Event::makeEvent(Event::TYPE_REGISTER,$team->get('OID'), $stationType->get('OID'));
-	$tmp = $event->create();
-	$json = array('message' => $stationType->get('instructions'));
-	json_sendObject($json);
+	if (Event::createEvent(Event::TYPE_REGISTER,$team, $station,0) === false) {
+	  trace("createEvent Failes",__FILE__,__LINE__,__METHOD__);
+	  rest_sendBadRequestResponse(500, "could not create event object");	
+	}
+	json_sendObject(array('message' => $stationType->get('instructions')) );
 }

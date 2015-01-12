@@ -1,6 +1,6 @@
 <?php
 // used to capture HTTP status code and message when processing REST API
-class MyException extends Exception {
+class RestException extends Exception {
 	public $statusCode;
 	public $statusMsg;
 	

@@ -9,6 +9,20 @@ class Team extends ModelEx {
     $this->rs['name'] = '';
     $this->rs['schoolId'] = -1;
     $this->rs['pin'] = "generated";
+    //$this->rs['totalPoints'] = 0;
+    //$this->rs['totalDuration'] = 0;
+    //$this->rs['regPoints'] = 0;
+    //$this->rs['regDuration'] = 0;
+    //$this->rs['ctsPoints'] = 0;
+    //$this->rs['ctsDuration'] = 0;
+    //$this->rs['fslPoints'] = 0;
+    //$this->rs['fslDuration'] = 0;
+    //$this->rs['hmbPoints'] = 0;
+    //$this->rs['hmbDuration'] = 0;
+    //$this->rs['cpaPoints'] = 0;
+    //$this->rs['cpaDuration'] = 0;
+    //$this->rs['extPoints'] = 0;
+    //$this->rs['extDuration'] = 0;
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }

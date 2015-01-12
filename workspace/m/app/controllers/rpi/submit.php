@@ -57,8 +57,7 @@ function _submit($stationTag=null)
 	//$count = Event::countEvents(Event::TYPE_SUBMIT, $team->get('OID'), $station->get('OID'));
 
 	//@todo calculate points
-	$event = Event::makeEvent(Event::TYPE_SUBMIT, $team->get('OID'), $station->get('OID'),$points);
-	if ($event->create()===false) {
+	if (Event::createEvent(Event::TYPE_SUBMIT, $team, $station,$points) === false)
 		trace("create event failed ".$team->get('OID')." ".$station->get('OID'),__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(500, "database create failed");
 	}

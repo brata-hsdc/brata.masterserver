@@ -23,6 +23,9 @@ class Station extends ModelEx {
   	$station = new Station();
   	return $station->retrieve_one("tag=?", $tag);
   }
+  static function getRegistrationStation() {
+  	return getFromTag("reg01");
+  }
   // for brata testing only
   static function getAllAsHTMLOptions($itemSelected=-1) {
   	$object = new Station();

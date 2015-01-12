@@ -56,8 +56,10 @@ function _submit($stationTag=null)
 	}
 	//@todo calculate points
 	$points = 0;
-	Event::makeEvent(Event::TYPE_SUBMIT, $team->get('OID'), $station->get('OID'),$points);
-	//$rpi->start_challenge($teamId);
+	if (Event::createEvent(Event::TYPE_SUBMIT, $team, $station,$points) === false) {
+		trace("can't create event object",__FILE__,__LINE__,__METHOD__);
+		json_sendBadRequestResponse(500,"Can't create event object");
+	}
      $json = array("message"=>"test ".$stationTag);  //@todo 
 	json_sendObject($json);
 }

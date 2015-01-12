@@ -41,7 +41,7 @@ function _start_challenge($stationTag=null)
 		rest_sendBadRequestResponse(404,"team not found PIN=".$teamPIN);  // doesn't return
 	}
 	
-	$parms = null;
+	$parms = null; // todo compute challenge parameters
 	switch($stationType->get('typeCode'))
 	{
 		case StationType::STATION_TYPE_CTS:
@@ -55,8 +55,7 @@ function _start_challenge($stationTag=null)
 	}
 	if ($rpi!=null) $rpi->start_challenge($stationType->get('delay'),$parms);
 	
-	$event = Event::makeEvent(Event::TYPE_START,$team->get('OID'), $station->get('OID'),0); //
-	if ($event->create()===false) {
+	if ( Event::ceateEvent(Event::TYPE_START,$team, $station,0) ===false) {
 		trace("create event failed",__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(500, "database create failed");
 	}
