@@ -30,5 +30,6 @@ function _register()
 	  trace("createEvent Failes",__FILE__,__LINE__,__METHOD__);
 	  rest_sendBadRequestResponse(500, "could not create event object");	
 	}
+  $stationType = StationType::getFromTypeCode("reg01");
 	json_sendObject(array('message' => $stationType->get('instructions')) );
 }
