@@ -9,20 +9,23 @@ class Team extends ModelEx {
     $this->rs['name'] = '';
     $this->rs['schoolId'] = -1;
     $this->rs['pin'] = "generated";
-    //$this->rs['totalPoints'] = 0;
-    //$this->rs['totalDuration'] = 0;
-    //$this->rs['regPoints'] = 0;
-    //$this->rs['regDuration'] = 0;
-    //$this->rs['ctsPoints'] = 0;
-    //$this->rs['ctsDuration'] = 0;
-    //$this->rs['fslPoints'] = 0;
-    //$this->rs['fslDuration'] = 0;
-    //$this->rs['hmbPoints'] = 0;
-    //$this->rs['hmbDuration'] = 0;
-    //$this->rs['cpaPoints'] = 0;
-    //$this->rs['cpaDuration'] = 0;
-    //$this->rs['extPoints'] = 0;
-    //$this->rs['extDuration'] = 0;
+    $this->rs['totalScore'] = 0;
+    $this->rs['totalDuration'] = 0;
+    
+    $this->rs['regScore'] = 0;
+    $this->rs['ctsScore'] = 0;
+    $this->rs['fslScore'] = 0;
+    $this->rs['hmbScore'] = 0;
+    $this->rs['cpaScore'] = 0;
+    $this->rs['extScore'] = 0;
+    
+    $this->rs['regDuration'] = 0;
+    $this->rs['ctsDuration'] = 0;
+    $this->rs['fslDuration'] = 0;
+    $this->rs['hmbDuration'] = 0;
+    $this->rs['cpaDuration'] = 0;
+    $this->rs['extDuration'] = 0;
+    
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
@@ -40,6 +43,30 @@ class Team extends ModelEx {
   static function getNameFromId($id) {
     $team = new Team($id,-1);
     return $team->get('name');
+  }
+  
+  function updateScore($stationType,$points) {
+  
+  	switch ($stationType->get('typeCode'))
+  	{
+  		case StationType::STATION_TYPE_REG:
+  			$this->set('regScore',$points);
+  			break;
+  		case StationType::STATION_TYPE_CTS:
+  			$this->set('ctsScore',$points);
+  			break;
+  		case StationType::STATION_TYPE_FSL:
+  			$this->set('fslScore',$points);
+  			break;
+  		case StationType::STATION_TYPE_HMB:
+  			$this->set('hmbScore',$points);
+  			break;
+  		case StationType::STATION_TYPE_CPA:
+  			$this->set('cpaScore',$points);
+  			break;
+  	}
+  	$this->set('totalScore',$sc->get('totalScore')+$points);
+  	return $this->update();
   }
   
   

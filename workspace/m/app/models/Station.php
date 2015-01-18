@@ -23,6 +23,7 @@ class Station extends ModelEx {
   	$station = new Station();
   	return $station->retrieve_one("tag=?", $tag);
   }
+  // use this if the QR code for the registration station doesn't have the tag inclued.
   static function getRegistrationStation() {
     return Station::getFromTag("reg01");
   }
