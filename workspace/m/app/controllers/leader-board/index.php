@@ -34,7 +34,7 @@ function _make_html_main_table($view,$item,$urlPrefix,&$data) {
 			else if ($f == "Duration") $row[]=htmlspecialchars($rs[$f]);
 			else if ($f == "Score")    $row[]=htmlspecialchars($rs[$f]);
 			//todo what if score is not valid?
-			else                       $row[]="<img src='img/$rs[$f].gif' >";
+			else                       $row[]="<img src='" . myUrl("img/$rs[$f].gif'") . ">";
 		}
 		$tablearr[]=$row;
 	};
