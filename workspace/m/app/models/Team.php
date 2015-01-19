@@ -65,7 +65,7 @@ class Team extends ModelEx {
   			$this->set('cpaScore',$points);
   			break;
   	}
-  	$this->set('totalScore',$sc->get('totalScore')+$points);
+  	$this->set('totalScore',$this->get('totalScore')+$points);
   	return $this->update();
   }
   

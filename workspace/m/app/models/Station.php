@@ -38,4 +38,15 @@ class Station extends ModelEx {
   	}
   	return $options;
   } 
+  // for rPI testing only
+  static function getAllRPIAsHTMLOptions($itemSelected=-1) {
+  	$object = new Station();
+  	$aray = $object->retrieve_many("tag like ? or tag like ? or tag like ?",array("cts%","hmb%","cpa%"));
+  	$options ="";
+  	foreach ($aray as $item) {
+  		$selected = $item->get('tag') == $itemSelected ? "selected" : "";
+  		$options .= '<option value='. $item->get('tag'). ' ' . $selected . '>' . $item->get("tag");
+  	}
+  	return $options;
+  }
 }

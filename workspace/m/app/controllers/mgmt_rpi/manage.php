@@ -10,7 +10,8 @@ function _manage($n=0) {
   if (loginCheckPermission(USER::MGMT_RPI))
   {
     _make_html_table($table,$item,$urlPrefix,$n,$data);
-    $data['body'][]='<p><a href="'.myUrl("$urlPrefix/add").'">Add New '.$item.'</a></p>';
+    // rPI are added via join not my browser
+//    $data['body'][]='<p><a href="'.myUrl("$urlPrefix/add").'">Add New '.$item.'</a></p>';
   }
   else
   {
@@ -45,8 +46,7 @@ function _make_html_table($table,$item,$urlPrefix,$n,&$data) {
 		foreach ($tablearr[0] as $f) {
 			$row[]=htmlspecialchars($rs[$f]);
 		}
-		$row[]=	'<a href="'.myUrl("$urlPrefix/test_start/$OID/$CID").'">Test Start</a> | '.
-				'<a href="'.myUrl("$urlPrefix/ops_reset/$OID/$CID").'">Reset</a> | '.
+		$row[]=	'<a href="'.myUrl("$urlPrefix/ops_reset/$OID/$CID").'">Reset</a> | '.
 				'<a href="'.myUrl("$urlPrefix/ops_shutdown/$OID/$CID").'">Shutdown</a> | '.
 		        '<a href="'.myUrl("$urlPrefix/edit/$OID/$CID").'">Edit</a> | '.
 				'<a href="javascript:jsconfirm(\'Really Delete '.$item.'?\',\''.

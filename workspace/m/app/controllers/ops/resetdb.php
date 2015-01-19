@@ -340,7 +340,7 @@ function _resetdb() {
     $admin->create();
         
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_REG, "Register", false, 0,
-       "Hello [team] you have been successfully registered and my start the competition",
+       "Hello [team] you have been successfully registered and may start the competition",
        "If you see this message there was an internal error 1",
        "If you see this message there was an internal error 2",
        "If you see this message there was an internal error 3"
@@ -362,7 +362,7 @@ function _resetdb() {
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_FSL,"Find Secret Lab"           ,false, 0,
        "Find and scan the first marker at [waypoint-lat=+dd.dddddd] [waypoint-lon=+dd.dddddd].",
        "Success! Find and scan the 2nd marker at [waypoint-lat=+dd.dddddd] [waypoint-lon=+dd.dddddd].",
-       "Too bad, you failed. Find and scan the second marker at [waypoint-lat=+dd.dddddd] [waypoint-lon=+dd.dddddd].",
+       "Too bad, you failed. Find and scan the second marker at [waypoint-lat=+dd.dddddd] [waypoint-long=+dd.dddddd].",
        "Wrong first marker, try again!"
     		
     		//Success! Go quickly to the next team queue.

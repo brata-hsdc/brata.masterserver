@@ -16,6 +16,7 @@ function rest_sendBadRequestResponse($sts,$stsmsg)
 	die;
 }
 // call signal all is well
+// NOTE: join doesn't have a body
 function rest_sendSuccessResponse($sts=200,$stsmsg="OK",$body=null)
 {
 	rest_CacheHeaders();

@@ -12,7 +12,7 @@ function makeWaypointList() {
 function makeStationList() {
 	return '<select name="stationId">'
 			. '<option value=-1>Select One'
-					. Station::getAllAsHTMLOptions(-1)
+					. Station::getAllRPIAsHTMLOptions(-1)
 					. '</select>';
 }
 function makeStationTypeList() {

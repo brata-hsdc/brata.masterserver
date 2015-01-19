@@ -15,24 +15,29 @@ function _register()
 		trace("missing PIN",__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(400,"missing team PIN");  // doesn't return
 	}
+	
 	$team = Team::getFromPin($teamPIN);
 	if ($team === false) {
 		trace("_can't find team PIN=".$teamPIN,__FILE__,__LINE__,__METHOD__);
-		rest_sendBadRequestResponse(404,"missing can' fint team PIN=".$teamPIN);  // doesn't return
+		rest_sendBadRequestResponse(404,"missing can't find team PIN=".$teamPIN);  // doesn't return
 	}
 	
 	// we are assuming that the QR code won't include the station tag.
 	$station = Station::getRegistrationStation();
 	if ($station === false) {
 		trace("can't find registration station",__FILE__,__LINE__,__METHOD__);
-		rest_sendBadRequestResponse(500, "can't fing registration station");
+		rest_sendBadRequestResponse(500, "can't find registration station");
 	}
 
-	if (Event::createEvent(Event::TYPE_REGISTER,$team, $station,0) === false) {
-	  trace("createEvent Failes",__FILE__,__LINE__,__METHOD__);
+    $points = 3;
+	if (Event::createEvent(Event::TYPE_REGISTER,$team, $station,$points) === false) {
+	  trace("createEvent Fails",__FILE__,__LINE__,__METHOD__);
 	  rest_sendBadRequestResponse(500, "could not create event object");	
 	}
+	
     $stationType = StationType::getFromTypeCode($station->get('tag'));
-    Team::
-	json_sendObject(array('message' => $stationType->get('instructions')) );
+    trace("registration complete",__FILE__,__LINE__,__METHOD__);
+    $team->updateScore($stationType, $points);
+    // todo need a better way to build the assoc array for expansion
+	json_sendObject(array('message' => $stationType->expandMessage(array("[team]"=>$team->get('name')), 'instructions') ) );
 }
