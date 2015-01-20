@@ -38,6 +38,17 @@ class Station extends ModelEx {
   	}
   	return $options;
   } 
+  // todo need a better way find by stationType
+  static function getAllCTSAsHTMLOptions($itemSelected=-1) {
+  	$object = new Station();
+  	$aray = $object->retrieve_many("tag like ? ",array("cts%"));
+  	$options ="";
+  	foreach ($aray as $item) {
+  		$selected = $item->get('OID') == $itemSelected ? "selected" : "";
+  		$options .= '<option value='. $item->get('OID'). ' ' . $selected . '>' . $item->get("tag");
+  	}
+  	return $options;
+  }  
   // for rPI testing only
   static function getAllRPIAsHTMLOptions($itemSelected=-1) {
   	$object = new Station();

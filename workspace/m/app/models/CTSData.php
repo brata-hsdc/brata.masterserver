@@ -1,6 +1,5 @@
 <?php
-define (XLATE,"BCDGHJKLMNPQRSTVWZbcdghjkmnpqrstvwz");
-define (XLATE_LNG,strlen(XLATE));
+include_once "const.php";
 
 class CTSData extends ModelEx {
 	
@@ -8,7 +7,7 @@ class CTSData extends ModelEx {
     parent::__construct('OID','CID','t_cts_data'); 
     $this->rs['OID'] = $oid;
     $this->rs['CID'] = $cid;
-    $this->rs['tag'] = "";
+    $this->rs['stationId'] = "";
     $this->rs['_1st'] = 0.0;
     $this->rs['_2nd'] = 0.0;
     $this->rs['_3rd'] = 0.0;
@@ -25,7 +24,12 @@ class CTSData extends ModelEx {
   	$tmp = array($this->rs['_1st'], $this->rs['_2nd'], $this->rs['_3rd'],$this->rs['_4th'],$this->rs['_5th']);
   	return array_rand($tmp,3);
   } 
-
+  
+  // fetch the Station object for the given skey
+  static function getFromStationId($stationId) {
+  	$o = new CTSData();
+  	return $o->retrieve_one("stationId=?", $stationId);
+  }
 
   static function hash($parms) {
 

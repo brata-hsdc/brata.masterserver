@@ -170,15 +170,15 @@ function create_t_cts_data($dbh) {
 	"CREATE TABLE `t_cts_data` (
   	`OID` int(10) unsigned NOT NULL auto_increment,
   	`CID` int(10) unsigned NOT NULL default '0',
-	`tag` varchar(255) NOT NULL,
+	`stationId` int(10) unsigned NOT NULL,
     `_1st` FLOAT NOT NULL,
 	`_2nd` FLOAT NOT NULL,
 	`_3rd` FLOAT NOT NULL,
 	`_4th` FLOAT NOT NULL,
 	`_5th` FLOAT NOT NULL,
-    `tolerance` FLOAT NOT NULL,
-	CONSTRAINT `cts_tag_unique` UNIQUE KEY (`tag`),
-  	PRIMARY KEY  (`OID`)"
+    `tolerance` FLOAT NOT NULL, "
+	."CONSTRAINT `fk_cts_stationid` FOREIGN KEY (`stationId`) REFERENCES `t_station` (`OID`) ON DELETE CASCADE, "
+  	."PRIMARY KEY  (`OID`) "
 	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
 	if ($status === false) throw new ErrorInfo($dbh,"t_cts_data");	
@@ -304,6 +304,12 @@ function _resetdb() {
     $list = explode(",","v_stationfinder,v_leaderboard_main,v_leaderboard_ext");
     foreach ($list as $view) dropView($dbh, $view);
 
+    
+    //
+    //  rPI challenge data
+    //
+    $list = explode(",", "t_cts_data,t_fsl_data,t_hmb_data,t_cpa_data,t_ext_data");
+    foreach ($list as $table) dropTable($dbh, $table);
 
     $list = explode(",", "t_event,t_user,t_rpi,t_station,t_stationtype,t_team,t_school");
     foreach ($list as $table) dropTable($dbh, $table);
@@ -322,9 +328,6 @@ function _resetdb() {
     //
     //  rPI challenge data
     //
-    $list = explode(",", "t_cts_data,t_fsl_data,t_hmb_data,t_cpa_data,t_ext_data");
-    foreach ($list as $table) dropTable($dbh, $table);
-    
     create_t_cts_data($dbh);
     create_t_fsl_data($dbh);
     create_t_hmb_data($dbh);
@@ -435,6 +438,19 @@ function _resetdb() {
       $team->set("schoolId",$i+1);  // hack we know the order the schools were added
       $team->set("pin", $pins[$i]); 
       if ($team->create() === false) echo "Create team $i failed";
+    }
+    for ($i=1; $i<= 5; $i++)
+    {
+      $cts = new CTSData();
+      $station = Station::getFromTag("cts0".$i);
+      $cts->set('stationId',$station->get('OID')); // hack assume get works
+      $cts->set('_1st',1);
+      $cts->set('_2nd',2);
+      $cts->set('_3rd',2);
+      $cts->set('_4th',2);
+      $cts->set('_5th',2);
+      $cts->set('tolerance',5.0);
+      if ($cts->create() === false) echo "Create CTS $i failed";
     }
 /*
     $events = array(
