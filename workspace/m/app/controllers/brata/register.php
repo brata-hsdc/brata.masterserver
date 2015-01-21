@@ -63,8 +63,7 @@ function _register()
         }
 	
         trace("registration complete",__FILE__,__LINE__,__METHOD__);
-        // TODO why is this throwing an error?
-        //$team->updateScore($stationType, $points);
+        $team->updateScore($stationType, $points);
 
         // todo need a better way to build the assoc array for expansion
         // TODO deconflict the hack and Dan's long term plan
