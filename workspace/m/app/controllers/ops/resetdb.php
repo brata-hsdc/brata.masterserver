@@ -1,5 +1,5 @@
 <?php
-// team finder
+// team finder ideas
 //select E.teamId,TT.pin,S.OID stationId, max(typeCode) stationType from t_event E left join t_station S on E.stationId = S.OID left join t_stationtype T on S.typeId=T.OID left join t_team TT  on E.teamId=TT.OID where E.type = 2 group by teamId;
 //select E.teamId,TT.pin,S.OID stationId, max(typeCode) stationType from t_event E left join t_station S on E.stationId = S.OID left join t_stationtype T on S.typeId=T.OID left join t_team TT  on E.teamId=TT.OID where E.type = 2 group by teamId;
 
@@ -100,6 +100,24 @@ function create_t_team($dbh) {
   	."`name` varchar(255) NOT NULL, "
     ."`pin`  varchar(5) NOT NULL, "
  	."`schoolId` int(10) unsigned NOT NULL, "
+			
+	."`totalScore` int(10) unsigned NOT NULL default 0, "
+	."`regScore` int(10) unsigned NOT NULL default 0, "		
+	."`ctsScore` int(10) unsigned NOT NULL default 0, "
+	."`fslScore` int(10) unsigned NOT NULL default 0, "
+	."`hmbScore` int(10) unsigned NOT NULL default 0, "
+	."`cpaScore` int(10) unsigned NOT NULL default 0, "
+	."`extScore` int(10) unsigned NOT NULL default 0, "
+						
+	."`totalDuration` int(10) unsigned NOT NULL default 0, "
+	."`regDuration` int(10) unsigned NOT NULL default 0, "
+	."`ctsDuration` int(10) unsigned NOT NULL default 0, "
+	."`fslDuration` int(10) unsigned NOT NULL default 0, "
+	."`hmbDuration` int(10) unsigned NOT NULL default 0, "
+	."`cpaDuration` int(10) unsigned NOT NULL default 0, "
+	."`extDuration` int(10) unsigned NOT NULL default 0, "
+	//."`started_dt`	varchar(255) NOT NULL, "
+	."`json` varchar(255) NOT NULL, "
   	."PRIMARY KEY  (`OID`), "
 	."UNIQUE KEY (`pin`), "
 	."CONSTRAINT `team_name_unique` UNIQUE KEY (`name`), "			
@@ -108,7 +126,6 @@ function create_t_team($dbh) {
 	);
 	if ($status === false) throw new ErrorInfo($dbh,"t_team");
 }
-
 
 function create_t_user($dbh)
 {
@@ -143,7 +160,7 @@ function create_t_event($dbh) {
 	`points` int(10) NOT NULL,			
   	`data` varchar(255) NOT NULL,
   	PRIMARY KEY  (`OID`),"
-	." CONSTRAINT `fk_teamId` FOREIGN KEY (`teamId`) REFERENCES `t_team` (`OID`),"
+	." CONSTRAINT `fk_teamId_event` FOREIGN KEY (`teamId`) REFERENCES `t_team` (`OID`),"
     ." CONSTRAINT `fk_stationId` FOREIGN KEY (`stationId`) REFERENCES `t_station` (`OID`)"
 	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -155,15 +172,15 @@ function create_t_cts_data($dbh) {
 	"CREATE TABLE `t_cts_data` (
   	`OID` int(10) unsigned NOT NULL auto_increment,
   	`CID` int(10) unsigned NOT NULL default '0',
-	`tag` varchar(255) NOT NULL,
+	`stationId` int(10) unsigned NOT NULL,
     `_1st` FLOAT NOT NULL,
 	`_2nd` FLOAT NOT NULL,
 	`_3rd` FLOAT NOT NULL,
 	`_4th` FLOAT NOT NULL,
 	`_5th` FLOAT NOT NULL,
-    `tolerance` FLOAT NOT NULL,
-	CONSTRAINT `cts_tag_unique` UNIQUE KEY (`tag`),
-  	PRIMARY KEY  (`OID`)"
+    `tolerance` FLOAT NOT NULL, "
+	."CONSTRAINT `fk_cts_stationid` FOREIGN KEY (`stationId`) REFERENCES `t_station` (`OID`) ON DELETE CASCADE, "
+  	."PRIMARY KEY  (`OID`) "
 	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
 	if ($status === false) throw new ErrorInfo($dbh,"t_cts_data");	
@@ -243,42 +260,24 @@ function create_v_stationfinder($dbh) {
     if ($status === false) throw new ErrorInfo($dbh,"v_stationfinder");
 }
 
-function create_v_scores($dbh) {
-	$status = $dbh->exec("create view v_scores as "
-			."select T.name team, E.stationId Station, ST.name name ,sum(E.points) score from t_event E "
-			."left join t_team T on E.teamid=T.OID " 
-			."left join t_station S on E.stationid=S.OID "
-			."left join t_stationtype ST on E.stationid=ST.OID "
-			."group by E.teamid,E.stationId order by E.teamid"
-	);
 
-	if ($status === false) throw new ErrorInfo($dbh,"v_scores");
-}
-
-function create_v_leaderboard($dbh) {
-	$status = $dbh->exec("create view v_leaderboard as "	
-	."select T.name team ,sum(E.points) score from t_event E "
-	."left join t_team T on E.teamid=T.OID group by E.teamid order by score desc"
+function create_v_leaderboard_main($dbh) {
+	$status = $dbh->exec("create view v_leaderboard_main as "	
+	."select name Name  , totalDuration Duration , totalScore Score, "
+	."regScore Reg,ctsScore CTS ,fslScore FSL,hmbScore HMB,cpaScore CPA"
+	." from t_team order by Duration desc, Score asc"
 	);
 	
-	if ($status === false) throw new ErrorInfo($dbh,"v_leaderboard");
+	if ($status === false) throw new ErrorInfo($dbh,"v_leaderboard_main");
 }
 
+function create_v_leaderboard_ext($dbh) {
+	$status = $dbh->exec("create view v_leaderboard_ext as "
+			."select name Name  , extDuration Duration , extScore Score from t_team order by Duration desc, Score asc"
+	);
 
-function create_v_duration($dbh) {
-	$status = $dbh->exec("create view v_duration as "
-			 ."select t1.teamid,t1.stationid,timediff(stop,start) "
-             ."from "
-             ."(SELECT teamid,stationid,min(created_dt) AS 'start' FROM t_event GROUP BY teamid,stationid) t1 "
-             ."left join "
-             ."(SELECT teamid,stationid,max(created_dt) AS 'stop' FROM t_event GROUP BY teamid,stationid) t2 "
-             ."on "
-             ." t1.teamid = t2.teamid and t1.stationid = t2.stationid"
-	         );
-
-	if ($status === false) throw new ErrorInfo($dbh,"v_duration");
+	if ($status === false) throw new ErrorInfo($dbh,"v_leaderboard_ext");
 }
-
 
 function dropView($dbh, $view) {
   if ($dbh->exec("DROP VIEW if exists ".$view) === false) {
@@ -304,9 +303,15 @@ function _resetdb() {
   {
     $dbh=getdbh();
 
-    $list = explode(",","v_stationfinder,v_duration,v_leaderboard,v_scores");
+    $list = explode(",","v_stationfinder,v_leaderboard_main,v_leaderboard_ext");
     foreach ($list as $view) dropView($dbh, $view);
 
+    
+    //
+    //  rPI challenge data
+    //
+    $list = explode(",", "t_cts_data,t_fsl_data,t_hmb_data,t_cpa_data,t_ext_data");
+    foreach ($list as $table) dropTable($dbh, $table);
 
     $list = explode(",", "t_event,t_user,t_rpi,t_station,t_stationtype,t_team,t_school");
     foreach ($list as $table) dropTable($dbh, $table);
@@ -319,16 +324,12 @@ function _resetdb() {
     create_t_event         ($dbh);
     create_t_rpi           ($dbh);
     
-//    create_v_duration($dbh);
-    ///create_v_scores($dbh);
-    ///create_v_leaderboard($dbh);
+    create_v_leaderboard_main($dbh);
+    create_v_leaderboard_ext($dbh);
     ///create_v_stationfinder($dbh);
     //
     //  rPI challenge data
     //
-    $list = explode(",", "t_cts_data,t_fsl_data,t_hmb_data,t_cpa_data,t_ext_data");
-    foreach ($list as $table) dropTable($dbh, $table);
-    
     create_t_cts_data($dbh);
     create_t_fsl_data($dbh);
     create_t_hmb_data($dbh);
@@ -366,7 +367,7 @@ function _resetdb() {
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_FSL,"Find Secret Lab"           ,false, 0,
        "Find and scan the first marker at [waypoint-lat=+dd.dddddd] [waypoint-lon=+dd.dddddd].",
        "Success! Find and scan the 2nd marker at [waypoint-lat=+dd.dddddd] [waypoint-lon=+dd.dddddd].",
-       "Too bad, you failed. Find and scan the second marker at [waypoint-lat=+dd.dddddd] [waypoint-lon=+dd.dddddd].",
+       "Too bad, you failed. Find and scan the second marker at [waypoint-lat=+dd.dddddd] [waypoint-long=+dd.dddddd].",
        "Wrong first marker, try again!"
     		
     		//Success! Go quickly to the next team queue.
@@ -440,7 +441,20 @@ function _resetdb() {
       $team->set("pin", $pins[$i]); 
       if ($team->create() === false) echo "Create team $i failed";
     }
-
+    for ($i=1; $i<= 5; $i++)
+    {
+      $cts = new CTSData();
+      $station = Station::getFromTag("cts0".$i);
+      $cts->set('stationId',$station->get('OID')); // hack assume get works
+      $cts->set('_1st',1);
+      $cts->set('_2nd',2);
+      $cts->set('_3rd',2);
+      $cts->set('_4th',2);
+      $cts->set('_5th',2);
+      $cts->set('tolerance',5.0);
+      if ($cts->create() === false) echo "Create CTS $i failed";
+    }
+/*
     $events = array(
     	array('pin'=>"00001", 'tag'=>"cts01", 'retries'=>1 ),
         array('pin'=>"00002", 'tag'=>"cts02", 'retries'=>1 )
@@ -450,8 +464,8 @@ function _resetdb() {
     	x($event);
     	
     }
-    // TODO why is this or some other message not still sent back to indicate the DB load is done?
-   //redirect('mgmt_main','Database Initialized test data!');
+    */
+   redirect('mgmt_main','Database Initialized test data!');
     
   }
   catch(ErrorInfo $e)

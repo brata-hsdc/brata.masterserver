@@ -9,9 +9,7 @@
 <p>Team CRUD includes generating random 5 digit pin for each team<p>
 
 <h2>Public Site</h2>
-(all features depreciated due to new requirments)
-Leader Board 
-Score details
+Leader board redone for both main and extra challenges
 
 <h2>rPI Interface</h2>
 <p>message passing only, M needs implementation logic/p>
@@ -31,8 +29,11 @@ Score details
 
 
 
-<p>Brata testing mock interface.
-</p>
+<p>Brata testing mock interface.</p>
+<ul>
+<li>Register operation working
+<li>submit still needs testing
+</ul>
 
 
 

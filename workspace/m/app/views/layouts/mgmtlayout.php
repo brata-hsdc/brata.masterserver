@@ -54,7 +54,6 @@
       <li><a href="<?php echo myUrl('mgmt_user/manage')?> ">Users</a></li>
       <li>Below is for Public Access</li>      
       <li><a href="<?php echo myUrl('leader-board/index')?>">View Leader Board</a></li>
-      <li><a href="<?php echo myUrl('viewscores')?>">View Scores</a></li>
 <?php if ( isDebug() ) { ?>      
       <li>Below is for testing</li>
       <li><a href="<?php echo myUrl('mock_brata/index')?>">Mock Brata</a></li> 

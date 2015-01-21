@@ -1,6 +1,4 @@
 <?php
-define (XLATE,"BCDGHJKLMNPQRSTVWZbcdghjkmnpqrstvwz");
-define (XLATE_LNG,strlen(XLATE));
 
 class CTSData extends ModelEx {
 	
@@ -8,7 +6,7 @@ class CTSData extends ModelEx {
     parent::__construct('OID','CID','t_cts_data'); 
     $this->rs['OID'] = $oid;
     $this->rs['CID'] = $cid;
-    $this->rs['tag'] = "";
+    $this->rs['stationId'] = "";
     $this->rs['_1st'] = 0.0;
     $this->rs['_2nd'] = 0.0;
     $this->rs['_3rd'] = 0.0;
@@ -25,16 +23,28 @@ class CTSData extends ModelEx {
   	$tmp = array($this->rs['_1st'], $this->rs['_2nd'], $this->rs['_3rd'],$this->rs['_4th'],$this->rs['_5th']);
   	return array_rand($tmp,3);
   } 
+  
+  // fetch the Station object for the given skey
+  static function getFromStationId($stationId) {
+  	$o = new CTSData();
+  	return $o->retrieve_one("stationId=?", $stationId);
+  }
 
-
+  const XLATE="BCDGHJKLMNPQRSTVWZbcdghjkmnpqrstvwz";
+             //12345678901234567890123456789012345
+             //         1         2         3
+  const XLATE_LNG= 35;
+  
   static function hash($parms) {
+  	
 
+  	
 	(int)$h = ((($parms[0]*127) + $parms[1])*127) + $parms[2];
 	var_dump($h);
 	$rVal="";
 	for ( $i = 0; $i < 4; $i++ ) {
-	  $rVal .= substr(XLATE,$h % XLATE_LNG,1);
-	  (int)$h = $h / XLATE_LNG;
+	  $rVal .= substr(CTSData::XLATE,$h % XLATE_LNG,1);
+	  (int)$h = $h / CTSData::XLATE_LNG;
 	}
 	return $rVal;
   }

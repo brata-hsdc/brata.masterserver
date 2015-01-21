@@ -1,11 +1,19 @@
+<?php
+function makeOptionList($stationId) {
+	return '<select name="stationId">'
+		. '<option value=-1>Select One'	
+		. Station::getAllCTSAsHTMLOptions($stationId)
+		. '</select>';
+}
+?>
 <form method="post" action="<?=$actionUrl?>">
 <input type="hidden" name="OID" value="<?php echo $object->get('OID')?>" />
 <input type="hidden" name="CID" value="<?php echo $object->get('CID')?>" />
 	<table>
 		<tr><th colspan="2"><?php echo $form_heading?></th></tr>
 		<tr>
-			<td>Tag</td>
-			<td><input type="text" name="tag" style="width:150px" value="<?php echo $object->get('tag')?>" /></td>
+			<td>Station</td>
+			<td><?php echo makeOptionList($object->get('stationId')) ?></td>
 		</tr>		
 		<tr>
 			<td>1st</td>

@@ -23,7 +23,7 @@ define("DEBUG",4);
 define("TRACE",5);
 function logit($lvl,$file,$line,$fun,$msg) {
 	if ($lvl >= $GLOBALS['LOGLEVEL']) {
-    	error_log($file."|".$line."|".$fun."|".$msg."\n",3,"/var/tmp/m.log");
+    	error_log($file."|".$line."|".$fun."|".$msg."\n",3,"/tmp/m.log");
 	}
 }
 function trace($msg,$file="",$line="",$fun="") {

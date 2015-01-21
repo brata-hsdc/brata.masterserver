@@ -15,28 +15,35 @@ function _register()
 		trace("missing PIN",__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(400,"missing team PIN");  // doesn't return
 	}
+	
 	$team = Team::getFromPin($teamPIN);
 	if ($team === false) {
 		trace("_can't find team PIN=".$teamPIN,__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(404,"missing can't find team PIN=".$teamPIN);  // doesn't return
 	}
+	
+	// we are assuming that the QR code won't include the station tag.
 	$station = Station::getRegistrationStation();
 	if ($station === false) {
 		trace("can't find registration station",__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(500, "can't find registration station");
 	}
 
-	if (Event::createEvent(Event::TYPE_REGISTER,$team, $station,0) === false) {
-	  trace("createEvent Failes",__FILE__,__LINE__,__METHOD__);
+        $points = 3;
+	if (Event::createEvent(Event::TYPE_REGISTER,$team, $station,$points) === false) {
+	  trace("createEvent Fails",__FILE__,__LINE__,__METHOD__);
 	  rest_sendBadRequestResponse(500, "could not create event object");	
 	}
+
+        // TODO deconflict the hack and Dan's long term plan 
+        //$stationType = StationType::getFromTypeCode($station->get('tag'));
         $stationType = StationType::getFromTypeCode("reg01");
         $teamNumber = (int)$teamPIN;
         // TODO this should be a DB look  up
         $schools = array(1 => "Titusville HS", "", "Edgewood Jr/Sr HS", "", "Holy Trinity", "", "West Shore Jr/Sr HS", "", "Melbourne HS", "", "Palm Bay Magnet HS", "", "Bayside HS", "");
         if ($teamNumber > sizeof($schools)+1 or $teamNumber < 1){
-	  trace("createEvent Failes",__FILE__,__LINE__,__METHOD__);
-	  rest_sendBadRequestResponse(404, "can't find team PIN");	
+	  trace("createEvent Fails",__FILE__,__LINE__,__METHOD__);
+          rest_sendBadRequestResponse(404, "can't find team PIN");	
         }
         $welcome = sprintf("Welcome %s to the Design Challenge! Your app has successfully communicated with the Master Server! Congratulations!", $schools[$teamNumber]);
         if ($teamNumber%2 == 0){
@@ -54,5 +61,14 @@ function _register()
           // use the encrypted version
           // TODO $welcome = encode($welcome);
         }
+	
+        trace("registration complete",__FILE__,__LINE__,__METHOD__);
+        // TODO why is this throwing an error?
+        //$team->updateScore($stationType, $points);
+
+        // todo need a better way to build the assoc array for expansion
+        // TODO deconflict the hack and Dan's long term plan
+	//json_sendObject(array('message' => $stationType->expandMessage(array("[team]"=>$team->get('name')), 'instructions') ) );
+	  
 	json_sendObject(array('message' => $welcome) );
 }

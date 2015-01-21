@@ -25,7 +25,7 @@ class Station extends ModelEx {
   }
   // use this if the QR code for the registration station doesn't have the tag inclued.
   static function getRegistrationStation() {
-  	return Station::getFromTag("reg01");
+    return Station::getFromTag("reg01");
   }
   // for brata testing only
   static function getAllAsHTMLOptions($itemSelected=-1) {

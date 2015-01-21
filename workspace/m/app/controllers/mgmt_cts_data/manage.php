@@ -31,7 +31,7 @@ function _make_html_table($table,$item,$urlPrefix,$n,&$data) {
 	$data['body'][]=pagination::makePagination($n,$total,myUrl("$urlPrefix/manage"),$GLOBALS['pagination']);
 
 	//table
-	$fields="tag,_1st,_2nd,_3rd,_4th,_5th,tolerance";
+	$fields="stationId,_1st,_2nd,_3rd,_4th,_5th,tolerance";
 	$stmt = $dbh->query("SELECT OID,CID,$fields FROM $table LIMIT $n,$limit");
 	if ($stmt === false) {
 		var_dump($dbh->errorInfo());
@@ -44,7 +44,11 @@ function _make_html_table($table,$item,$urlPrefix,$n,&$data) {
 		$row=null;
 		foreach ($tablearr[0] as $f) 
 		{
-			$row[]=$f=="encode" ? ($rs[$f]==1?"true":'false'): htmlspecialchars($rs[$f]);
+			if ($f == "stationId")  {
+				$tmp = new Station($rs[$f],-1); // todo fix this hack need view?
+				$row[]=htmlspecialchars($tmp->get('tag'));
+			}
+			else                    $row[]=htmlspecialchars($rs[$f]);
 		}
 		$row[]=	'<a href="'.myUrl("$urlPrefix/edit/$OID/$CID").'">Edit</a> | '.
 				'<a href="javascript:jsconfirm(\'Really Delete '.$item.'?\',\''.
