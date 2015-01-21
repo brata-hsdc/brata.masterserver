@@ -26,6 +26,9 @@ class Team extends ModelEx {
     $this->rs['cpaDuration'] = 0;
     $this->rs['extDuration'] = 0;
     
+    //$this->rs['started_dt'] = "";
+    $this->rs['json'] = ""; // json string holding challenge data
+    
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
@@ -34,19 +37,27 @@ class Team extends ModelEx {
   	return School::getSchoolNameFromId($this->rs['schoolId']);
   }
   
-  // fetch the Team object for the given pin
-  static function getFromPin($pin) {
-  	$team = new Team();
-  	return $team->retrieve_one("pin=?", $pin);
+  // under development
+  function startChallenge($station,$jsonObject) {
+  	
+  	$jsonObject['started'] = microtime(true);         // get system time in micro seconds as a float
+  	$this->rs['json']      = json_encode($jsonObject);
+  	return $this->update();
   }
   
-  static function getNameFromId($id) {
-    $team = new Team($id,-1);
-    return $team->get('name');
+  // under development
+  function getChallengeData()  {
+  	return json_decode($this->rs['json']);
   }
   
+  // under development
+  function endChallenge() {
+  	
+  }
+  // under development
   function updateScore($stationType,$points) {
   
+  	$json = $this->getChallengeData();
   	switch ($stationType->get('typeCode'))
   	{
   		case StationType::STATION_TYPE_REG:
@@ -69,6 +80,16 @@ class Team extends ModelEx {
   	return $this->update();
   }
   
+  // fetch the Team object for the given pin
+  static function getFromPin($pin) {
+  	$team = new Team();
+  	return $team->retrieve_one("pin=?", $pin);
+  }
+  
+  static function getNameFromId($id) {
+  	$team = new Team($id,-1);
+  	return $team->get('name');
+  }
   
   // generate a random pin of the given length, with the last digit a check digit
   static function generatePIN($length=5) {

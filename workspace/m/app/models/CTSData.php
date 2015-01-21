@@ -1,5 +1,4 @@
 <?php
-include_once "const.php";
 
 class CTSData extends ModelEx {
 	
@@ -31,14 +30,21 @@ class CTSData extends ModelEx {
   	return $o->retrieve_one("stationId=?", $stationId);
   }
 
+  const XLATE="BCDGHJKLMNPQRSTVWZbcdghjkmnpqrstvwz";
+             //12345678901234567890123456789012345
+             //         1         2         3
+  const XLATE_LNG= 35;
+  
   static function hash($parms) {
+  	
 
+  	
 	(int)$h = ((($parms[0]*127) + $parms[1])*127) + $parms[2];
 	var_dump($h);
 	$rVal="";
 	for ( $i = 0; $i < 4; $i++ ) {
-	  $rVal .= substr(XLATE,$h % XLATE_LNG,1);
-	  (int)$h = $h / XLATE_LNG;
+	  $rVal .= substr(CTSData::XLATE,$h % XLATE_LNG,1);
+	  (int)$h = $h / CTSData::XLATE_LNG;
 	}
 	return $rVal;
   }

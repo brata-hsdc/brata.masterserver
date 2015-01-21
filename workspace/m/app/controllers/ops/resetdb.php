@@ -116,6 +116,8 @@ function create_t_team($dbh) {
 	."`hmbDuration` int(10) unsigned NOT NULL default 0, "
 	."`cpaDuration` int(10) unsigned NOT NULL default 0, "
 	."`extDuration` int(10) unsigned NOT NULL default 0, "
+	//."`started_dt`	varchar(255) NOT NULL, "
+	."`json` varchar(255) NOT NULL, "
   	."PRIMARY KEY  (`OID`), "
 	."UNIQUE KEY (`pin`), "
 	."CONSTRAINT `team_name_unique` UNIQUE KEY (`name`), "			
