@@ -23,6 +23,7 @@ class Station extends ModelEx {
   	$station = new Station();
   	return $station->retrieve_one("tag=?", $tag);
   }
+  // use this if the QR code for the registration station doesn't have the tag inclued.
   static function getRegistrationStation() {
   	return Station::getFromTag("reg01");
   }
@@ -37,4 +38,26 @@ class Station extends ModelEx {
   	}
   	return $options;
   } 
+  // todo need a better way find by stationType
+  static function getAllCTSAsHTMLOptions($itemSelected=-1) {
+  	$object = new Station();
+  	$aray = $object->retrieve_many("tag like ? ",array("cts%"));
+  	$options ="";
+  	foreach ($aray as $item) {
+  		$selected = $item->get('OID') == $itemSelected ? "selected" : "";
+  		$options .= '<option value='. $item->get('OID'). ' ' . $selected . '>' . $item->get("tag");
+  	}
+  	return $options;
+  }  
+  // for rPI testing only
+  static function getAllRPIAsHTMLOptions($itemSelected=-1) {
+  	$object = new Station();
+  	$aray = $object->retrieve_many("tag like ? or tag like ? or tag like ?",array("cts%","hmb%","cpa%"));
+  	$options ="";
+  	foreach ($aray as $item) {
+  		$selected = $item->get('tag') == $itemSelected ? "selected" : "";
+  		$options .= '<option value='. $item->get('tag'). ' ' . $selected . '>' . $item->get("tag");
+  	}
+  	return $options;
+  }
 }
