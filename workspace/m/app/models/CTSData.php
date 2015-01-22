@@ -29,6 +29,14 @@ class CTSData extends ModelEx {
   	$o = new CTSData();
   	return $o->retrieve_one("stationId=?", $stationId);
   }
+  
+  
+  static function startChallenge($stationId) {
+  	$cts = CTSData::getFromStationId($stationId);
+  	$parms = $cts->generateParameters();
+  	$parms['clue'] = CTSData::hash($parms);
+  	return $parms;
+  }
 
   const XLATE="BCDGHJKLMNPQRSTVWZbcdghjkmnpqrstvwz";
              //12345678901234567890123456789012345
@@ -37,13 +45,10 @@ class CTSData extends ModelEx {
   
   static function hash($parms) {
   	
-
-  	
 	(int)$h = ((($parms[0]*127) + $parms[1])*127) + $parms[2];
-	var_dump($h);
 	$rVal="";
 	for ( $i = 0; $i < 4; $i++ ) {
-	  $rVal .= substr(CTSData::XLATE,$h % XLATE_LNG,1);
+	  $rVal .= substr(CTSData::XLATE,$h % CTSData::XLATE_LNG,1);
 	  (int)$h = $h / CTSData::XLATE_LNG;
 	}
 	return $rVal;

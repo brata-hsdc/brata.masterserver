@@ -38,6 +38,5 @@ function _register()
     $stationType = StationType::getFromTypeCode($station->get('tag'));
     trace("registration complete",__FILE__,__LINE__,__METHOD__);
     $team->updateScore($stationType, $points);
-    // todo need a better way to build the assoc array for expansion
-	json_sendObject(array('message' => $stationType->expandMessage(array("[team]"=>$team->get('name')), 'instructions') ) );
+	json_sendObject(array('message' => $team->expandMessage($stationType->get('instructions'), null ) ) );
 }

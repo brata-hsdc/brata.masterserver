@@ -26,7 +26,7 @@ class Team extends ModelEx {
     $this->rs['cpaDuration'] = 0;
     $this->rs['extDuration'] = 0;
     
-    //$this->rs['started_dt'] = "";
+    $this->rs['started'] = 0;
     $this->rs['json'] = ""; // json string holding challenge data
     
     if ($oid && $cid)
@@ -40,8 +40,8 @@ class Team extends ModelEx {
   // under development
   function startChallenge($station,$jsonObject) {
   	
-  	$jsonObject['started'] = microtime(true);         // get system time in micro seconds as a float
-  	$this->rs['json']      = json_encode($jsonObject);
+  	$this->rs['started'] = time();                       // get system time 
+  	$this->rs['json']    = json_encode($jsonObject);
   	return $this->update();
   }
   
@@ -76,8 +76,18 @@ class Team extends ModelEx {
   			$this->set('cpaScore',$points);
   			break;
   	}
-  	$this->set('totalScore',$this->get('totalScore')+$points);
+  	$this->set('totalScore',$this->get('regScore')+$this->get('ctsScore')+$this->get('fslScore')+$this->get('cpaScore'));
   	return $this->update();
+  }
+  // todo is this the best place?
+  // table assoc array field the field name holding the message to expand
+  function expandMessage($msg,$table) {
+  	if ($table == null)  $table=array("team"=>$this->get('name'));
+  	else                 $table['team'] = $this->get('name');   // add team name
+  	foreach ($table as $key => $value) {
+  		$msg = str_replace("[$key]", $value, $msg);
+  	}
+  	return $msg;
   }
   
   // fetch the Team object for the given pin

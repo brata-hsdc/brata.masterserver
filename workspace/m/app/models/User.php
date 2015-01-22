@@ -29,13 +29,14 @@ class User extends ModelEx {
   static function getAllAsHtmlOptions($selectValue) {
     return
 		 "<option " . User::isSelected(User::ROLL_ADMIN, $selectValue)           . "value=" . User::ROLL_ADMIN . "> Admin"
-		 ."<option " . User::isSelected(User::ROLL_ADMIN_ASSISTANT, $selectValue) . "value=" . User::ROLL_ADMIN_ASSISTANT    . "> Admin Assistant";
+	//	 ."<option " . User::isSelected(User::ROLL_ADMIN_ASSISTANT, $selectValue) . "value=" . User::ROLL_ADMIN_ASSISTANT    . "> Admin Assistant"
+	;
   }
   static function getPermissionsAsRollText($value) {
     switch ($value)
     {
       case User::ROLL_ADMIN          : return "admin";
-      case User::ROLL_ADMIN_ASSISTANT: return "assistant";
+      //case User::ROLL_ADMIN_ASSISTANT: return "assistant";
       case User::ROLL_NONE           : return "none";
       default: return "Error - unknown Roll";
     }

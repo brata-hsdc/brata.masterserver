@@ -40,16 +40,6 @@ class StationType extends ModelEx {
   	return $o->create();  	
   }
  
-  // todo is this the best place?
-  // table assoc array field the field name holding the message to expand
-  function expandMessage($table,$field) {
-  	$msg = $this->get($field);
-  	trace("msg=$msg field=$field",__FILE__,__LINE__,__METHOD__);
-  	foreach ($table as $key => $value) {
-  		$msg = str_replace($key, $value, $msg);
-  	}
-  	return $msg;
-  }
 // return the StationType object for the given "short" name 
   static function getFromTypeCode($typeCode) {
     $type = new StationType();

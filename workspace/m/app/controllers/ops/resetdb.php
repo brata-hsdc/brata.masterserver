@@ -28,12 +28,12 @@ function createStations($stationCount,$tag,$typeId) {
 function create_t_stationtype($dbh) {
 	$status = $dbh->exec(
 	"CREATE TABLE `t_stationtype` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
-	`typeCode` int(10) NOT NULL,
+  	`OID` int unsigned NOT NULL auto_increment,
+  	`CID` int unsigned NOT NULL default '0',
+	`typeCode` int NOT NULL,
 	`name` varchar(255) NOT NULL,
 	`hasrPI` bool NOT NULL default false,				
-  	`delay` int(10) unsigned NOT NULL default '60',			
+  	`delay` int unsigned NOT NULL default '60',			
  	`instructions` varchar(255) NOT NULL,
 	`success_msg` varchar(255) NOT NULL,
 	`failed_msg` varchar(255) NOT NULL,
@@ -48,9 +48,9 @@ function create_t_stationtype($dbh) {
 function create_t_station($dbh) {
 	$status = $dbh->exec(
 			"CREATE TABLE `t_station` ( "
-			."`OID` int(10) unsigned NOT NULL auto_increment, "
-			."`CID` int(10) unsigned NOT NULL default '0', "
-			."`typeId` int(10) unsigned NOT NULL, "
+			."`OID` int unsigned NOT NULL auto_increment, "
+			."`CID` int unsigned NOT NULL default '0', "
+			."`typeId` int unsigned NOT NULL, "
 			."`tag` varchar(255), "
 			."PRIMARY KEY  (`OID`), "
 			."CONSTRAINT `rpi_tag_unique` UNIQUE KEY (`tag`), "
@@ -63,9 +63,9 @@ function create_t_station($dbh) {
 function create_t_rpi($dbh) {
 	$status = $dbh->exec(
 	"CREATE TABLE `t_rpi` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
-	`stationId` int(10) unsigned NOT NULL, 
+  	`OID` int unsigned NOT NULL auto_increment,
+  	`CID` int unsigned NOT NULL default '0',
+	`stationId` int unsigned NOT NULL, 
   	`URL` varchar(255) NOT NULL, 
 	`lastContact` DATETIME NOT NULL,
 	`debug` varchar(255) NOT NULL, 
@@ -80,11 +80,11 @@ function create_t_rpi($dbh) {
 function create_t_school($dbh) {
 	$status = $dbh->exec(
 			"CREATE TABLE `t_school` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
+  	`OID` int unsigned NOT NULL auto_increment,
+  	`CID` int unsigned NOT NULL default '0',
   	`name` varchar(255) NOT NULL,
  	`mascot` varchar(255) NOT NULL,
-  	`logo` int(10) unsigned NULL,
+  	`logo` int unsigned NULL,
   	PRIMARY KEY  (`OID`),
 	CONSTRAINT `school_name_unique` UNIQUE KEY (`name`)
 	) ENGINE=InnoDB DEFAULT CHARSET=latin1"
@@ -95,28 +95,28 @@ function create_t_school($dbh) {
 function create_t_team($dbh) {
 	$status = $dbh->exec(
 	"CREATE TABLE `t_team` ( "
-  	."`OID` int(10) unsigned NOT NULL auto_increment, "
-  	."`CID` int(10) unsigned NOT NULL default '0', "
+  	."`OID` int unsigned NOT NULL auto_increment, "
+  	."`CID` int unsigned NOT NULL default '0', "
   	."`name` varchar(255) NOT NULL, "
     ."`pin`  varchar(5) NOT NULL, "
- 	."`schoolId` int(10) unsigned NOT NULL, "
+ 	."`schoolId` int unsigned NOT NULL, "
 			
-	."`totalScore` int(10) unsigned NOT NULL default 0, "
-	."`regScore` int(10) unsigned NOT NULL default 0, "		
-	."`ctsScore` int(10) unsigned NOT NULL default 0, "
-	."`fslScore` int(10) unsigned NOT NULL default 0, "
-	."`hmbScore` int(10) unsigned NOT NULL default 0, "
-	."`cpaScore` int(10) unsigned NOT NULL default 0, "
-	."`extScore` int(10) unsigned NOT NULL default 0, "
+	."`totalScore` int unsigned NOT NULL default 0, "
+	."`regScore` int unsigned NOT NULL default 0, "		
+	."`ctsScore` int unsigned NOT NULL default 0, "
+	."`fslScore` int unsigned NOT NULL default 0, "
+	."`hmbScore` int unsigned NOT NULL default 0, "
+	."`cpaScore` int unsigned NOT NULL default 0, "
+	."`extScore` int unsigned NOT NULL default 0, "
 						
-	."`totalDuration` int(10) unsigned NOT NULL default 0, "
-	."`regDuration` int(10) unsigned NOT NULL default 0, "
-	."`ctsDuration` int(10) unsigned NOT NULL default 0, "
-	."`fslDuration` int(10) unsigned NOT NULL default 0, "
-	."`hmbDuration` int(10) unsigned NOT NULL default 0, "
-	."`cpaDuration` int(10) unsigned NOT NULL default 0, "
-	."`extDuration` int(10) unsigned NOT NULL default 0, "
-	//."`started_dt`	varchar(255) NOT NULL, "
+	."`totalDuration` int unsigned NOT NULL default 0, "
+	."`regDuration` int unsigned NOT NULL default 0, "
+	."`ctsDuration` int unsigned NOT NULL default 0, "
+	."`fslDuration` int unsigned NOT NULL default 0, "
+	."`hmbDuration` int unsigned NOT NULL default 0, "
+	."`cpaDuration` int unsigned NOT NULL default 0, "
+	."`extDuration` int unsigned NOT NULL default 0, "
+	."`started`	    int unsigned NOT NULL default 0, "
 	."`json` varchar(255) NOT NULL, "
   	."PRIMARY KEY  (`OID`), "
 	."UNIQUE KEY (`pin`), "
@@ -131,9 +131,9 @@ function create_t_user($dbh)
 {
   $status = $dbh->exec(
 	"CREATE TABLE `t_user` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
-  	`permissions` int(10) unsigned NOT NULL default '0',
+  	`OID` int unsigned NOT NULL auto_increment,
+  	`CID` int unsigned NOT NULL default '0',
+  	`permissions` int unsigned NOT NULL default '0',
   	`username` varchar(255) NOT NULL,
   	`passwordHash` varchar(40) NOT NULL,
   	`email` varchar(255) NOT NULL,  	
@@ -151,13 +151,13 @@ function create_t_user($dbh)
 function create_t_event($dbh) {
 	$status = $dbh->exec(
 	"CREATE TABLE `t_event` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
+  	`OID` int unsigned NOT NULL auto_increment,
+  	`CID` int unsigned NOT NULL default '0',
     `created_dt` DATETIME NOT NULL,
-  	`teamId` int(10) unsigned NOT NULL,
-  	`stationId` int(10) unsigned NOT NULL default '0',
- 	`eventType` int(10) NOT NULL,
-	`points` int(10) NOT NULL,			
+  	`teamId` int unsigned NOT NULL,
+  	`stationId` int unsigned NOT NULL default '0',
+ 	`eventType` int NOT NULL,
+	`points` int NOT NULL,			
   	`data` varchar(255) NOT NULL,
   	PRIMARY KEY  (`OID`),"
 	." CONSTRAINT `fk_teamId_event` FOREIGN KEY (`teamId`) REFERENCES `t_team` (`OID`),"
@@ -170,9 +170,9 @@ function create_t_event($dbh) {
 function create_t_cts_data($dbh) {
 	$status = $dbh->exec(
 	"CREATE TABLE `t_cts_data` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
-	`stationId` int(10) unsigned NOT NULL,
+  	`OID` int unsigned NOT NULL auto_increment,
+  	`CID` int unsigned NOT NULL default '0',
+	`stationId` int unsigned NOT NULL,
     `_1st` FLOAT NOT NULL,
 	`_2nd` FLOAT NOT NULL,
 	`_3rd` FLOAT NOT NULL,
@@ -189,8 +189,8 @@ function create_t_cts_data($dbh) {
 function create_t_fsl_data($dbh) {
 	$status = $dbh->exec(
 			"CREATE TABLE `t_fsl_data` ( "
-			."`OID` int(10) unsigned NOT NULL auto_increment, "
-			."`CID` int(10) unsigned NOT NULL default '0', "
+			."`OID` int unsigned NOT NULL auto_increment, "
+			."`CID` int unsigned NOT NULL default '0', "
 			."`tag` varchar(255) NOT NULL, "
 			."`lat1` decimal(12,8) NOT NULL, "
 			."`lng1` decimal(12,8) NOT NULL, "
@@ -209,8 +209,8 @@ function create_t_fsl_data($dbh) {
 function create_t_hmb_data($dbh) {
 	$status = $dbh->exec(
 	"CREATE TABLE `t_hmb_data` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
+  	`OID` int unsigned NOT NULL auto_increment,
+  	`CID` int unsigned NOT NULL default '0',
 	`_1st` int unsigned NOT NULL,	
     `_2nd` int unsigned NOT NULL,
     `_3rd` int unsigned NOT NULL,		
@@ -223,8 +223,8 @@ function create_t_hmb_data($dbh) {
 function create_t_cpa_data($dbh) {
 	$status = $dbh->exec(
 	"CREATE TABLE `t_cpa_data` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
+  	`OID` int unsigned NOT NULL auto_increment,
+  	`CID` int unsigned NOT NULL default '0',
 	`velocity` int unsigned NOT NULL,
     `velocity_tolerance` int unsigned NOT NULL,
     `window_time` int unsigned NOT NULL,
@@ -241,8 +241,8 @@ function create_t_cpa_data($dbh) {
 function create_t_ext_data($dbh) {
 	$status = $dbh->exec(
 	"CREATE TABLE `t_ext_data` (
-  	`OID` int(10) unsigned NOT NULL auto_increment,
-  	`CID` int(10) unsigned NOT NULL default '0',
+  	`OID` int unsigned NOT NULL auto_increment,
+  	`CID` int unsigned NOT NULL default '0',
 	`todo` varchar(255) NOT NULL,		
   	PRIMARY KEY  (`OID`)"
 	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
@@ -344,7 +344,7 @@ function _resetdb() {
     $admin->setRoll(USER::ROLL_ADMIN);
     $admin->create();
         
-    $stationType = StationType::makeStationType(StationType::STATION_TYPE_REG, "Register", false, 0,
+    $stationType = StationType::makeStationType(StationType::STATION_TYPE_REG, "Register", false, 60,
        "Hello [team] you have been successfully registered and may start the competition",
        "If you see this message there was an internal error 1",
        "If you see this message there was an internal error 2",
@@ -355,8 +355,8 @@ function _resetdb() {
     else createStations(1,"reg",$stationType->get('OID'));
     	
 
-    $stationType = StationType::makeStationType(StationType::STATION_TYPE_CTS,"Crack The Safe"            ,true, 0,
-      "Welcome, [team] Your first assignment is to break into Professor Aardvark's safe where you will find the first clue to his Secret Laboratory. Measure the interior angles and pick the three correct angles for the safe combination. Good luck! [clue=rrsG]",
+    $stationType = StationType::makeStationType(StationType::STATION_TYPE_CTS,"Crack The Safe"            ,true, 60,
+      "Welcome, [team] Your first assignment is to break into Professor Aardvark's safe where you will find the first clue to his Secret Laboratory. Measure the interior angles and pick the three correct angles for the safe combination. Good luck! clue=[clue]",
       "Success! Go quickly to the next team queue.",
        "You have failed the challenge. Go quickly to the next team queue.",
        "No luck, better try again!"
@@ -364,11 +364,11 @@ function _resetdb() {
     if ($stationType===false) echo "Create StationType CTS failed";
     else createStations(6,"cts",$stationType->get('OID'));
     
-    $stationType = StationType::makeStationType(StationType::STATION_TYPE_FSL,"Find Secret Lab"           ,false, 0,
-       "Find and scan the first marker at [waypoint-lat=+dd.dddddd] [waypoint-lon=+dd.dddddd].",
-       "Success! Find and scan the 2nd marker at [waypoint-lat=+dd.dddddd] [waypoint-lon=+dd.dddddd].",
-       "Too bad, you failed. Find and scan the second marker at [waypoint-lat=+dd.dddddd] [waypoint-long=+dd.dddddd].",
-       "Wrong first marker, try again!"
+    $stationType = StationType::makeStationType(StationType::STATION_TYPE_FSL,"Find Secret Lab"           ,false, 60,
+       "Find and scan the marker at [lat] [lng].",
+       "Success! Find and scan the next marker at [lat] [lng].",
+       "Too bad, you failed. Find and scan the next marker at [lat] [lng].",
+       "Wrong marker, try again!"
     		
     		//Success! Go quickly to the next team queue.
     		//Wrong Secret Laboratory marker, try again!
@@ -377,7 +377,7 @@ function _resetdb() {
     if ($stationType===false) echo "Create StationType FSL failed";
     else createStations(1,"fsl",$stationType->get('OID'));
     
-     $stationType = StationType::makeStationType(StationType::STATION_TYPE_HMB,"Defuse Hypermutation Bomb" ,false, 0,
+     $stationType = StationType::makeStationType(StationType::STATION_TYPE_HMB,"Defuse Hypermutation Bomb" ,false, 60,
      	"The HMB has been triggered! Send the Energy Pulsator cycle time quickly!",
      	"Success! Go quickly to the next team queue.",
      	"Oops. Enough said. Go quickly to the next team queue.",
@@ -386,8 +386,8 @@ function _resetdb() {
     if ($stationType===false) echo "Create StationType HMB failed";
     else createStations(6,"hmb",$stationType->get('OID'));
     
-     $stationType = StationType::makeStationType(StationType::STATION_TYPE_CPA,"Catch Provessor Aardvark"   ,true, 0,
-       "PA is trying to escape. Quickly measure [fence=d] [building=d] and scan Start QR Code.",
+     $stationType = StationType::makeStationType(StationType::STATION_TYPE_CPA,"Catch Provessor Aardvark"   ,true, 60,
+       "PA is trying to escape. Quickly measure fence=[fence] building=[building] and scan Start QR Code.",
      		
      		//"Watch now as the professor attempts to escape. Get him!"
      		"Success! Go quickly to the team finish area.",
@@ -397,7 +397,7 @@ function _resetdb() {
     if ($stationType===false) echo "Create StationType CPA failed";
     else createStations(6,"cpa",$stationType->get('OID'));
     
-    $stationType = StationType::makeStationType(StationType::STATION_TYPE_EXT,"Extra"                     ,false, 0,
+    $stationType = StationType::makeStationType(StationType::STATION_TYPE_EXT,"Extra"                     ,false, 60,
      "You have 20 (TBR) minutes to provide the tower location and height. Good luck. [waypoint1-lat=+dd.dddddd] [waypoint1-lon=+dd.dddddd] [waypoint2-lat=+dd.dddddd] [waypoint2-lon=+dd.dddddd] [waypoint3-lat=+dd.dddddd] [waypoint3-lon=+dd.dddddd]",
       "success",
       "failed",
