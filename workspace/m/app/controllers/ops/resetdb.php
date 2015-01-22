@@ -345,7 +345,7 @@ function _resetdb() {
     $admin->create();
         
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_REG, "Register", false, 60,
-       "Hello [team] you have been successfully registered and may start the competition",
+       "Welcome [team] to the Design Challenge! Your app has successfully communicated with the Master Server! Congratulations!",
        "If you see this message there was an internal error 1",
        "If you see this message there was an internal error 2",
        "If you see this message there was an internal error 3"
@@ -422,22 +422,22 @@ function _resetdb() {
     	if ($user->create()===false) echo "Create user $i failed";
     }
     
-    $names   = explode(",", "Tigers,Bulldogs");
-    $schools = explode(",","Bayside High,Valley High");
+    $mascots = explode(",","Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded");
+    $schools   = explode(",", "Titusville HS,Edgewood Jr/Sr HS,Holy Trinity,West Shore Jr/Sr HS,Melbourne HS,Palm Bay Magnet HS,Bayside HS");
     for ($i=0; $i<count($schools); $i++)
     {
     	$school = new School();
     	$school->set("name",$schools[$i]);
-    	$school->set("mascot",$names[$i]);
+    	$school->set("mascot",$mascots[$i]);
     	if ($school->create() === false) echo "Create School $i failed";
     }
-    $names   = explode(",", "Tigers,Bulldogs");
-    $pins = explode(",","00001,00002");
+    $names = explode(",","00001,00002,00003,00004,00005,00006,00007,00008,00009,00010,00011,00012,00013,00014");
+    $pins = explode(",","00001,00002,00003,00004,00005,00006,00007,00008,00009,00010,00011,00012,00013,00014");
     for ($i=0; $i<count($names);$i++)
     {
       $team = new Team();
       $team->set("name",$names[$i]);
-      $team->set("schoolId",$i+1);  // hack we know the order the schools were added
+      $team->set("schoolId", (int)(($i+1)/2) + (int)(($i+1)%2));  // hack we know the order the schools were added
       $team->set("pin", $pins[$i]); 
       if ($team->create() === false) echo "Create team $i failed";
     }
