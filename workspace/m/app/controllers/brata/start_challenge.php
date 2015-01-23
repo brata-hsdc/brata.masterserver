@@ -55,6 +55,8 @@ function _start_challenge($stationTag=null)
 	        	break;
 	}
 	if ($rpi!=null) $rpi->start_challenge($stationType->get('delay'),$parms);
+	//TODO transaction
+	$station->startChallenge($team);
 	$team->startChallenge($station, $parms);
 	
 	if ( Event::createEvent(Event::TYPE_START,$team, $station,0) ===false) {

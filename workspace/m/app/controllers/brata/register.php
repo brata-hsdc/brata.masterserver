@@ -8,7 +8,6 @@ function _register()
 	trace("start",__FILE__,__LINE__,__METHOD__);
 	
 	$json = json_getObjectFromRequest("POST");
-	//if ($json === NULL) return;
 	json_checkMembers("team_id,message", $json);
         $teamPIN = $json['team_id'];
 	if ($teamPIN === null) {
@@ -29,7 +28,7 @@ function _register()
 		rest_sendBadRequestResponse(500, "can't find registration station");
 	}
 
-        $points = 3;
+    $points = 3;
 	if (Event::createEvent(Event::TYPE_REGISTER,$team, $station,$points) === false) {
 	  trace("createEvent Fails",__FILE__,__LINE__,__METHOD__);
 	  rest_sendBadRequestResponse(500, "could not create event object");	

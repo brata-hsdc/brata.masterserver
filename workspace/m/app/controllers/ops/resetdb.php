@@ -117,6 +117,7 @@ function create_t_team($dbh) {
 	."`hmbDuration` int unsigned NOT NULL default 0, "
 	."`cpaDuration` int unsigned NOT NULL default 0, "
 	."`extDuration` int unsigned NOT NULL default 0, "
+	."`count`	    int unsigned NOT NULL default 0, "			
 	."`started`	    int unsigned NOT NULL default 0, "
 	."`json` varchar(255) NOT NULL, "
   	."PRIMARY KEY  (`OID`), "
@@ -364,7 +365,7 @@ function _resetdb() {
     );
     $numStations = ($dataOption == 1) ? 1 : 6;
     if ($stationType===false) echo "Create StationType CTS failed";
-    else createStations(6,"cts",$stationType->get('OID'));
+    else createStations($numStations,"cts",$stationType->get('OID'));
     
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_FSL,"Find Secret Lab"           ,false, 60,
        "Find and scan the marker at [lat] [lng].",
@@ -389,7 +390,7 @@ function _resetdb() {
      
     $numStations = ($dataOption == 1) ? 1 : 6;
     if ($stationType===false) echo "Create StationType HMB failed";
-    else createStations(6,"hmb",$stationType->get('OID'));
+    else createStations($numStations,"hmb",$stationType->get('OID'));
     
      $stationType = StationType::makeStationType(StationType::STATION_TYPE_CPA,"Catch Provessor Aardvark"   ,true, 60,
        "PA is trying to escape. Quickly measure fence=[fence] building=[building] and scan Start QR Code.",
@@ -402,7 +403,7 @@ function _resetdb() {
      
     $numStations = ($dataOption == 1) ? 1 : 6;
     if ($stationType===false) echo "Create StationType CPA failed";
-    else createStations(6,"cpa",$stationType->get('OID'));
+    else createStations($numStations,"cpa",$stationType->get('OID'));
     
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_EXT,"Extra"                     ,false, 60,
      "You have 20 (TBR) minutes to provide the tower location and height. Good luck. [waypoint1-lat=+dd.dddddd] [waypoint1-lon=+dd.dddddd] [waypoint2-lat=+dd.dddddd] [waypoint2-lon=+dd.dddddd] [waypoint3-lat=+dd.dddddd] [waypoint3-lon=+dd.dddddd]",
@@ -462,10 +463,11 @@ function _resetdb() {
       $team->set("pin", $pins[$i]); 
       if ($team->create() === false) echo "Create team $i failed";
     }
-    for ($i=1; $i<= 5; $i++)
+    for ($i=1; $i<= (($dataOption==1)?1:5); $i++)
     {
       $cts = new CTSData();
       $station = Station::getFromTag("cts0".$i);
+      if ($station === false) break;
       $cts->set('stationId',$station->get('OID')); // hack assume get works
       $cts->set('_1st',1);
       $cts->set('_2nd',2);

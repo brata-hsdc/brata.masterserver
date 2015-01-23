@@ -13,6 +13,16 @@ class Station extends ModelEx {
     $this->retrieve($oid,$cid);
   }
   
+  function startChallenge($team) {
+  	$this->set('teamAtStation',$team->get('OID'));
+  	return $this->update();
+  }
+  // under development
+  function endChallenge() {
+  	$this->set('teamAtStation',0);
+  	return $this->update();
+  }
+  
   // map the given typeId into its text falue
   static function getTypeAsText($typeId) {
   	$stationType = new StationType($typeId,-1);

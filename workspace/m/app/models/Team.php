@@ -26,6 +26,7 @@ class Team extends ModelEx {
     $this->rs['cpaDuration'] = 0;
     $this->rs['extDuration'] = 0;
     
+    $this->rs['count'] = 0;
     $this->rs['started'] = 0;
     $this->rs['json'] = ""; // json string holding challenge data
     
@@ -40,6 +41,7 @@ class Team extends ModelEx {
   // under development
   function startChallenge($station,$jsonObject) {
   	
+  	$this->rs['count'] = 0;
   	$this->rs['started'] = time();                       // get system time 
   	$this->rs['json']    = json_encode($jsonObject);
   	return $this->update();
@@ -52,31 +54,40 @@ class Team extends ModelEx {
   
   // under development
   function endChallenge() {
-  	
+  	$this->rs['count'] = 0;
+  	$this->rs['started'] = 0;                       // get system time
+  	$this->rs['json']    = '';
+  	return $this->update();  	
   }
   // under development
   function updateScore($stationType,$points) {
   
-  	$json = $this->getChallengeData();
+  	$duration = time()-$this->get('started');
   	switch ($stationType->get('typeCode'))
   	{
   		case StationType::STATION_TYPE_REG:
   			$this->set('regScore',$points);
+  			$this->set('regDuration',$duration);
   			break;
   		case StationType::STATION_TYPE_CTS:
   			$this->set('ctsScore',$points);
+  			$this->set('regDuration',$duration);
   			break;
   		case StationType::STATION_TYPE_FSL:
   			$this->set('fslScore',$points);
+  			$this->set('regDuration',$duration);
   			break;
   		case StationType::STATION_TYPE_HMB:
   			$this->set('hmbScore',$points);
+  			$this->set('regDuration',$duration);
   			break;
   		case StationType::STATION_TYPE_CPA:
   			$this->set('cpaScore',$points);
+  			$this->set('regDuration',$duration);
   			break;
   	}
   	$this->set('totalScore',$this->get('regScore')+$this->get('ctsScore')+$this->get('fslScore')+$this->get('cpaScore'));
+  	$this->set('totalDuration',$this->get('regDuration')+$this->get('ctsDuration')+$this->get('fslDuration')+$this->get('cpaDuration'));
   	return $this->update();
   }
   // todo is this the best place?

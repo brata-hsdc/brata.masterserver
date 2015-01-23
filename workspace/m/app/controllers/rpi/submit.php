@@ -22,7 +22,12 @@ function _submit($stationTag=null)
 		trace("can't find station from tag");
 		rest_sendBadRequestResponse(404,"can find station stationTag=".$stationTag);  // doesn't return		
 	}
-	
+	$team = new Team($station->get('teamAtStation'),-1);
+	if ($team === false ) {
+		trace("can't find team",__FILE__,__LINE__,__METHOD__);
+		rest_sendBadRequestResponse(404,"can find team at station stationTag=".$stationTag." teamId=".$team->get('OID'));  // doesn't return
+	}
+		
 	$stationType = new StationType($station->get('typeId'),-1);
 	if ($stationType === false ) {
 		trace("can't find station type stationTag = ".$stationTag,__FILE__,__LINE__,__METHOD__);
@@ -49,14 +54,20 @@ function _submit($stationTag=null)
 			break;
 		
 	}
-	$team = new Team(1,-1); // todo get real team 
-	if ($team->get('OID') != 1 ) {
-		trace("can't find team",__FILE__,__LINE__,__METHOD__);
-	}
-	$points = ($json['is_correct']) ? 3 : -1;
-	//$count = Event::countEvents(Event::TYPE_SUBMIT, $team->get('OID'), $station->get('OID'));
 
-	//@todo calculate points
+	$count = $team->get('count');
+	$points = 3-$count;
+	$team->updateScore($stationType, $points);
+	if (!$json['is_correct']) {
+		$team->set('count',$count+1);
+		$challenge_complete=false;
+	}
+	else {
+	   $station->endChallenge();
+	   $team->endChallenge();
+	   $challenge_complete=true;
+	}
+
 	if (Event::createEvent(Event::TYPE_SUBMIT, $team, $station,$points) === false) {
 		trace("create event failed ".$team->get('OID')." ".$station->get('OID'),__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(500, "database create failed");
@@ -65,7 +76,7 @@ function _submit($stationTag=null)
 	$json = array("message_version" =>0 ,
 			"message_timestamp"=> date("Y-m-d H:i:s"),
 			"theatric_delay_ms"=>$stationType->get('delay') ,
-			"challenge_complete"=>false
+			"challenge_complete"=>$challenge_complete
 	);
 	
 	json_sendObject($json);
