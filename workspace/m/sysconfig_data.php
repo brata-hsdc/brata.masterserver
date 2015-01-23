@@ -8,4 +8,5 @@ $SYSCONFIG_DBPASS='$$##zxcv';
 $SYSCONFIG_DEBUG=1;
 $SYSCONFIG_SENDMAIL=0;
 $SYSCONFIG_LOGLEVEL=5;
-$SYSCONFIG_DATASET=1;  // 1 for test data 0 for real
+$SYSCONFIG_STUDENT=0;  // 1 for student mode server 0 for real
+$SYSCONFIG_ENCODE=0;   // 1 to encode messags 0 otherwise

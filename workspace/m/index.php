@@ -1,5 +1,5 @@
 <?php
-include_once "sysconfig_data.php";
+include_once "sysconfig_data.php"; 
 define('DBHOST',$SYSCONFIG_DBHOST);
 define('DBNAME',$SYSCONFIG_DBNAME);
 define('DBUSER',$SYSCONFIG_DBUSER);
@@ -8,8 +8,15 @@ define('PIN_RETRY_MAX',1000);
 $GLOBALS['SYSCONFIG_DEBUG'] = $SYSCONFIG_DEBUG;
 $GLOBALS['SYSCONFIG_SENDMAIL'] = $SYSCONFIG_SENDMAIL;
 $GLOBALS['LOGLEVEL'] = $SYSCONFIG_LOGLEVEL;
+$GLOBALS['SYSCONFIG_STUDENT'] = $SYSCONFIG_STUDENT;
+$GLOBALS['SYSCONFIG_ENCODE'] = $SYSCONFIG_ENCODE;
 
-
+function isStudenServer() {
+	return $GLOBALS['SYSCONFIG_STUDENT'];
+}
+function isEncodeEnabled() {
+	return $GLOBALS['SYSCONFIG_ENCODE'];
+}
 //===============================================
 // Debug
 //===============================================

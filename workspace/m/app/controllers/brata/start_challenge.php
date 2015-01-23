@@ -49,10 +49,8 @@ function _start_challenge($stationTag=null)
 			$parms = CTSData::startChallenge($stationId);
 	        break;
 	    case StationType::STATION_TYPE_CPA:
-	        	$parms =array("cpa_velocity" => 6000, "cpa_velocity_tolerance_ms"=>0,
-	        	"cpa_window_time_ms"=>8000, "cpa_window_time_tolerance_ms"=>100,
-	        	"cpa_pulse_width_ms"=>10, "cpa_pulse_width_tolerance_ms"=>20);
-	        	break;
+	        $parms =CPAData::getFromStationId($stationId);
+	        break;
 	}
 	if ($rpi!=null) $rpi->start_challenge($stationType->get('delay'),$parms);
 	//TODO transaction
@@ -66,7 +64,7 @@ function _start_challenge($stationTag=null)
 
 	$msg = $team->expandMessage($stationType->get('instructions'), $parms );
 	trace("message before decode $msg",__FILE__,__LINE__,__METHOD__);
-	$msg = $team->encodeText($msg);
+	if(isEncodeEnabled()) $msg = $team->encodeText($msg);
 	json_sendObject(array('message' => $msg ) );
 }
 

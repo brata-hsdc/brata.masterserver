@@ -14,7 +14,7 @@ function _submit($stationTag=null)
 	
 	$station = Station::getFromTag($stationTag);
 	if ($station === false) {
-		trace("brata can't find station stationTag".$stationTag,__FILE__,__LINE__,__METHOD__);
+		trace("brata can't find station stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(404,"can't find station stationTag=".$stationTag);  // doesn't return		
 	}
 	
@@ -28,7 +28,7 @@ function _submit($stationTag=null)
 	{
 	  $rpi = RPI::getFromStationId($station->get('OID'));
 	  if ($rpi === false) {
-		  trace("_start_challenge can't find RPI stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
+		  trace("_submit can't find RPI stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
 		  rest_sendBadRequestResponse(500,"can't find RPI stationTag=".$stationTag);
 	  }
 	} else {
@@ -45,7 +45,10 @@ function _submit($stationTag=null)
 	$challengeComplete = false;
 	switch($stationType->get('typeCode'))
 	{
+		case StationType::STATION_TYPE_FSL:
+		  break;
 		case StationType::STATION_TYPE_HMB:
+		  preg_match(".*answer.*=.*(\d)", $json['message'], $matches);
 		  trace('calling handle_challenge');
           $rpi->handle_challenge($stationType->get('delay'),$isCorrect, $challengeComplete);
           break;

@@ -64,10 +64,13 @@ function makeTeamList() {
     <form method="post" action="<?=$submitUrl?>">
 		<tr><th colspan="2">Submit Test</th></tr>
 		<tr>
-			<td>TeamId (a.k.a. team ping)</td>
+			<td>TeamId (a.k.a. team pin)</td>
 			<td><?php echo makeTeamList() ?> </td>
 		</tr>		
-		<tr>			
+		<tr>
+			<td>StationId (a.k.a. station Tag -- remeber to check for rPI Joins!)</td>
+			<td><?php echo makeStationList() ?> </td>
+		</tr>
 		<tr>
 			<td>Candidate Answer</td>
 			<td><input type="text" name="candidateAnswer" style="width:150px" value="" /></td>

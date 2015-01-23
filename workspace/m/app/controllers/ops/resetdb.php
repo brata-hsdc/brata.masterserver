@@ -431,13 +431,14 @@ function _resetdb() {
    // 	if ($user->create()===false) echo "Create user $i failed";
    // }
     
-    if ($dataOption == 1) {
-      $mascots   = explode(",", "Tigers,Bulldogs");
-      $schools = explode(",","Bayside High,Valley High");
+    if ($SYSCONFIG_STUDENT == 1) {
+    	$mascots = explode(",","Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded");
+    	$schools = explode(",", "Titusville HS,Edgewood Jr/Sr HS,Holy Trinity,West Shore Jr/Sr HS,Melbourne HS,Palm Bay Magnet HS,Bayside HS");
     } else {
-      $mascots = explode(",","Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded");
-      $schools   = explode(",", "Titusville HS,Edgewood Jr/Sr HS,Holy Trinity,West Shore Jr/Sr HS,Melbourne HS,Palm Bay Magnet HS,Bayside HS");
+    	$mascots = explode(",", "Tigers,Bulldogs");
+    	$schools = explode(",","Bayside High,Valley High");
     }
+    
     for ($i=0; $i<count($schools); $i++)
     {
     	$school = new School();
@@ -445,22 +446,24 @@ function _resetdb() {
     	$school->set("mascot",$mascots[$i]);
     	if ($school->create() === false) echo "Create School $i failed";
     }
-    if ($dataOption == 1) {
-      $names   = explode(",", "Tigers,Bulldogs");
-      $pins = explode(",","00001,00002");
+    
+    if ($SYSCONFIG_STUDENT == 1) {
+    	$names = explode(",","team1,team2,team3,team4,team5,team6,team7,team8,team9,team10,team11,team12,team13,team14");
+    	$pins = explode(",","00001,00002,00003,00004,00005,00006,00007,00008,00009,00010,00011,00012,00013,00014");
+    	 
     } else {
-      $names = explode(",","00001,00002,00003,00004,00005,00006,00007,00008,00009,00010,00011,00012,00013,00014");
-      $pins = explode(",","00001,00002,00003,00004,00005,00006,00007,00008,00009,00010,00011,00012,00013,00014");
+    	$names = explode(",", "Tigers,Bulldogs");
+    	$pins  = explode(",","00001,00002");
     }
     
     for ($i=0; $i<count($names);$i++)
     {
       $team = new Team();
       $team->set("name",$names[$i]);
-      if ($dataOption == 1)
-        $team->set("schoolId",$i+1);  // hack we know the order the schools were added
+      if ($SYSCONFIG_STUDENT == 1)
+      	$team->set("schoolId", (int)(($i+1)/2) + (int)(($i+1)%2));  // hack we know the order the schools were added
       else    
-         $team->set("schoolId", (int)(($i+1)/2) + (int)(($i+1)%2));  // hack we know the order the schools were added
+      	$team->set("schoolId",$i+1);  // hack we know the order the schools were added
       $team->set("pin", $pins[$i]); 
       if ($team->create() === false) echo "Create team $i failed";
     }
@@ -492,17 +495,7 @@ function _resetdb() {
     $cpa->set('pulse_width_tolerance',30);
     if ($cpa->create() === false) echo "Create CTA $i failed";
     }
-/*
-    $events = array(
-    	array('pin'=>"00001", 'tag'=>"cts01", 'retries'=>1 ),
-        array('pin'=>"00002", 'tag'=>"cts02", 'retries'=>1 )
-    );
-    foreach ( $events as $event )
-    {
-    	x($event);
-    	
-    }
-    */
+
    redirect('mgmt_main','Database Initialized test data!');
     
   }
