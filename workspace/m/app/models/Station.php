@@ -8,6 +8,7 @@ class Station extends ModelEx {
     $this->rs['CID'] = $cid;
     $this->rs['typeId'] = -1;
     $this->rs['tag'] = ""; 
+    $this->rs['teamAtStation'] = 0;
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }

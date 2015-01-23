@@ -52,6 +52,7 @@ function create_t_station($dbh) {
 			."`CID` int unsigned NOT NULL default '0', "
 			."`typeId` int unsigned NOT NULL, "
 			."`tag` varchar(255), "
+			."`teamAtStation` int unsigned default '0', "	
 			."PRIMARY KEY  (`OID`), "
 			."CONSTRAINT `rpi_tag_unique` UNIQUE KEY (`tag`), "
 			."CONSTRAINT `fk_typeId` FOREIGN KEY (`typeId`) REFERENCES `t_stationtype` (`OID`) ON DELETE CASCADE"
@@ -361,6 +362,7 @@ function _resetdb() {
        "You have failed the challenge. Go quickly to the next team queue.",
        "No luck, better try again!"
     );
+    $numStations = ($dataOption == 1) ? 1 : 6;
     if ($stationType===false) echo "Create StationType CTS failed";
     else createStations(6,"cts",$stationType->get('OID'));
     
@@ -374,6 +376,7 @@ function _resetdb() {
     		//Wrong Secret Laboratory marker, try again!
     		//Too bad, you failed. Go quickly to the next team queue.
     );
+    
     if ($stationType===false) echo "Create StationType FSL failed";
     else createStations(1,"fsl",$stationType->get('OID'));
     
@@ -383,6 +386,8 @@ function _resetdb() {
      	"Oops. Enough said. Go quickly to the next team queue.",
      	"Nope, better try again!"
     );
+     
+    $numStations = ($dataOption == 1) ? 1 : 6;
     if ($stationType===false) echo "Create StationType HMB failed";
     else createStations(6,"hmb",$stationType->get('OID'));
     
@@ -394,6 +399,8 @@ function _resetdb() {
      		"Professor Aardvark has escaped. Oh well. Go quickly to the team finish area.",
      		"Miss! Try again!"
     );
+     
+    $numStations = ($dataOption == 1) ? 1 : 6;
     if ($stationType===false) echo "Create StationType CPA failed";
     else createStations(6,"cpa",$stationType->get('OID'));
     
@@ -422,8 +429,13 @@ function _resetdb() {
     	if ($user->create()===false) echo "Create user $i failed";
     }
     
-    $mascots = explode(",","Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded");
-    $schools   = explode(",", "Titusville HS,Edgewood Jr/Sr HS,Holy Trinity,West Shore Jr/Sr HS,Melbourne HS,Palm Bay Magnet HS,Bayside HS");
+    if ($dataOption == 1) {
+      $mascots   = explode(",", "Tigers,Bulldogs");
+      $schools = explode(",","Bayside High,Valley High");
+    } else {
+      $mascots = explode(",","Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded");
+      $schools   = explode(",", "Titusville HS,Edgewood Jr/Sr HS,Holy Trinity,West Shore Jr/Sr HS,Melbourne HS,Palm Bay Magnet HS,Bayside HS");
+    }
     for ($i=0; $i<count($schools); $i++)
     {
     	$school = new School();
@@ -431,13 +443,22 @@ function _resetdb() {
     	$school->set("mascot",$mascots[$i]);
     	if ($school->create() === false) echo "Create School $i failed";
     }
-    $names = explode(",","00001,00002,00003,00004,00005,00006,00007,00008,00009,00010,00011,00012,00013,00014");
-    $pins = explode(",","00001,00002,00003,00004,00005,00006,00007,00008,00009,00010,00011,00012,00013,00014");
+    if ($dataOption == 1) {
+      $names   = explode(",", "Tigers,Bulldogs");
+      $pins = explode(",","00001,00002");
+    } else {
+      $names = explode(",","00001,00002,00003,00004,00005,00006,00007,00008,00009,00010,00011,00012,00013,00014");
+      $pins = explode(",","00001,00002,00003,00004,00005,00006,00007,00008,00009,00010,00011,00012,00013,00014");
+    }
+    
     for ($i=0; $i<count($names);$i++)
     {
       $team = new Team();
       $team->set("name",$names[$i]);
-      $team->set("schoolId", (int)(($i+1)/2) + (int)(($i+1)%2));  // hack we know the order the schools were added
+      if ($dataOption == 1)
+        $team->set("schoolId",$i+1);  // hack we know the order the schools were added
+      else    
+         $team->set("schoolId", (int)(($i+1)/2) + (int)(($i+1)%2));  // hack we know the order the schools were added
       $team->set("pin", $pins[$i]); 
       if ($team->create() === false) echo "Create team $i failed";
     }

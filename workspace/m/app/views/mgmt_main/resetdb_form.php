@@ -7,7 +7,8 @@
       <td>
       <select name='dataOption' >
          <option value=0 > No Test Data</option>
-         <option value=1 > With Test Data</option>
+         <option value=1 > With Test Data (short)</option>
+         <option value=1 > With Test Data (long)</option>
       </select>
       </td>
     </tr>
