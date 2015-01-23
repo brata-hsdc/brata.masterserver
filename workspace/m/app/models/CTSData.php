@@ -33,8 +33,8 @@ class CTSData extends ModelEx {
   
   static function startChallenge($stationId) {
   	$cts = CTSData::getFromStationId($stationId);
-  	$parms = $cts->generateParameters();
-  	$parms['clue'] = CTSData::hash($parms);
+  	$parms['cts_combo'] = $cts->generateParameters();
+  	$parms['clue'] = CTSData::hash($parms['cts_combo']);
   	return $parms;
   }
 

@@ -3,7 +3,7 @@
 //
 require(APP_PATH.'inc/rest_functions.php');
 require(APP_PATH.'inc/json_functions.php');
-function _register() 
+function _register($tag='reg01') 
 {
 	trace("start",__FILE__,__LINE__,__METHOD__);
 	
@@ -64,6 +64,8 @@ function _register()
     $stationType = StationType::getFromTypeCode($station->get('tag'));
     trace("registration complete",__FILE__,__LINE__,__METHOD__);
     $team->updateScore($stationType, $points);
-	json_sendObject(array('message' => $team->expandMessage($stationType->get('instructions'), null ) ) );
+    $msg = $team->expandMessage($stationType->get('instructions'), null ) ;
+    $msg = $team->encodeText($msg);
+	json_sendObject(array('message' => $msg) );
 }
 

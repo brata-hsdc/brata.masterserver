@@ -227,15 +227,16 @@ function create_t_cpa_data($dbh) {
 	"CREATE TABLE `t_cpa_data` (
   	`OID` int unsigned NOT NULL auto_increment,
   	`CID` int unsigned NOT NULL default '0',
+	`stationId` int unsigned NOT NULL,
 	`velocity` int unsigned NOT NULL,
     `velocity_tolerance` int unsigned NOT NULL,
     `window_time` int unsigned NOT NULL,
     `window_time_tolerance` int unsigned NOT NULL,
     `pulse_width` int unsigned NOT NULL,
-    `pulse_width_tolerance` int unsigned NOT NULL,
-    `combo` int unsigned NOT NULL,
-  	PRIMARY KEY  (`OID`)"
-			." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
+    `pulse_width_tolerance` int unsigned NOT NULL, "
+    ."CONSTRAINT `fk_cpa_stationid` FOREIGN KEY (`stationId`) REFERENCES `t_station` (`OID`) ON DELETE CASCADE, "	
+  	. " PRIMARY KEY  (`OID`)"
+	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
 	if ($status === false) throw new ErrorInfo($dbh,"t_cpa_data");
 }
@@ -421,14 +422,14 @@ function _resetdb() {
     
     // generate test data
     
-    for ($i=1;$i < 21; $i++) {
-    	$user = new User();
-    	$user->set('username','user'.$i);
-    	$user->setPassword('pass'.$i);
-    	$user->set('email','email'.$i."@harris.com");
-    	$user->set('fullname','User #'.$i);
-    	if ($user->create()===false) echo "Create user $i failed";
-    }
+   // for ($i=1;$i < 21; $i++) {
+   // 	$user = new User();
+   // 	$user->set('username','user'.$i);
+   // 	$user->setPassword('pass'.$i);
+   // 	$user->set('email','email'.$i."@harris.com");
+   // 	$user->set('fullname','User #'.$i);
+   // 	if ($user->create()===false) echo "Create user $i failed";
+   // }
     
     if ($dataOption == 1) {
       $mascots   = explode(",", "Tigers,Bulldogs");
@@ -469,13 +470,27 @@ function _resetdb() {
       $station = Station::getFromTag("cts0".$i);
       if ($station === false) break;
       $cts->set('stationId',$station->get('OID')); // hack assume get works
-      $cts->set('_1st',1);
-      $cts->set('_2nd',2);
-      $cts->set('_3rd',2);
-      $cts->set('_4th',2);
-      $cts->set('_5th',2);
+      $cts->set('_1st',10+$i);
+      $cts->set('_2nd',20+$i);
+      $cts->set('_3rd',30+$i);
+      $cts->set('_4th',40+$i);
+      $cts->set('_5th',50+$i);
       $cts->set('tolerance',5.0);
       if ($cts->create() === false) echo "Create CTS $i failed";
+    }
+    for ($i=1; $i<= (($dataOption==1)?1:5); $i++)
+    {
+    $cpa = new CPAData();
+    $station = Station::getFromTag("cpa0".$i);
+    if ($station === false) break;
+    $cpa->set('stationId',$station->get('OID')); // hack assume get works
+    $cpa->set('velocity',8000);
+    $cpa->set('velocity_tolerance',1000);
+    $cpa->set('window_time',2000);
+    $cpa->set('window_time_tolerance',100);
+    $cpa->set('pulse_width',10);
+    $cpa->set('pulse_width_tolerance',30);
+    if ($cpa->create() === false) echo "Create CTA $i failed";
     }
 /*
     $events = array(

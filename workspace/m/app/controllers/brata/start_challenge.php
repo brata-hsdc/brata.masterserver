@@ -64,6 +64,9 @@ function _start_challenge($stationTag=null)
 		rest_sendBadRequestResponse(500, "database create failed");
 	}
 
-	json_sendObject(array('message' => $team->expandMessage($stationType->get('instructions'), $parms ) ) );
+	$msg = $team->expandMessage($stationType->get('instructions'), $parms );
+	trace("message before decode $msg",__FILE__,__LINE__,__METHOD__);
+	$msg = $team->encodeText($msg);
+	json_sendObject(array('message' => $msg ) );
 }
 

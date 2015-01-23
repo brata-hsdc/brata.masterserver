@@ -60,6 +60,7 @@ function writeSysconfig()
       fwrite($fd,"\$SYSCONFIG_DEBUG=".$_POST['debug'].";\n");
       fwrite($fd,"\$SYSCONFIG_SENDMAIL=".$_POST['sendmail'].";\n");      
       fwrite($fd,"\$SYSCONFIG_LOGLEVEL=".$_POST['loglevel'].";\n");
+      fwrite($fd,"\$SYSCONFIG_DATASET=".$_POST['dataset'].";\n");
       fclose($fd);
    }
    return $errors;
@@ -105,6 +106,7 @@ if ( isset($_GET['write']) ) {
 <tr><td>Log Level</td><td><input name=loglevel value='<?php echo $SYSCONFIG_LOGLEVEL?>'/></td></tr>
 <tr><td>Send Mail (to new users)</td><td><input type=checkbox name=sendmail value='1' <?php if ($SYSCONFIG_SENDMAIL) echo "checked"; ?> /> </td></tr>
 <tr><td>Debug Mode</td><td><input type=checkbox name=debug value='1' <?php if ($SYSCONFIG_DEBUG) echo "checked"; ?> /> </td></tr>
+<tr><td>Data Set</td><td><input type=checkbox name=dataset value='1' <?php if ($SYSCONFIG_DATASET) echo "checked"; ?> /> </td></tr>
 </table>
 <input class="button" type="submit" name=submit />
 </form>

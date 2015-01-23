@@ -96,10 +96,84 @@ class Team extends ModelEx {
   	if ($table == null)  $table=array("team"=>$this->get('name'));
   	else                 $table['team'] = $this->get('name');   // add team name
   	foreach ($table as $key => $value) {
+  		if (is_array($value)) continue; // todo make this a string
   		$msg = str_replace("[$key]", $value, $msg);
   	}
   	return $msg;
   }
+
+  static function makePrimes($n) {
+  	/* Return a list of between 2 and n (inclusive) prime numbers.
+  	  
+  	    Create a list of the prime numbers between 2 and n inclusive. The
+  	    method used is a essentially the "Sieve of Eratosthenes" whereby the
+  	    initial prime number 2 is seeded. Thereafter, if the next candidate
+  	    integer can not be evenly divided by any prime number already in the
+  	    list, then the candidate is found to be prime and added to the list.
+  	    */
+  	 $pList = array();
+  	 $_range =range(2, $n + 1,1);
+  	 foreach ($_range as $i) { 
+  	    $isPrime = true;
+  	    foreach ($pList as $t) {
+  	    	if (($i % $t) == 0) {
+  	    		$isPrime = false;
+  	    		break;
+  	    	}
+  	    }
+  	    if ($isPrime) {
+  	    	$pList[] = $i;
+  	    }
+  	 }
+  	 return $pList;
+  }
+
+  static function getPrimeFactors($n) {
+  	if (!isset($GLOBALS['primes'])) $GLOBALS['primes'] = Team::makePrimes(500);
+  	$fList = array();
+  	foreach($GLOBALS['primes'] as $t) {
+  		if (($n % $t) == 0) {
+  			$fList[] = $t;
+  			if (floor($n/$t) < $t) break;
+  		}
+  	}
+  	$c = count($fList);
+  	return $fList;
+  }
+  static function getEncodingParameters($text) {
+  	$lng = strlen($text);
+  	$augment = 0;
+  	while(true) {
+  		if ($lng >= 255) { // fail safe
+  			return array($text,null);
+  		}
+  	  $factors = Team::getPrimeFactors($lng);
+  	  if (count($factors) == 2 and ($factors[0] * $factors[1] == $lng)){
+  	  	break;
+  	  }
+  	  else {
+  	  	$lng += 1;
+  	    $augment += 1;
+  	  }
+  	}
+  	$text = $text . str_repeat("~", $augment);
+  	return array($text,$factors);
+  }
+  function encodeText($clearText) {
+  	$clearText = strtr($clearText,' ',"_");
+  	list($clearText,$factors) = Team::getEncodingParameters($clearText);
+  	if ($factors == null ) { // fail safe
+  		return $clearText;
+  	}
+  	$cipherText = array();
+  	foreach (range(0,$factors[1]-1) as $j) {
+  		foreach(range(0,$factors[0]-1) as $k) {
+  			$cipherText[] = ($clearText[$k * $factors[1] + $j]);
+  		}
+  	}
+  	return implode($cipherText);
+  }
+  
   
   // fetch the Team object for the given pin
   static function getFromPin($pin) {

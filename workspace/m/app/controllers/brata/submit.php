@@ -38,6 +38,8 @@ function _submit($stationTag=null)
 	$json = json_getObjectFromRequest("POST");  // won't return if an error happens
 	
 	json_checkMembers("message,team_id", $json);
+	
+//	$ans = $json['message']
 
 	$isCorrect = false;
 	$challengeComplete = false;
@@ -60,6 +62,10 @@ function _submit($stationTag=null)
 		trace("can't create event object",__FILE__,__LINE__,__METHOD__);
 		json_sendBadRequestResponse(500,"Can't create event object");
 	}
-     $json = array("message"=>"test ".$stationTag);  //@todo 
+	if       ($isCorrect) $msg = $stationType->get('success_msg');
+	else if  ($count >=3) $msg = $stationType->get('failed_msg');
+	else                  $msg = $stationType->get('retry_msg');
+    $msg = $team->expandMessage($msg, $parms );
+    $msg = $team->encodeText($msg);
 	json_sendObject($json);
 }

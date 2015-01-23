@@ -1,8 +1,20 @@
+<?php
+function makeOptionList($stationId) {
+	return '<select name="stationId">'
+		. '<option value=-1>Select One'	
+		. Station::getAllCPAAsHTMLOptions($stationId)
+		. '</select>';
+}
+?>
 <form method="post" action="<?=$actionUrl?>">
 <input type="hidden" name="OID" value="<?php echo $object->get('OID')?>" />
 <input type="hidden" name="CID" value="<?php echo $object->get('CID')?>" />
 	<table>
 		<tr><th colspan="2"><?php echo $form_heading?></th></tr>
+		<tr>
+			<td>Station</td>
+			<td><?php echo makeOptionList($object->get('stationId')) ?></td>
+		</tr>
 		<tr>
 			<td>Velocity</td>
 			<td><input type="text" name="velocity" style="width:150px" value="<?php echo $object->get('velocity')?>" /></td>
@@ -26,11 +38,7 @@
 		<tr>
 			<td>Pulse Width Tolerance</td>
 			<td><input type="text" name="pulse_width_tolerance" style="width:150px" value="<?php echo $object->get('pulse_width_tolerance')?>" /></td>
-		</tr>	
-		<tr>
-			<td>Combo</td>
-			<td><input type="text" name="combo" style="width:150px" value="<?php echo $object->get('combo')?>" /></td>
-		</tr>		
+		</tr>			
 		<tr>
 			<td colspan="2" style="text-align:right">
 	     	<input type="button" value="<?=$cancelLabel?>" onclick="location.href='<?=$cancelUrl ?>' " />

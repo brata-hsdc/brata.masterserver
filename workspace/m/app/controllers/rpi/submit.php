@@ -55,6 +55,7 @@ function _submit($stationTag=null)
 		
 	}
 
+	//TODO count >= 3
 	$count = $team->get('count');
 	$points = 3-$count;
 	$team->updateScore($stationType, $points);

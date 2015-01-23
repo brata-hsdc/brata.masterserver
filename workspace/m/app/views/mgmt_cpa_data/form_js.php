@@ -1,5 +1,10 @@
 <script type="text/javascript">
   function validateForm(f) {
+    if (f.stationId.value == -1) {
+      alert("Please enter tag");
+	  f.stationId.focus();
+	  return false;
+	}
 
     if (f.velocity.value == "") {
       alert("Please enter a velocity");
@@ -29,11 +34,6 @@
         if (f.pulse_width_tolerance.value == "") {
             alert("Please enter the pulse width tolerance");
             f.pulse_width_tolerance.focus();
-            return false;
-         }
-        if (f.combo.value == "") {
-            alert("Please enter the combo");
-            f.combo.focus();
             return false;
          }
         
