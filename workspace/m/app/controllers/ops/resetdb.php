@@ -246,7 +246,12 @@ function create_t_ext_data($dbh) {
 	"CREATE TABLE `t_ext_data` (
   	`OID` int unsigned NOT NULL auto_increment,
   	`CID` int unsigned NOT NULL default '0',
-	`todo` varchar(255) NOT NULL,		
+	`waypoint1_lat` decimal(8,6) NOT NULL,
+	`waypoint1_lng` decimal(8,6) NOT NULL,
+	`waypoint2_lat` decimal(8,6) NOT NULL,
+	`waypoint2_lng` decimal(8,6) NOT NULL,
+	`waypoint3_lat` decimal(8,6) NOT NULL,
+	`waypoint3_lng` decimal(8,6) NOT NULL,
   	PRIMARY KEY  (`OID`)"
 	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -382,7 +387,7 @@ function _resetdb() {
     if ($stationType===false) echo "Create StationType FSL failed";
     else createStations(1,"fsl",$stationType->get('OID'));
     
-     $stationType = StationType::makeStationType(StationType::STATION_TYPE_HMB,"Defuse Hypermutation Bomb" ,false, 60,
+     $stationType = StationType::makeStationType(StationType::STATION_TYPE_HMB,"Defuse Hypermutation Bomb" ,true, 60,
      	"The HMB has been triggered! Send the Energy Pulsator cycle time quickly!",
      	"Success! Go quickly to the next team queue.",
      	"Oops. Enough said. Go quickly to the next team queue.",
@@ -407,7 +412,10 @@ function _resetdb() {
     else createStations($numStations,"cpa",$stationType->get('OID'));
     
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_EXT,"Extra"                     ,false, 60,
-     "You have 20 (TBR) minutes to provide the tower location and height. Good luck. [waypoint1-lat=+dd.dddddd] [waypoint1-lon=+dd.dddddd] [waypoint2-lat=+dd.dddddd] [waypoint2-lon=+dd.dddddd] [waypoint3-lat=+dd.dddddd] [waypoint3-lon=+dd.dddddd]",
+     "You have 20 (TBR) minutes to provide the tower location and height. Good luck."
+     ." waypoint1-lat=[waypoint1-lat] waypoint1-lng=[waypoint1-lng]"
+     ."	waypoint2-lat=[waypoint2-lat] waypoint2-lng=[waypoint2=lng]"
+     ." waypoint3-lat=[waypoint3-lat] waypoint3-lng=[waypoint3-lng]",
       "success",
       "failed",
       "retry"

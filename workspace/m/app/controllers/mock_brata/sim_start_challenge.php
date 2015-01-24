@@ -2,7 +2,7 @@
 require(APP_PATH.'inc/mock_functions.php');
 function _sim_start_challenge()
 {
-   $stationTag = $_POST['stationId'];
+   $stationTag = $_POST['stationTag'];
    $teamId = $_POST['teamId'];
    $json = array("team_id"=>$teamId, "message" => "");
    // hack just to reuse do_post_request code

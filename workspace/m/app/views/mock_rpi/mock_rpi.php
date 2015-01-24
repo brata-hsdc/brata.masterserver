@@ -1,14 +1,6 @@
 <?php
 require(APP_PATH.'inc/mock_functions.php');
-/*
-function makeWaypointList() {
-	return '<select name="waypointId">'
-		. '<option value=-1>Select One'	
-		. Waypoint::getAllAsHTMLOptions(-1)
-		. '</select>';
-}
 
-*/
 function makeStationList() {
 	return '<select name="stationId">'
 			. '<option value=-1>Select One'
@@ -18,7 +10,7 @@ function makeStationList() {
 function makeStationTypeList() {
 	return '<select name="stationType">'
 			. '<option value=-1>Select One'
-					. StationType::getAllAsHTMLOptions(-1)
+					. StationType::getAllAsHTMLOptionsText(-1)
 					. '</select>';
 }
 ?>

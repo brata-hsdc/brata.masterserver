@@ -7,7 +7,7 @@ require(APP_PATH.'inc/json_functions.php');
 function _start_challenge($stationTag=null) 
 {
 	if ($stationTag === null) {
-		rest_sendBadRequestResponse(400,"missing stationId");  // doesn't return
+		rest_sendBadRequestResponse(400,"missing station Tag");  // doesn't return
 	}
 	
 	$station = Station::getFromTag($stationTag);

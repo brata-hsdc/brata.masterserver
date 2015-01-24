@@ -17,7 +17,7 @@ class Station extends ModelEx {
   	$this->set('teamAtStation',$team->get('OID'));
   	return $this->update();
   }
-  // under development
+ 
   function endChallenge() {
   	$this->set('teamAtStation',0);
   	return $this->update();

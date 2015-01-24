@@ -3,7 +3,7 @@
 //
 require(APP_PATH.'inc/rest_functions.php');
 require(APP_PATH.'inc/json_functions.php');
-function _register($tag='reg01') 
+function _register() 
 {
 	trace("start",__FILE__,__LINE__,__METHOD__);
 	

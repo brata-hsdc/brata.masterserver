@@ -40,13 +40,12 @@ class RPI extends ModelEx {
 
   }
   */
-  function set_contact_data(&$json) {
+  function set_contact_data($tag, &$json) {
   	$this->rs['lastContact']= unixToMySQL(time());
   	$this->rs['URL'        ]= $json ['station_url'];
-  	$this->rs['debug'      ]= json_encode ( $json );
+  	$this->rs['debug'      ]= "tag=$tag ".json_encode ( $json );
   }
  
-  //todo pass delay
   function start_challenge($delay, $parms=null)  {
   	$json = array("message_version" =>0 , 
   			"message_timestamp"=> date("Y-m-d H:i:s"), 
@@ -58,14 +57,13 @@ class RPI extends ModelEx {
   	return RPI::do_post_request($this->rs['URL']."/start_challenge", $json);
   }
   
-  //todo pass delay not HMB ONLY!!!!
-  function handle_submission($delay,$isCorrect,$isComplete)  {
+  //TODO check message format
+  function handle_submission($delay,$candidate_answer)  {
   	$json = array("message_version" =>0 ,
   			"message_timestamp"=> date("Y-m-d H:i:s"),
   			"theatric_delay_ms"=>$delay,
-  	         "is_correct" => $isCorrect,
-  	         "challenge_complete" => $isComplete);
-   	trace("handle_challenge sending ". json_encode($json),__FILE__,__LINE__,__METHOD__);
+  	         "candidate_answer" => $candidate_answer);
+   	trace("handle_submission sending ". json_encode($json),__FILE__,__LINE__,__METHOD__);
   	// todo remove this is just for testing don't send it URL start with test
   	if (substr($this->rs['URL'],0,4) == "test") return true;
   	return RPI::do_post_request($this->rs['URL']."/handle_submission", $json);

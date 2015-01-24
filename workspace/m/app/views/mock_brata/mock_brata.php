@@ -10,7 +10,7 @@ function makeWaypointList() {
 
 */
 function makeStationList() {
-	return '<select name="stationId">'
+	return '<select name="stationTag">'
 			. '<option value=-1>Select One'
 					. Station::getAllAsHTMLOptions(-1)
 					. '</select>';
@@ -49,7 +49,7 @@ function makeTeamList() {
 			<td><?php echo makeTeamList() ?> </td>
 		</tr>		
 		<tr>
-			<td>StationId (a.k.a. station Tag -- remeber to check for rPI Joins!)</td>
+			<td>Station Tag -- remeber to check for rPI Joins!)</td>
 			<td><?php echo makeStationList() ?> </td>
 		</tr>	
 		<tr>
@@ -68,7 +68,7 @@ function makeTeamList() {
 			<td><?php echo makeTeamList() ?> </td>
 		</tr>		
 		<tr>
-			<td>StationId (a.k.a. station Tag -- remeber to check for rPI Joins!)</td>
+			<td>Station Tag -- remeber to check for rPI Joins!)</td>
 			<td><?php echo makeStationList() ?> </td>
 		</tr>
 		<tr>

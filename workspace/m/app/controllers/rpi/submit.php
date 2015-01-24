@@ -43,30 +43,23 @@ function _submit($stationTag=null)
 	$json = json_getObjectFromRequest("POST");  // won't return if an error happens
 	
 	json_checkMembers("candidate_answer,is_correct,fail_message", $json);
-
-	// for CTS candidate_answer is array of three
-	// for CPA candidate_answer is text hit in/out of window
-	switch($stationType->get('typeCode'))
-	{
-		case StationType::STATION_TYPE_CTS:
-			break;
-		case StationType::STATION_TYPE_CPA:
-			break;
-		
-	}
-
-	//TODO count >= 3
+	
 	$count = $team->get('count');
 	$points = 3-$count;
 	$team->updateScore($stationType, $points);
 	if (!$json['is_correct']) {
-		$team->set('count',$count+1);
-		$challenge_complete=false;
+		$count++;
+		$team->set('count',$count);
+		$challenge_complete=($count<3?false:true);
 	}
 	else {
+	  $challenge_complete=true;
+	}
+	
+	if ($challenge_complete)
+	{
 	   $station->endChallenge();
 	   $team->endChallenge();
-	   $challenge_complete=true;
 	}
 
 	if (Event::createEvent(Event::TYPE_SUBMIT, $team, $station,$points) === false) {

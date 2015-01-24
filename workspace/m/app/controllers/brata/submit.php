@@ -39,36 +39,57 @@ function _submit($stationTag=null)
 	
 	json_checkMembers("message,team_id", $json);
 	
-//	$ans = $json['message']
-
+	$team = Team::getFromPin($json['team_id']);
+	if ($team === false) {
+		trace("can't find team from team ".$json['team_id']);
+		rest_sendBadRequestResponse(404, "can't find team pin=".$json['team_id']);
+	}
+	
+	$count = $team->get('count');
 	$isCorrect = false;
 	$challengeComplete = false;
+	
 	switch($stationType->get('typeCode'))
 	{
 		case StationType::STATION_TYPE_FSL:
 		  break;
 		case StationType::STATION_TYPE_HMB:
-		  preg_match(".*answer.*=.*(\d)", $json['message'], $matches);
+		  preg_match("/.*answer.*=.*(\d)/", $json['message'], $matches);
 		  trace('calling handle_challenge');
-          $rpi->handle_challenge($stationType->get('delay'),$isCorrect, $challengeComplete);
+          $json = $rpi->handle_submission($stationType->get('delay'),$isCorrect, $challengeComplete);
+          //TODO if ($json === false) ERROR???
+          //TODO json_checkMembers("message,team_id", $json);
+          //$isCorrect=$json['is_correct'];
           break;
 	}
 	
-	$team = Team::getFromPin($json['team_id']);
-	if ($team === false) {
-		trace("can't find team from team ".$json['team_id']);
-		//todo fail here
+	$count = $team->get('count');
+	$points = 3-$count;
+	$team->updateScore($stationType, $points);
+	if (!$json['is_correct']) {
+		$count++;
+		$team->set('count',$count);
+		$challenge_complete=($count<3?false:true);
 	}
-	//@todo calculate points
-	$points = 0;
+	else {
+		$challenge_complete=true;
+	}
+	
+	if ($challenge_complete)
+	{
+		$station->endChallenge();
+		$team->endChallenge();
+	}
+	
 	if (Event::createEvent(Event::TYPE_SUBMIT, $team, $station,$points) === false) {
 		trace("can't create event object",__FILE__,__LINE__,__METHOD__);
 		json_sendBadRequestResponse(500,"Can't create event object");
 	}
+	
 	if       ($isCorrect) $msg = $stationType->get('success_msg');
 	else if  ($count >=3) $msg = $stationType->get('failed_msg');
 	else                  $msg = $stationType->get('retry_msg');
     $msg = $team->expandMessage($msg, $parms );
-    $msg = $team->encodeText($msg);
+    if(isEncodeEnabled())$msg = $team->encodeText($msg);
 	json_sendObject($json);
 }

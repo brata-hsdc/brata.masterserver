@@ -2,7 +2,8 @@
 require(APP_PATH.'inc/mock_functions.php');
 function _sim_submit()
 {
-	$teamid = $_POST['teamId'];
+	$stationTag = $_POST['stationTag'];
+	$teamId = $_POST['teamId'];
 	$candidateAnswer =$_POST['candidateAnswer'];
 	$json = array("team_id"=>$teamId, "message" => $candidateAnswer);
 	// hack just to reuse do_post_request code
