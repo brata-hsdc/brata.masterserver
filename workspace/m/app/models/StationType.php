@@ -8,6 +8,19 @@ class StationType extends ModelEx {
  const STATION_TYPE_HMB = 3;
  const STATION_TYPE_CPA = 4;
  const STATION_TYPE_EXT = 5;
+ 
+ static function TypeToText($type) {
+ 	switch($type)
+ 	{
+ 		case StationType::STATION_TYPE_REG: return "REG";
+ 		case StationType::STATION_TYPE_CTS: return "CTS";
+ 		case StationType::STATION_TYPE_FSL: return "FSL";
+ 		case StationType::STATION_TYPE_HMB: return "HMB";
+ 		case StationType::STATION_TYPE_CPA: return "CPA";
+ 		case StationType::STATION_TYPE_EXT: return "EXT";
+ 		default : return "BAD";
+ 	}
+ }
   
   function __construct($oid=0,$cid=0) {
     parent::__construct('OID','CID','t_stationtype'); 
@@ -40,16 +53,6 @@ class StationType extends ModelEx {
   	return $o->create();  	
   }
  
-  // todo is this the best place?
-  // table assoc array field the field name holding the message to expand
-  function expandMessage($table,$field) {
-  	$msg = $this->get($field);
-  	trace("msg=$msg field=$field",__FILE__,__LINE__,__METHOD__);
-  	foreach ($table as $key => $value) {
-  		$msg = str_replace($key, $value, $msg);
-  	}
-  	return $msg;
-  }
 // return the StationType object for the given "short" name 
   static function getFromTypeCode($typeCode) {
     $type = new StationType();
@@ -65,6 +68,18 @@ class StationType extends ModelEx {
       $options .= '<option value='. $item->get('OID'). ' ' . $selected . '>' . $item->get("name");
     }
     return $options;
+  }
+  // for mock RPI
+  static function getAllAsHTMLOptionsText($oid=-1) {
+  	$type = new StationType();
+  	$aray = $type->retrieve_many();
+  	$options ="";
+  	foreach ($aray as $item) {
+  		$text = StationType::TypeToText($item->get('OID'));
+  		$selected = $item->get('OID') == $oid ? "selected" : "";
+  		$options .= '<option value='.$text. ' ' . $selected . '>' . $text;
+  	}
+  	return $options;
   }
 }
   

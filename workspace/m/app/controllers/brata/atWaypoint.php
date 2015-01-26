@@ -19,14 +19,20 @@ function _atWaypoint($waypointId=null,$teamId=null)
 //	}
 
 	$waypoint = new Waypoint($waypointId,-1);
-	$message = Message::getFromWaypointId($waypointId);
-	if ($message === false) {
+	$msg = Message::getFromWaypointId($waypointId);
+	if ($msg === false) {
 		rest_sendBadRequestResponse(500,"no message at this waypoint waypointId=$waypointId");  // doesn't return
 	}
 
 
 	transactionBegin();
-    $json = array("message" => $text);
+	if($GLOBALS['SYSCONFIG_ENCODE'] == 1){
+          // if not in student mode encode, if in student mode we only encrypt the even team numbers responses
+          if($GLOBALS['SYSCONFIG_STUDENT'] == 0 or ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $teamPIN % 2 == 0)) {
+            $msg = $team->encodeText($msg);
+          }
+        }
+        $json = array("message" => $msg);
 	if (json_sendObject($json)) transactionCommit();
 	else                        transactionRollback();
 }

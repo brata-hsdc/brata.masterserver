@@ -7,7 +7,7 @@ require(APP_PATH.'inc/json_functions.php');
 function _start_challenge($stationTag=null) 
 {
 	if ($stationTag === null) {
-		rest_sendBadRequestResponse(400,"missing stationId");  // doesn't return
+		rest_sendBadRequestResponse(400,"missing station Tag");  // doesn't return
 	}
 	
 	$station = Station::getFromTag($stationTag);
@@ -41,26 +41,35 @@ function _start_challenge($stationTag=null)
 		rest_sendBadRequestResponse(404,"team not found PIN=".$teamPIN);  // doesn't return
 	}
 	
+	$stationId = $station->get('OID');
 	$parms = null; // todo compute challenge parameters
 	switch($stationType->get('typeCode'))
 	{
 		case StationType::STATION_TYPE_CTS:
-	        $parms =array("cts_combo" => [1,2,3]);
+			$parms = CTSData::startChallenge($stationId);
 	        break;
 	    case StationType::STATION_TYPE_CPA:
-	        	$parms =array("cpa_velocity" => 6000, "cpa_velocity_tolerance_ms"=>0,
-	        	"cpa_window_time_ms"=>8000, "cpa_window_time_tolerance_ms"=>100,
-	        	"cpa_pulse_width_ms"=>10, "cpa_pulse_width_tolerance_ms"=>20);
-	        	break;
+	        $parms =CPAData::getFromStationId($stationId);
+	        break;
 	}
 	if ($rpi!=null) $rpi->start_challenge($stationType->get('delay'),$parms);
+	//TODO transaction
+	$station->startChallenge($team);
+	$team->startChallenge($station, $parms);
 	
-	if ( Event::ceateEvent(Event::TYPE_START,$team, $station,0) ===false) {
+	if ( Event::createEvent(Event::TYPE_START,$team, $station,0) ===false) {
 		trace("create event failed",__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(500, "database create failed");
 	}
 
-	$json = array('message' => $stationType->get('instructions'));
-	json_sendObject($json);
+	$msg = $team->expandMessage($stationType->get('instructions'), $parms );
+	trace("message before decode $msg",__FILE__,__LINE__,__METHOD__);
+	if($GLOBALS['SYSCONFIG_ENCODE'] == 1){
+          // if not in student mode encode, if in student mode we only encrypt the even team numbers responses
+          if($GLOBALS['SYSCONFIG_STUDENT'] == 0 or ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $teamPIN % 2 == 0)) {
+            $msg = $team->encodeText($msg);
+          }
+        }
+	json_sendObject(array('message' => $msg ) );
 }
 

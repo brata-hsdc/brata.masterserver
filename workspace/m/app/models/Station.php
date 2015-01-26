@@ -8,8 +8,19 @@ class Station extends ModelEx {
     $this->rs['CID'] = $cid;
     $this->rs['typeId'] = -1;
     $this->rs['tag'] = ""; 
+    $this->rs['teamAtStation'] = 0;
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
+  }
+  
+  function startChallenge($team) {
+  	$this->set('teamAtStation',$team->get('OID'));
+  	return $this->update();
+  }
+ 
+  function endChallenge() {
+  	$this->set('teamAtStation',0);
+  	return $this->update();
   }
   
   // map the given typeId into its text falue
@@ -49,6 +60,16 @@ class Station extends ModelEx {
   	}
   	return $options;
   }  
+  static function getAllCPAAsHTMLOptions($itemSelected=-1) {
+  	$object = new Station();
+  	$aray = $object->retrieve_many("tag like ? ",array("cpa%"));
+  	$options ="";
+  	foreach ($aray as $item) {
+  		$selected = $item->get('OID') == $itemSelected ? "selected" : "";
+  		$options .= '<option value='. $item->get('OID'). ' ' . $selected . '>' . $item->get("tag");
+  	}
+  	return $options;
+  }
   // for rPI testing only
   static function getAllRPIAsHTMLOptions($itemSelected=-1) {
   	$object = new Station();

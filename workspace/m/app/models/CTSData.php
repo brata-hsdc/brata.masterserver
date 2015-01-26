@@ -21,13 +21,24 @@ class CTSData extends ModelEx {
   //
   function generateParameters() {
   	$tmp = array($this->rs['_1st'], $this->rs['_2nd'], $this->rs['_3rd'],$this->rs['_4th'],$this->rs['_5th']);
-  	return array_rand($tmp,3);
+  	shuffle($tmp);
+        $keys = array_rand($tmp,3);
+        $answer = array((int)$tmp[$keys[0]], (int)$tmp[$keys[1]], (int)$tmp[$keys[2]]);
+        return $answer;
   } 
   
   // fetch the Station object for the given skey
   static function getFromStationId($stationId) {
   	$o = new CTSData();
   	return $o->retrieve_one("stationId=?", $stationId);
+  }
+  
+  
+  static function startChallenge($stationId) {
+  	$cts = CTSData::getFromStationId($stationId);
+  	$parms['cts_combo'] = $cts->generateParameters();
+  	$parms['clue'] = CTSData::hash($parms['cts_combo']);
+  	return $parms;
   }
 
   const XLATE="BCDGHJKLMNPQRSTVWZbcdghjkmnpqrstvwz";
@@ -37,13 +48,10 @@ class CTSData extends ModelEx {
   
   static function hash($parms) {
   	
-
-  	
 	(int)$h = ((($parms[0]*127) + $parms[1])*127) + $parms[2];
-	var_dump($h);
 	$rVal="";
 	for ( $i = 0; $i < 4; $i++ ) {
-	  $rVal .= substr(CTSData::XLATE,$h % XLATE_LNG,1);
+	  $rVal .= substr(CTSData::XLATE,$h % CTSData::XLATE_LNG,1);
 	  (int)$h = $h / CTSData::XLATE_LNG;
 	}
 	return $rVal;

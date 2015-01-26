@@ -1,9 +1,9 @@
 <script type="text/javascript">
   function validateForm(f) {
 	  
-	 if (f.tag.value == "") {
+	 if (f.stationId.value == -1) {
 	   alert("Please enter tag");
-	   f.tag.focus();
+	   f.stationId.focus();
 	   return false;
 	}
 

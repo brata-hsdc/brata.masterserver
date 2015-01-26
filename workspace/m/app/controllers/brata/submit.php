@@ -14,7 +14,7 @@ function _submit($stationTag=null)
 	
 	$station = Station::getFromTag($stationTag);
 	if ($station === false) {
-		trace("brata can't find station stationTag".$stationTag,__FILE__,__LINE__,__METHOD__);
+		trace("brata can't find station stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(404,"can't find station stationTag=".$stationTag);  // doesn't return		
 	}
 	
@@ -28,7 +28,7 @@ function _submit($stationTag=null)
 	{
 	  $rpi = RPI::getFromStationId($station->get('OID'));
 	  if ($rpi === false) {
-		  trace("_start_challenge can't find RPI stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
+		  trace("_submit can't find RPI stationTag=".$stationTag,__FILE__,__LINE__,__METHOD__);
 		  rest_sendBadRequestResponse(500,"can't find RPI stationTag=".$stationTag);
 	  }
 	} else {
@@ -38,28 +38,64 @@ function _submit($stationTag=null)
 	$json = json_getObjectFromRequest("POST");  // won't return if an error happens
 	
 	json_checkMembers("message,team_id", $json);
-
-	$isCorrect = false;
-	$challengeComplete = false;
-	switch($stationType->get('typeCode'))
-	{
-		case StationType::STATION_TYPE_HMB:
-		  trace('calling handle_challenge');
-          $rpi->handle_challenge($stationType->get('delay'),$isCorrect, $challengeComplete);
-          break;
-	}
 	
 	$team = Team::getFromPin($json['team_id']);
 	if ($team === false) {
 		trace("can't find team from team ".$json['team_id']);
-		//todo fail here
+		rest_sendBadRequestResponse(404, "can't find team pin=".$json['team_id']);
 	}
-	//@todo calculate points
-	$points = 0;
+	
+	$count = $team->get('count');
+	$isCorrect = false;
+	$challengeComplete = false;
+	
+	switch($stationType->get('typeCode'))
+	{
+		case StationType::STATION_TYPE_FSL:
+		  break;
+		case StationType::STATION_TYPE_HMB:
+		  preg_match("/.*answer.*=.*(\d)/", $json['message'], $matches);
+		  trace('calling handle_challenge');
+          $json = $rpi->handle_submission($stationType->get('delay'),$isCorrect, $challengeComplete);
+          //TODO if ($json === false) ERROR???
+          //TODO json_checkMembers("message,team_id", $json);
+          //$isCorrect=$json['is_correct'];
+          break;
+	}
+	
+	$count = $team->get('count');
+	$points = 3-$count;
+	$team->updateScore($stationType, $points);
+	if (!$json['is_correct']) {
+		$count++;
+		$team->set('count',$count);
+		$challenge_complete=($count<3?false:true);
+	}
+	else {
+		$challenge_complete=true;
+	}
+	
+	if ($challenge_complete)
+	{
+		$station->endChallenge();
+		$team->endChallenge();
+	}
+	
 	if (Event::createEvent(Event::TYPE_SUBMIT, $team, $station,$points) === false) {
 		trace("can't create event object",__FILE__,__LINE__,__METHOD__);
 		json_sendBadRequestResponse(500,"Can't create event object");
 	}
-     $json = array("message"=>"test ".$stationTag);  //@todo 
-	json_sendObject($json);
+	
+	if       ($isCorrect) $msg = $stationType->get('success_msg');
+	else if  ($count >=3) $msg = $stationType->get('failed_msg');
+	else                  $msg = $stationType->get('retry_msg');
+    $msg = $team->expandMessage($msg, $parms );
+
+	if($GLOBALS['SYSCONFIG_ENCODE'] == 1){
+          // if not in student mode encode, if in student mode we only encrypt the even team numbers responses
+          if($GLOBALS['SYSCONFIG_STUDENT'] == 0 or ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $teamPIN % 2 == 0)) {
+            $msg = $team->encodeText($msg);
+          }
+        }
+	json_sendObject(array('message' => $msg ) );
 }
