@@ -18,4 +18,34 @@ class FSLData extends ModelEx {
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
+
+  // steps 1-3 for the 1st to third waypoint parameters
+  function generateParameters($step) {
+    $answer = null;
+    switch($step){
+      case 1:
+        $answer = array("lat"=> $this->rs['lat1'], "lng" => $this->rs['lng1']);
+        break;
+      case 2:
+        $answer = array("lat"=> $this->rs['lat2'], "lng" => $this->rs['lng2']);
+        break;
+      case 3:
+        $answer = array("lat"=> $this->rs['lat3'], "lng" => $this->rs['lng3']);
+        break;
+    }
+    return $answer;
+  }
+
+  // fetch the Station object for the given skey
+  static function getFromTag($tag) {
+  	$o = new FSLData();
+  	return $o->retrieve_one("tag=?", $tag);
+  }
+  
+  
+  static function startChallenge($tag) {
+  	$fsl = FSLData::getFromTag($tag);
+  	$parms = $fsl->generateParameters(1);
+  	return $parms;
+  }
 }

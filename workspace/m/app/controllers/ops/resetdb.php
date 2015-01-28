@@ -374,9 +374,9 @@ function _resetdb() {
     else createStations($numStations,"cts",$stationType->get('OID'));
     
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_FSL,"Find Secret Lab"           ,false, 60,
-       "Find and scan the marker at [lat] [lng].",
-       "Success! Find and scan the next marker at [lat] [lng].",
-       "Too bad, you failed. Find and scan the next marker at [lat] [lng].",
+       "Find and scan the marker at waypoint-lat=[lat] waypoint-lon=[lng].",
+       "Success! Find and scan the next marker at waypoint-lat=[lat] waypoint-lon=[lng].",
+       "Too bad, you failed. Find and scan the next marker at waypoint-lat=[lat] waypoint-lon=[lng].",
        "Wrong marker, try again!"
     		
     		//Success! Go quickly to the next team queue.
@@ -515,14 +515,98 @@ function _resetdb() {
     for ($i=1; $i<= (($dataOption==1)?1:1); $i++)
     {
       $hmb = new HMBData();
-      $station = Station::getFromTag("hmb0".$i);
-      if ($station === false) break;
-        $hmb->set('_1st',11);
-        $hmb->set('_2nd',13);
-        $hmb->set('_3rd',17);
+      $hmb->set('_1st',11);
+      $hmb->set('_2nd',13);
+      $hmb->set('_3rd',17);
       if ($hmb->create() === false) echo "Create HMB $i failed";
     }
-
+    if ($GLOBALS['SYSCONFIG_STUDENT'] == 1)
+    {
+      $fsl = new FSLData();
+      $fsl->set('tag','T-WP');
+      $fsl->set('lat1',28.592573);
+      $fsl->set('lng1',-80.806185);
+      $fsl->set('lat2',28.592480);
+      $fsl->set('lng2',-80.806162);
+      $fsl->set('lat3',28.592504);
+      $fsl->set('lng3',-80.806321);
+      $fsl->set('rad1',1);
+      $fsl->set('rad2',2);
+      $fsl->set('rad3',3);
+      if ($fsl->create() === false) echo "Create FSL T-WP failed";
+      $fsl = new FSLData();
+      $fsl->set('tag','EW-WP');
+      $fsl->set('lat1',28.362813);
+      $fsl->set('lng1',-80.696523);
+      $fsl->set('lat2',28.362808);
+      $fsl->set('lng2',-80.696677);
+      $fsl->set('lat3',28.362735);
+      $fsl->set('lng3',-80.696516);
+      $fsl->set('rad1',1);
+      $fsl->set('rad2',2);
+      $fsl->set('rad3',3);
+      if ($fsl->create() === false) echo "Create FSL EW-WP failed";
+      $fsl = new FSLData();
+      $fsl->set('tag','HT-WP');
+      $fsl->set('lat1',28.201413);
+      $fsl->set('lng1',-80.667392);
+      $fsl->set('lat2',28.201522);
+      $fsl->set('lng2',-80.667223);
+      $fsl->set('lat3',28.201390);
+      $fsl->set('lng3',-80.667241);
+      $fsl->set('rad1',1);
+      $fsl->set('rad2',2);
+      $fsl->set('rad3',3);
+      if ($fsl->create() === false) echo "Create FSL HT-WP failed";
+      $fsl = new FSLData();
+      $fsl->set('tag','WS-WP');
+      $fsl->set('lat1',28.108592);
+      $fsl->set('lng1',-80.627157);
+      $fsl->set('lat2',28.108555);
+      $fsl->set('lng2',-80.627252);
+      $fsl->set('lat3',28.108511);
+      $fsl->set('lng3',-80.627118);
+      $fsl->set('rad1',1);
+      $fsl->set('rad2',2);
+      $fsl->set('rad3',3);
+      if ($fsl->create() === false) echo "Create FSL WS-WP failed";
+      $fsl = new FSLData();
+      $fsl->set('tag','M-WP');
+      $fsl->set('lat1',28.090005);
+      $fsl->set('lng1',-80.619992);
+      $fsl->set('lat2',28.089905);
+      $fsl->set('lng2',-80.619916);
+      $fsl->set('lat3',28.089966);
+      $fsl->set('lng3',-80.619857);
+      $fsl->set('rad1',1);
+      $fsl->set('rad2',2);
+      $fsl->set('rad3',3);
+      if ($fsl->create() === false) echo "Create FSL M-WP failed";
+      $fsl = new FSLData();
+      $fsl->set('tag','PB-WP');
+      $fsl->set('lat1',28.048604);
+      $fsl->set('lng1',-80.619697);
+      $fsl->set('lat2',28.048483);
+      $fsl->set('lng2',-80.619651);
+      $fsl->set('lat3',28.048532);
+      $fsl->set('lng3',-80.619796);
+      $fsl->set('rad1',1);
+      $fsl->set('rad2',2);
+      $fsl->set('rad3',3);
+      if ($fsl->create() === false) echo "Create FSL PB-WP failed";
+      $fsl = new FSLData();
+      $fsl->set('tag','BS-WP');
+      $fsl->set('lat1',27.951701);
+      $fsl->set('lng1',-80.675085);
+      $fsl->set('lat2',27.951616);
+      $fsl->set('lng2',-80.675061);
+      $fsl->set('lat3',27.951640);
+      $fsl->set('lng3',-80.674953);
+      $fsl->set('rad1',1);
+      $fsl->set('rad2',2);
+      $fsl->set('rad3',3);
+      if ($fsl->create() === false) echo "Create FSL BS-WP failed";
+    }
    redirect('mgmt_main','Database Initialized test data!');
     
   }

@@ -51,6 +51,43 @@ function _start_challenge($stationTag=null)
 	    case StationType::STATION_TYPE_CPA:
 	        $parms =CPAData::getFromStationId($stationId);
 	        break;
+	    case StationType::STATION_TYPE_FSL:
+                // For the real competition we just pick a tag at random
+	        // TODO
+                // For testing need to send them to their schools params
+                if($GLOBALS['SYSCONFIG_STUDENT'] == 1) {
+                  switch($teamPIN){
+                    case '00001':
+                    case '00002':
+                      $parms = FSLData::startChallenge('T-WP');
+                      break;
+                    case '00003':
+                    case '00004':
+                      $parms = FSLData::startChallenge('EW-WP');
+                      break;
+                    case '00005':
+                    case '00006':
+                      $parms = FSLData::startChallenge('HT-WP');
+                      break;
+                    case '00007':
+                    case '00008':
+                      $parms = FSLData::startChallenge('WS-WP');
+                      break;
+                    case '00009':
+                    case '00010':
+                      $parms = FSLData::startChallenge('M-WP');
+                      break;
+                    case '00011':
+                    case '00012':
+                      $parms = FSLData::startChallenge('PB-WP');
+                      break;
+                    case '00013':
+                    case '00014':
+                      $parms = FSLData::startChallenge('BS-WP');
+                      break;
+                  }
+                }
+	        break;
 	}
 	if ($rpi!=null) $rpi->start_challenge($stationType->get('delay'),$parms);
 	//TODO transaction
