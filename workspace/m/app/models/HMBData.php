@@ -25,5 +25,14 @@ function generateParameters() {
 	}
 	return $parms;
 }
+// fetch the Station object for the given key
+static function getFromStationId($stationId) {
+	$o = new HMBData();
+	return $o->retrieve_one("stationId=?", $stationId);
+}
+static function startChallenge($stationId) {
+	$hmb = HMBData::getromStationId($stationId);
+	return $hmb->generateParameters(); // TODO 
+}
 
 }

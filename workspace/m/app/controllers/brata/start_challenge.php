@@ -42,14 +42,23 @@ function _start_challenge($stationTag=null)
 	}
 	
 	$stationId = $station->get('OID');
-	$parms = null; // todo compute challenge parameters
+	$parms = null; // compute challenge parameters into a php hash which will be sent to rPI and used to populate message sent to team
 	switch($stationType->get('typeCode'))
 	{
 		case StationType::STATION_TYPE_CTS:
 			$parms = CTSData::startChallenge($stationId);
 	        break;
+	    case StationType::STATION_TYPE_FSL:
+	        $parms = FSLData::startChallenge($stationId);
+	        break;
+	    case StationType::STATION_TYPE_HMB:
+	    	$parms = HMBData::startChallenge($stationId);
+	    	break;
 	    case StationType::STATION_TYPE_CPA:
-	        $parms =CPAData::getFromStationId($stationId);
+	        $parms = CPAData::startChallenge($stationId);
+	        break;
+	    case StationType::STATION_TYPE_EXT:
+	    	$parms = EXTData::startChallenge($stationId);
 	        break;
 	}
 	if ($rpi!=null) $rpi->start_challenge($stationType->get('delay'),$parms);
