@@ -14,4 +14,17 @@ class EXTData extends ModelEx {
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
+  
+  
+  static function startChallenge($stationId) {
+  	$ext = EXTData(1,-1);  // there is only one record
+  	return array(
+  	'waypoint1_lat' =>   $this->rs['waypoint1_lat'],
+    'waypoint1_lng' => $this->rs['waypoint1_lng'],
+    'waypoint2_lat' => $this->rs['waypoint2_lat'],
+    'waypoint2_lng' => $this->rs['waypoint2_lng'],
+    'waypoint3_lat' => $this->rs['waypoint3_lat'],
+    'waypoint3_lng' => $this->rs['waypoint3_lng']
+  	);
+  }
 }

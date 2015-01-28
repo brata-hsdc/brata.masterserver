@@ -42,18 +42,22 @@ function _start_challenge($stationTag=null)
 	}
 	
 	$stationId = $station->get('OID');
-	$parms = null; // todo compute challenge parameters
+	$parms = null; // compute challenge parameters into a php hash which will be sent to rPI and used to populate message sent to team
 	switch($stationType->get('typeCode'))
 	{
 		case StationType::STATION_TYPE_CTS:
 			$parms = CTSData::startChallenge($stationId);
 	        break;
+	    case StationType::STATION_TYPE_HMB:
+	    	$parms = HMBData::startChallenge($stationId);
+	    	break;
 	    case StationType::STATION_TYPE_CPA:
-	        $parms =CPAData::getFromStationId($stationId);
+	        $parms = CPAData::startChallenge($stationId);
+	        break;
+	    case StationType::STATION_TYPE_EXT:
+	    	$parms = EXTData::startChallenge($stationId);
 	        break;
 	    case StationType::STATION_TYPE_FSL:
-                // For the real competition we just pick a tag at random
-	        // TODO
                 // For testing need to send them to their schools params
                 if($GLOBALS['SYSCONFIG_STUDENT'] == 1) {
                   switch($teamPIN){
@@ -86,6 +90,11 @@ function _start_challenge($stationTag=null)
                       $parms = FSLData::startChallenge('BS-WP');
                       break;
                   }
+                }
+                else{
+                  // For the real competition we just pick a tag at random
+                  // TODO
+   	          $parms = FSLData::startChallenge($stationId);
                 }
 	        break;
 	}

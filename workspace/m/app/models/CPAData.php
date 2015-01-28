@@ -18,8 +18,8 @@ class CPAData extends ModelEx {
   }
   function generateParameters() {
   	return array("cpa_velocity" => $this->rs['velocity'],
-  			 "cpa_velocity_tolerance_ms"=>$this->rs['velocity_tolerance'],
-  			 "cpa_window_time_ms"=>$this->rs['window_time'], 
+  			"cpa_velocity_tolerance_ms"=>$this->rs['velocity_tolerance'],
+  			"cpa_window_time_ms"=>$this->rs['window_time'], 
   			"cpa_window_time_tolerance_ms"=>$this->rs['windown_time_tolerance'],
   			"cpa_pulse_width_ms"=> $this->rs['pulse_width'], 
   			"cpa_pulse_width_tolerance_ms"=>$this->rs['pulse_witch_tolerance']);
@@ -31,9 +31,7 @@ class CPAData extends ModelEx {
   }
   static function startChallenge($stationId) {
   	$cpa = CPAData::getFromStationId($stationId);
-  	$parms['cts_combo'] = $cts->generateParameters();
-  	$parms['clue'] = CTSData::hash($parms['cts_combo']);
-  	return $parms;
+  	return $cpa->generateParameters(); 
   }
 }
 

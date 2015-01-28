@@ -6,6 +6,7 @@
 require(APP_PATH.'inc/rest_functions.php');
 require(APP_PATH.'inc/json_functions.php');
 
+// if possible fold this into submit my adding challenge_over to message
 function _time_expired($stationId=null) {
 	if ($stationId === null) {
 		rest_sendBadRequestResponse(400,"missing stationId");

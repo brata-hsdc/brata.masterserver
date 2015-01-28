@@ -3,9 +3,9 @@
 
 //	"message_version": 0,
 //	"message_timestamp": "2014-09-15 14:08:59",
-//	"station_id": "97531",
-//	"station_type": "hmb",
-//	"station_url": "http://192.168.0.2:9876"
+//   candidate_answer: <string>
+//   is_correct: <bool>
+//   fail_message: <string>
 //
 require(APP_PATH.'inc/rest_functions.php');
 require(APP_PATH.'inc/json_functions.php');
