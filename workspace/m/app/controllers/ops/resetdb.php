@@ -439,7 +439,7 @@ function _resetdb() {
    // 	if ($user->create()===false) echo "Create user $i failed";
    // }
     
-    if ($SYSCONFIG_STUDENT == 1) {
+    if ($GLOBALS['SYSCONFIG_STUDENT'] == 1) {
     	$mascots = explode(",","Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded,Unencoded,Encoded");
     	$schools = explode(",", "Titusville HS,Edgewood Jr/Sr HS,Holy Trinity,West Shore Jr/Sr HS,Melbourne HS,Palm Bay Magnet HS,Bayside HS");
     } else {
@@ -455,7 +455,7 @@ function _resetdb() {
     	if ($school->create() === false) echo "Create School $i failed";
     }
     
-    if ($SYSCONFIG_STUDENT == 1) {
+    if ($GLOBALS['SYSCONFIG_STUDENT'] == 1) {
     	$names = explode(",","team1,team2,team3,team4,team5,team6,team7,team8,team9,team10,team11,team12,team13,team14");
     	$pins = explode(",","00001,00002,00003,00004,00005,00006,00007,00008,00009,00010,00011,00012,00013,00014");
     	 
@@ -468,7 +468,7 @@ function _resetdb() {
     {
       $team = new Team();
       $team->set("name",$names[$i]);
-      if ($SYSCONFIG_STUDENT == 1)
+      if ($GLOBALS['SYSCONFIG_STUDENT'] == 1)
       	$team->set("schoolId", (int)(($i+1)/2) + (int)(($i+1)%2));  // hack we know the order the schools were added
       else    
       	$team->set("schoolId",$i+1);  // hack we know the order the schools were added
@@ -481,27 +481,46 @@ function _resetdb() {
       $station = Station::getFromTag("cts0".$i);
       if ($station === false) break;
       $cts->set('stationId',$station->get('OID')); // hack assume get works
-      $cts->set('_1st',10+$i);
-      $cts->set('_2nd',20+$i);
-      $cts->set('_3rd',30+$i);
-      $cts->set('_4th',40+$i);
-      $cts->set('_5th',50+$i);
+      if ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $i == 1){
+        $cts->set('_1st',39);
+        $cts->set('_2nd',57);
+        $cts->set('_3rd',13);
+        $cts->set('_4th',23);
+        $cts->set('_5th',48);
+      }
+      else {
+        $cts->set('_1st',10+$i);
+        $cts->set('_2nd',20+$i);
+        $cts->set('_3rd',30+$i);
+        $cts->set('_4th',40+$i);
+        $cts->set('_5th',50+$i);
+      }
       $cts->set('tolerance',5.0);
       if ($cts->create() === false) echo "Create CTS $i failed";
     }
     for ($i=1; $i<= (($dataOption==1)?1:5); $i++)
     {
-    $cpa = new CPAData();
-    $station = Station::getFromTag("cpa0".$i);
-    if ($station === false) break;
-    $cpa->set('stationId',$station->get('OID')); // hack assume get works
-    $cpa->set('velocity',8000);
-    $cpa->set('velocity_tolerance',1000);
-    $cpa->set('window_time',2000);
-    $cpa->set('window_time_tolerance',100);
-    $cpa->set('pulse_width',10);
-    $cpa->set('pulse_width_tolerance',30);
-    if ($cpa->create() === false) echo "Create CTA $i failed";
+      $cpa = new CPAData();
+      $station = Station::getFromTag("cpa0".$i);
+      if ($station === false) break;
+      $cpa->set('stationId',$station->get('OID')); // hack assume get works
+      $cpa->set('velocity',8000);
+      $cpa->set('velocity_tolerance',1000);
+      $cpa->set('window_time',2000);
+      $cpa->set('window_time_tolerance',100);
+      $cpa->set('pulse_width',10);
+      $cpa->set('pulse_width_tolerance',30);
+      if ($cpa->create() === false) echo "Create CTA $i failed";
+    }
+    for ($i=1; $i<= (($dataOption==1)?1:1); $i++)
+    {
+      $hmb = new HMBData();
+      $station = Station::getFromTag("hmb0".$i);
+      if ($station === false) break;
+        $hmb->set('_1st',11);
+        $hmb->set('_2nd',13);
+        $hmb->set('_3rd',17);
+      if ($hmb->create() === false) echo "Create HMB $i failed";
     }
 
    redirect('mgmt_main','Database Initialized test data!');

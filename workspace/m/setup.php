@@ -40,6 +40,7 @@ function writeSysconfig()
    
    $_POST['debug'] = isset($_POST['debug'] ) ?  1 : 0;
    $_POST['sendmail'] = isset($_POST['sendmail'] ) ?  1 : 0;
+   $_POST['student'] = isset($_POST['student'] ) ?  1 : 0;
    
    if ($errors =="")
    {
@@ -60,7 +61,7 @@ function writeSysconfig()
       fwrite($fd,"\$SYSCONFIG_DEBUG=".$_POST['debug'].";\n");
       fwrite($fd,"\$SYSCONFIG_SENDMAIL=".$_POST['sendmail'].";\n");      
       fwrite($fd,"\$SYSCONFIG_LOGLEVEL=".$_POST['loglevel'].";\n");
-      fwrite($fd,"\$SYSCONFIG_DATASET=".$_POST['dataset'].";\n");
+      fwrite($fd,"\$SYSCONFIG_STUDENT=".$_POST['student'].";\n");
       fwrite($fd,"\$SYSCONFIG_ENCODE=".$_POST['encode'].";\n");
       fclose($fd);
    }

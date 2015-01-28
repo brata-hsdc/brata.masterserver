@@ -46,7 +46,6 @@ function _submit($stationTag=null)
 	
 	$count = $team->get('count');
 	$points = 3-$count;
-	$team->updateScore($stationType, $points);
 	if (!$json['is_correct']) {
 		$count++;
 		$team->set('count',$count);
@@ -58,6 +57,7 @@ function _submit($stationTag=null)
 	
 	if ($challenge_complete)
 	{
+	   $team->updateScore($stationType, $points);
 	   $station->endChallenge();
 	   $team->endChallenge();
 	}

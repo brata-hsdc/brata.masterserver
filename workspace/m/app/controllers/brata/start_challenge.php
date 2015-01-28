@@ -73,7 +73,12 @@ function _start_challenge($stationTag=null)
 
 	$msg = $team->expandMessage($stationType->get('instructions'), $parms );
 	trace("message before decode $msg",__FILE__,__LINE__,__METHOD__);
-	if(isEncodeEnabled()) $msg = $team->encodeText($msg);
+	if($GLOBALS['SYSCONFIG_ENCODE'] == 1){
+          // if not in student mode encode, if in student mode we only encrypt the even team numbers responses
+          if($GLOBALS['SYSCONFIG_STUDENT'] == 0 or ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $teamPIN % 2 == 0)) {
+            $msg = $team->encodeText($msg);
+          }
+        }
 	json_sendObject(array('message' => $msg ) );
 }
 

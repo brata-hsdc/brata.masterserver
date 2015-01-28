@@ -90,6 +90,12 @@ function _submit($stationTag=null)
 	else if  ($count >=3) $msg = $stationType->get('failed_msg');
 	else                  $msg = $stationType->get('retry_msg');
     $msg = $team->expandMessage($msg, $parms );
-    if(isEncodeEnabled())$msg = $team->encodeText($msg);
-	json_sendObject($json);
+
+	if($GLOBALS['SYSCONFIG_ENCODE'] == 1){
+          // if not in student mode encode, if in student mode we only encrypt the even team numbers responses
+          if($GLOBALS['SYSCONFIG_STUDENT'] == 0 or ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $teamPIN % 2 == 0)) {
+            $msg = $team->encodeText($msg);
+          }
+        }
+	json_sendObject(array('message' => $msg ) );
 }

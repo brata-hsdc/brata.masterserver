@@ -21,7 +21,10 @@ class CTSData extends ModelEx {
   //
   function generateParameters() {
   	$tmp = array($this->rs['_1st'], $this->rs['_2nd'], $this->rs['_3rd'],$this->rs['_4th'],$this->rs['_5th']);
-  	return array_rand($tmp,3);
+  	shuffle($tmp);
+        $keys = array_rand($tmp,3);
+        $answer = array((int)$tmp[$keys[0]], (int)$tmp[$keys[1]], (int)$tmp[$keys[2]]);
+        return $answer;
   } 
   
   // fetch the Station object for the given skey
