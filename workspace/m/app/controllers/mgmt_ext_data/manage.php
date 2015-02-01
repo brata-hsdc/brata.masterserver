@@ -11,6 +11,7 @@ function _manage($n=0) {
   {
     _make_html_table($table,$item,$urlPrefix,$n,$data);
     $data['body'][]='<p><a href="'.myUrl("$urlPrefix/add").'">Add New '.$item.'</a></p>';
+    $data['body'][]='<p><a href="'.myUrl("$urlPrefix/loaddb").'">Load '.$item.' Data</a></p>';
   }
   else
   {

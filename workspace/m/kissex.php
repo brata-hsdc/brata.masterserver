@@ -96,5 +96,11 @@ class ModelEx extends KISS_Model  {
 		$oid=$stmt->fetchColumn();
 	    $oid=rand(0,$oid);
 	    return $this->retrieve($oid,-1);
-	}	
+	}
+	#for master server loaddb
+	function truncateTable() {
+		$dbh=$this->getdbh();
+		$stmt = $dbh->query('TRUNCATE TABLE '.$this->enquote($this->tablename));
+		
+	}
 }
