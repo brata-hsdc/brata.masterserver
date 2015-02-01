@@ -233,7 +233,9 @@ function create_t_cpa_data($dbh) {
     `window_time` int unsigned NOT NULL,
     `window_time_tolerance` int unsigned NOT NULL,
     `pulse_width` int unsigned NOT NULL,
-    `pulse_width_tolerance` int unsigned NOT NULL, "
+    `pulse_width_tolerance` int unsigned NOT NULL,
+    `fence` int unsigned NOT NULL,
+    `building` int unsigned NOT NULL, "
     ."CONSTRAINT `fk_cpa_stationid` FOREIGN KEY (`stationId`) REFERENCES `t_station` (`OID`) ON DELETE CASCADE, "	
   	. " PRIMARY KEY  (`OID`)"
 	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
@@ -353,7 +355,7 @@ function _resetdb() {
     $admin->create();
         
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_REG, "Register", false, 60,
-       "Welcome [team] to the Design Challenge! Your app has successfully communicated with the Master Server! Congratulations!",
+       "Hello! You have been successfully registered and may start the competition.",
        "If you see this message there was an internal error 1",
        "If you see this message there was an internal error 2",
        "If you see this message there was an internal error 3"
@@ -364,7 +366,7 @@ function _resetdb() {
     	
 
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_CTS,"Crack The Safe"            ,true, 60,
-      "Welcome, [team] Your first assignment is to break into Professor Aardvark's safe where you will find the first clue to his Secret Laboratory. Measure the interior angles and pick the three correct angles for the safe combination. Good luck! clue=[clue]",
+      "Welcome, Team! Your first assignment is to break into Professor Aardvark's safe where you will find the first clue to his Secret Laboratory. Measure the interior angles and pick the three correct angles for the safe combination. Good luck! [clue=[clue]]",
       "Success! Go quickly to the next team queue.",
        "You have failed the challenge. Go quickly to the next team queue.",
        "No luck, better try again!"
@@ -374,8 +376,8 @@ function _resetdb() {
     else createStations($numStations,"cts",$stationType->get('OID'));
     
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_FSL,"Find Secret Lab"           ,false, 60,
-       "Find and scan the marker at waypoint-lat=[lat] waypoint-lon=[lng].",
-       "Success! Find and scan the next marker at waypoint-lat=[lat] waypoint-lon=[lng].",
+       "Find and scan the marker at [waypoint-lat=[lat]] [waypoint-lon=[lng]].",
+       "Success! Find and scan the next marker at [waypoint-lat=[lat]] [waypoint-lon=[lng]].",
        "Too bad, you failed. Find and scan the next marker at waypoint-lat=[lat] waypoint-lon=[lng].",
        "Wrong marker, try again!"
     		
@@ -399,9 +401,8 @@ function _resetdb() {
     else createStations($numStations,"hmb",$stationType->get('OID'));
     
      $stationType = StationType::makeStationType(StationType::STATION_TYPE_CPA,"Catch Provessor Aardvark"   ,true, 60,
-       "PA is trying to escape. Quickly measure fence=[fence] building=[building] and scan Start QR Code.",
-     		
-     		//"Watch now as the professor attempts to escape. Get him!"
+       //"PA is trying to escape. Quickly measure [fence=[fence]] [building=[building]] and scan Start QR Code.",
+     		"Watch now as the professor attempts to escape. Get him!",
      		"Success! Go quickly to the team finish area.",
      		"Professor Aardvark has escaped. Oh well. Go quickly to the team finish area.",
      		"Miss! Try again!"
@@ -506,10 +507,12 @@ function _resetdb() {
       $cpa->set('stationId',$station->get('OID')); // hack assume get works
       $cpa->set('velocity',8000);
       $cpa->set('velocity_tolerance',1000);
-      $cpa->set('window_time',2000);
+      $cpa->set('window_time',10000);
       $cpa->set('window_time_tolerance',100);
-      $cpa->set('pulse_width',10);
-      $cpa->set('pulse_width_tolerance',30);
+      $cpa->set('pulse_width',100);
+      $cpa->set('pulse_width_tolerance',50);
+      $cpa->set('fence',1);
+      $cpa->set('building',1);
       if ($cpa->create() === false) echo "Create CTA $i failed";
     }
     for ($i=1; $i<= (($dataOption==1)?1:1); $i++)

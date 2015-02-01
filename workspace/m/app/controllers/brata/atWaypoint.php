@@ -19,8 +19,10 @@ function _atWaypoint($waypointId=null,$teamId=null)
 //	}
 
 	$waypoint = new Waypoint($waypointId,-1);
-	$msg = Message::getFromWaypointId($waypointId);
-	if ($msg === false) {
+	//$msg = Message::getFromWaypointId($waypointId);
+	// TODO fix this right
+        $msg = 'PA is trying to escape. Quickly measure [fence=1] [building=1] and scan Start QR Code."
+        if ($msg === false) {
 		rest_sendBadRequestResponse(500,"no message at this waypoint waypointId=$waypointId");  // doesn't return
 	}
 

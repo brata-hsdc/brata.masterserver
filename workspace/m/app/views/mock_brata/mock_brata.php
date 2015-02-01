@@ -42,6 +42,44 @@ function makeTeamList() {
 </table>
 <hr>
   <table>
+    <form method="post" action="<?=$atWaypointUrl?>">
+		<tr><th colspan="2">At Waypoint</th></tr>
+		<tr>
+			<td>TeamId (a.k.a. team pin)</td>
+			<td><?php echo makeTeamList() ?> </td>
+		</tr>		
+		<tr>
+			<td>Waypoint Tag</td>
+			<td><?php echo makeStationList() ?> </td>
+		</tr>	
+		<tr>
+			<td colspan="2" style="text-align:right">
+	     	<input type="button" value="<?=$cancelLabel?>" onclick="location.href='<?=$cancelUrl ?>' " />
+			<input type="button" value="<?=$atWaypointLabel?>" onclick="submit()" /></td>
+		</tr>	
+  </form>
+</table>
+<hr>
+  <table>
+    <form method="post" action="<?=$cpaMeasureUrl?>">
+		<tr><th colspan="2">CPA Measure</th></tr>
+		<tr>
+			<td>TeamId (a.k.a. team pin)</td>
+			<td><?php echo makeTeamList() ?> </td>
+		</tr>		
+		<tr>
+			<td>Station Tag</td>
+			<td><?php echo makeStationList() ?> </td>
+		</tr>	
+		<tr>
+			<td colspan="2" style="text-align:right">
+	     	<input type="button" value="<?=$cancelLabel?>" onclick="location.href='<?=$cancelUrl ?>' " />
+			<input type="button" value="<?=$cpaMeasureLabel?>" onclick="submit()" /></td>
+		</tr>	
+  </form>
+</table>
+<hr>
+  <table>
     <form method="post" action="<?=$startUrl?>">
 		<tr><th colspan="2">Start Challenge</th></tr>
 		<tr>

@@ -13,8 +13,11 @@ function _index() {
   $fdata['submitUrl']=myUrl("$urlPrefix/sim_submit");
   $fdata['submitLabel']="Submit";
   
-  $fdata['atWayPointUrl']=myUrl("$urlPrefix/sim_atwaypoint");
-  $fdata['atWayPointLabel']="At Waypoint";
+  $fdata['atWaypointUrl']=myUrl("$urlPrefix/sim_atwaypoint");
+  $fdata['atWaypointLabel']="At Waypoint";
+
+  $fdata['cpaMeasureUrl']=myUrl("$urlPrefix/sim_cpaMeasure");
+  $fdata['cpaMeasureLabel']="CPA Measure";
   
   $fdata['cancelUrl']=myUrl("$urlPrefix/index");
   $fdata['cancelLabel']="Cancel";

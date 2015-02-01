@@ -36,6 +36,16 @@
             f.pulse_width_tolerance.focus();
             return false;
          }
+        if (f.fence.value == "") {
+            alert("Please enter the fence id");
+            f.fence.focus();
+            return false;
+         }
+        if (f.building.value == "") {
+            alert("Please enter the building id");
+            f.building.focus();
+            return false;
+         }
         
     f.submit();
   }

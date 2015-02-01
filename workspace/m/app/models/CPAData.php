@@ -12,6 +12,8 @@ class CPAData extends ModelEx {
     $this->rs['window_time_tolerance'] = 0;
     $this->rs['pulse_width'] = 0;
     $this->rs['pulse_width_tolerance'] = 0;
+    $this->rs['fence'] = 0;
+    $this->rs['building'] = 0;
     
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
@@ -20,9 +22,11 @@ class CPAData extends ModelEx {
   	return array("cpa_velocity" => $this->rs['velocity'],
   			"cpa_velocity_tolerance_ms"=>$this->rs['velocity_tolerance'],
   			"cpa_window_time_ms"=>$this->rs['window_time'], 
-  			"cpa_window_time_tolerance_ms"=>$this->rs['windown_time_tolerance'],
+  			"cpa_window_time_tolerance_ms"=>$this->rs['window_time_tolerance'],
   			"cpa_pulse_width_ms"=> $this->rs['pulse_width'], 
-  			"cpa_pulse_width_tolerance_ms"=>$this->rs['pulse_witch_tolerance']);
+  			"cpa_pulse_width_tolerance_ms"=>$this->rs['pulse_width_tolerance'],
+  			"fence"=> $this->rs['fence'], 
+  			"building"=>$this->rs['building']);
   }
   // fetch the Station object for the given key
   static function getFromStationId($stationId) {
@@ -31,7 +35,11 @@ class CPAData extends ModelEx {
   }
   static function startChallenge($stationId) {
   	$cpa = CPAData::getFromStationId($stationId);
-  	return $cpa->generateParameters(); 
+  	return $cpa->generateParameters();
+  }
+  static function getItemsToMeasure($stationId) {
+  	$cpa = CPAData::getFromStationId($stationId);
+  	return $cpa->generateParameters();
   }
 }
 

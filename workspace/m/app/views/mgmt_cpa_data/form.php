@@ -40,6 +40,14 @@ function makeOptionList($stationId) {
 			<td><input type="text" name="pulse_width_tolerance" style="width:150px" value="<?php echo $object->get('pulse_width_tolerance')?>" /></td>
 		</tr>			
 		<tr>
+			<td>Fence</td>
+			<td><input type="text" name="fence" style="width:150px" value="<?php echo $object->get('fence')?>" /></td>
+		</tr>			
+		<tr>
+			<td>Building</td>
+			<td><input type="text" name="building" style="width:150px" value="<?php echo $object->get('building')?>" /></td>
+		</tr>			
+		<tr>
 			<td colspan="2" style="text-align:right">
 	     	<input type="button" value="<?=$cancelLabel?>" onclick="location.href='<?=$cancelUrl ?>' " />
 			<input type="button" value="<?=$actionLabel?>" onclick="validateForm(this.form);return false;" /></td>
