@@ -1,36 +1,51 @@
 <script type="text/javascript">
   function validateForm(f) {
 
-    if (f.waypoint1_lat.value == "") {
-      alert("Please enter waypoint1_lat");
-      f.waypoint1_lat.focus();
+    if (f.a_lat.value == "") {
+      alert("Please enter a_lat");
+      f.a_lat.focus();
       return false;
     }
-    if (f.waypoint1_lng.value == "") {
-      alert("Please enter waypoint1_lng");
-      f.waypoint1_lng.focus();
+    if (f.a_lng.value == "") {
+      alert("Please enter a_lng");
+      f.a_lng.focus();
       return false;
     }        
-    if (f.waypoint2_lat.value == "") {
-      alert("Please enter waypoint2_lat");
-      f.waypoint2_lat.focus();
+    if (f.b_lat.value == "") {
+      alert("Please enter b_lat");
+      f.b_lat.focus();
       return false;
     }
-    if (f.waypoint2_lng.value == "") {
-      alert("Please enter waypoint2_lng");
-      f.waypoint2_lng.focus();
+    if (f.b_lng.value == "") {
+      alert("Please enter b_lng");
+      f.b_lng.focus();
       return false;
     }
-    if (f.waypoint3_lat.value == "") {
-      alert("Please enter waypoint3_lat");
-      f.waypoint3_lat.focus();
+    if (f.c_lat.value == "") {
+      alert("Please enter c_lat");
+      f.c_lat.focus();
       return false;
     }
-    if (f.waypoint3_lng.value == "") {
-      alert("Please enter waypoint3_lng");
-      f.waypoint3_lng.focus();
+    if (f.c_lng.value == "") {
+      alert("Please enter c_lng");
+      f.c_lng.focus();
       return false;
     }
+    if (f.t_lat.value == "") {
+        alert("Please enter t_lat");
+        f.t_lat.focus();
+        return false;
+    }
+    if (f.t_lng.value == "") {
+      alert("Please enter t_lng");
+      f.t_lng.focus();
+      return false;
+    }
+    if (f.height.value == "") {
+        alert("Please enter height");
+        f.height.focus();
+        return false;
+     }
     f.submit();
   }
 </script>

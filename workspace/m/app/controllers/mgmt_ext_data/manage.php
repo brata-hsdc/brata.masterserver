@@ -32,7 +32,7 @@ function _make_html_table($table,$item,$urlPrefix,$n,&$data) {
 	$data['body'][]=pagination::makePagination($n,$total,myUrl("$urlPrefix/manage"),$GLOBALS['pagination']);
 
 	//table
-	$fields="waypoint1_lat,waypoint1_lng,waypoint2_lat,waypoint2_lng,waypoint3_lat,waypoint3_lng";
+	$fields="a_lat,a_lng,b_lat,b_lng,c_lat,c_lng,t_lat,t_lng,height";
 	$stmt = $dbh->query("SELECT OID,CID,$fields FROM $table LIMIT $n,$limit");
 	if ($stmt === false) {
 		var_dump($dbh->errorInfo());

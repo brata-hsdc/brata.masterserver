@@ -5,28 +5,21 @@ class CPAData extends ModelEx {
     parent::__construct('OID','CID','t_cpa_data'); 
     $this->rs['OID'] = $oid;
     $this->rs['CID'] = $cid;
-    $this->rs['stationId'] = -1;
-    $this->rs['velocity'] = 0;
-    $this->rs['velocity_tolerance'] = 0;
-    $this->rs['window_time'] =  0;
-    $this->rs['window_time_tolerance'] = 0;
-    $this->rs['pulse_width'] = 0;
-    $this->rs['pulse_width_tolerance'] = 0;
+    $this->rs['label'] = 0;
     $this->rs['fence'] = 0;
-    $this->rs['building'] = 0;
+    $this->rs['building'] =  0;
+    $this->rs['sum'] = 0;
     
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
   function generateParameters() {
-  	return array("cpa_velocity" => $this->rs['velocity'],
-  			"cpa_velocity_tolerance_ms"=>$this->rs['velocity_tolerance'],
-  			"cpa_window_time_ms"=>$this->rs['window_time'], 
-  			"cpa_window_time_tolerance_ms"=>$this->rs['window_time_tolerance'],
-  			"cpa_pulse_width_ms"=> $this->rs['pulse_width'], 
-  			"cpa_pulse_width_tolerance_ms"=>$this->rs['pulse_width_tolerance'],
+  	return array(
+  			"which"=> $this->rs['which'],
   			"fence"=> $this->rs['fence'], 
-  			"building"=>$this->rs['building']);
+  			"building"=>$this->rs['building'],
+  			"sum" => $this->rs['sum']
+  	);
   }
   // fetch the Station object for the given key
   static function getFromStationId($stationId) {

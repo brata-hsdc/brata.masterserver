@@ -11,6 +11,7 @@ function _manage($n=0) {
   {
     _make_html_table($table,$item,$urlPrefix,$n,$data);
     $data['body'][]='<p><a href="'.myUrl("$urlPrefix/add").'">Add New '.$item.'</a></p>';
+    $data['body'][]='<p><a href="'.myUrl("$urlPrefix/loaddb").'">Load '.$item.' Data</a></p>';
   }
   else
   {
@@ -31,7 +32,7 @@ function _make_html_table($table,$item,$urlPrefix,$n,&$data) {
 	$data['body'][]=pagination::makePagination($n,$total,myUrl("$urlPrefix/manage"),$GLOBALS['pagination']);
 
 	//table
-	$fields="_1st,_2nd,_3rd";
+	$fields="_1st_on,_1st_off,_2nd_on,_2nd_off,_3rd_on,_3rd_off,cycle";
 	$stmt = $dbh->query("SELECT OID,CID,$fields FROM $table LIMIT $n,$limit");
 	if ($stmt === false) {
 		var_dump($dbh->errorInfo());

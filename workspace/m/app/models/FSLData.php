@@ -5,16 +5,20 @@ class FSLData extends ModelEx {
     parent::__construct('OID','CID','t_fsl_data');
     $this->rs['OID'] = $oid;
     $this->rs['CID'] = $cid;
-    $this->rs['tag'] = "";
-    $this->rs['lat1'] = 0;
-    $this->rs['lng1'] = 0;
-    $this->rs['lat2'] = 0;
-    $this->rs['lng2'] = 0;
-    $this->rs['lat3'] = 0;
-    $this->rs['lng3'] = 0;
-    $this->rs['rad1'] = 0;
-    $this->rs['rad2'] = 0;
-    $this->rs['rad3'] = 0;
+    $this->rs['a_tag'] = "";
+    $this->rs['a_lat'] = 0;
+    $this->rs['a_lng'] = 0;
+    $this->rs['b_tag'] = "";
+    $this->rs['b_lat'] = 0;
+    $this->rs['b_lng'] = 0;
+    $this->rs['c_tag'] = "";
+    $this->rs['c_lat'] = 0;
+    $this->rs['c_lng'] = 0;
+    $this->rs['l_lat'] = 0;
+    $this->rs['l_lng'] = 0;
+    $this->rs['a_rad'] = 0;
+    $this->rs['b_rad'] = 0;
+    $this->rs['c_rad'] = 0;
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }

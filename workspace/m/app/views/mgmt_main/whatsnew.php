@@ -1,12 +1,11 @@
 <h2>General Differences</h2>
-<p>New requirement are forcing rewrite of almost of the server code</p>
+<p>New requirement are forcing rewrite of almost of the server code. The rewrite is almost complete</p>
 
 <h2>Database changes</h2>
-<p>redesign of station type objects</p>
+<p>Updated all object to match spec EXECPT CTS which is still using old format (5 values with the hash computed on the fly)</p>
 
 <h2>Management Site</h2>
-<p>CRUD for station type,station instances,schools,teams</p>
-<p>Team CRUD includes generating random 5 digit pin for each team<p>
+<p>All object have a load db featue to load the DB from csv fails</p>
 
 <h2>Public Site</h2>
 Leader board redone for both main and extra challenges

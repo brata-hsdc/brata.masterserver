@@ -193,16 +193,21 @@ function create_t_fsl_data($dbh) {
 			"CREATE TABLE `t_fsl_data` ( "
 			."`OID` int unsigned NOT NULL auto_increment, "
 			."`CID` int unsigned NOT NULL default '0', "
-			."`tag` varchar(255) NOT NULL, "
-			."`lat1` decimal(12,8) NOT NULL, "
-			."`lng1` decimal(12,8) NOT NULL, "
-			."`lat2` decimal(12,8) NOT NULL, "
-			."`lng2` decimal(12,8) NOT NULL, "
-			."`lat3` decimal(12,8) NOT NULL, "
-			."`lng3` decimal(12,8) NOT NULL, "	
-			."`rad1` int NOT NULL, "
-			."`rad2` int NOT NULL, "
-			."`rad3` int NOT NULL, "			
+			."`a_tag` varchar(255) NOT NULL, "
+			."`a_lat` decimal(12,8) NOT NULL, "
+			."`a_lng` decimal(12,8) NOT NULL, "
+			."`b_tag` varchar(255) NOT NULL, "
+			."`b_lat` decimal(12,8) NOT NULL, "
+			."`b_lng` decimal(12,8) NOT NULL, "
+			."`c_tag` varchar(255) NOT NULL, "
+			."`c_lat` decimal(12,8) NOT NULL, "
+			."`c_lng` decimal(12,8) NOT NULL, "	
+			."`l_tag` varchar(255) NOT NULL, "
+			."`l_lat` decimal(12,8) NOT NULL, "
+			."`l_lng` decimal(12,8) NOT NULL, "	
+			."`a_rad` float NOT NULL, "
+			."`b_rad` float NOT NULL, "
+			."`c_rad` float NOT NULL, "			
 			."PRIMARY KEY  (`OID`) "
 			.") ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -213,9 +218,13 @@ function create_t_hmb_data($dbh) {
 	"CREATE TABLE `t_hmb_data` (
   	`OID` int unsigned NOT NULL auto_increment,
   	`CID` int unsigned NOT NULL default '0',
-	`_1st` int unsigned NOT NULL,	
-    `_2nd` int unsigned NOT NULL,
-    `_3rd` int unsigned NOT NULL,		
+	`_1st_on`  int unsigned NOT NULL,	
+	`_1st_off` int unsigned NOT NULL,
+    `_2nd_on`  int unsigned NOT NULL,
+	`_2nd_off` int unsigned NOT NULL,
+    `_3rd_on`  int unsigned NOT NULL,		
+    `_3rd_off` int unsigned NOT NULL,
+    `cycle`    int unsigned NOT NULL,
   	PRIMARY KEY  (`OID`)"
 	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -227,16 +236,10 @@ function create_t_cpa_data($dbh) {
 	"CREATE TABLE `t_cpa_data` (
   	`OID` int unsigned NOT NULL auto_increment,
   	`CID` int unsigned NOT NULL default '0',
-	`stationId` int unsigned NOT NULL,
-	`velocity` int unsigned NOT NULL,
-    `velocity_tolerance` int unsigned NOT NULL,
-    `window_time` int unsigned NOT NULL,
-    `window_time_tolerance` int unsigned NOT NULL,
-    `pulse_width` int unsigned NOT NULL,
-    `pulse_width_tolerance` int unsigned NOT NULL,
-    `fence` int unsigned NOT NULL,
-    `building` int unsigned NOT NULL, "
-    ."CONSTRAINT `fk_cpa_stationid` FOREIGN KEY (`stationId`) REFERENCES `t_station` (`OID`) ON DELETE CASCADE, "	
+	`label` varchar(255) NOT NULL,
+	`fence` int unsigned NOT NULL,
+    `building` int unsigned NOT NULL,
+    `sum` int unsigned NOT NULL,"	
   	. " PRIMARY KEY  (`OID`)"
 	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -248,12 +251,15 @@ function create_t_ext_data($dbh) {
 	"CREATE TABLE `t_ext_data` (
   	`OID` int unsigned NOT NULL auto_increment,
   	`CID` int unsigned NOT NULL default '0',
-	`waypoint1_lat` decimal(8,6) NOT NULL,
-	`waypoint1_lng` decimal(8,6) NOT NULL,
-	`waypoint2_lat` decimal(8,6) NOT NULL,
-	`waypoint2_lng` decimal(8,6) NOT NULL,
-	`waypoint3_lat` decimal(8,6) NOT NULL,
-	`waypoint3_lng` decimal(8,6) NOT NULL,
+	`a_lat` decimal(8,6) NOT NULL,
+	`a_lng` decimal(8,6) NOT NULL,
+	`b_lat` decimal(8,6) NOT NULL,
+	`b_lng` decimal(8,6) NOT NULL,
+	`c_lat` decimal(8,6) NOT NULL,
+	`c_lng` decimal(8,6) NOT NULL,
+	`t_lat` decimal(8,6) NOT NULL,
+	`t_lng` decimal(8,6) NOT NULL,
+	`height` int unsigned NOT NULL,
   	PRIMARY KEY  (`OID`)"
 	." ) ENGINE=InnoDB DEFAULT CHARSET=latin1"
 	);
@@ -401,7 +407,7 @@ function _resetdb() {
     else createStations($numStations,"hmb",$stationType->get('OID'));
     
      $stationType = StationType::makeStationType(StationType::STATION_TYPE_CPA,"Catch Provessor Aardvark"   ,true, 60,
-       //"PA is trying to escape. Quickly measure [fence=[fence]] [building=[building]] and scan Start QR Code.",
+       "PA is trying to escape. Quickly measure the fence and building labled=[label] and scan Start QR Code.",
      		"Watch now as the professor attempts to escape. Get him!",
      		"Success! Go quickly to the team finish area.",
      		"Professor Aardvark has escaped. Oh well. Go quickly to the team finish area.",
@@ -414,9 +420,9 @@ function _resetdb() {
     
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_EXT,"Extra"                     ,false, 60,
      "You have 20 (TBR) minutes to provide the tower location and height. Good luck."
-     ." waypoint1-lat=[waypoint1-lat] waypoint1-lng=[waypoint1-lng]"
-     ."	waypoint2-lat=[waypoint2-lat] waypoint2-lng=[waypoint2=lng]"
-     ." waypoint3-lat=[waypoint3-lat] waypoint3-lng=[waypoint3-lng]",
+     ." waypoint1-lat=[a_lat] waypoint1-lng=[a_lng]"
+     ."	waypoint2-lat=[b_lat] waypoint2-lng=[b_lng]"
+     ." waypoint3-lat=[c_lat] waypoint3-lng=[c_lng]",
       "success",
       "failed",
       "retry"
@@ -518,97 +524,42 @@ function _resetdb() {
     for ($i=1; $i<= (($dataOption==1)?1:1); $i++)
     {
       $hmb = new HMBData();
-      $hmb->set('_1st',11);
-      $hmb->set('_2nd',13);
-      $hmb->set('_3rd',17);
+      $hmb->set('_1st_on'  , 11);
+      $hmb->set('_1st_off' , 11);
+      $hmb->set('_2nd_on'  , 13);
+      $hmb->set('_2nd_off' , 13);
+      $hmb->set('_3rd_on'  , 17);
+      $hmb->set('_3rd_off' , 17);
+      $hmb->set('cycle', 17);
       if ($hmb->create() === false) echo "Create HMB $i failed";
     }
     if ($GLOBALS['SYSCONFIG_STUDENT'] == 1)
     {
-      $fsl = new FSLData();
-      $fsl->set('tag','T-WP');
-      $fsl->set('lat1',28.592573);
-      $fsl->set('lng1',-80.806185);
-      $fsl->set('lat2',28.592480);
-      $fsl->set('lng2',-80.806162);
-      $fsl->set('lat3',28.592504);
-      $fsl->set('lng3',-80.806321);
-      $fsl->set('rad1',1);
-      $fsl->set('rad2',2);
-      $fsl->set('rad3',3);
-      if ($fsl->create() === false) echo "Create FSL T-WP failed";
-      $fsl = new FSLData();
-      $fsl->set('tag','EW-WP');
-      $fsl->set('lat1',28.362813);
-      $fsl->set('lng1',-80.696523);
-      $fsl->set('lat2',28.362808);
-      $fsl->set('lng2',-80.696677);
-      $fsl->set('lat3',28.362735);
-      $fsl->set('lng3',-80.696516);
-      $fsl->set('rad1',1);
-      $fsl->set('rad2',2);
-      $fsl->set('rad3',3);
-      if ($fsl->create() === false) echo "Create FSL EW-WP failed";
-      $fsl = new FSLData();
-      $fsl->set('tag','HT-WP');
-      $fsl->set('lat1',28.201413);
-      $fsl->set('lng1',-80.667392);
-      $fsl->set('lat2',28.201522);
-      $fsl->set('lng2',-80.667223);
-      $fsl->set('lat3',28.201390);
-      $fsl->set('lng3',-80.667241);
-      $fsl->set('rad1',1);
-      $fsl->set('rad2',2);
-      $fsl->set('rad3',3);
-      if ($fsl->create() === false) echo "Create FSL HT-WP failed";
-      $fsl = new FSLData();
-      $fsl->set('tag','WS-WP');
-      $fsl->set('lat1',28.108592);
-      $fsl->set('lng1',-80.627157);
-      $fsl->set('lat2',28.108555);
-      $fsl->set('lng2',-80.627252);
-      $fsl->set('lat3',28.108511);
-      $fsl->set('lng3',-80.627118);
-      $fsl->set('rad1',1);
-      $fsl->set('rad2',2);
-      $fsl->set('rad3',3);
-      if ($fsl->create() === false) echo "Create FSL WS-WP failed";
-      $fsl = new FSLData();
-      $fsl->set('tag','M-WP');
-      $fsl->set('lat1',28.090005);
-      $fsl->set('lng1',-80.619992);
-      $fsl->set('lat2',28.089905);
-      $fsl->set('lng2',-80.619916);
-      $fsl->set('lat3',28.089966);
-      $fsl->set('lng3',-80.619857);
-      $fsl->set('rad1',1);
-      $fsl->set('rad2',2);
-      $fsl->set('rad3',3);
-      if ($fsl->create() === false) echo "Create FSL M-WP failed";
-      $fsl = new FSLData();
-      $fsl->set('tag','PB-WP');
-      $fsl->set('lat1',28.048604);
-      $fsl->set('lng1',-80.619697);
-      $fsl->set('lat2',28.048483);
-      $fsl->set('lng2',-80.619651);
-      $fsl->set('lat3',28.048532);
-      $fsl->set('lng3',-80.619796);
-      $fsl->set('rad1',1);
-      $fsl->set('rad2',2);
-      $fsl->set('rad3',3);
-      if ($fsl->create() === false) echo "Create FSL PB-WP failed";
-      $fsl = new FSLData();
-      $fsl->set('tag','BS-WP');
-      $fsl->set('lat1',27.951701);
-      $fsl->set('lng1',-80.675085);
-      $fsl->set('lat2',27.951616);
-      $fsl->set('lng2',-80.675061);
-      $fsl->set('lat3',27.951640);
-      $fsl->set('lng3',-80.674953);
-      $fsl->set('rad1',1);
-      $fsl->set('rad2',2);
-      $fsl->set('rad3',3);
-      if ($fsl->create() === false) echo "Create FSL BS-WP failed";
+    	$fsl_data = array(
+    	array("1", +28.030924, -80.601834, "1", +28.032708, -80.600032, "1", +28.031670, -80.598559, "1", +28.031062, -80.600013, 665.8, 600.1, 574.6),
+    	array("1", +28.030924, -80.601834, "1", +28.032708, -80.600032, "1", +28.031670, -80.598559, "2", +28.030975, -80.600107, 629.9, 632.4, 618.6),
+    	array("1", +28.030924, -80.601834, "1", +28.032708, -80.600032, "1", +28.031670, -80.598559, "3", +28.030859, -80.600018, 662.5, 674.1, 608.6)
+    	);
+    	for ($i=0;$i<count($fsl_data);$i++)
+    	{
+          $fsl = new FSLData();
+          $fsl->set('a_tag',$fsl_data[$i][0]);
+          $fsl->set('a_lat',$fsl_data[$i][1]);
+          $fsl->set('a_lng',$fsl_data[$i][2]);
+          $fsl->set('b_tag',$fsl_data[$i][3]);
+          $fsl->set('b_lat',$fsl_data[$i][4]);
+          $fsl->set('b_lng',$fsl_data[$i][5]);
+          $fsl->set('c_tag',$fsl_data[$i][6]);
+          $fsl->set('c_lat',$fsl_data[$i][7]);
+          $fsl->set('c_lng',$fsl_data[$i][8]);
+          $fsl->set('l_tag',$fsl_data[$i][9]);
+          $fsl->set('l_lat',$fsl_data[$i][10]);
+          $fsl->set('l_lng',$fsl_data[$i][11]);
+          $fsl->set('a_rad',$fsl_data[$i][12]);
+          $fsl->set('b_rad',$fsl_data[$i][13]);
+          $fsl->set('c_rad',$fsl_data[$i][14]);
+          if ($fsl->create() === false) echo "Create FSLData $i failed";
+    	}
     }
    redirect('mgmt_main','Database Initialized test data!');
     

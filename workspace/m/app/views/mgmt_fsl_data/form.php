@@ -4,44 +4,64 @@
 	<table>
 		<tr><th colspan="2"><?php echo $form_heading?></th></tr>
 		<tr>
-			<td>Tag</td>
-			<td><input type="text" name="tag" style="width:150px" value="<?php echo $object->get('tag')?>" /></td>
+			<td>A Tag</td>
+			<td><input type="text" name="a_tag" style="width:150px" value="<?php echo $object->get('a_tag')?>" /></td>
 		</tr>
 		<tr>
-			<td>Lat1</td>
-			<td><input type="text" name="lat1" style="width:150px" value="<?php echo $object->get('lat1')?>" /></td>
+			<td>A Lat</td>
+			<td><input type="text" name="a_lat" style="width:150px" value="<?php echo $object->get('a_lat')?>" /></td>
 		</tr>
 		<tr>
-			<td>Lng1</td>
-			<td><input type="text" name="lng1" style="width:150px" value="<?php echo $object->get('lng1')?>" /></td>
+			<td>A Lng</td>
+			<td><input type="text" name="a_lng" style="width:150px" value="<?php echo $object->get('a_lng')?>" /></td>
 		</tr>
 		<tr>
-			<td>Lat2</td>
-			<td><input type="text" name="lat2" style="width:150px" value="<?php echo $object->get('lat2')?>" /></td>
+			<td>B Tag</td>
+			<td><input type="text" name="b_tag" style="width:150px" value="<?php echo $object->get('b_tag')?>" /></td>
 		</tr>
 		<tr>
-			<td>Lng2</td>
-			<td><input type="text" name="lng2" style="width:150px" value="<?php echo $object->get('lng2')?>" /></td>
+			<td>B Lat</td>
+			<td><input type="text" name="b_lat" style="width:150px" value="<?php echo $object->get('b_lat')?>" /></td>
 		</tr>
 		<tr>
-			<td>Lat3</td>
-			<td><input type="text" name="lat3" style="width:150px" value="<?php echo $object->get('lat3')?>" /></td>
+			<td>B Lng</td>
+			<td><input type="text" name="b_lng" style="width:150px" value="<?php echo $object->get('b_lng')?>" /></td>
 		</tr>
 		<tr>
-			<td>Lng3</td>
-			<td><input type="text" name="lng3" style="width:150px" value="<?php echo $object->get('lng3')?>" /></td>
+			<td>C Tag</td>
+			<td><input type="text" name="c_tag" style="width:150px" value="<?php echo $object->get('c_tag')?>" /></td>
+		</tr>	
+		<tr>
+			<td>C Lat</td>
+			<td><input type="text" name="c_lat" style="width:150px" value="<?php echo $object->get('c_lat')?>" /></td>
 		</tr>
 		<tr>
-			<td>Rad1</td>
-			<td><input type="text" name="rad1" style="width:150px" value="<?php echo $object->get('rad1')?>" /></td>
+			<td>C Lng</td>
+			<td><input type="text" name="c_lng" style="width:150px" value="<?php echo $object->get('c_lng')?>" /></td>
 		</tr>
 		<tr>
-			<td>Rad2</td>
-			<td><input type="text" name="rad2" style="width:150px" value="<?php echo $object->get('rad2')?>" /></td>
+			<td>Lat Tag</td>
+			<td><input type="text" name="l_tag" style="width:150px" value="<?php echo $object->get('l_tag')?>" /></td>
+		</tr>	
+		<tr>
+			<td>Lab Lat</td>
+			<td><input type="text" name="l_lat" style="width:150px" value="<?php echo $object->get('l_lat')?>" /></td>
 		</tr>
 		<tr>
-			<td>Rad3</td>
-			<td><input type="text" name="rad3" style="width:150px" value="<?php echo $object->get('rad3')?>" /></td>
+			<td>Lab Lng</td>
+			<td><input type="text" name="l_lng" style="width:150px" value="<?php echo $object->get('l_lng')?>" /></td>
+		</tr>		
+		<tr>
+			<td>A Rad</td>
+			<td><input type="text" name="a_rad" style="width:150px" value="<?php echo $object->get('a_rad')?>" /></td>
+		</tr>
+		<tr>
+			<td>B Rad</td>
+			<td><input type="text" name="b_rad" style="width:150px" value="<?php echo $object->get('b_rad')?>" /></td>
+		</tr>
+		<tr>
+			<td>C Rad</td>
+			<td><input type="text" name="c_rad" style="width:150px" value="<?php echo $object->get('c_rad')?>" /></td>
 		</tr>					
 	    <tr>
 			<td colspan="2" style="text-align:right">

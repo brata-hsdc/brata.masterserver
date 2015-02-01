@@ -5,9 +5,13 @@ class HMBData extends ModelEx {
     parent::__construct('OID','CID','t_hmb_data'); 
     $this->rs['OID'] = $oid;
     $this->rs['CID'] = $cid;
-    $this->rs['_1st'] = 0;
-    $this->rs['_2nd'] = 0;
-    $this->rs['_3rd'] = 0;
+    $this->rs['_1st_on'] = 0;
+    $this->rs['_1st_off'] = 0;
+    $this->rs['_2nd_on'] = 0;
+    $this->rs['_2nd_off'] = 0;
+    $this->rs['_3rd_on'] = 0;
+    $this->rs['_3rd_off'] = 0;
+    $this->rs['cycle'] = 0;
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
@@ -16,15 +20,12 @@ class HMBData extends ModelEx {
 //  convert Pulsator tripple to array of on/off pairs
 //
 function generateParameters() {
-//	$tmp = array($this->rs['_1st'], $this->rs['_2nd'], $this->rs['_3rd']);
-//	shuffle($tmp);
-//	foreach ($tmp as $i) {
-//		$on = (int)($i/2);
-//		$parms[] = $on;
-//		$parms[] = $i-$on;
-//	}
-//	return $parms;
-
+//	return = array(
+ //  $this->rs['_1st_on'], $this->rs['_1st_off'],
+//   $this->rs['_2nd_on'], $this->rs['_2nd_off'], 
+//   $this->rs['_3rd_on']  $this->rs['_3rd_off']
+//   $cycle);
+//
 	$answer = array(1000, 2000, 1000, 4000, 1000, 16000);
 	return $answer;
 }

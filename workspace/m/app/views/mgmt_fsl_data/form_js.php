@@ -1,54 +1,79 @@
 <script type="text/javascript">
   function validateForm(f) {
 
-    if (f.tag.value == "") {
-      alert("Please enter a tag");
-      f.tag.focus();
+    if (f.a_tag.value == "") {
+      alert("Please enter a_tag");
+      f.a_tag.focus();
       return false;
     }
-    if (f.lat1.value == "") {
-        alert("Please enter the lat1 value");
-        f.lat1.focus();
+    if (f.a_lat.value == "") {
+        alert("Please enter the a_lat value");
+        f.a_lat.focus();
         return false;
      }
-    if (f.lng1.value == "") {
-        alert("Please enter the lng1 value");
-        f.lng1.focus();
+    if (f.a_lng.value == "") {
+        alert("Please enter the a_lng value");
+        f.a_lng.focus();
         return false;
       }
-      if (f.lat2.value == "") {
-          alert("Please enter the lat2 value");
-          f.lat2.focus();
+    if (f.b_tag.value == "") {
+        alert("Please enter b_tag");
+        f.b_tag.focus();
+        return false;
+      }
+      if (f.b_lat.value == "") {
+          alert("Please enter the b_lat value");
+          f.b_lat.focus();
           return false;
        }   
-      if (f.lng2.value == "") {
-          alert("Please enter the lng2 value");
-          f.lng2.focus();
+      if (f.b_lng.value == "") {
+          alert("Please enter the b_lng value");
+          f.b_lng.focus();
           return false;
         }
-      if (f.lat3.value == "") {
-          alert("Please enter the lat3 value");
-          f.lat2.focus();
+      if (f.c_tag.value == "") {
+          alert("Please enter c_tag");
+          f.c_tag.focus();
+          return false;
+        }
+      if (f.c_lat.value == "") {
+          alert("Please enter the c_lat value");
+          f.c_lat.focus();
           return false;
        }   
-      if (f.lng3.value == "") {
-          alert("Please enter the lng3 value");
-          f.lng2.focus();
+      if (f.c_lng.value == "") {
+          alert("Please enter the c_lng value");
+          f.c_lng.focus();
           return false;
         } 
-      if (f.rad1.value == "") {
-          alert("Please enter the rad1 value");
-          f.rad1.focus();
+      if (f.l_tag.value == "") {
+          alert("Please enter the l_tag value");
+          f.l_tag.focus();
+          return false;
+       }
+      if (f.l_lat.value == "") {
+          alert("Please enter the l_lat value");
+          f.l_lat.focus();
+          return false;
+       }   
+      if (f.l_lng.value == "") {
+          alert("Please enter the l_lng value");
+          f.l_lng.focus();
+          return false;
+        } 
+      if (f.a_rad.value == "") {
+          alert("Please enter the a_rad value");
+          f.a_rad.focus();
           return false
         }
-      if (f.rad2.value == "") {
-          alert("Please enter the rad2 value");
-          f.rad2.focus();
+      if (f.b_rad.value == "") {
+          alert("Please enter the b_rad value");
+          f.b_rad.focus();
           return false;
         }       
-      if (f.rad3.value == "") {
-          alert("Please enter the rad3 value");
-          f.rad3.focus();
+      if (f.c_rad.value == "") {
+          alert("Please enter the c_rad value");
+          f.c_rad.focus();
           return false;
         }
         
