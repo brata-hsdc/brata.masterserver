@@ -26,8 +26,9 @@ class CPAData extends ModelEx {
   	$o = new CPAData();
   	return $o->retrieve_one("stationId=?", $stationId);
   }
+  
   static function startChallenge($stationId) {
-  	$cpa = CPAData::getFromStationId($stationId);
+  	$cpa = CPAData::getFromStationId($stationId); // WARNING BUG HERE CPA data is not unique to station
   	return $cpa->generateParameters();
   }
   static function getItemsToMeasure($stationId) {
