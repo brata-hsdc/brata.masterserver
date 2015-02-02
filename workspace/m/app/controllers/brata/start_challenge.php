@@ -101,7 +101,7 @@ function _start_challenge($stationTag=null)
 	if ($rpi!=null) $rpi->start_challenge($stationType->get('delay'),$parms);
 	//TODO transaction
 	$station->startChallenge($team);
-	$team->startChallenge($station, $parms);
+	$team->startChallenge($parms);
 	
 	if ( Event::createEvent(Event::TYPE_START,$team, $station,0) ===false) {
 		trace("create event failed",__FILE__,__LINE__,__METHOD__);

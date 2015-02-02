@@ -39,11 +39,11 @@ class Team extends ModelEx {
   }
   
   // under development
-  function startChallenge($station,$jsonObject) {
+  function startChallenge($station,$jsonObject=null) {
   	
   	$this->rs['count'] = 0;
   	$this->rs['started'] = time();                       // get system time 
-  	$this->rs['json']    = json_encode($jsonObject);
+  	$this->rs['json']    = jsonObject?json_encode($jsonObject):"";
   	return $this->update();
   }
   

@@ -58,5 +58,6 @@ function _make_html_ext_table($view,$item,$urlPrefix,&$data) {
 		}
 		$tablearr[]=$row;
 	};
+	$data['head'][] = '<meta http-equiv="refresh" content="'.$GLOBALS['leaderBoardRefresh'].'">';
 	$data['body'][]=table::makeTable($tablearr);
 }

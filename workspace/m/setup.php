@@ -36,7 +36,10 @@ function writeSysconfig()
    {
    	   	$errrors .= ", invalid dbpass";
    } 
-
+   if ( !isset($_POST['leaderBoardRefersh']) || $_POST['leaderBoardRefersh'] =="" )
+   {
+   	$errrors .= ", invalid dbpass";
+   }
    
    $_POST['debug'] = isset($_POST['debug'] ) ?  1 : 0;
    $_POST['sendmail'] = isset($_POST['sendmail'] ) ?  1 : 0;
@@ -44,7 +47,7 @@ function writeSysconfig()
    
    if ($errors =="")
    {
-      //$fd = fopen("/var/tmp/sysconfig_data.php","w"); // when you can't write directly to sysconfig_data.php ...
+      //$fd = fopen("/tmp/sysconfig_data.php","w"); // when you can't write directly to sysconfig_data.php ...
       $fd = fopen("sysconfig_data.php","w");
       if ($fd === false) {
       	$a= error_get_last();
@@ -63,6 +66,7 @@ function writeSysconfig()
       fwrite($fd,"\$SYSCONFIG_LOGLEVEL=".$_POST['loglevel'].";\n");
       fwrite($fd,"\$SYSCONFIG_STUDENT=".$_POST['student'].";\n");
       fwrite($fd,"\$SYSCONFIG_ENCODE=".$_POST['encode'].";\n");
+      fwrite($fd,"\$SYSCONFIG_LEADERBOARD_REFRESH=".$_POST['leaderBoardRefersh'].";\n");
       fclose($fd);
    }
    return $errors;
@@ -105,6 +109,7 @@ if ( isset($_GET['write']) ) {
 <tr><td>Database Name</td><td><input name=dbname value='<?php echo $SYSCONFIG_DBNAME?>'/></td></tr>
 <tr><td>Database User</td><td><input name=dbuser value='<?php echo $SYSCONFIG_DBUSER?>'/></td></tr>
 <tr><td>Database Password</td><td><input name=dbpass value='<?php echo $SYSCONFIG_DBPASS?>'/></td></tr>
+<tr><td>Leader Board Refresh Rate(seconds)</td><td><input name=leaderBoardRefersh value='<?php echo $SYSCONFIG_LEADERBOARD_REFRESH?>'/></td></tr>
 <tr><td>Log Level</td><td><input name=loglevel value='<?php echo $SYSCONFIG_LOGLEVEL?>'/></td></tr>
 <tr><td>Send Mail (to new users)</td><td><input type=checkbox name=sendmail value='1' <?php if ($SYSCONFIG_SENDMAIL) echo "checked"; ?> /> </td></tr>
 <tr><td>Debug Mode</td><td><input type=checkbox name=debug value='1' <?php if ($SYSCONFIG_DEBUG) echo "checked"; ?> /> </td></tr>

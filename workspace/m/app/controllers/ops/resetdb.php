@@ -281,7 +281,7 @@ function create_v_leaderboard_main($dbh) {
 	$status = $dbh->exec("create view v_leaderboard_main as "	
 	."select name Name  , totalDuration Duration , totalScore Score, "
 	."regScore Reg,ctsScore CTS ,fslScore FSL,hmbScore HMB,cpaScore CPA"
-	." from t_team order by Duration desc, Score asc"
+	." from t_team order by Duration asc, Score desc"
 	);
 	
 	if ($status === false) throw new ErrorInfo($dbh,"v_leaderboard_main");
