@@ -43,7 +43,7 @@ class Team extends ModelEx {
   	
   	$this->rs['count'] = 0;
   	$this->rs['started'] = time();                       // get system time 
-  	$this->rs['json']    = jsonObject?json_encode($jsonObject):"";
+  	$this->rs['json']    = $jsonObject?json_encode($jsonObject):"";
   	return $this->update();
   }
   

@@ -382,9 +382,9 @@ function _resetdb() {
     else createStations($numStations,"cts",$stationType->get('OID'));
     
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_FSL,"Find Secret Lab"           ,false, 60,
-       "Find and scan the marker at [waypoint-lat=[lat]] [waypoint-lon=[lng]].",
-       "Success! Find and scan the next marker at [waypoint-lat=[lat]] [waypoint-lon=[lng]].",
-       "Too bad, you failed. Find and scan the next marker at waypoint-lat=[lat] waypoint-lon=[lng].",
+       "Find and scan the marker at waypoint-lat=[lat] waypoint-lon=[lng].",
+       "Success! Find and scan the next marker at waypoint-lat=[next_lat] waypoint-lon=[next_lng].",
+       "Too bad, you failed. Find and scan the next marker at waypoint-lat=[next_lat] waypoint-lon=[next_lng].",
        "Wrong marker, try again!"
     		
     		//Success! Go quickly to the next team queue.
