@@ -13,6 +13,8 @@ class Station extends ModelEx {
     $this->retrieve($oid,$cid);
   }
   
+  // record which team is at which station
+  // NOTE: fsl & ext can't use this since there is only one instance of these station type
   function startChallenge($team) {
   	$this->set('teamAtStation',$team->get('OID'));
   	return $this->update();
