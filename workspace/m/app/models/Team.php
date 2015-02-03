@@ -38,7 +38,9 @@ class Team extends ModelEx {
   	return School::getSchoolNameFromId($this->rs['schoolId']);
   }
   
-  // under development
+  // Must be called to place challenge data into the started state
+  //  basiclly the try count is cleared the started time is set (used to calculate duration) and the
+  // option challenge data can be saved to the DB.
   function startChallenge($station,$jsonObject=null) {
   	
   	$this->rs['count'] = 0;
@@ -49,17 +51,19 @@ class Team extends ModelEx {
   
   // under development
   function getChallengeData()  {
-  	return json_decode($this->rs['json']);
+  	return json_decode($this->rs['json'],true);
   }
   
-  // under development
+  // must be called at end of challenge to clear challenge state
   function endChallenge() {
   	$this->rs['count'] = 0;
-  	$this->rs['started'] = 0;                       // get system time
+  	$this->rs['started'] = 0;
   	$this->rs['json']    = '';
   	return $this->update();  	
   }
-  // under development
+  // Must be called to update team's score, this method is designed to be called 
+  // after every submit.  The last call will be the final score.  This allows the leader board
+  // to dyamiclly converge to the final score (duration goes up, points go down) with each submit.
   function updateScore($stationType,$points) {
   
   	$duration = time()-$this->get('started');
@@ -90,13 +94,17 @@ class Team extends ModelEx {
   	$this->set('totalDuration',$this->get('regDuration')+$this->get('ctsDuration')+$this->get('fslDuration')+$this->get('cpaDuration'));
   	return $this->update();
   }
+  
   // todo is this the best place?
   // table assoc array field the field name holding the message to expand
-  function expandMessage($msg,$table) {
+  // the assumption is that the labels in the message the "[label]" will match
+  // the keys in the given hash $table.
+  
+  function expandMessage($msg,$table=null) {
   	if ($table == null)  $table=array("team"=>$this->get('name'));
   	else                 $table['team'] = $this->get('name');   // add team name
   	foreach ($table as $key => $value) {
-  		if (is_array($value)) continue; // todo make this a string
+  		if (is_array($value)) $value = print_r($value,true); // convert to a string
   		$msg = str_replace("[$key]", $value, $msg);
   	}
   	return $msg;

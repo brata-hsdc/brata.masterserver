@@ -46,6 +46,7 @@ class Event extends ModelEx {
   }
   
   static function createEvent($eventType,$team,$station,$points,$data="") {
+  	if (is_array($data)) $data = json_encode($data);  // if data is an array assume its json and convert it to text
   	$o = new Event();
   	$o->set('eventType', $eventType);
   	$o->set('teamId',$team->get('OID'));

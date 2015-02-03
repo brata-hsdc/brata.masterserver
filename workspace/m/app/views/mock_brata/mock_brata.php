@@ -1,14 +1,6 @@
 <?php
 require(APP_PATH.'inc/mock_functions.php');
-/*
-function makeWaypointList() {
-	return '<select name="waypointId">'
-		. '<option value=-1>Select One'	
-		. Waypoint::getAllAsHTMLOptions(-1)
-		. '</select>';
-}
 
-*/
 function makeStationList() {
 	return '<select name="stationTag">'
 			. '<option value=-1>Select One'
@@ -27,7 +19,7 @@ function makeTeamList() {
   <tr><td><?php echo htmlspecialchars(mock_get_brata_response()) ?></td></tr>
   </table>
   <table>
-    <form method="post" action="<?=$registerUrl?>">
+    <form method="post" action="<?=$registerUrl?>" >
 		<tr><th colspan="2">Register</th></tr>
 		<tr>
 			<td>TeamId (a.k.a. team pin)</td>
@@ -50,7 +42,7 @@ function makeTeamList() {
 		</tr>		
 		<tr>
 			<td>Waypoint Tag</td>
-			<td><?php echo makeStationList() ?> </td>
+			<td><input type="text" name="waypointId" style="width:150px" value="" /></td>
 		</tr>	
 		<tr>
 			<td colspan="2" style="text-align:right">

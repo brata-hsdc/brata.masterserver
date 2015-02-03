@@ -58,6 +58,9 @@ class StationType extends ModelEx {
     $type = new StationType();
     return $type->retrieve_one("typeCode=?", array($typeCode));
   }
+  static function getFSLType() {
+  	return StationType::getFromTypeCode(StationType::STATION_TYPE_FSL); // NOTE we assume there is only one FSL type
+  }
   
   static function getAllAsHTMLOptions($oid=-1) {
     $type = new StationType();

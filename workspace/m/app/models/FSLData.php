@@ -26,17 +26,17 @@ class FSLData extends ModelEx {
   // generate the initial parameters atWaypoint will drive the game play from here on out
   function generateParameters() {
   	return array(
-  	'count' => 0, // tracks which waypoint is current
+  	'index' => 0, // tracks which waypoint is current
+  	'waypoints' => array(	
+  	  array('tag' => $this->rs['a_tag'], 'lat' => $this->rs['a_lat'], 'lng' => $this->rs['a_lng']),
+  	  array('tag' => $this->rs['b_tag'], 'lat' => $this->rs['b_lat'], 'lng' => $this->rs['b_lng']),
+  	  array('tag' => $this->rs['c_tag'], 'lat' => $this->rs['c_lat'], 'lng' => $this->rs['c_lng']),
+  	),
   	'lat' => $this->rs['a_lat'],
-  	'lng' => $this->rs['a_lng'],
-  	'next_lat' => $this->rs['b_lat'],
-  	'next_lng' => $this->rs['b_lng'],
-  	'c_lat' => $this->rs['c_lat'],
-  	'c_lng' => $this->rs['c_lng'],
+  	'lng' => $this->rs['a_lng'],		
   	'a_rad' => $this->rs['a_rad'],
   	'b_rad' => $this->rs['b_rad'],
   	'c_rad' => $this->rs['c_rad']);
-  
   }
 
   // fetch the Station object for the given skey

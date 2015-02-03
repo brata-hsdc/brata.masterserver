@@ -69,9 +69,9 @@ function _start_challenge($stationTag=null)
 	trace("station and team start calls");
 	//TODO transaction
 	$station->startChallenge($team);
-	$team->startChallenge($parms,$fslState);
+	$team->startChallenge($parms,$fslState);  // $fslState will be null when NOT doing FSL
 	
-	if ( Event::createEvent(Event::TYPE_START,$team, $station,0) ===false) {
+	if ( Event::createEvent(Event::TYPE_START,$team, $station,0, $fslState) ===false) {
 		trace("create event failed",__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(500, "database create failed");
 	}
