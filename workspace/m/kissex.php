@@ -94,7 +94,7 @@ class ModelEx extends KISS_Model  {
 		$dbh=$this->getdbh();		
 		$stmt = $dbh->query('SELECT max(oid) FROM '.$this->enquote($this->tablename));
 		$oid=$stmt->fetchColumn();
-	    $oid=rand(0,$oid);
+	    $oid=rand(1,$oid);
 	    return $this->retrieve($oid,-1);
 	}
 	#for master server loaddb
