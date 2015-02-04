@@ -58,7 +58,7 @@ function _start_challenge($stationTag=null)
 	    	$parms = EXTData::startChallenge($stationId);
 	        break;
 	    case StationType::STATION_TYPE_FSL:
-   	        $fslState=$parms = FSLData::startChallenge($stationId);
+   	        $fslState=($parms = FSLData::startChallenge($stationId));
 	        break;
 	}
 	

@@ -119,7 +119,7 @@ function create_t_team($dbh) {
 	."`extDuration` int unsigned NOT NULL default 0, "
 	."`count`	    int unsigned NOT NULL default 0, "			
 	."`started`	    int unsigned NOT NULL default 0, "
-	."`json` varchar(255) NOT NULL, "
+	."`json` TEXT NOT NULL, "
   	."PRIMARY KEY  (`OID`), "
 	."UNIQUE KEY (`pin`), "
 	."CONSTRAINT `team_name_unique` UNIQUE KEY (`name`), "			
@@ -382,9 +382,9 @@ function _resetdb() {
     else createStations($numStations,"cts",$stationType->get('OID'));
     
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_FSL,"Find Secret Lab"           ,false, 60,
-       "Find and scan the [index] at waypoint-lat=[lat] waypoint-lon=[lng].",
-       "Success! Find and scan the [index] marker at waypoint-lat=[lat] waypoint-lon=[lng].",
-       "Too bad, you failed. Find and scan the [index] marker at waypoint-lat=[lat] waypoint-lon=[lng].",
+       "Find and scan the [ordinal] at waypoint-lat=[lat] waypoint-lon=[lng].",
+       "Success! Find and scan the [ordinal] marker at waypoint-lat=[lat] waypoint-lon=[lng].",
+       "Too bad, you failed. Find and scan the [ordinal] marker at waypoint-lat=[lat] waypoint-lon=[lng].",
        "Wrong marker, try again!"
     		
     		//Success! Go quickly to the next team queue.

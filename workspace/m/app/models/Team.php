@@ -53,6 +53,9 @@ class Team extends ModelEx {
   function getChallengeData()  {
   	return json_decode($this->rs['json'],true);
   }
+  function setChallengeData($json) {
+  	$this->rs['json'] = json_encode($json);
+  }
   
   // must be called at end of challenge to clear challenge state
   function endChallenge() {

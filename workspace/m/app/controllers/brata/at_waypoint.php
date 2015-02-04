@@ -5,7 +5,7 @@ require(APP_PATH.'inc/json_functions.php');
 //
 function _at_waypoint($waypointId=null)
 {
-	trace("yes");
+	trace("waypointId = $waypointId");
   if ($waypointId === null) {
     rest_sendBadRequestResponse(400,"missing waypointId");  // doesn't return
   }
@@ -14,38 +14,57 @@ function _at_waypoint($waypointId=null)
   json_checkMembers("team_id,message", $json);
   $teamPIN = $json['team_id'];
   $team = Team::getFromPin($teamPIN);
+  trace("got team from pin".print_r($team,true));
   if ($team === false) {
-    trace("_can't find team PIN=".$teamPIN,__FILE__,__LINE__,__METHOD__);
+    trace("can't find team PIN=".$teamPIN,__FILE__,__LINE__,__METHOD__);
     rest_sendBadRequestResponse(404,"missing can't find team PIN=".$teamPIN);  // doesn't return
   }
   
   $stationType = StationType::getFSLType();
   if ($stationType === false) {
-  	trace("_can't find team PIN=".$teamPIN,__FILE__,__LINE__,__METHOD__);
+  	trace("can't find team PIN=".$teamPIN,__FILE__,__LINE__,__METHOD__);
   	rest_sendBadRequestResponse(500,"can't find the FSL StationType");  // doesn't return
   }
   
   $count = $team->get('count');
-  $isCorrect = false;
+  $fslState = $team->getChallengeData();
+  $isCorrect = FSLData::isMatch($fslState, $waypointId);
+  trace("isCorrect=$isCorrect");
   $challengeComplete = false;
   
-  $fslState = $team->getChallengeData();
-  if ($fslState['waypoints'][$fslState['index']]==$waypointId) {
-  	$isCorrect = true;
-  	if (++$fslState['index']==3);
-  } else {
-  	if (++$count >= 3) $challengeComplete = true;  	
+  if ($isCorrect) {
+  	if (!FSLData::nextWaypoint($fslState)) {
+  		$challengeComplete = true;  		
+  	} else {
+  		$team->set('count',0);
+  		$team->setChallengeData($fslState);
+  	}
+  }
+  else {
+  	$team->set('count',++$count);
+  	$team->setChallengeData($fslState);
   }	
   
-  if       ($isCorrect) $msg = $stationType->get('success_msg');
-  else if  ($count >=3) $msg = $stationType->get('failed_msg');
-  else                  $msg = $stationType->get('retry_msg');
+  if       ($challengeComplete) {
+  	$msg = "[a_rad] [b_rad] [c_rad]";
+  } 
+  else if  ($isCorrect) {
+  	$msg = $stationType->get('success_msg');
+  }
+  else if  ($count < 3) { 
+  	$msg = $stationType->get('retry_msg'); 
+  }
+  else {
+  	$msg = $stationType->get('failed_msg');
+  }
+  $team->updateScore($stationType, 3-$count);
+  if ($challengeComplete) $team->endChallenge();
     
-  $team->expandMessage($msg,$table);
+  $msg = $team->expandMessage($msg,$fslState);
   
   if(isEncodeEnabled()) {
   	// if not in student mode encode, if in student mode we only encrypt the even team numbers responses
-     if(!isStudenServer() || (isStudenServer() && ($teamPIN % 2 == 0))) {
+     if(!isStudentServer() || (isStudentServer() && ($teamPIN % 2 == 0))) {
        $msg = $team->encodeText($msg);
      }
   }

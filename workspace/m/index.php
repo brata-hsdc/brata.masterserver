@@ -12,7 +12,7 @@ $GLOBALS['SYSCONFIG_STUDENT'] = $SYSCONFIG_STUDENT;
 $GLOBALS['SYSCONFIG_ENCODE'] = $SYSCONFIG_ENCODE;
 $GLOBALS['leaderBoardRefresh'] = $SYSCONFIG_LEADERBOARD_REFRESH;
 
-function isStudenServer() {
+function isStudentServer() {
 	return $GLOBALS['SYSCONFIG_STUDENT'] == 1;
 }
 function isEncodeEnabled() {
