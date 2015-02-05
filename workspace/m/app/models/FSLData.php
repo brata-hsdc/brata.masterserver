@@ -25,36 +25,42 @@ class FSLData extends ModelEx {
 
   // generate the initial parameters atWaypoint will drive the game play from here on out
   function generateParameters() {
-  	return array(
+  	$tmp = array(
   	'index' => 0, // tracks which waypoint is current
   	'waypoints' => array(	
   	  array('tag' => $this->rs['a_tag'], 'lat' => $this->rs['a_lat'], 'lng' => $this->rs['a_lng']),
   	  array('tag' => $this->rs['b_tag'], 'lat' => $this->rs['b_lat'], 'lng' => $this->rs['b_lng']),
   	  array('tag' => $this->rs['c_tag'], 'lat' => $this->rs['c_lat'], 'lng' => $this->rs['c_lng']),
-  	),		
+  	),	
+  	'msg_values' => array(     // used to expand messages which will be sent to teams
+   		'ordinal' => "first",
+  		'lat' => $this->rs['a_lat'],
+  		'lng' => $this->rs['a_lng']
+  	),	
   	'a_rad' => $this->rs['a_rad'],
   	'b_rad' => $this->rs['b_rad'],
-  	'c_rad' => $this->rs['c_rad'],
-  	'ordinal' => "first",
-  	'lat' => $this->rs['a_lat'],
-  	'lng' => $this->rs['a_lng'],
+  	'c_rad' => $this->rs['c_rad']
   	);
+  	trace("genParms ".print_r($tmp,true));
+  	return $tmp;
   }
   // test if the given id matches the id of the current waypoint
   static function isMatch(&$json, $id) {
-  	//trace("json ".print_r($json,true),__FILE__,__LINE__,__METHOD__);
-  	//trace("index is ".$json['index'],__FILE__,__LINE__,__METHOD__);
-  	//trace("waypoints  ".print_r($json['waypoints'][$json['index']],true),__FILE__,__LINE__,__METHOD__);
   	trace("id=$id tag is ".$json['waypoints'][$json['index']]['tag'],__FILE__,__LINE__,__METHOD__);
   	return $id == $json['waypoints'][$json['index']]['tag'];
   }
   // advance to the next waypoint if possible, also update the hash so expand message will replace with the current values
   static function nextWaypoint(&$json) {
- 	if ($json['index'] >= 2) return false;
+ 	if ($json['index'] >= 2) {
+ 		$json['msg_values']['a_rad'] = $json['a_rad'];
+ 		$json['msg_values']['b_rad'] = $json['b_rad'];
+ 		$json['msg_values']['c_rad'] = $json['c_rad'];
+ 		return false;
+ 	}
  	$i = ++$json['index'];
- 	$json['ordinal'] = $i == 1 ? "second" : "third";
- 	$json['lat'] = $json['waypoints'][$i];
- 	$json['lng'] = $json['waypoints'][$i]; 	
+ 	$json['msg_values']['ordinal'] = $i == 1 ? "second" : "third";
+ 	$json['msg_values']['lat'] = $json['waypoints'][$i]['lat'];
+ 	$json['msg_values']['lng'] = $json['waypoints'][$i]['lng']; 
  	return true;
  }
   

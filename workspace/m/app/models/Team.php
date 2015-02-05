@@ -98,10 +98,10 @@ class Team extends ModelEx {
   	return $this->update();
   }
   
-  // todo is this the best place?
   // table assoc array field the field name holding the message to expand
   // the assumption is that the labels in the message the "[label]" will match
   // the keys in the given hash $table.
+  // WARNING: Doesn't seem to work if the table holds nested arrays.
   
   function expandMessage($msg,$table=null) {
   	if ($table == null)  $table=array("team"=>$this->get('name'));

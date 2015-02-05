@@ -14,7 +14,6 @@ function _at_waypoint($waypointId=null)
   json_checkMembers("team_id,message", $json);
   $teamPIN = $json['team_id'];
   $team = Team::getFromPin($teamPIN);
-  trace("got team from pin".print_r($team,true));
   if ($team === false) {
     trace("can't find team PIN=".$teamPIN,__FILE__,__LINE__,__METHOD__);
     rest_sendBadRequestResponse(404,"missing can't find team PIN=".$teamPIN);  // doesn't return
@@ -45,8 +44,12 @@ function _at_waypoint($waypointId=null)
   	$team->setChallengeData($fslState);
   }	
   
+  //TODO Too bad, you failed. Use ...
+  //TODO Success! go quickly to the next queue
+  //TODO Wrong secet Laboratory marker, try again!
+  //TODO Too bad, you failed. Go quickly to the next queue.
   if       ($challengeComplete) {
-  	$msg = "[a_rad] [b_rad] [c_rad]";
+  	$msg = "Success! Use radius1=[a_rad] radius2=[b_rad] and radius3=[c_rad] to find the secret labatory marker";
   } 
   else if  ($isCorrect) {
   	$msg = $stationType->get('success_msg');
@@ -60,7 +63,9 @@ function _at_waypoint($waypointId=null)
   $team->updateScore($stationType, 3-$count);
   if ($challengeComplete) $team->endChallenge();
     
-  $msg = $team->expandMessage($msg,$fslState);
+  trace("FSLState ". print_r($fslState,true));
+  trace("msg_value ".print_r($fslState['msg_values'],true));
+  $msg = $team->expandMessage($msg,$fslState['msg_values']);
   
   if(isEncodeEnabled()) {
   	// if not in student mode encode, if in student mode we only encrypt the even team numbers responses
