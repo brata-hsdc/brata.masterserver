@@ -99,7 +99,7 @@ class Team extends ModelEx {
   	{
   		case StationType::STATION_TYPE_REG:
   			$this->set('regScore',$points);
-  			$this->set('regDuration',$duration);
+  			$this->set('regDuration',0);
   			break;
   		case StationType::STATION_TYPE_CTS:
   			$this->set('ctsScore',$points);

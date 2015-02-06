@@ -61,6 +61,12 @@ function _submit($stationTag=null)
           //TODO json_checkMembers("message,team_id", $json);
           //$isCorrect=$json['is_correct'];
           break;
+		case StationType::STATION_TYPE_EXT:
+          preg_match("/.*tower-lat.*=.*(\d)+dd.dddddd] [tower-lon=+dd.dddddd] [tower-height=dddd]",$json['message'],$matches);
+          $msg = $stationType->get('success_msg');
+          var_dump($matches);
+          goto hack;
+          
 	}
 	
 	$count = $team->get('count');
@@ -97,5 +103,6 @@ function _submit($stationTag=null)
             $msg = $team->encodeText($msg);
           }
         }
+ hack:
 	json_sendObject(array('message' => $msg ) );
 }

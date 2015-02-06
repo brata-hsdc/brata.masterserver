@@ -20,14 +20,14 @@ class EXTData extends ModelEx {
   
   
   static function startChallenge($stationId) {
-  	$ext = EXTData(1,-1);  // there is only one record
+  	$ext = new EXTData(1,-1);  // there is only one record
   	return array(
-  	'a_lat' =>   $this->rs['a_lat'],
-    'a_lng' => $this->rs['a_lng'],
-    'b_lat' => $this->rs['b_lat'],
-    'b_lng' => $this->rs['b_lng'],
-    'c_lat' => $this->rs['c_lat'],
-    'c_lng' => $this->rs['c_lng']
+  	'a_lat' => $ext->rs['a_lat'],
+    'a_lng' => $ext->rs['a_lng'],
+    'b_lat' => $ext->rs['b_lat'],
+    'b_lng' => $ext->rs['b_lng'],
+    'c_lat' => $ext->rs['c_lat'],
+    'c_lng' => $ext->rs['c_lng']
   	);
   }
 }

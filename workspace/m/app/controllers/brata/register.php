@@ -4,9 +4,7 @@
 require(APP_PATH.'inc/rest_functions.php');
 require(APP_PATH.'inc/json_functions.php');
 function _register() 
-{
-	trace("start",__FILE__,__LINE__,__METHOD__);
-	
+{	
 	$json = json_getObjectFromRequest("POST");
 	json_checkMembers("team_id,message", $json);
         $teamPIN = $json['team_id'];

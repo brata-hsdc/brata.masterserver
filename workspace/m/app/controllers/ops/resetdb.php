@@ -266,17 +266,6 @@ function create_t_ext_data($dbh) {
 	if ($status === false) throw new ErrorInfo($dbh,"t_ext_data");
 }
 
-function create_v_stationfinder($dbh) {
-   $status = $dbh->exec("create view v_stationfinder as "
-   		."select S.tag,T.hasrPI,R.stationId,R.URL,S.typeId,T.name from t_rpi R "
-   		."left join t_station S on S.OID=R.stationId "
-   		."left join t_stationtype T on S.typeId=T.OID"
-   		);
-   
-    if ($status === false) throw new ErrorInfo($dbh,"v_stationfinder");
-}
-
-
 function create_v_leaderboard_main($dbh) {
 	$status = $dbh->exec("create view v_leaderboard_main as "	
 	."select name Name  , totalDuration Duration , totalScore Score, "
@@ -319,10 +308,9 @@ function _resetdb() {
   {
     $dbh=getdbh();
 
-    $list = explode(",","v_stationfinder,v_leaderboard_main,v_leaderboard_ext");
+    $list = explode(",","v_leaderboard_main,v_leaderboard_ext");
     foreach ($list as $view) dropView($dbh, $view);
-
-    
+ 
     //
     //  rPI challenge data
     //
@@ -342,7 +330,6 @@ function _resetdb() {
     
     create_v_leaderboard_main($dbh);
     create_v_leaderboard_ext($dbh);
-    ///create_v_stationfinder($dbh);
     //
     //  rPI challenge data
     //
@@ -420,12 +407,12 @@ function _resetdb() {
     
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_EXT,"Extra"                     ,false, 60,
      "You have 20 (TBR) minutes to provide the tower location and height. Good luck."
-     ." waypoint1-lat=[a_lat] waypoint1-lng=[a_lng]"
-     ."	waypoint2-lat=[b_lat] waypoint2-lng=[b_lng]"
-     ." waypoint3-lat=[c_lat] waypoint3-lng=[c_lng]",
-      "success",
-      "failed",
-      "retry"
+     ." landmark1-lat=[a_lat] landmark1-log=[a_lng]"
+     ."	landmark2-lat=[b_lat] landmark2-log=[b_lng]"
+     ." landmark3-lat=[c_lat] landmark3-log=[c_lng]",
+      "Message received, return to base",
+      "If you see this message there was an internal error 4",
+      "If you see this message there was an internal error 5"
     );
     if ($stationType===false) echo "Create StationType EXT failed";
     else createStations(1,"ext",$stationType->get('OID'));
@@ -560,6 +547,18 @@ function _resetdb() {
           $fsl->set('c_rad',$fsl_data[$i][14]);
           if ($fsl->create() === false) echo "Create FSLData $i failed";
     	}
+    	
+    	$ext = new EXTData();
+    	$ext->set('a_lat', +28.031848);
+    	$ext->set('a_lng', -80.600938);
+    	$ext->set('b_lat', +28.031695);
+    	$ext->set('b_lng', -80.600413);
+    	$ext->set('c_lat', +28.031579);
+    	$ext->set('c_lng', -80.600873);
+    	$ext->set('t_lat', +28.031698);
+    	$ext->set('t_lng', -80.600755);
+    	$ext->set('height', 102);
+    	if ($ext->create() === false) echo "Create EXTData $i failed";
     }
    redirect('mgmt_main','Database Initialized test data!');
     
