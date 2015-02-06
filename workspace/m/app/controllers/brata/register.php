@@ -36,7 +36,7 @@ function _register()
 
     $stationType = StationType::getFromTypeCode($station->get('tag'));
     trace("registration complete",__FILE__,__LINE__,__METHOD__);
-    $team->startChallenge();
+    $team->endChallenge();  // clear any stale challenge data
     $team->updateScore($stationType, $points);
     $msg = $team->expandMessage($stationType->get('instructions'), null ) ;
 	if($GLOBALS['SYSCONFIG_ENCODE'] == 1){

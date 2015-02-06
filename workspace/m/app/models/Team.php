@@ -38,14 +38,39 @@ class Team extends ModelEx {
   	return School::getSchoolNameFromId($this->rs['schoolId']);
   }
   
-  // Must be called to place challenge data into the started state
+  // Must be called to put the challenge data into the started state
   //  basiclly the try count is cleared the started time is set (used to calculate duration) and the
+  // the station type code is needed to clear any stale challenge data when a team restarts a challenge like when their phone dies
   // option challenge data can be saved to the DB.
-  function startChallenge($station,$jsonObject=null) {
+  function startChallenge($station,$stationTypeCode,$jsonObject=null) {
   	
   	$this->rs['count'] = 0;
   	$this->rs['started'] = time();                       // get system time 
   	$this->rs['json']    = $jsonObject?json_encode($jsonObject):"";
+
+  	switch ($stationTypeCode)
+  	{
+  	  case StationType::STATION_TYPE_REG:
+  		$this->set('regScore',0);
+  		$this->set('regDuration',0);
+  		break;
+  	  case StationType::STATION_TYPE_CTS:
+  		$this->set('ctsScore',0);
+  		$this->set('regDuration',0);
+  		break;
+  	  case StationType::STATION_TYPE_FSL:
+  		$this->set('fslScore',0);
+  		$this->set('regDuration',0);
+  		break;
+  	  case StationType::STATION_TYPE_HMB:
+  		$this->set('hmbScore',0);
+  		$this->set('regDuration',0);
+  		break;
+  	  case StationType::STATION_TYPE_CPA:
+  		$this->set('cpaScore',0);
+  		$this->set('regDuration',0);
+  		break;
+  	}
   	return $this->update();
   }
   

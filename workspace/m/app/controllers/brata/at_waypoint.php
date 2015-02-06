@@ -24,47 +24,71 @@ function _at_waypoint($waypointId=null)
   	trace("can't find team PIN=".$teamPIN,__FILE__,__LINE__,__METHOD__);
   	rest_sendBadRequestResponse(500,"can't find the FSL StationType");  // doesn't return
   }
-  
+
   $count = $team->get('count');
   $fslState = $team->getChallengeData();
   $isCorrect = FSLData::isMatch($fslState, $waypointId);
-  trace("isCorrect=$isCorrect");
   $challengeComplete = false;
+  $atLab = FSLData::atLab($fslState);   // are we looking for the lab?
+  $labNext = false;                     // is the lab next?
   
   if ($isCorrect) {
-  	if (!FSLData::nextWaypoint($fslState)) {
-  		$challengeComplete = true;  		
-  	} else {
-  		$team->set('count',0);
-  		$team->setChallengeData($fslState);
-  	}
-  }
-  else {
+    FSLData::nextWaypoint($fslState);
+    $labNext = FSLData::atLab($fslState); // are we now looking for the lab?
+    $team->set('count',0);
+  } else {
   	$team->set('count',++$count);
-  	$team->setChallengeData($fslState);
   }	
   
   //TODO Too bad, you failed. Use ...
   //TODO Success! go quickly to the next queue
   //TODO Wrong secet Laboratory marker, try again!
   //TODO Too bad, you failed. Go quickly to the next queue.
-  if       ($challengeComplete) {
-  	$msg = "Success! Use radius1=[a_rad] radius2=[b_rad] and radius3=[c_rad] to find the secret labatory marker";
+  if  ($atLab) {
+  	if  ($isCorrect) {
+  		//$msg = $stationType->get('TODO');
+  		$msg = 'Success! go quickly to the next queue';
+  		$challengeComplete = true;
+  	}
+  	else if  ($count < 3) {
+  		//$msg = $stationType->get('TODO');
+  		$msg = 'Wrong secet Laboratory marker, try again!';
+  	}
+  	else {
+  		//$msg = $stationType->get('TODO');
+  		$msg = 'Too bad, you failed. Go quickly to the next queue.';
+  		$challengeComplete = true;
+  	}	
   } 
-  else if  ($isCorrect) {
-  	$msg = $stationType->get('success_msg');
+  else if ($labNext) 
+  {
+  	//TODO move messages to DB if possible
+  	$prefix = ($isCorrect) ? "Success!" : "Too bad, you failed.";
+  	$msg = "$prefix Use radius1=[a_rad] radius2=[b_rad] and radius3=[c_rad] to find the secret labatory marker";
+  } 
+  else 
+  {
+  	if  ($isCorrect) {
+  	  $msg = $stationType->get('success_msg');
+    }
+    else if  ($count < 3) { 
+  	  $msg = $stationType->get('retry_msg'); 
+    }
+    else {
+  	  $msg = $stationType->get('failed_msg');
+    }
   }
-  else if  ($count < 3) { 
-  	$msg = $stationType->get('retry_msg'); 
+
+  trace("the poings  is ".(3-$count));
+  $points = FSLData::updateScore($fslState,3-$count);
+  trace("the point are $points");
+  $team->setChallengeData($fslState);                  // put the update state data back into the team object
+  $team->updateScore($stationType, $points );
+  
+  if ($challengeComplete) {
+  	$team->endChallenge();
   }
-  else {
-  	$msg = $stationType->get('failed_msg');
-  }
-  $team->updateScore($stationType, 3-$count);
-  if ($challengeComplete) $team->endChallenge();
     
-  trace("FSLState ". print_r($fslState,true));
-  trace("msg_value ".print_r($fslState['msg_values'],true));
   $msg = $team->expandMessage($msg,$fslState['msg_values']);
   
   if(isEncodeEnabled()) {
