@@ -4,7 +4,7 @@
 //	"message": "",
 require(APP_PATH.'inc/rest_functions.php');
 require(APP_PATH.'inc/json_functions.php');
-//
+
 function _submit($stationTag=null)
 {
 	if ($stationTag === null) {
@@ -48,6 +48,7 @@ function _submit($stationTag=null)
 	$count = $team->get('count');
 	$isCorrect = false;
 	$challengeComplete = false;
+	$matches = array();             // for regex matches
 	
 	switch($stationType->get('typeCode'))
 	{
@@ -62,9 +63,11 @@ function _submit($stationTag=null)
           //$isCorrect=$json['is_correct'];
           break;
 		case StationType::STATION_TYPE_EXT:
-          preg_match("/.*tower-lat.*=.*(\d)+dd.dddddd] [tower-lon=+dd.dddddd] [tower-height=dddd]",$json['message'],$matches);
-          $msg = $stationType->get('success_msg');
-          var_dump($matches);
+
+          $ext = new ExtData(1,-1);  //TODO get from team
+          $ext->submit($json['message'],$team);
+
+          
           goto hack;
           
 	}

@@ -1,6 +1,6 @@
 <?php
 
-class CTSData extends ModelEx {
+class CTSData extends XXXData {
 	
   function __construct($oid=0,$cid=0) {
     parent::__construct('OID','CID','t_cts_data'); 

@@ -42,7 +42,7 @@ function _start_challenge($stationTag=null)
 	
 	$stationId = $station->get('OID');
 	$parms = null; // compute challenge parameters into a php hash which will be sent to rPI and used to populate message sent to team
-	$fslState = null;
+	$state = null;
 	switch($stationType->get('typeCode'))
 	{
 		case StationType::STATION_TYPE_CTS:
@@ -54,12 +54,13 @@ function _start_challenge($stationTag=null)
 	    case StationType::STATION_TYPE_CPA:
 	        $parms = CPAData::startChallenge($stationId);
 	        break;
-	    case StationType::STATION_TYPE_EXT:
-	    	$parms = EXTData::startChallenge($stationId);
-	        break;
 	    case StationType::STATION_TYPE_FSL:
-   	        $fslState= FSLData::startChallenge($stationId);
-   	        $parms=$fslState['msg_values'];
+   	        $state= FSLData::startChallenge($stationId);
+   	        $parms=$state['msg_values'];
+	        break;
+	    case StationType::STATION_TYPE_EXT:
+	        $state = EXTData::startChallenge($stationId);
+	        $parms = $state;
 	        break;
 	}
 	
@@ -70,15 +71,14 @@ function _start_challenge($stationTag=null)
 	trace("station and team start calls");
 	//TODO transaction
 	$station->startChallenge($team);
-	$team->startChallenge($parms,$stationType->get('typeCode'),$fslState);  // $fslState will be null when NOT doing FSL
+	$team->startChallenge($parms,$stationType->get('typeCode'),$state);  // $state
 	
-	if ( Event::createEvent(Event::TYPE_START,$team, $station,0, $fslState) ===false) {
+	if ( Event::createEvent(Event::TYPE_START,$team, $station,0, $state) ===false) {
 		trace("create event failed",__FILE__,__LINE__,__METHOD__);
 		rest_sendBadRequestResponse(500, "database create failed");
 	}
 
 	$msg = $team->expandMessage($stationType->get('instructions'), $parms );
-	trace("message before decode $msg",__FILE__,__LINE__,__METHOD__);
 	if($GLOBALS['SYSCONFIG_ENCODE'] == 1){
           // if not in student mode encode, if in student mode we only encrypt the even team numbers responses
           if($GLOBALS['SYSCONFIG_STUDENT'] == 0 or ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $teamPIN % 2 == 0)) {

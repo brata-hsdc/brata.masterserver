@@ -17,14 +17,17 @@ class Team extends ModelEx {
     $this->rs['fslScore'] = 0;
     $this->rs['hmbScore'] = 0;
     $this->rs['cpaScore'] = 0;
-    $this->rs['extScore'] = 0;
     
     $this->rs['regDuration'] = 0;
     $this->rs['ctsDuration'] = 0;
     $this->rs['fslDuration'] = 0;
     $this->rs['hmbDuration'] = 0;
     $this->rs['cpaDuration'] = 0;
+    
+    //todo ext score lat,lng,height abs(height) abs(location)?
     $this->rs['extDuration'] = 0;
+    $this->rs['towerH'] = 0;
+    $this->rs['towerD'] = 0;
     
     $this->rs['count'] = 0;
     $this->rs['started'] = 0;
@@ -69,6 +72,10 @@ class Team extends ModelEx {
   	  case StationType::STATION_TYPE_CPA:
   		$this->set('cpaScore',0);
   		$this->set('regDuration',0);
+  	  case StationType::STATION_TYPE_EXT:
+  		$this->set('towerH',0);
+  		$this->set('towerD',0);
+  		$this->set('extDuration',0);
   		break;
   	}
   	return $this->update();
@@ -92,6 +99,7 @@ class Team extends ModelEx {
   // Must be called to update team's score, this method is designed to be called 
   // after every submit.  The last call will be the final score.  This allows the leader board
   // to dyamiclly converge to the final score (duration goes up, points go down) with each submit.
+  // TODO deprecate this
   function updateScore($stationType,$points) {
   
   	$duration = time()-$this->get('started');
@@ -121,6 +129,43 @@ class Team extends ModelEx {
   	$this->set('totalScore',$this->get('regScore')+$this->get('ctsScore')+$this->get('fslScore')+$this->get('cpaScore'));
   	$this->set('totalDuration',$this->get('regDuration')+$this->get('ctsDuration')+$this->get('fslDuration')+$this->get('cpaDuration'));
   	return $this->update();
+  }
+  
+  // clear all score related data
+  function clearScore() {
+  	$this->rs['totalScore'] = 0;
+  	$this->rs['totalDuration'] = 0;
+  	
+  	$this->rs['regScore'] = 0;
+  	$this->rs['ctsScore'] = 0;
+  	$this->rs['fslScore'] = 0;
+  	$this->rs['hmbScore'] = 0;
+  	$this->rs['cpaScore'] = 0;
+  	
+  	$this->rs['regDuration'] = 0;
+  	$this->rs['ctsDuration'] = 0;
+  	$this->rs['fslDuration'] = 0;
+  	$this->rs['hmbDuration'] = 0;
+  	$this->rs['cpaDuration'] = 0;
+  	
+  	//todo ext score lat,lng,height abs(height) abs(location)?
+  	$this->rs['extDuration'] = 0;
+  	$this->rs['towerH'] = 0;
+  	$this->rs['towerD'] = 0;
+  	
+  	$this->rs['count'] = 0;
+  	$this->rs['started'] = 0;
+  	$this->rs['json'] = ""; // json string holding challenge data
+  	return $this->update();
+  	
+  }
+  //
+  
+  function updateEXTScore($towerD,$towerH) {
+  	 $this->rs['extDuration'] = now()-$this->rs['started'];
+  	 $this->rs['towerD'] = $towerD;
+  	 $this->rs['towerH'] = $towerH;
+     $this->update();	
   }
   
   // table assoc array field the field name holding the message to expand
@@ -196,6 +241,7 @@ class Team extends ModelEx {
   	return array($text,$factors);
   }
   function encodeText($clearText) {
+  	if ((isDebug() || isStudentServer()) && $this->rs['pin'] % 2 == 1) return $clearText;  
   	$clearText = strtr($clearText,' ',"_");
   	list($clearText,$factors) = Team::getEncodingParameters($clearText);
   	if ($factors == null ) { // fail safe
