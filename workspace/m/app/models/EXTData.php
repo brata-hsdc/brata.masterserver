@@ -18,7 +18,8 @@ class EXTData extends ModelEx {
     $this->retrieve($oid,$cid);
   }
   
-  static function startChallenge($stationId) {
+  // depreciated
+  static function _startChallenge($stationId) {
   	$ext = new EXTData(1,-1);  // there is only one record
   	return array(
   	'a_lat' => $ext->rs['a_lat'],

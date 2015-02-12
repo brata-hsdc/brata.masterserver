@@ -13,21 +13,30 @@ class CPAData extends XXXData {
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
-  function generateParameters() {
+  
+  
+  protected function generateParameters() {
   	return array(
-  			"which"=> $this->rs['which'],
+  			"label"=> $this->rs['label'],
   			"fence"=> $this->rs['fence'], 
   			"building"=>$this->rs['building'],
   			"sum" => $this->rs['sum']
   	);
   }
+  // all stations share data pool stationId ignored
+  protected function fetchData($stationId) {
+  	$this->retrieveRandom();  	
+  }
+
   // fetch the Station object for the given key
-  static function getFromStationId($stationId) {
+  // depreciated
+  static function _getFromStationId($stationId) {
   	$o = new CPAData();
   	return $o->retrieve_one("stationId=?", $stationId);
   }
   
-  static function startChallenge($stationId) {
+  // depreciated
+  static function _startChallenge($stationId) {
   	$cpa = CPAData::getFromStationId($stationId); // WARNING BUG HERE CPA data is not unique to station
   	return $cpa->generateParameters();
   }

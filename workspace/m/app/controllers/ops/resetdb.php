@@ -481,7 +481,7 @@ function _resetdb() {
       $station = Station::getFromTag("cts0".$i);
       if ($station === false) break;
       $cts->set('stationId',$station->get('OID')); // hack assume get works
-      if ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $i == 1){
+      if (isStudentServer() && $i == 1){
         $cts->set('_1st',39);
         $cts->set('_2nd',57);
         $cts->set('_3rd',13);
@@ -504,28 +504,29 @@ function _resetdb() {
      $station = Station::getFromTag("cpa0".$i);
      if ($station === false) break;
      $cpa->set('stationId',$station->get('OID')); // hack assume get works
-     $cpa->set('velocity',8000);
-     $cpa->set('velocity_tolerance',1000);
-     $cpa->set('window_time',10000);
-     $cpa->set('window_time_tolerance',100);
-     $cpa->set('pulse_width',100);
-     $cpa->set('pulse_width_tolerance',50);
-     $cpa->set('fence',1);
-     $cpa->set('building',1);
+     if ($i== 1) {
+     	$cpa->set('label', $i);
+     	$cpa->set('fence', 240);
+     	$cpa->set('building',127);
+     	$cpa->set('sum',367);
+     } else {
+     	$cpa->set('label', $i);
+     	$cpa->set('fence', 240+$i);
+     	$cpa->set('building',127-$i);
+     	$cpa->set('sum',367);     	
+     }
      if ($cpa->create() === false) echo "Create CTA $i failed";
    }
-   for ($i=1; $i<= (($dataOption==1)?1:1); $i++)
-   {
-     $hmb = new HMBData();
-     $hmb->set('_1st_on'  , 11);
-     $hmb->set('_1st_off' , 11);
-     $hmb->set('_2nd_on'  , 13);
-     $hmb->set('_2nd_off' , 13);
-     $hmb->set('_3rd_on'  , 17);
-     $hmb->set('_3rd_off' , 17);
-     $hmb->set('cycle', 17);
-     if ($hmb->create() === false) echo "Create HMB $i failed";
-   }
+   $hmb = new HMBData();
+   $hmb->set('_1st_on'  , 1);
+   $hmb->set('_1st_off' , 1);
+   $hmb->set('_2nd_on'  , 1);
+   $hmb->set('_2nd_off' , 10);
+   $hmb->set('_3rd_on'  , 1);
+   $hmb->set('_3rd_off' , 22);
+   $hmb->set('cycle'    , 506);
+   if ($hmb->create() === false) echo "Create HMB $i failed";
+   
    $fsl_data = array(
      array("1", +28.030924, -80.601834, "1", +28.032708, -80.600032, "1", +28.031670, -80.598559, "1", +28.031062, -80.600013, 665.8, 600.1, 574.6),
      array("1", +28.030924, -80.601834, "1", +28.032708, -80.600032, "1", +28.031670, -80.598559, "2", +28.030975, -80.600107, 629.9, 632.4, 618.6),

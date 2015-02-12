@@ -131,6 +131,56 @@ class Team extends ModelEx {
   	return $this->update();
   }
   
+  // called after updateXXXScore to compute new totals and update the DB.
+  // returns updated object or false on error
+  private function updateTotalScore() {
+  	$this->set('totalScore',$this->get('regScore')+$this->get('ctsScore')+$this->get('fslScore')+$this->get('cpaScore'));
+  	$this->set('totalDuration',$this->get('regDuration')+$this->get('ctsDuration')+$this->get('fslDuration')+$this->get('cpaDuration'));
+  	return $this->update();  	
+  }
+  
+  // update Registration portion of the score and then the totals
+  function updateREGScore($points) {
+    $this->set('regScore',$points);
+  	$this->set('regDuration',0);
+  	return $this->updateTotalScore();
+  }
+  
+  // update the CTS portion of the score and then the totals
+  function updateCTSSCore($points) {
+    $this->set('ctsScore',$points);
+  	$this->set('regDuration',time()-$this->get('started'));
+  	return $this->updateTotalScore();
+  }
+  // update the FSL portion of the score and then the totals
+  // TODO break FSL into seperate parts for each waypoint
+  function updateFSLScore($points) {
+    $this->set('fslScore',$points);
+  	$this->set('regDuration',time()-$this->get('started'));
+  	return $this->updateTotalScore();
+  }
+  
+  // update the HMB portion of the score and then the totals
+  function updateHMBScore($points) {
+    $this->set('hmbScore',$points);
+  	$this->set('regDuration',time()-$this->get('started'));
+  	return $this->updateTotalScore();
+  }
+  
+  // update the CPS portion of the score and then the totals
+  function updateCPAScore($points) {
+    $this->set('cpaScore',$points);
+  	$this->set('regDuration',time()-$this->get('started'));
+  	return $this->updateTotalScore();
+  }
+  
+  // update the EXT portion of the score NOTE this is not part of the total
+  function updateEXTScore($towerD,$towerH) {
+  	$this->rs['extDuration'] = now()-$this->rs['started'];
+  	$this->rs['towerD'] = $towerD;
+  	$this->rs['towerH'] = $towerH;
+  	return $this->update();
+  }
   // clear all score related data
   function clearScore() {
   	$this->rs['totalScore'] = 0;
@@ -158,14 +208,6 @@ class Team extends ModelEx {
   	$this->rs['json'] = ""; // json string holding challenge data
   	return $this->update();
   	
-  }
-  //
-  
-  function updateEXTScore($towerD,$towerH) {
-  	 $this->rs['extDuration'] = now()-$this->rs['started'];
-  	 $this->rs['towerD'] = $towerD;
-  	 $this->rs['towerH'] = $towerH;
-     $this->update();	
   }
   
   // table assoc array field the field name holding the message to expand
@@ -240,6 +282,9 @@ class Team extends ModelEx {
   	$text = $text . str_repeat("~", $augment);
   	return array($text,$factors);
   }
+  
+  // encode the message
+  // unless debug or in student server mode then encode only even pin
   function encodeText($clearText) {
   	if ((isDebug() || isStudentServer()) && $this->rs['pin'] % 2 == 1) return $clearText;  
   	$clearText = strtr($clearText,' ',"_");

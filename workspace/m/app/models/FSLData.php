@@ -84,9 +84,21 @@ class FSLData extends XXXData {
   	return $o->retrieve_one("tag=?", $tag);
   }
   
+  function startChallenge($team,$station,$stationType)
+  {
+  	trace('oops');
+  }
 
   // note stationId not used here
-  static function startChallenge($stationId) {
+  protected function fetchData($stationId) {
+  	$this->retrieveRandom();   // now replace that object with a real ramdon object.
+  	$tmp= $fsl->generateParameters();
+  	trace("parms ".print_r($tmp,true),__FILE__,__LINE__,__METHOD__);
+  	return $tmp;
+  }
+  // note stationId not used here
+  // depreciated
+  static function _startChallenge($stationId) {
   	$fsl = new FSLData();            // we need an object to call retrieveRandom 
   	$fsl = $fsl->retrieveRandom();   // now replace that object with a real ramdon object.
   	$tmp= $fsl->generateParameters();

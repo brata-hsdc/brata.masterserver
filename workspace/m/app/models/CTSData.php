@@ -19,22 +19,27 @@ class CTSData extends XXXData {
   //
   //  convert Pulsator tripple to array of on/off pairs
   //
-  function generateParameters() {
+  protected function generateParameters() {
+  	trace("CTS::generateParms");
   	$tmp = array($this->rs['_1st'], $this->rs['_2nd'], $this->rs['_3rd'],$this->rs['_4th'],$this->rs['_5th']);
   	shuffle($tmp);
         $keys = array_rand($tmp,3);
-        $answer = array((int)$tmp[$keys[0]], (int)$tmp[$keys[1]], (int)$tmp[$keys[2]]);
-        return $answer;
+        $parms['cts_combo'] = array((int)$tmp[$keys[0]], (int)$tmp[$keys[1]], (int)$tmp[$keys[2]]);
+        $parms['clue'] = CTSData::hash($parms['cts_combo']);
+        return $parms;
   } 
-  
+  protected function fetchData($stationId) {
+    $this->retrieve_one("stationId=?", $stationId);
+  }
   // fetch the Station object for the given skey
-  static function getFromStationId($stationId) {
+  // depreciated
+  static function _getFromStationId($stationId) {
   	$o = new CTSData();
   	return $o->retrieve_one("stationId=?", $stationId);
   }
   
-  
-  static function startChallenge($stationId) {
+  // depreciated
+  static function _startChallenge($stationId) {
   	$cts = CTSData::getFromStationId($stationId);
   	$parms['cts_combo'] = $cts->generateParameters();
   	$parms['clue'] = CTSData::hash($parms['cts_combo']);
