@@ -2,18 +2,12 @@
 // base class for all challenged data classes
 class XXXData extends ModelEx {
 	
-	//
+	// use this to extract a named value from a brata message
 	//  assume regex has one and only one capture clause a.k.a. "()"
 	protected function getOneValue($regex,$msg) {
 		$matches = array();
 		if (preg_match($regex,$msg,$matches)==0) return false;
 		return $matches[1];
-	}
-	
-	// Called to generate challenge parameters from this object
-	//  i.e. randomize the data compute hashes etc.
-	protected function generateParameters() {
-		throw new Exception("generateParameters not implemented");
 	}
 	
 	// fetch the challenge data for this station
@@ -24,6 +18,18 @@ class XXXData extends ModelEx {
 		//$this->retrieve_one("stationId=?", $stationId);
 	}
 	
+	// Called to generate challenge parameters from this object
+	//  i.e. randomize the data compute hashes etc.
+	protected function generateParameters() {
+		throw new Exception("generateParameters not implemented");
+	}
+	
+	// implement this to start a challenge for the given team
+	protected function teamStartChallenge($team, $state) {
+		throw new Exception("teamStartChallenge not implemented");
+		//use $team->startXXXStartChallenge($state);
+		// where XXX is one of the challenges
+	}
 	// Called to start a challenge at the given station for the given teamt
 	//
 	// get challenge data
@@ -32,8 +38,9 @@ class XXXData extends ModelEx {
 	// return encoded instructions
 	function startChallenge($team,$station,$stationType) 
 	{	
-	   $this->fetchData($station->get('OID'));       
-       $parms = $this->generateParameters(); // compute challenge parameters into a php hash which will be sent to rPI and used to populate message sent to team
+	   $this->fetchData($station->get('OID')); // polymorphic callback to derived class      
+	   // putcomputed challenge parameters into a php hash which will be sent to rPI and used to populate message sent to team
+       $parms = $this->generateParameters();   // polymorphic callback to derivce class 
 
        $rpi = null;
        if ($stationType->get('hasrPI')) {
@@ -46,8 +53,9 @@ class XXXData extends ModelEx {
        }     
        
        //TODO transaction
-       $station->startChallenge($team);
-       $team->startChallenge($parms,$stationType->get('typeCode'),$parms);
+       $station->updateTeamAtStation($team);     // with this we know which team is at this station
+       //TODO fix the above FSL & EXT don't need the above
+       $this->teamStartChallenge($team,$parms);  // polymorphic callback to derived class
        
        if ( Event::createEvent(Event::TYPE_START,$team, $station,0, $parms) ===false) {
        	trace("create event failed",__FILE__,__LINE__,__METHOD__);

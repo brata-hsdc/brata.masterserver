@@ -24,25 +24,6 @@ class FSLData extends XXXData {
     $this->retrieve($oid,$cid);
   }
 
-  // generate the initial parameters atWaypoint will drive the game play from here on out
-  function generateParameters() {
-  	$tmp = array(
-  	'totalScore' => 0,
-  	'index' => 0,      // tracks which waypoint is current
-  	'waypoints' => array(	
-  	  array('score' => 0, 'tag' => $this->rs['a_tag'], 'lat' => $this->rs['a_lat'], 'lng' => $this->rs['a_lng']),
-  	  array('score' => 0, 'tag' => $this->rs['b_tag'], 'lat' => $this->rs['b_lat'], 'lng' => $this->rs['b_lng']),
-  	  array('score' => 0, 'tag' => $this->rs['c_tag'], 'lat' => $this->rs['c_lat'], 'lng' => $this->rs['c_lng']),
-  	  array('score' => 0, 'tag' => $this->rs['l_tag'],  'a_rad' => $this->rs['a_rad'], 'b_rad' => $this->rs['b_rad'], 'c_rad' => $this->rs['c_rad'])
-  	),	
-  	'msg_values' => array(     // used to expand messages which will be sent to teams
-   		'ordinal' => "first",
-  		'lat' => $this->rs['a_lat'],
-  		'lng' => $this->rs['a_lng']
-  	)
-  	);
-  	return $tmp;
-  }
   // test if the given id matches the id of the current waypoint
   static function isMatch(&$json, $id) {
   	return $id == $json['waypoints'][$json['index']]['tag'];
@@ -84,11 +65,6 @@ class FSLData extends XXXData {
   	return $o->retrieve_one("tag=?", $tag);
   }
   
-  function startChallenge($team,$station,$stationType)
-  {
-  	trace('oops');
-  }
-
   // note stationId not used here
   protected function fetchData($stationId) {
   	$this->retrieveRandom();   // now replace that object with a real ramdon object.
@@ -96,6 +72,47 @@ class FSLData extends XXXData {
   	trace("parms ".print_r($tmp,true),__FILE__,__LINE__,__METHOD__);
   	return $tmp;
   }
+  // generate the initial parameters atWaypoint will drive the game play from here on out
+  protected function generateParameters() {
+  	$tmp = array(
+  			'totalScore' => 0,
+  			'index' => 0,      // tracks which waypoint is current
+  			'waypoints' => array(
+  					array('score' => 0, 'tag' => $this->rs['a_tag'], 'lat' => $this->rs['a_lat'], 'lng' => $this->rs['a_lng']),
+  					array('score' => 0, 'tag' => $this->rs['b_tag'], 'lat' => $this->rs['b_lat'], 'lng' => $this->rs['b_lng']),
+  					array('score' => 0, 'tag' => $this->rs['c_tag'], 'lat' => $this->rs['c_lat'], 'lng' => $this->rs['c_lng']),
+  					array('score' => 0, 'tag' => $this->rs['l_tag'],  'a_rad' => $this->rs['a_rad'], 'b_rad' => $this->rs['b_rad'], 'c_rad' => $this->rs['c_rad'])
+  			),
+  			'msg_values' => array(     // used to expand messages which will be sent to teams
+  					'ordinal' => "first",
+  					'lat' => $this->rs['a_lat'],
+  					'lng' => $this->rs['a_lng']
+  			)
+  	);
+  	return $tmp;
+  }  
+  function startChallenge($team,$station,$stationType)
+  {
+  	$this->retrieveRandom();   // now replace that object with a real ramdon object.
+  	$state= $this->generateParameters();
+  	trace("state ".print_r($state,true),__FILE__,__LINE__,__METHOD__);
+  	$team->startChallenge($parms,$stationType->get('typeCode'),$state);  // $state
+  	
+  	if ( Event::createEvent(Event::TYPE_START,$team, $station,0, $state) ===false) {
+  		trace("create event failed",__FILE__,__LINE__,__METHOD__);
+  		rest_sendBadRequestResponse(500, "database create failed");
+  	}
+  	
+  	$msg = $team->expandMessage($stationType->get('instructions'), $parms );
+  	if($GLOBALS['SYSCONFIG_ENCODE'] == 1){
+  		// if not in student mode encode, if in student mode we only encrypt the even team numbers responses
+  		if($GLOBALS['SYSCONFIG_STUDENT'] == 0 or ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $teamPIN % 2 == 0)) {
+  			$msg = $team->encodeText($msg);
+  		}
+  	}
+  	 
+  }
+  
   // note stationId not used here
   // depreciated
   static function _startChallenge($stationId) {

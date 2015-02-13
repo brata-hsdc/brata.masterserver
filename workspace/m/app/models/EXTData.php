@@ -34,6 +34,31 @@ class EXTData extends ModelEx {
   	);
   }
   
+  // fetch the challenge data for this station
+  protected function fetchData($stationId) {
+  	$this->retrieve(1,-1);
+  }
+  
+  // Called to generate challenge parameters from this object
+  //  i.e. randomize the data compute hashes etc.
+  protected function generateParameters() {
+  	return array(
+  			'a_lat' => $this->rs['a_lat'],
+  			'a_lng' => $this->rs['a_lng'],
+  			'b_lat' => $this->rs['b_lat'],
+  			'b_lng' => $this->rs['b_lng'],
+  			'c_lat' => $this->rs['c_lat'],
+  			'c_lng' => $this->rs['c_lng'],
+  			't_lat' => $this->rs['t_lat'],
+  			't_lng' => $this->rs['t_lng'],
+  			'height' => $this->rs['height']
+  	);
+  }
+  // implement this to start a challenge for the given team
+  protected function teamStartChallenge($team, $state) {
+  	$team->startEXTStartChallenge($state);
+  }
+  
   // process the submit request
   // returns message for team, or false if DB error
   function submit($msg,$team,$stationType) {

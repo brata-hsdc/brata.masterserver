@@ -28,6 +28,10 @@ class CPAData extends XXXData {
   	$this->retrieveRandom();  	
   }
 
+  // implement this to put the given team
+  protected function teamStartChallenge($team, $state) {
+  	return $team->startCPAChallenge($state);
+  }
   // fetch the Station object for the given key
   // depreciated
   static function _getFromStationId($stationId) {

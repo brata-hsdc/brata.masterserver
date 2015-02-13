@@ -40,51 +40,62 @@ class Team extends ModelEx {
   function getSchoolName() {
   	return School::getSchoolNameFromId($this->rs['schoolId']);
   }
-  
+
+  // setup the common data fields needed to start a challenge
+  private function startXXXChallenge($jsonObject=null) {
+  	$this->rs['count'] = 0;
+  	$this->rs['started'] = time();                       // get system time
+  	$this->rs['json']    = $jsonObject?json_encode($jsonObject):"";
+  	return $this->update();  	
+  }
+
   // Must be called to put the challenge data into the started state
   //  basiclly the try count is cleared the started time is set (used to calculate duration) and the
   // the station type code is needed to clear any stale challenge data when a team restarts a challenge like when their phone dies
   // option challenge data can be saved to the DB.
-  function startChallenge($station,$stationTypeCode,$jsonObject=null) {
-  	
-  	$this->rs['count'] = 0;
-  	$this->rs['started'] = time();                       // get system time 
-  	$this->rs['json']    = $jsonObject?json_encode($jsonObject):"";
-
-  	switch ($stationTypeCode)
-  	{
-  	  case StationType::STATION_TYPE_REG:
-  		$this->set('regScore',0);
-  		$this->set('regDuration',0);
-  		break;
-  	  case StationType::STATION_TYPE_CTS:
-  		$this->set('ctsScore',0);
-  		$this->set('regDuration',0);
-  		break;
-  	  case StationType::STATION_TYPE_FSL:
-  		$this->set('fslScore',0);
-  		$this->set('regDuration',0);
-  		break;
-  	  case StationType::STATION_TYPE_HMB:
-  		$this->set('hmbScore',0);
-  		$this->set('regDuration',0);
-  		break;
-  	  case StationType::STATION_TYPE_CPA:
-  		$this->set('cpaScore',0);
-  		$this->set('regDuration',0);
-  	  case StationType::STATION_TYPE_EXT:
-  		$this->set('towerH',0);
-  		$this->set('towerD',0);
-  		$this->set('extDuration',0);
-  		break;
-  	}
-  	return $this->update();
+  function startRegChallenge($jsonObject=null) {	
+    $this->set('regScore',0);
+    $this->set('regDuration',0);
+    return $this->startXXXChallenge($jsonObject);
+  }
+  function startCSTChallenge($jsonObject=null)
+  {
+  	$this->set('ctsScore',0);
+  	$this->set('ctsDuration',0);
+  	return $this->startXXXChallenge($jsonObject);
+  }
+  function startFSLChallenge($jsonObject=null)
+  {
+  	$this->set('fslScore',0);
+  	$this->set('fslDuration',0);
+  	return $this->startXXXChallenge($jsonObject);
+  }
+  function startHMBChallenge($jsonObject=null)
+  {
+  	$this->set('hmbScore',0);
+  	$this->set('hmbDuration',0);
+  	return $this->startXXXChallenge($jsonObject);
+  }
+  function startCPAChallenge($jsonObject=null)
+  {
+  	$this->set('cpaScore',0);
+  	$this->set('cpaDuration',0);
+  	return $this->startXXXChallenge($jsonObject);
+  }
+  function startEXTChallenge($jsonObject=null) 
+  {
+  	$this->set('towerH',0);
+  	$this->set('towerD',0);
+  	$this->set('extDuration',0);
+  	return $this->startXXXChallenge($jsonObject);
   }
   
-  // under development
+  // get the json object holding the challenge state
   function getChallengeData()  {
   	return json_decode($this->rs['json'],true);
   }
+  
+  // set the json object holding the challenge state
   function setChallengeData($json) {
   	$this->rs['json'] = json_encode($json);
   }

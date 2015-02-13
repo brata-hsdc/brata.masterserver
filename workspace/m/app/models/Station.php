@@ -15,7 +15,7 @@ class Station extends ModelEx {
   
   // record which team is at which station
   // NOTE: fsl & ext can't use this since there is only one instance of these station type
-  function startChallenge($team) {
+  function updateTeamAtStation($team) {
   	$this->set('teamAtStation',$team->get('OID'));
   	return $this->update();
   }

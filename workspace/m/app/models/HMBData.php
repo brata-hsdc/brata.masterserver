@@ -32,6 +32,10 @@ protected function generateParameters() {
 protected function fetchData($stationId) {
 	$this->retrieveRandom();
 }
+// implement this to start a challenge for the given team
+protected function teamStartChallenge($team, $state) {
+	$team->startHMBStartChallenge($state);
+}
 // fetch the Station object for the given key
 // depreciated
 static function _getFromStationId($stationId) {

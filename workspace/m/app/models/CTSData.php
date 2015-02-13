@@ -23,14 +23,18 @@ class CTSData extends XXXData {
   	trace("CTS::generateParms");
   	$tmp = array($this->rs['_1st'], $this->rs['_2nd'], $this->rs['_3rd'],$this->rs['_4th'],$this->rs['_5th']);
   	shuffle($tmp);
-        $keys = array_rand($tmp,3);
-        $parms['cts_combo'] = array((int)$tmp[$keys[0]], (int)$tmp[$keys[1]], (int)$tmp[$keys[2]]);
-        $parms['clue'] = CTSData::hash($parms['cts_combo']);
-        return $parms;
+    $keys = array_rand($tmp,3);
+    $parms['cts_combo'] = array((int)$tmp[$keys[0]], (int)$tmp[$keys[1]], (int)$tmp[$keys[2]]);
+    $parms['clue'] = CTSData::hash($parms['cts_combo']);
+    return $parms;
   } 
   protected function fetchData($stationId) {
     $this->retrieve_one("stationId=?", $stationId);
   }
+  // implement this to start a challenge for the given team
+  protected function teamStartChallenge($team, $state) {
+    $team->startCTSStartChallenge($state);
+  } 
   // fetch the Station object for the given skey
   // depreciated
   static function _getFromStationId($stationId) {
