@@ -21,13 +21,13 @@ class XXXData extends ModelEx {
 	// Called to generate challenge parameters from this object
 	//  i.e. randomize the data compute hashes etc.
 	protected function generateParameters() {
-		throw new Exception("generateParameters not implemented");
+	  throw new Exception("generateParameters not implemented");
 	}
 	
 	// implement this to start a challenge for the given team
 	protected function teamStartChallenge($team, $state) {
 		throw new Exception("teamStartChallenge not implemented");
-		//use $team->startXXXStartChallenge($state);
+		//use $team->startXXXChallenge($state);
 		// where XXX is one of the challenges
 	}
 	// Called to start a challenge at the given station for the given teamt

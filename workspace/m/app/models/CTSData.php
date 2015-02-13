@@ -33,7 +33,7 @@ class CTSData extends XXXData {
   }
   // implement this to start a challenge for the given team
   protected function teamStartChallenge($team, $state) {
-    $team->startCTSStartChallenge($state);
+    $team->startCTSChallenge($state);
   } 
   // fetch the Station object for the given skey
   // depreciated

@@ -34,7 +34,7 @@ protected function fetchData($stationId) {
 }
 // implement this to start a challenge for the given team
 protected function teamStartChallenge($team, $state) {
-	$team->startHMBStartChallenge($state);
+	$team->startHMBChallenge($state);
 }
 // fetch the Station object for the given key
 // depreciated

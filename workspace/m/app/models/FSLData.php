@@ -96,20 +96,16 @@ class FSLData extends XXXData {
   	$this->retrieveRandom();   // now replace that object with a real ramdon object.
   	$state= $this->generateParameters();
   	trace("state ".print_r($state,true),__FILE__,__LINE__,__METHOD__);
-  	$team->startChallenge($parms,$stationType->get('typeCode'),$state);  // $state
+  	$team->startFSLChallenge($state);
   	
   	if ( Event::createEvent(Event::TYPE_START,$team, $station,0, $state) ===false) {
   		trace("create event failed",__FILE__,__LINE__,__METHOD__);
   		rest_sendBadRequestResponse(500, "database create failed");
   	}
   	
-  	$msg = $team->expandMessage($stationType->get('instructions'), $parms );
-  	if($GLOBALS['SYSCONFIG_ENCODE'] == 1){
-  		// if not in student mode encode, if in student mode we only encrypt the even team numbers responses
-  		if($GLOBALS['SYSCONFIG_STUDENT'] == 0 or ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $teamPIN % 2 == 0)) {
-  			$msg = $team->encodeText($msg);
-  		}
-  	}
+  	$msg = $team->expandMessage($stationType->get('instructions'), $state['msg_values'] );
+  	$msg = $team->encodeText($msg);
+  	return $msg;
   	 
   }
   

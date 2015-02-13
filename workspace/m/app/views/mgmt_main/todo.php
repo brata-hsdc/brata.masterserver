@@ -10,7 +10,7 @@
 <li>Code CPA business logic - JB</li>
 <li>Code EXT business logic - DC</li>
 <li>Add refresh timer to leader board page.</li>
-<li>Add validation (server side & client side)</li>
+<li>Add validation (server side &amp; client side)</li>
 <li>Improve use of Twitter Bootstrap</li>
 </ol>
 <h1>Bugs</h1> 

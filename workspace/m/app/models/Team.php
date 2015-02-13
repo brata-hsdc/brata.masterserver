@@ -58,7 +58,7 @@ class Team extends ModelEx {
     $this->set('regDuration',0);
     return $this->startXXXChallenge($jsonObject);
   }
-  function startCSTChallenge($jsonObject=null)
+  function startCTSChallenge($jsonObject=null)
   {
   	$this->set('ctsScore',0);
   	$this->set('ctsDuration',0);

@@ -1,5 +1,5 @@
 <?php
-class EXTData extends ModelEx {
+class EXTData extends XXXData {
 		
   function __construct($oid=0,$cid=0) {
     parent::__construct('OID','CID','t_ext_data'); 
@@ -56,7 +56,7 @@ class EXTData extends ModelEx {
   }
   // implement this to start a challenge for the given team
   protected function teamStartChallenge($team, $state) {
-  	$team->startEXTStartChallenge($state);
+  	$team->startEXTChallenge($state);
   }
   
   // process the submit request
