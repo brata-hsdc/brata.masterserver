@@ -61,17 +61,23 @@ class EXTData extends XXXData {
   
   // process the submit request
   // returns message for team, or false if DB error
-  function submit($msg,$team,$stationType) {
-  	$lat    = getOneValue("/.*tower-lat.*=.*(\d)/", $msg);
-  	$lng    = getOneValue("/.*tower-lon.*=.*(\d)/`", $msg);
-  	$height = getOneValue("/.*tower-height.*=*.(\d)/", $msg);
+  function brataSubmit($msg,$team,$station,$stationType) {
+  	$lat    = getOneValue("tower-lat", $msg);
+  	$lng    = getOneValue("tower-lon", $msg);
+  	$height = getOneValue("tower-height", $msg);
 
   	if ($lat === false || $lng === false || $height === false) $msg = $stationType->get('failed_msg');
   	else                                                       $msg = $stationType->get('success_msg');
   	
   	$towerH = abs($this->rs['height']-$height);
   	$towerD = sqrt(pow($this->rs['t_lat']-$lat,2)+pow($this->rs['t_lng']-$lng,2));
-  	if ($team->updateExtScore($towerD,$towerH) === false) return false;
+  	if ($team->updateEXTScore($towerD,$towerH) === false) {
+  		trace("Team::updateEXTScore failed for team".$team->get('name'));
+  		throw new InternalError("Team::updateEXTScore failed for team".$team->get('name'));
+  	}
   	return $team->encodeText($msg);
+  }
+  protected function updateTeamScore($team,$points) {
+  	$team->updateEXTScore($points);
   }
 }

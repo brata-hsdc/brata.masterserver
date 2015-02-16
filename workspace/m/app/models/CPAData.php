@@ -32,6 +32,13 @@ class CPAData extends XXXData {
   protected function teamStartChallenge($team, $state) {
   	return $team->startCPAChallenge($state);
   }
+  protected function markTeamAtStation($team,$station) {
+  	$station->updateTeamAtStation($team);
+  }
+  
+  protected function updateTeamScore($team,$points) {
+  	$team->updateCPAScore($points);
+  }
   // fetch the Station object for the given key
   // depreciated
   static function _getFromStationId($stationId) {

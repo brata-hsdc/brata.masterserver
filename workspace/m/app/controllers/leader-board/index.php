@@ -1,5 +1,17 @@
 <?php
 
+function toWingDing($points) {
+	$points = $points % 4;
+	switch ($points)
+	{
+		case  0: return "&ndash;";
+		case  1: return "&#x2718;"; // heavy ballot x
+		case  2: return "&#x2705;";  // white check mark
+		case  3: return "&#x2714;"; // ballot check mark
+		default:
+	}
+}
+
 function _index() {
   $view="v_leaderboard_main";
   $item="Leader Board";
@@ -35,7 +47,8 @@ function _make_html_main_table($view,$item,$urlPrefix,&$data) {
 			else if ($f == "Score")    $row[]=htmlspecialchars($rs[$f]);
 			//todo what if score is not valid?
 			else if ($f == "FSL")      { $T=$rs[$f]%4; $row[]="<img src='" . myUrl("img/$T.gif'") . ">"; } // TODO
-			else                       $row[]="<img src='" . myUrl("img/$rs[$f].gif'") . ">";
+			//else                       $row[]="<img src='" . myUrl("img/$rs[$f].gif'") . ">";//
+			else                       $row[]=toWingDing($rs[$f]);
 		}
 		$tablearr[]=$row;
 	};

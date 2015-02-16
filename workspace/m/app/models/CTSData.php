@@ -35,6 +35,20 @@ class CTSData extends XXXData {
   protected function teamStartChallenge($team, $state) {
     $team->startCTSChallenge($state);
   } 
+  // mark team at station
+  protected function markTeamAtStation($team,$station) {
+  	$station->updateTeamAtStation($team);
+  }
+  
+  protected function testSolution($msg,$rPI=null) {
+  	throw new Exception("testSolution not implemented");
+  }
+  // implment this to update the teams score (points and duration)
+  protected function updateTeamScore($team,$points) {
+    $team->updateCTSScore($points);
+  }
+  
+  
   // fetch the Station object for the given skey
   // depreciated
   static function _getFromStationId($stationId) {

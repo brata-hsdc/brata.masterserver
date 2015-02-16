@@ -36,6 +36,16 @@ protected function fetchData($stationId) {
 protected function teamStartChallenge($team, $state) {
 	$team->startHMBChallenge($state);
 }
+protected function markTeamAtStation($team,$station) {
+	//$station->updateTeamAtStation($team);
+}
+protected function testSolution($msg,$rPI=null) {
+	throw new Exception("testSolution not implemented");
+	$this->getOneValue("", $msg)
+}
+protected function updateTeamScore($team,$points) {
+	$team->updateHMBScore($points);
+}
 // fetch the Station object for the given key
 // depreciated
 static function _getFromStationId($stationId) {
