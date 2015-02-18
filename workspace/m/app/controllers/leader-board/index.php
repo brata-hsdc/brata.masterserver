@@ -4,10 +4,10 @@ function toWingDing($points) {
 	$points = $points % 4;
 	switch ($points)
 	{
-		case  0: return "&ndash;";
-		case  1: return "&#x2718;"; // heavy ballot x
-		case  2: return "&#x2705;";  // white check mark
-		case  3: return "&#x2714;"; // ballot check mark
+		case  0: return "<font size='5' color='black'>&ndash;</font>";    // dash
+		case  1: return "<font size='5' color='red'>&#x2718;</font>";     // heavy ballot x
+		case  2: return "<font size='5' color='blue'>&#x2714;</font>";    // check mark
+		case  3: return "<font size='5' color='green'>&#x2605;</font>";   // star
 		default:
 	}
 }

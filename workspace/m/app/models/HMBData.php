@@ -41,7 +41,7 @@ protected function markTeamAtStation($team,$station) {
 }
 protected function testSolution($msg,$rPI=null) {
 	throw new Exception("testSolution not implemented");
-	$this->getOneValue("", $msg)
+	$this->getOneValue("answer", $msg);
 }
 protected function updateTeamScore($team,$points) {
 	$team->updateHMBScore($points);
