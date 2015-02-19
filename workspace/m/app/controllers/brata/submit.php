@@ -45,29 +45,4 @@ function _submit($stationTag=null)
 		rest_sendBadRequestResponse($ie->getCode(), $ie->getMessage());
 	}
 	
-	switch($stationType->get('typeCode'))
-	{
-		case StationType::STATION_TYPE_FSL:
-		  break;
-		case StationType::STATION_TYPE_HMB:
-		  preg_match("/.*answer.*=.*(\d)/", $json['message'], $matches);
-		  trace('calling handle_challenge');
-          $json = $rpi->handle_submission($stationType->get('delay'),$isCorrect, $challengeComplete);
-          //TODO if ($json === false) ERROR???
-          //TODO json_checkMembers("message,team_id", $json);
-          //$isCorrect=$json['is_correct'];
-          break;
-		case StationType::STATION_TYPE_EXT:
-
-          $ext = new ExtData(1,-1);  //TODO get from team
-          $ext->submit($json['message'],$team);
-
-          
-          goto hack;
-          
-	}
-	
-	
- hack:
-	json_sendObject(array('message' => $msg ) );
 }

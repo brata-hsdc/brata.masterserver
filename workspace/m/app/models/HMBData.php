@@ -38,7 +38,7 @@ protected function teamStartChallenge($team, $state) {
 	$team->startHMBChallenge($state);
 }
 protected function markTeamAtStation($team,$station) {
-	//$station->updateTeamAtStation($team);
+	$station->updateTeamAtStation($team);
 }
 protected function testSolution($msg,$rPI=null) {
 	$answer = $this->getOneValue("answer", $msg);
@@ -63,13 +63,14 @@ function brataSubmit($msg,$team,$station,$stationType)
 	$challengeComplete = false;
 
 	$json = $team->getChallengeData();
-	$this->rs['_1st_on']  = $json['_1st_on'];
-	$this->rs['_1st_off'] = $json['_1st_off'];
-	$this->rs['_2nd_on']  = $json['_2nd_on'];
-	$this->rs['_2nd_off'] = $json['_2nd_off'];
-	$this->rs['_3rd_on']  = $json['_3rd_on'];
-	$this->rs['_3rd_off'] = $json['_3rd_off'];
-	$this->rs['cycle']    = $json['cycle'];
+	trace("the jsons is".print_r($json,true));
+	$this->rs['_1st_on']  = $json['hmb_vibration_pattern_ms'][0];
+	$this->rs['_1st_off'] = $json['hmb_vibration_pattern_ms'][1];
+	$this->rs['_2nd_on']  = $json['hmb_vibration_pattern_ms'][2];
+	$this->rs['_2nd_off'] = $json['hmb_vibration_pattern_ms'][3];
+	$this->rs['_3rd_on']  = $json['hmb_vibration_pattern_ms'][4];
+	$this->rs['_3rd_off'] = $json['hmb_vibration_pattern_ms'][5];
+	$this->rs['cycle']    = $json['hmb_vibration_pattern_ms'][6];
 	
 	$count = $team->get('count');
 	$points = 3-$count;
@@ -77,7 +78,8 @@ function brataSubmit($msg,$team,$station,$stationType)
 	$team->updateHMBScore(0);                   // save count 
     $isCorrect = $this->testSolution($msg);
 	$challengeComplete=($count<3?false:true);
-
+	
+	$rpi = RPI::getFromStationId($station->get('OID'));
 	if ($rpi!=null){
       $json = $rpi->handle_hmb_submission($stationType->get('delay'),$isCorrect, $challengeComplete);
 	 }
@@ -86,10 +88,10 @@ function brataSubmit($msg,$team,$station,$stationType)
 	  rest_sendBadRequestResponse(500,"MS DB configuration is suspect as HMB requires an RPI.");
 	}
 	trace("count before update = ".$count);
-	$team->updateScore($stationType, $points);
+	$team->updateHMBScore($points);
 	
 	
-	if ($challenge_complete) {
+	if ($challengeComplete) {
 		$station->endChallenge();
 		$team->endChallenge();
 	}
@@ -102,7 +104,7 @@ function brataSubmit($msg,$team,$station,$stationType)
 	if       ($isCorrect) $msg = $stationType->get('success_msg');
 	else if  ($count >=3) $msg = $stationType->get('failed_msg');
 	else                  $msg = $stationType->get('retry_msg');
-	$msg = $team->expandMessage($msg, $parms );
+	//$msg = $team->expandMessage($msg, $parms ); // nothing to expand
 	$msg = $team->encodeText($msg);
 	return $msg;
 }
