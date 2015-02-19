@@ -68,6 +68,18 @@ class RPI extends ModelEx {
   	if (substr($this->rs['URL'],0,4) == "test") return true;
   	return RPI::do_post_request($this->rs['URL']."/handle_submission", $json);
   }
+  // TODO remvoe this hack and get back to an agnostic system
+  function handle_hmb_submission($delay,$is_correct,$challenge_complete)  {
+  	$json = array("message_version" =>0 ,
+  			"message_timestamp"=> date("Y-m-d H:i:s"),
+  			"theatric_delay_ms"=>$delay,
+  			"is_correct"=>$is_correct,
+  	         "challenge_complete" => $challenge_complete);
+   	trace("handle_submission sending ". json_encode($json),__FILE__,__LINE__,__METHOD__);
+  	// todo remove this is just for testing don't send it URL start with test
+  	if (substr($this->rs['URL'],0,4) == "test") return true;
+  	return RPI::do_post_request($this->rs['URL']."/handle_submission", $json);
+  }
   
   function reset() {
   	return RPI::do_get_request($this->rs['URL']."/reset/".RPI::PIN);

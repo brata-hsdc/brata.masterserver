@@ -76,12 +76,33 @@ class XXXData extends ModelEx {
        return $msg;
 	}
 	
-    // impplement this to test if the team's solution is correct
+    // implement this to test if the team's solution is correct
     // $msg is a text string holding the team's solution, 
-    // $rPI is the rPI running the challenge or null if here is no rPI at this station
     // return true or false
-	protected function testSolution($msg,$rPI=null) {
+	protected function testBrataSolution($msg) {
 		throw new Exception("testSolution not implemented");
+	}
+	// implement this to test if the team's solution is correct
+	// $msg is a text string holding the team's solution,
+	// $rPI is the rPI running the challenge or null if here is no rPI at this station
+	// return true or false
+	protected function testRpiSolution($msg) {
+		throw new Exception("testSolution not implemented");	  //=====
+	  // CPA and CTS are handled the same way.
+	  	$stationjson = $team->getChallengeData();
+	  	trace("stored station data = ".json_encode($stationjson));
+	  	json_checkMembers("is_correct", $stationjson);
+	  	trace("after check of stored station data ");
+	  	$isCorrect = $stationjson['is_correct'];
+	  	if ($isCorrect){
+	  		// success
+	  		$challengeComplete=true;
+	  		$isCorrect = true;
+	  	}
+	  	else {
+	  		$challengeComplete=($count<3?false:true);
+	  		$isCorrect = false;
+	  	}
 	}
 	// implment this to update the teams score (points and duration)
 	protected function updateTeamScore($team,$points) {
@@ -107,12 +128,13 @@ class XXXData extends ModelEx {
 	    }
 	  }
       $count = $team->get('count');
+      $team->set('count',$count+1);
       $points = 3-$count;
-	  $this->updateTeamScore($team,$points);
+      $this->updateTeamScore($team, $points);  // save count
 		
-	  if (!$this->testSolution($msg,$rpi)) {
-	    $count++;
-	    $team->set('count',$count);
+	  $isCorrect = $this->testRpiSolution($team->getChallengeData());
+	  
+	  if (!$isCorrect) {
 		$challenge_complete=($count<3?false:true);
 	  }
 	  else {

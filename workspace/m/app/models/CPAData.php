@@ -16,12 +16,21 @@ class CPAData extends XXXData {
   
   
   protected function generateParameters() {
-  	return array(
+  	$tmp =  array(
   			"label"=> $this->rs['label'],
   			"fence"=> $this->rs['fence'], 
   			"building"=>$this->rs['building'],
   			"sum" => $this->rs['sum']
   	);
+  	return array("cpa_velocity" => $this->rs['velocity'],
+  			"cpa_velocity_tolerance_ms"=>$this->rs['velocity_tolerance'],
+  			"cpa_window_time_ms"=>$this->rs['window_time'], 
+  			"cpa_window_time_tolerance_ms"=>$this->rs['window_time_tolerance'],
+  			"cpa_pulse_width_ms"=> $this->rs['pulse_width'], 
+  			"cpa_pulse_width_tolerance_ms"=>$this->rs['pulse_width_tolerance'],
+  			"fence"=> $this->rs['fence'], 
+  			"building"=>$this->rs['building']);
+
   }
   // all stations share data pool stationId ignored
   protected function fetchData($stationId) {

@@ -45,11 +45,15 @@ function _submit($stationTag=null)
 	json_checkMembers("candidate_answer,is_correct,fail_message", $json);
 	
 	$count = $team->get('count');
+	$team->updateChallengeData($json);
+        trace("count=".$count);
 	$points = 3-$count;
 	if (!$json['is_correct']) {
 		$count++;
 		$team->set('count',$count);
-		$challenge_complete=($count<3?false:true);
+                trace("count=".$count);
+		$challenge_complete=$count>2;
+    	        $team->_updateScore($stationType, 0); //TODO add legacy update score
 	}
 	else {
 	  $challenge_complete=true;
@@ -58,8 +62,17 @@ function _submit($stationTag=null)
 	if ($challenge_complete)
 	{
 	   $team->updateScore($stationType, $points);
-	   $station->endChallenge();
-	   $team->endChallenge();
+           switch($stationType->get('typeCode'))
+           {
+             case StationType::STATION_TYPE_HMB:
+	       $station->endChallenge();
+	       $team->endChallenge();
+               break;
+             default:
+               // FSL does not have pi, CPA and CTS not done until scan last qr
+               // so technically challenge not complete until the brata submit
+               break;
+           }
 	}
 
 	if (Event::createEvent(Event::TYPE_SUBMIT, $team, $station,$points) === false) {

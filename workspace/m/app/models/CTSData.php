@@ -40,9 +40,6 @@ class CTSData extends XXXData {
   	$station->updateTeamAtStation($team);
   }
   
-  protected function testSolution($msg,$rPI=null) {
-  	throw new Exception("testSolution not implemented");
-  }
   // implment this to update the teams score (points and duration)
   protected function updateTeamScore($team,$points) {
     $team->updateCTSScore($points);
