@@ -111,35 +111,21 @@ class Team extends ModelEx {
   // after every submit.  The last call will be the final score.  This allows the leader board
   // to dyamiclly converge to the final score (duration goes up, points go down) with each submit.
   // TODO deprecate this
-  function updateScore($stationType,$points) {
+  function _updateScore($stationType,$points) {
   
-  	$duration = time()-$this->get('started');
   	switch ($stationType->get('typeCode'))
   	{
   		case StationType::STATION_TYPE_REG:
-  			$this->set('regScore',$points);
-  			$this->set('regDuration',0);
-  			break;
+  			return $this->updateREGScore($points);
   		case StationType::STATION_TYPE_CTS:
-  			$this->set('ctsScore',$points);
-  			$this->set('regDuration',$duration);
-  			break;
+  			return $this->updateCTSSCore($points);
   		case StationType::STATION_TYPE_FSL:
-  			$this->set('fslScore',$points);
-  			$this->set('regDuration',$duration);
-  			break;
+  			return $this->updateFSLScore($points);
   		case StationType::STATION_TYPE_HMB:
-  			$this->set('hmbScore',$points);
-  			$this->set('regDuration',$duration);
-  			break;
+  			return $this->updateHMBScore($points);
   		case StationType::STATION_TYPE_CPA:
-  			$this->set('cpaScore',$points);
-  			$this->set('regDuration',$duration);
-  			break;
+  			return $this->updateCPAScore($points);
   	}
-  	$this->set('totalScore',$this->get('regScore')+$this->get('ctsScore')+$this->get('fslScore')+$this->get('cpaScore'));
-  	$this->set('totalDuration',$this->get('regDuration')+$this->get('ctsDuration')+$this->get('fslDuration')+$this->get('cpaDuration'));
-  	return $this->update();
   }
   
   // called after updateXXXScore to compute new totals and update the DB.
