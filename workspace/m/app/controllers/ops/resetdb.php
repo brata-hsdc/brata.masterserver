@@ -104,7 +104,10 @@ function create_t_team($dbh) {
  ."`totalScore` int unsigned NOT NULL default 0, "
  ."`regScore` int unsigned NOT NULL default 0, "  
  ."`ctsScore` int unsigned NOT NULL default 0, "
- ."`fslScore` int unsigned NOT NULL default 0, "
+ ."`fslScore0` int unsigned NOT NULL default 0, "
+ ."`fslScore1` int unsigned NOT NULL default 0, "
+ ."`fslScore2` int unsigned NOT NULL default 0, "
+ ."`fslScore3` int unsigned NOT NULL default 0, "
  ."`hmbScore` int unsigned NOT NULL default 0, "
  ."`cpaScore` int unsigned NOT NULL default 0, "
       
@@ -269,7 +272,7 @@ function create_t_ext_data($dbh) {
 function create_v_leaderboard_main($dbh) {
  $status = $dbh->exec("create view v_leaderboard_main as " 
  ."select name Name  , totalDuration Duration , totalScore Score, "
- ."regScore Reg,ctsScore CTS ,fslScore FSL,hmbScore HMB,cpaScore CPA"
+ ."regScore Reg,ctsScore CTS ,fslScore0 FSL0,fslScore1 FSL1,fslScore2 FSL2,fslScore3 FSL3,hmbScore HMB,cpaScore CPA"
  ." from t_team order by Duration asc, Score desc"
  );
  

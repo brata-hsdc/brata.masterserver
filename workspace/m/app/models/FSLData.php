@@ -45,20 +45,6 @@ class FSLData extends XXXData {
  	return true;
  }
   
- // return true if looking for the lab
- static function atLab(&$json) {
- 	return $json['index'] == 3 ? true : false;
- }
- // update score after each try
- // NOTE: you must also call the team update score after each try 
- static function updateScore(&$json,$points) {
- 	$json['waypoints'][$json['index']]['score'] = $points;
- 	$json ['totalScore'] = 0;
- 	for($i=0;$i<count($json['waypoints']);$i++) {
- 	  $json['totalScore'] += $json['waypoints'][$i]['score'] ;
- 	}
- 	return $json['totalScore'];
- }
   // fetch the Station object for the given skey
   static function getFromTag($tag) {
   	$o = new FSLData();
@@ -75,13 +61,12 @@ class FSLData extends XXXData {
   // generate the initial parameters atWaypoint will drive the game play from here on out
   protected function generateParameters() {
   	$tmp = array(
-  			'totalScore' => 0,
   			'index' => 0,      // tracks which waypoint is current
   			'waypoints' => array(
-  					array('score' => 0, 'tag' => $this->rs['a_tag'], 'lat' => $this->rs['a_lat'], 'lng' => $this->rs['a_lng']),
-  					array('score' => 0, 'tag' => $this->rs['b_tag'], 'lat' => $this->rs['b_lat'], 'lng' => $this->rs['b_lng']),
-  					array('score' => 0, 'tag' => $this->rs['c_tag'], 'lat' => $this->rs['c_lat'], 'lng' => $this->rs['c_lng']),
-  					array('score' => 0, 'tag' => $this->rs['l_tag'],  'a_rad' => $this->rs['a_rad'], 'b_rad' => $this->rs['b_rad'], 'c_rad' => $this->rs['c_rad'])
+  					array('tag' => $this->rs['a_tag'], 'lat' => $this->rs['a_lat'], 'lng' => $this->rs['a_lng']),
+  					array('tag' => $this->rs['b_tag'], 'lat' => $this->rs['b_lat'], 'lng' => $this->rs['b_lng']),
+  					array('tag' => $this->rs['c_tag'], 'lat' => $this->rs['c_lat'], 'lng' => $this->rs['c_lng']),
+  					array('tag' => $this->rs['l_tag'],  'a_rad' => $this->rs['a_rad'], 'b_rad' => $this->rs['b_rad'], 'c_rad' => $this->rs['c_rad'])
   			),
   			'msg_values' => array(     // used to expand messages which will be sent to teams
   					'ordinal' => "first",
@@ -107,15 +92,5 @@ class FSLData extends XXXData {
   	$msg = $team->encodeText($msg);
   	return $msg;
   	 
-  }
-  
-  // note stationId not used here
-  // depreciated
-  static function _startChallenge($stationId) {
-  	$fsl = new FSLData();            // we need an object to call retrieveRandom 
-  	$fsl = $fsl->retrieveRandom();   // now replace that object with a real ramdon object.
-  	$tmp= $fsl->generateParameters();
-  	trace("parms ".print_r($tmp,true),__FILE__,__LINE__,__METHOD__);
-  	return $tmp;
   }
 }

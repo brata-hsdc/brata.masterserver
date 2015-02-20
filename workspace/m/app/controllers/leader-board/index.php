@@ -32,7 +32,7 @@ function _make_html_main_table($view,$item,$urlPrefix,&$data) {
 	$dbh=getdbh();
 
 	//view
-	$fields="Name,Reg,CTS,FSL,HMB,CPA,Duration,Score";
+	$fields="Name,Reg,CTS,FSL0,FSL1,FSL2,FSL3,HMB,CPA,Duration,Score";
 	$stmt = $dbh->query("SELECT $fields FROM $view");
 	if ($stmt === false) {
 		var_dump($dbh->errorInfo());
@@ -45,9 +45,6 @@ function _make_html_main_table($view,$item,$urlPrefix,&$data) {
 			if      ($f == "Name")     $row[]=htmlspecialchars($rs[$f]);
 			else if ($f == "Duration") $row[]=htmlspecialchars($rs[$f]);
 			else if ($f == "Score")    $row[]=htmlspecialchars($rs[$f]);
-			//todo what if score is not valid?
-			else if ($f == "FSL")      { $T=$rs[$f]%4; $row[]="<img src='" . myUrl("img/$T.gif'") . ">"; } // TODO
-			//else                       $row[]="<img src='" . myUrl("img/$rs[$f].gif'") . ">";//
 			else                       $row[]=toWingDing($rs[$f]);
 		}
 		$tablearr[]=$row;

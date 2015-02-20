@@ -46,8 +46,8 @@ function _at_waypoint($waypointId=null)
   $challengeComplete = false;
   $points = 0;
   
-  if ($isCorrect || $count == 3) {
-  	$points = FSLData::updateScore($fslState,3-$count);
+  if ($isCorrect || $count >= 2) {
+  	$team->updateFSLScore(3-$count,$fslState['index'] );
     $challengeComplete = !FSLData::nextSection($fslState);
     $team->set('count',0);
   } else {
@@ -55,14 +55,14 @@ function _at_waypoint($waypointId=null)
   }	
 
   $team->setChallengeData($fslState);                  // put the update state data back into the team object
-  $team->updateFSLScore($points );
+  $team->update();
   
   if ($challengeComplete) {
   	$team->endChallenge();
   }
   
   if       ($isCorrect) $msg = $stationType->get('success_msg');
-  else if  ($count >=3) $msg = $stationType->get('failed_msg');
+  else if  ($count >=2) $msg = $stationType->get('failed_msg');
   else                  $msg = $stationType->get('retry_msg');
   
   $msg = $team->expandMessage($msg,$fslState['msg_values']);

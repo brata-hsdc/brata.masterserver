@@ -14,7 +14,10 @@ class Team extends ModelEx {
     
     $this->rs['regScore'] = 0;
     $this->rs['ctsScore'] = 0;
-    $this->rs['fslScore'] = 0;
+    $this->rs['fslScore0'] = 0;
+    $this->rs['fslScore1'] = 0;
+    $this->rs['fslScore2'] = 0;
+    $this->rs['fslScore3'] = 0;
     $this->rs['hmbScore'] = 0;
     $this->rs['cpaScore'] = 0;
     
@@ -66,7 +69,10 @@ class Team extends ModelEx {
   }
   function startFSLChallenge($jsonObject=null)
   {
-  	$this->set('fslScore',0);
+  	$this->set('fslScore0',0);
+  	$this->set('fslScore1',0);
+  	$this->set('fslScore2',0);
+  	$this->set('fslScore3',0);
   	$this->set('fslDuration',0);
   	return $this->startXXXChallenge($jsonObject);
   }
@@ -119,8 +125,8 @@ class Team extends ModelEx {
   			return $this->updateREGScore($points);
   		case StationType::STATION_TYPE_CTS:
   			return $this->updateCTSSCore($points);
-  		case StationType::STATION_TYPE_FSL:
-  			return $this->updateFSLScore($points);
+  		//case StationType::STATION_TYPE_FSL:
+  		//	return $this->updateFSLScore($points);
   		case StationType::STATION_TYPE_HMB:
   			return $this->updateHMBScore($points);
   		case StationType::STATION_TYPE_CPA:
@@ -131,7 +137,8 @@ class Team extends ModelEx {
   // called after updateXXXScore to compute new totals and update the DB.
   // returns updated object or false on error
   private function updateTotalScore() {
-  	$this->set('totalScore',$this->get('regScore')+$this->get('ctsScore')+$this->get('fslScore')+$this->get('cpaScore'));
+  	$this->set('totalScore',$this->get('regScore')+$this->get('ctsScore')+
+  			  $this->get('fslScore0')+$this->get('fslScore1')+$this->get('fslScore2')+$this->get('fslScore3')+$this->get('cpaScore'));
   	$this->set('totalDuration',$this->get('regDuration')+$this->get('ctsDuration')+$this->get('fslDuration')+$this->get('cpaDuration'));
   	return $this->update();  	
   }
@@ -150,9 +157,8 @@ class Team extends ModelEx {
   	return $this->updateTotalScore();
   }
   // update the FSL portion of the score and then the totals
-  // TODO break FSL into seperate parts for each waypoint
-  function updateFSLScore($points) {
-    $this->set('fslScore',$points);
+  function updateFSLScore($points,$section) {
+    $this->set('fslScore'.$section,$points);
   	$this->set('fslDuration',time()-$this->get('started'));
   	return $this->updateTotalScore();
   }
@@ -164,7 +170,7 @@ class Team extends ModelEx {
   	return $this->updateTotalScore();
   }
   
-  // update the CPS portion of the score and then the totals
+  // update the CPA portion of the score and then the totals
   function updateCPAScore($points) {
     $this->set('cpaScore',$points);
   	$this->set('cpaDuration',time()-$this->get('started'));
@@ -185,7 +191,10 @@ class Team extends ModelEx {
   	
   	$this->rs['regScore'] = 0;
   	$this->rs['ctsScore'] = 0;
-  	$this->rs['fslScore'] = 0;
+  	$this->rs['fslScore0'] = 0;
+  	$this->rs['fslScore1'] = 0;
+  	$this->rs['fslScore2'] = 0;
+  	$this->rs['fslScore3'] = 0;
   	$this->rs['hmbScore'] = 0;
   	$this->rs['cpaScore'] = 0;
   	
