@@ -38,10 +38,12 @@ function _make_html_main_table($view,$item,$urlPrefix,&$data) {
 		var_dump($dbh->errorInfo());
 		return;
 	}
-	$tablearr[]=explode(',',$fields);
+	$tablearr[]=explode(',',"Name,Reg,CTS,Waypoint 1,Waypoint 2,Waypoint 3,FSL,HMB,CPA,Duration,Score");
+	
+	$fields=explode(',',$fields);
 	while ($rs = $stmt->fetch(PDO::FETCH_ASSOC)) {
 		$row=null;
-		foreach ($tablearr[0] as $f) {
+		foreach ($fields as $f) {
 			if      ($f == "Name")     $row[]=htmlspecialchars($rs[$f]);
 			else if ($f == "Duration") $row[]=htmlspecialchars($rs[$f]);
 			else if ($f == "Score")    $row[]=htmlspecialchars($rs[$f]);
