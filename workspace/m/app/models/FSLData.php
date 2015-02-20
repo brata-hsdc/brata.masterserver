@@ -28,16 +28,16 @@ class FSLData extends XXXData {
   static function isMatch(&$json, $id) {
   	return $id == $json['waypoints'][$json['index']]['tag'];
   }
-  // advance to the next waypoint if possible, also update the hash so expand message will replace with the current values
+  // advance to the next section if possible, also update the hash so expand message will replace with the current values
   // false means challenge complete
-  static function nextWaypoint(&$json) {
+  static function nextSection(&$json) {
   	if ($json['index'] == 3) return false;
   	$i = ++$json['index'];
  	if ($json['index'] == 3) {
  		$json['msg_values'] = array('a_rad' => $json['waypoints'][$i]['a_rad'],  // replace the old hash wih a whole new one
  		                            'b_rad' => $json['waypoints'][$i]['b_rad'],
  		                            'c_rad' => $json['waypoints'][$i]['c_rad']);
- 		return false;
+ 		return true;
  	}
  	$json['msg_values']['ordinal'] = $i == 1 ? "second" : "third";   // update the hash
  	$json['msg_values']['lat'] = $json['waypoints'][$i]['lat'];

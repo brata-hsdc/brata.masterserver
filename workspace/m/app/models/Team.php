@@ -146,14 +146,14 @@ class Team extends ModelEx {
   // update the CTS portion of the score and then the totals
   function updateCTSSCore($points) {
     $this->set('ctsScore',$points);
-  	$this->set('regDuration',time()-$this->get('started'));
+  	$this->set('ctsDuration',time()-$this->get('started'));
   	return $this->updateTotalScore();
   }
   // update the FSL portion of the score and then the totals
   // TODO break FSL into seperate parts for each waypoint
   function updateFSLScore($points) {
     $this->set('fslScore',$points);
-  	$this->set('regDuration',time()-$this->get('started'));
+  	$this->set('fslDuration',time()-$this->get('started'));
   	return $this->updateTotalScore();
   }
   
@@ -167,7 +167,7 @@ class Team extends ModelEx {
   // update the CPS portion of the score and then the totals
   function updateCPAScore($points) {
     $this->set('cpaScore',$points);
-  	$this->set('regDuration',time()-$this->get('started'));
+  	$this->set('cpaDuration',time()-$this->get('started'));
   	return $this->updateTotalScore();
   }
   

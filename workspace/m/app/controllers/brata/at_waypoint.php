@@ -5,7 +5,6 @@ require(APP_PATH.'inc/json_functions.php');
 //
 function _at_waypoint($waypointId=null)
 {
-	trace("waypointId = $waypointId");
   if ($waypointId === null) {
     rest_sendBadRequestResponse(400,"missing waypointId");  // doesn't return
   }
@@ -24,79 +23,50 @@ function _at_waypoint($waypointId=null)
   	trace("can't find team PIN=".$teamPIN,__FILE__,__LINE__,__METHOD__);
   	rest_sendBadRequestResponse(500,"can't find the FSL StationType");  // doesn't return
   }
-
-  $count = $team->get('count');
+  
   $fslState = $team->getChallengeData();
+  switch ($fslState['index'])
+  {
+  	case 0: // use "default" messages for waypoints 1 and 2
+  	case 1:
+  		break;   
+  	case 2:     // for waypoint 2 change success and failed messages, keep retry message the same
+  		$stationType->set('success_msg', 'Success! Use radius1=[a_rad] radius2=[b_rad] and radius3=[c_rad] to find the secret labatory marker');
+  		$stationType->set('failed_msg' , 'Too bad, you failed. Use radius1=[a_rad] radius2=[b_rad] and radius3=[c_rad] to find the secret labatory marker');
+  		break;
+  	case 3:    // for the lab change 
+  		$stationType->set('success_msg','Success! go quickly to the next queue');
+  		$stationType->set('retry_msg'  ,'Wrong secret Laboratory marker, try again!');
+  		$stationType->set('failed_msg' ,'Too bad, you failed. Go quickly to the next queue.');  		
+  }
+  
+  $count = $team->get('count');
+
   $isCorrect = FSLData::isMatch($fslState, $waypointId);
   $challengeComplete = false;
-  $atLab = FSLData::atLab($fslState);   // are we looking for the lab?
-  $labNext = false;                     // is the lab next?
+  $points = 0;
   
-  if ($isCorrect) {
-    FSLData::nextWaypoint($fslState);
-    $labNext = FSLData::atLab($fslState); // are we now looking for the lab?
+  if ($isCorrect || $count == 3) {
+  	$points = FSLData::updateScore($fslState,3-$count);
+    $challengeComplete = !FSLData::nextSection($fslState);
     $team->set('count',0);
   } else {
-  	$team->set('count',++$count);
+  	$team->set('count',$count+1);
   }	
-  
-  //TODO Too bad, you failed. Use ...
-  //TODO Success! go quickly to the next queue
-  //TODO Wrong secet Laboratory marker, try again!
-  //TODO Too bad, you failed. Go quickly to the next queue.
-  if  ($atLab) {
-  	if  ($isCorrect) {
-  		//$msg = $stationType->get('TODO');
-  		$msg = 'Success! go quickly to the next queue';
-  		$challengeComplete = true;
-  	}
-  	else if  ($count < 3) {
-  		//$msg = $stationType->get('TODO');
-  		$msg = 'Wrong secet Laboratory marker, try again!';
-  	}
-  	else {
-  		//$msg = $stationType->get('TODO');
-  		$msg = 'Too bad, you failed. Go quickly to the next queue.';
-  		$challengeComplete = true;
-  	}	
-  } 
-  else if ($labNext) 
-  {
-  	//TODO move messages to DB if possible
-  	$prefix = ($isCorrect) ? "Success!" : "Too bad, you failed.";
-  	$msg = "$prefix Use radius1=[a_rad] radius2=[b_rad] and radius3=[c_rad] to find the secret labatory marker";
-  } 
-  else 
-  {
-  	if  ($isCorrect) {
-  	  $msg = $stationType->get('success_msg');
-    }
-    else if  ($count < 3) { 
-  	  $msg = $stationType->get('retry_msg'); 
-    }
-    else {
-  	  $msg = $stationType->get('failed_msg');
-    }
-  }
 
-  trace("the poings  is ".(3-$count));
-  $points = FSLData::updateScore($fslState,3-$count);
-  trace("the point are $points");
   $team->setChallengeData($fslState);                  // put the update state data back into the team object
-  $team->updateScore($stationType, $points );
+  $team->updateFSLScore($points );
   
   if ($challengeComplete) {
   	$team->endChallenge();
   }
-    
-  $msg = $team->expandMessage($msg,$fslState['msg_values']);
   
-  if(isEncodeEnabled()) {
-  	// if not in student mode encode, if in student mode we only encrypt the even team numbers responses
-     if(!isStudentServer() || (isStudentServer() && ($teamPIN % 2 == 0))) {
-       $msg = $team->encodeText($msg);
-     }
-  }
+  if       ($isCorrect) $msg = $stationType->get('success_msg');
+  else if  ($count >=3) $msg = $stationType->get('failed_msg');
+  else                  $msg = $stationType->get('retry_msg');
+  
+  $msg = $team->expandMessage($msg,$fslState['msg_values']);
+  $msg = $team->encodeText($msg);  
   $json = array("message" => $msg);
   json_sendObject($json);
 }
