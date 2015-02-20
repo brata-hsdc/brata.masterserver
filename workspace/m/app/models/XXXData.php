@@ -14,14 +14,14 @@ class XXXData extends ModelEx {
 	protected function getOneValue($keyword,$msg) {
 		return getOneFloatValue($keyword,$msg);
 	}
-	// use this to extract a named value from a brata message
+	// use this to extract a named integer value from a brata message
 	//  assume regex has one and only one capture clause a.k.a. "()"
 	protected function getOneIntValue($keyword,$msg) {
 		$matches = array();
 		if (preg_match("/.*$keyword.*=.*(\d+)/",$msg,$matches)==0) return false;
 		return $matches[1];
 	}	
-	// use this to extract a named value from a brata message
+	// use this to extract a namedfloating point value from a brata message
 	//  assume regex has one and only one capture clause a.k.a. "()"
 	protected function getOneFloatValue($keyword,$msg) {
 		$matches = array();
