@@ -52,9 +52,10 @@ function _cpaMeasure($stationTag=null)
 	trace("message before decode $msg",__FILE__,__LINE__,__METHOD__);
 	if($GLOBALS['SYSCONFIG_ENCODE'] == 1){
           // if not in student mode encode, if in student mode we only encrypt the even team numbers responses
-          if($GLOBALS['SYSCONFIG_STUDENT'] == 0 or ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $teamPIN % 2 == 0)) {
+          // TODO studnet mode not woring
+          //if($GLOBALS['SYSCONFIG_STUDENT'] == 0 or ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $teamPIN % 2 == 0)) {
             $msg = $team->encodeText($msg);
-          }
+         // }
         }
 	json_sendObject(array('message' => $msg ) );
 }

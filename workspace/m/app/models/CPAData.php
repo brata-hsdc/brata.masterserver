@@ -22,13 +22,17 @@ class CPAData extends XXXData {
   			"building"=>$this->rs['building'],
   			"sum" => $this->rs['sum']
   	);
-  	return array("cpa_velocity" => $this->rs['velocity'],
-  			"cpa_velocity_tolerance_ms"=>$this->rs['velocity_tolerance'],
-  			"cpa_window_time_ms"=>$this->rs['window_time'], 
-  			"cpa_window_time_tolerance_ms"=>$this->rs['window_time_tolerance'],
-  			"cpa_pulse_width_ms"=> $this->rs['pulse_width'], 
-  			"cpa_pulse_width_tolerance_ms"=>$this->rs['pulse_width_tolerance'],
-  			"fence"=> $this->rs['fence'], 
+	// We are to randomly select a time between 2-6 seconds for the time
+	// the fence distance is traversed, and apply same to the building
+	$fence_time = rand(2, 6);
+        $building_time = (int)((float)$fence_time * (float)$this->rs['building'] / (float)$this->rs['fence']);
+  	return array("cpa_velocity" => $fence_time,
+  			"cpa_velocity_tolerance_ms"=>1000,
+  			"cpa_window_time_ms"=>$building_time, 
+  			"cpa_window_time_tolerance_ms"=> 500,
+  			"cpa_pulse_width_ms"=> 100, 
+  			"cpa_pulse_width_tolerance_ms"=> 75,
+  			"fence"=>$this->rs['fence'], 
   			"building"=>$this->rs['building']);
 
   }
@@ -61,7 +65,7 @@ class CPAData extends XXXData {
   	return $cpa->generateParameters();
   }
   static function getItemsToMeasure($stationId) {
-  	$cpa = CPAData::getFromStationId($stationId);
+  	$cpa = CPAData::_getFromStationId($stationId);
   	return $cpa->generateParameters();
   }
 }

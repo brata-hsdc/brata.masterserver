@@ -292,7 +292,8 @@ class Team extends ModelEx {
   // encode the message
   // unless debug or in student server mode then encode only even pin
   function encodeText($clearText) {
-  	if ((isDebug() || isStudentServer()) && $this->rs['pin'] % 2 == 1) return $clearText;  
+  	// Not sure why but this was not working so killed for nw
+        //if ((isDebug() || isStudentServer()) && $this->rs['pin'] % 2 == 1) return $clearText;  
   	$clearText = strtr($clearText,' ',"_");
   	list($clearText,$factors) = Team::getEncodingParameters($clearText);
   	if ($factors == null ) { // fail safe

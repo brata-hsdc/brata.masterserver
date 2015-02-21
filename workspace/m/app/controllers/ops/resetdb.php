@@ -360,7 +360,7 @@ function _resetdb() {
     $admin->create();
         
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_REG, "Register", false, 60,
-       "Hello! You have been successfully registered and may start the competition.",
+       "Hello! You have been successfully registered and may start the competition. Good luck!",
        "If you see this message there was an internal error 1",
        "If you see this message there was an internal error 2",
        "If you see this message there was an internal error 3"
@@ -381,9 +381,9 @@ function _resetdb() {
     else createStations($numStations,"cts",$stationType->get('OID'));
     
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_FSL,"Find Secret Lab"           ,false, 60,
-       "Find and scan the [ordinal] at waypoint-lat=[lat] waypoint-lon=[lng].",
-       "Success! Find and scan the [ordinal] marker at waypoint-lat=[lat] waypoint-lon=[lng].",
-       "Too bad, you failed. Find and scan the [ordinal] marker at waypoint-lat=[lat] waypoint-lon=[lng].",
+       "Find and scan the [ordinal] at [waypoint-lat=[lat]] [waypoint-lon=[lng]].",
+       "Success! Find and scan the [ordinal] marker at [waypoint-lat=[lat]] [waypoint-lon=[lng]].",
+       "Too bad, you failed. Find and scan the [ordinal] marker at [waypoint-lat=[lat]] [waypoint-lon=[lng]].",
        "Wrong marker, try again!"
       
       //Success! Go quickly to the next team queue.
@@ -406,7 +406,7 @@ function _resetdb() {
     else createStations($numStations,"hmb",$stationType->get('OID'));
     
      $stationType = StationType::makeStationType(StationType::STATION_TYPE_CPA,"Catch Provessor Aardvark"   ,true, 60,
-       "PA is trying to escape. Quickly measure the fence and building labled=[label] and scan Start QR Code.",
+       "PA is trying to escape. Quickly measure the [fence=label] [building=[label]] and scan Start QR Code.",
        "Watch now as the professor attempts to escape. Get him!",
        "Success! Go quickly to the team finish area.",
        "Professor Aardvark has escaped. Oh well. Go quickly to the team finish area.",
@@ -419,9 +419,9 @@ function _resetdb() {
     
     $stationType = StationType::makeStationType(StationType::STATION_TYPE_EXT,"Extra"                     ,false, 60,
      "You have 20 (TBR) minutes to provide the tower location and height. Good luck."
-     ." landmark1-lat=[a_lat] landmark1-log=[a_lng]"
-     ." landmark2-lat=[b_lat] landmark2-log=[b_lng]"
-     ." landmark3-lat=[c_lat] landmark3-log=[c_lng]",
+     ." [waypoint1-lat=[a_lat]] [waypoint1-lon=[a_lng]]"
+     ." [waypoint2-lat=[b_lat]] [waypoint2-lon=[b_lng]]"
+     ." [waypoint3-lat=[c_lat]] [waypoint3-lon=[c_lng]]",
       "Message received, return to base",
       "M didn't understand your message",
       "If you see this message there was an internal error 5"
@@ -452,7 +452,8 @@ function _resetdb() {
     $names   = explode(",", "team1,team2,team3,team4,team5,team6,team7,team8,team9,team10,team11,team12,team13,team14");
     $pins    = explode(",", "00001,00002,00003,00004,00005,00006,00007,00008,00009,00010,00011,00012,00013,00014");
     
-    $numSchools = ($dataOption == 1) ? 2 : count($schools);
+    // always make the schools
+    $numSchools = count($schools);
     for ($i=0; $i<$numSchools; $i++)
     {
      $school = new School();
@@ -462,6 +463,7 @@ function _resetdb() {
      $schools[$i] = $school->get('OID');  // replace school name with OID for next part
     }
     
+    // TODO always make the teams with random ids
     $numTeams = ($dataOption == 1) ? 2 : count($names);
     for ($i=0; $i<$numTeams;$i++)
     {

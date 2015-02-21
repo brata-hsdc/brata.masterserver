@@ -45,7 +45,7 @@ function _submit($stationTag=null)
 	json_checkMembers("candidate_answer,is_correct,fail_message", $json);
 	
 	$count = $team->get('count');
-	$team->updateChallengeData($json);
+	$team->setChallengeData($json);
         trace("count=".$count);
 	$points = 3-$count;
 	if (!$json['is_correct']) {
@@ -61,7 +61,7 @@ function _submit($stationTag=null)
 	
 	if ($challenge_complete)
 	{
-	   $team->updateScore($stationType, $points);
+	   $team->_updateScore($stationType, $points);
            switch($stationType->get('typeCode'))
            {
              case StationType::STATION_TYPE_HMB:

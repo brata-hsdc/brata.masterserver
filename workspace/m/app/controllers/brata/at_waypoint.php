@@ -31,8 +31,8 @@ function _at_waypoint($waypointId=null)
   	case 1:
   		break;   
   	case 2:     // for waypoint 2 change success and failed messages, keep retry message the same
-  		$stationType->set('success_msg', 'Success! Use radius1=[a_rad] radius2=[b_rad] and radius3=[c_rad] to find the secret labatory marker');
-  		$stationType->set('failed_msg' , 'Too bad, you failed. Use radius1=[a_rad] radius2=[b_rad] and radius3=[c_rad] to find the secret labatory marker');
+  		$stationType->set('success_msg', 'Success! Use [radius1=[a_rad]], [radius2=[b_rad]], and [radius3=[c_rad]]. Find Secret Labatory marker.');
+  		$stationType->set('failed_msg' , 'Too bad, you failed. Use [radius1=[a_rad]], [radius2=[b_rad]], and [radius3=[c_rad]]. Find Secret Labatory marker');
   		break;
   	case 3:    // for the lab change 
   		$stationType->set('success_msg','Success! go quickly to the next queue');

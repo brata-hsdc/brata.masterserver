@@ -23,11 +23,10 @@ protected function generateParameters() {
 
   	return array("hmb_vibration_pattern_ms" => 
 	  array(
-       $this->rs['_1st_on'] , $this->rs['_1st_off'],
-        $this->rs['_2nd_on'], $this->rs['_2nd_off'], 
-        $this->rs['_3rd_on'], $this->rs['_3rd_off'],
-        $this->rs['cycle'])
-    );
+       ((int)$this->rs['_1st_on'])*1000 , ((int)$this->rs['_1st_off'])*1000,
+        ((int)$this->rs['_2nd_on'])*1000, ((int)$this->rs['_2nd_off'])*1000, 
+        ((int)$this->rs['_3rd_on'])*1000, ((int)$this->rs['_3rd_off'])*1000));
+//        $this->rs['cycle']));
 
 }
 protected function fetchData($stationId) {
@@ -47,9 +46,9 @@ protected function testSolution($msg,$rPI=null) {
 	    rest_sendBadRequestResponse(500,"The [answer=ddd] field was not provided in your message or was malformed.");
 	}
 	$correctAnswer = (
-			((int)$this->rs['_1st_on'] + (int)$this->rs['_1st_off']) *
-	        ((int)$this->rs['_2nd_on'] + (int)$this->rs['_2nd_off']) *
-	        ((int)$this->rs['_3rd_on'] + (int)$this->rs['_3rd_off'])
+			((int)$this->rs['_1st_on'] + (int)$this->rs['_1st_off']) / 1000 *
+	        ((int)$this->rs['_2nd_on'] + (int)$this->rs['_2nd_off']) / 1000 *
+	        ((int)$this->rs['_3rd_on'] + (int)$this->rs['_3rd_off']) / 1000
 	);
 	return ($answer > $correctAnswer - $correctAnswer * 0.01 and $answer < $correctAnswer + $correctAnswer * 0.01);
 
@@ -70,14 +69,14 @@ function brataSubmit($msg,$team,$station,$stationType)
 	$this->rs['_2nd_off'] = $json['hmb_vibration_pattern_ms'][3];
 	$this->rs['_3rd_on']  = $json['hmb_vibration_pattern_ms'][4];
 	$this->rs['_3rd_off'] = $json['hmb_vibration_pattern_ms'][5];
-	$this->rs['cycle']    = $json['hmb_vibration_pattern_ms'][6];
+//	$this->rs['cycle']    = $json['hmb_vibration_pattern_ms'][6];
 	
 	$count = $team->get('count');
 	$points = 3-$count;
 	$team->set('count',$count+1);
 	$team->updateHMBScore(0);                   // save count 
-    $isCorrect = $this->testSolution($msg);
-	$challengeComplete=($count<3?false:true);
+        $isCorrect = $this->testSolution($msg);
+	$challengeComplete=($count+1<3?false:true);
 	
 	$rpi = RPI::getFromStationId($station->get('OID'));
 	if ($rpi!=null){

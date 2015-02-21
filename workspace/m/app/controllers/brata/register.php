@@ -35,13 +35,14 @@ function _register()
     $stationType = StationType::getFromTypeCode($station->get('tag'));
     trace("registration complete",__FILE__,__LINE__,__METHOD__);
     $team->endChallenge();  // clear any stale challenge data
-    $team->updateScore($stationType, $points);
+    $team->_updateScore($stationType, $points);
     $msg = $team->expandMessage($stationType->get('instructions'), null ) ;
 	if($GLOBALS['SYSCONFIG_ENCODE'] == 1){
           // if not in student mode encode, if in student mode we only encrypt the even team numbers responses
-          if($GLOBALS['SYSCONFIG_STUDENT'] == 0 or ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $teamPIN % 2 == 0)) {
-            $msg = $team->encodeText($msg);
-          }
+          //if($GLOBALS['SYSCONFIG_STUDENT'] == 0 or ($GLOBALS['SYSCONFIG_STUDENT'] == 1 and $teamPIN % 2 == 0)) {
+            // something in merge broke this global flag so turning it off
+             $msg = $team->encodeText($msg);
+          //}
         }
 	json_sendObject(array('message' => $msg) );
 }

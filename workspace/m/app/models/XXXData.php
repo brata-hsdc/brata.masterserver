@@ -87,22 +87,16 @@ class XXXData extends ModelEx {
 	// $rPI is the rPI running the challenge or null if here is no rPI at this station
 	// return true or false
 	protected function testRpiSolution($msg) {
-		throw new Exception("testSolution not implemented");	  //=====
+		//throw new Exception("testSolution not implemented");	  //=====
 	  // CPA and CTS are handled the same way.
-	  	$stationjson = $team->getChallengeData();
-	  	trace("stored station data = ".json_encode($stationjson));
-	  	json_checkMembers("is_correct", $stationjson);
-	  	trace("after check of stored station data ");
-	  	$isCorrect = $stationjson['is_correct'];
-	  	if ($isCorrect){
-	  		// success
-	  		$challengeComplete=true;
-	  		$isCorrect = true;
-	  	}
-	  	else {
-	  		$challengeComplete=($count<3?false:true);
-	  		$isCorrect = false;
-	  	}
+	  	//$stationjson = $team->getChallengeData();
+	  	//trace("stored station data = ".json_encode($stationjson));
+	  	//trace("stored station data = ".$msg);
+	        $isCorrect = false;
+                 // TODO fix this check needs to just return false if not there not FAIL
+	  	json_checkMembers("is_correct", $msg);
+	  	$isCorrect = $msg['is_correct'];
+                return $isCorrect;
 	}
 	// implment this to update the teams score (points and duration)
 	protected function updateTeamScore($team,$points) {
@@ -128,7 +122,21 @@ class XXXData extends ModelEx {
 	    }
 	  }
       $count = $team->get('count');
-      $team->set('count',$count+1);
+		switch($stationType->get('typeCode'))
+		{
+			case StationType::STATION_TYPE_CTS:
+				break;
+			case StationType::STATION_TYPE_FSL:
+				break;
+			case StationType::STATION_TYPE_HMB:
+                               $team->set('count',$count+1);
+				break;
+			case StationType::STATION_TYPE_CPA:
+				break;
+			case StationType::STATION_TYPE_EXT:
+				break;
+		}
+
       $points = 3-$count;
       $this->updateTeamScore($team, $points);  // save count
 		
@@ -139,11 +147,12 @@ class XXXData extends ModelEx {
 	  }
 	  else {
 	    $challenge_complete=true;
+             trace('SUCCESS');
 	  }
 		
 	  if ($challenge_complete) {
-        $station->endChallenge();
-		$team->endChallenge();
+              $station->endChallenge();
+	      $team->endChallenge();
 	  }
 		
 	  if (Event::createEvent(Event::TYPE_SUBMIT, $team, $station,$points) === false) {
@@ -154,8 +163,11 @@ class XXXData extends ModelEx {
 	  if       ($isCorrect) $msg = $stationType->get('success_msg');
 	  else if  ($count >=3) $msg = $stationType->get('failed_msg');
 	  else                  $msg = $stationType->get('retry_msg');
-	  $msg = $team->expandMessage($msg, $parms );		
-	  $msg = $team->encodeText($msg);
+	  // TODO this is broek from merge
+          //$msg = $team->expandMessage($msg, $parms );
+	  
+          // TODO ineresing this is still needed afer the refactoring
+          $msg = $team->encodeText($msg);
 	  return $msg;
 	}
 	
