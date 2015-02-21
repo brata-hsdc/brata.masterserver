@@ -38,18 +38,28 @@ function _make_html_main_table($view,$item,$urlPrefix,&$data) {
 		var_dump($dbh->errorInfo());
 		return;
 	}
-	$tablearr[]=explode(',',$fields);
+	$tablearr[]=explode(',',"Name,Reg,CTS,Waypoint 1,Waypoint 2,Waypoint 3,FSL,HMB,CPA,Duration,Score");
+	
+	$fields=explode(',',$fields);
+	
+	$data['body'][]="<table class='table table-striped'>";
+	$data['body'][]="<thead><tr><th>Name</th><th>Reg</th><th>CTS</th><th colspan=4 style=text-align:center>FSL</th><th>HMB</th><th>CPA</th><th>Duration</th><th>Score</th></tr></thead></tbody>";
+	
+	$data['body'][]="<thead><tr><th></th><th></th><th></th><th>WP1</th><th>WP2</th><th>WP3</th><th>Lab</th><th></th><th></th><th></th><th></th></tr></thead></tbody>";
+	
 	while ($rs = $stmt->fetch(PDO::FETCH_ASSOC)) {
 		$row=null;
-		foreach ($tablearr[0] as $f) {
-			if      ($f == "Name")     $row[]=htmlspecialchars($rs[$f]);
-			else if ($f == "Duration") $row[]=htmlspecialchars($rs[$f]);
-			else if ($f == "Score")    $row[]=htmlspecialchars($rs[$f]);
-			else                       $row[]=toWingDing($rs[$f]);
+		foreach ($fields as $f) {
+			if      ($f == "Name")     $row[]="<td>".htmlspecialchars($rs[$f])."</td>";
+			else if ($f == "Duration") $row[]="<td>".htmlspecialchars($rs[$f])."</td>";
+			else if ($f == "Score")    $row[]="<td>".htmlspecialchars($rs[$f])."</td>";
+			else                       $row[]="<td>".toWingDing($rs[$f])."</td>";
 		}
-		$tablearr[]=$row;
+		$data['body'][]="<tr>".implode($row)."</tr>";
 	};
-	$data['body'][]=table::makeTable($tablearr);
+	//$data['body'][]=table::makeTable($tablearr);
+	$data['body'][]="</tbody></table>";
+	
 }
 function _make_html_ext_table($view,$item,$urlPrefix,&$data) {
 	$dbh=getdbh();
