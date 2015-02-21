@@ -26,7 +26,8 @@ class FSLData extends XXXData {
 
   // test if the given id matches the id of the current waypoint
   static function isMatch(&$json, $id) {
-  	return $id == $json['waypoints'][$json['index']]['tag'];
+        //trace("In FSL id=".$id." and stored next wapoint index tag is =".$json['waypoints'][$json['index']]['tag']." All is ".var_dump($json));
+  	return $id == trim($json['waypoints'][$json['index']]['tag']);
   }
   // advance to the next section if possible, also update the hash so expand message will replace with the current values
   // false means challenge complete
