@@ -25,7 +25,7 @@ function _index() {
   $data['body'][]="<h2>$item</h2><br />";
   _make_html_ext_table($view,$item,$urlPrefix,$data);
     
-  View::do_dump(VIEW_PATH.'layouts/mgmtlayout.php',$data);
+  View::do_dump(VIEW_PATH.'layouts/leaderboardlayout.php',$data);
 }
 
 function _make_html_main_table($view,$item,$urlPrefix,&$data) {
