@@ -58,6 +58,7 @@
       <li><a href="<?php echo myUrl('mock_brata/index')?>">Mock Brata</a></li> 
       <li><a href="<?php echo myUrl('mock_rpi/index')?>">Mock rPI</a></li> 
       <li><a href="<?php echo myUrl('test_event/manage')?>">Event Testing</a></li> 
+      <li><a href="<?php echo myUrl('mgmt_main/clear_scores') ?>">Clear Scores</a></li>
       <li><a href="<?php echo myUrl('mgmt_main/resetdb') ?>">Reset Database</a></li>
 <?php  } ?>      
     </ul></div><!-- end right side -->

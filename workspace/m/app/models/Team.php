@@ -27,7 +27,6 @@ class Team extends ModelEx {
     $this->rs['hmbDuration'] = 0;
     $this->rs['cpaDuration'] = 0;
     
-    //todo ext score lat,lng,height abs(height) abs(location)?
     $this->rs['extDuration'] = 0;
     $this->rs['towerH'] = 0;
     $this->rs['towerD'] = 0;

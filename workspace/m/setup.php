@@ -19,7 +19,10 @@ function writeSysconfig()
    {
    	$errrors .= ", invalid loglevel";
    }
-   
+   if ( !isset($_POST['logfile']))
+   {
+   	$errrors .= ", invalid logfile";
+   }   
    if ( !isset($_POST['dbhost']) || $_POST['dbhost'] =="" )
    {
    	   	$errrors .= ", invalid dbhost";
@@ -64,6 +67,7 @@ function writeSysconfig()
       fwrite($fd,"\$SYSCONFIG_DEBUG=".$_POST['debug'].";\n");
       fwrite($fd,"\$SYSCONFIG_SENDMAIL=".$_POST['sendmail'].";\n");      
       fwrite($fd,"\$SYSCONFIG_LOGLEVEL=".$_POST['loglevel'].";\n");
+      fwrite($fd,"\$SYSCONFIG_LOGFILE=".$_POST['logfile'].";\n");
       fwrite($fd,"\$SYSCONFIG_STUDENT=".$_POST['student'].";\n");
       fwrite($fd,"\$SYSCONFIG_ENCODE=".$_POST['encode'].";\n");
       fwrite($fd,"\$SYSCONFIG_LEADERBOARD_REFRESH=".$_POST['leaderBoardRefersh'].";\n");
@@ -111,11 +115,10 @@ if ( isset($_GET['write']) ) {
 <tr><td>Database Password</td><td><input name=dbpass value='<?php echo $SYSCONFIG_DBPASS?>'/></td></tr>
 <tr><td>Leader Board Refresh Rate(seconds)</td><td><input name=leaderBoardRefersh value='<?php echo $SYSCONFIG_LEADERBOARD_REFRESH?>'/></td></tr>
 <tr><td>Log Level</td><td><input name=loglevel value='<?php echo $SYSCONFIG_LOGLEVEL?>'/></td></tr>
+<tr><td>Log File</td><td><input name=logfile value='<?php echo $SYSCONFIG_LOGFILE?>'/></td></tr>
 <tr><td>Send Mail (to new users)</td><td><input type=checkbox name=sendmail value='1' <?php if ($SYSCONFIG_SENDMAIL) echo "checked"; ?> /> </td></tr>
 <tr><td>Debug Mode</td><td><input type=checkbox name=debug value='1' <?php if ($SYSCONFIG_DEBUG) echo "checked"; ?> /> </td></tr>
 <tr><td>Student Mode Server</td><td><input type=checkbox name=student value='1' <?php if ($SYSCONFIG_STUDENT) echo "checked"; ?> /> </td></tr>
-<tr><td>Encode Messages</td><td><input type=checkbox name=encode value='1' <?php if ($SYSCONFIG_ENCODE) echo "checked"; ?> /> </td></tr>
-
 </table>
 <input class="button" type="submit" name=submit />
 </form>

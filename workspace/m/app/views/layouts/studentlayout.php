@@ -33,12 +33,13 @@
 <div class="row">
    <div class="col-md-4">
    <!--  right side -->
+     <ul>
      <li>Below is for Public Access</li>      
-      <li><a href="<?php echo myUrl('leader-board/index')?>">View Leader Board</a></li>
+     <li><a href="<?php echo myUrl('leader-board/index')?>">View Leader Board</a></li>
      <li>Below is for Student Access</li>
       <li><a href="<?php echo myUrl('student/showevents')?>">Show Events</a></li>
       <li><a href="<?php echo myUrl('student/showlog')?>">Show M's Log</a></li>  
-      <li><a href="<?php echo myUrl('student/resetdb') ?>">Reset Database</a></li>
+      <li><a href="<?php echo myUrl('student/clear_scores')?>">Clear Scores</a></li> 
     </ul></div><!-- end right side -->
    <div class="col-md-8"><!-- left side -->
    <?php echo (isset($body) && is_array($body)) ? implode("\n",$body) : ''?>

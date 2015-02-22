@@ -100,7 +100,14 @@ class ModelEx extends KISS_Model  {
 	#for master server loaddb
 	function truncateTable() {
 		$dbh=$this->getdbh();
-		$stmt = $dbh->query('TRUNCATE TABLE '.$this->enquote($this->tablename));
+		return $dbh->query('TRUNCATE TABLE '.$this->enquote($this->tablename));
 		
+	}
+	# for team load, can't truncate due to foreign key constratins :(
+	function deleteAll() {
+		$dbh=$this->getdbh();
+		$sts = $dbh->exec('DELETE FROM '.$this->enquote($this->tablename));
+		return $sts;
+	
 	}
 }

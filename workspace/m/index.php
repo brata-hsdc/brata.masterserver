@@ -8,16 +8,14 @@ define('PIN_RETRY_MAX',1000);
 $GLOBALS['SYSCONFIG_DEBUG'] = $SYSCONFIG_DEBUG;
 $GLOBALS['SYSCONFIG_SENDMAIL'] = $SYSCONFIG_SENDMAIL;
 $GLOBALS['LOGLEVEL'] = $SYSCONFIG_LOGLEVEL;
+$GLOBALS['LOGFILE'] = $SYSCONFIG_LOGFILE;
 $GLOBALS['SYSCONFIG_STUDENT'] = $SYSCONFIG_STUDENT;
-$GLOBALS['SYSCONFIG_ENCODE'] = $SYSCONFIG_ENCODE;
 $GLOBALS['leaderBoardRefresh'] = $SYSCONFIG_LEADERBOARD_REFRESH;
 
 function isStudentServer() {
 	return $GLOBALS['SYSCONFIG_STUDENT'] == 1;
 }
-function isEncodeEnabled() {
-	return $GLOBALS['SYSCONFIG_ENCODE'] == 1;
-}
+
 //===============================================
 // Debug
 //===============================================
@@ -168,4 +166,8 @@ function __autoload($classname) {
 //===============================================
 // Start the controller
 //===============================================
-$controller = new Controller(APP_PATH.'controllers/',WEB_FOLDER,'mgmt_main','index');
+if (isStudentServer()) {	
+  $controller = new Controller(APP_PATH.'controllers/',WEB_FOLDER,'student','index');
+} else {
+  $controller = new Controller(APP_PATH.'controllers/',WEB_FOLDER,'mgmt_main','index');
+}

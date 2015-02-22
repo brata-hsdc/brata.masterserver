@@ -1,4 +1,4 @@
 <?php
 function _index() {
-  redirect('mgmt_storywebsite/manage');
+  redirect('mgmt_website/manage');
 }

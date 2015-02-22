@@ -16,6 +16,11 @@ class School extends ModelEx {
     $item = new School($oid,-1);
     return $item->get('name');
   }
+  static function getFromName($name) {
+  	$item = new School();
+  	return $item->retrieve_one("name=?", $name);
+  }
+  
   
   static function getAllAsHTMLOptions($itemId=-1) {
     $school = new School();

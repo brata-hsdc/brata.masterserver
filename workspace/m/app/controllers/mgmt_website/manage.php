@@ -1,4 +1,5 @@
 <?php
+// WARNING under development code transplanted from another project but not integrated in with this project
 function _manage($n=0) {
 
   loginRequireMgmt();

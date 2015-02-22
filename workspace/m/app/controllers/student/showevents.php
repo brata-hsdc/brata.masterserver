@@ -22,7 +22,7 @@ function _make_html_table($n,&$data) {
   while ($rs = $stmt->fetch(PDO::FETCH_ASSOC)) {
     $row=null;
     foreach ($tablearr[0] as $f) {
-    	$row=htmlspecialchars($rs[$f]);
+    	$row[]=htmlspecialchars($rs[$f]);
     }
     $tablearr[]=$row;
   };
