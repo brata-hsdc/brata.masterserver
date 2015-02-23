@@ -48,7 +48,8 @@ function _make_html_table($table,$item,$urlPrefix,$n,&$data) {
 			else
 			  $row[]=htmlspecialchars($rs[$f]);
 		}
-		$row[]=	'<a href="'.myUrl("$urlPrefix/edit/$OID/$CID").'">Edit</a> | '.
+		$row[]=	'<a href="'.myUrl("$urlPrefix/edit_score/$OID/$CID").'">Edit Score</a> | '.
+				'<a href="'.myUrl("$urlPrefix/edit/$OID/$CID").'">Edit</a> | '.
 				'<a href="javascript:jsconfirm(\'Really Delete '.$item.'?\',\''.
 		        myUrl("$urlPrefix/ops_delete/$OID/$CID").'\')">Delete</a>';
 		$tablearr[]=$row;

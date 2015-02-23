@@ -46,6 +46,7 @@
       <li><a href="<?php echo myUrl('mgmt_stationtype/manage')?>">Station Types</a></li>
       <li><a href="<?php echo myUrl('mgmt_station/manage')?>">Stations</a></li>
       <li><a href="<?php echo myUrl('mgmt_rpi/manage')?>">rPI</a></li>
+      <li><a href="<?php echo myUrl('mgmt_main/showevents')?>">Show Events</a></li>
       <li><a href="<?php echo myUrl('mgmt_cts_data/manage')?>">CTS Data</a></li>
       <li><a href="<?php echo myUrl('mgmt_fsl_data/manage')?>">FSL Data</a></li>      
       <li><a href="<?php echo myUrl('mgmt_hmb_data/manage')?>">HMB Data</a></li>

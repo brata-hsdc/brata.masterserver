@@ -6,6 +6,7 @@ class Event extends ModelEx {
 	const TYPE_START    = 2;
 	const TYPE_SUBMIT   = 3;
 	const TYPE_END      = 4;
+	const TYPE_EDIT     = 5;
 
 	static private function isSelected($value, $selectValue) {
 		return $value == $selectValue ? " selected " : "";
@@ -16,7 +17,8 @@ class Event extends ModelEx {
 		."<option " . Event::isSelected(Event::TYPE_REGISTER , $selectValue) . "value=" . Event::TYPE_REGISTER . "> Register"
 		."<option " . Event::isSelected(Event::TYPE_START    , $selectValue) . "value=" . Event::TYPE_START  . "> Start"
 		."<option " . Event::isSelected(Event::TYPE_SUBMIT   , $selectValue) . "value=" . Event::TYPE_SUBMIT . "> Submit"
-		."<option " . Event::isSelected(Event::TYPE_END      , $selectValue) . "value=" . Event::TYPE_END    . "> End";
+		."<option " . Event::isSelected(Event::TYPE_END      , $selectValue) . "value=" . Event::TYPE_END    . "> End"
+		."<option " . Event::isSelected(Event::TYPE_EDIT     , $selectValue) . "value=" . Event::TYPE_EDIT   . "> Edit";
 	}
 	
 	static function getTypeAsText($value) {
@@ -26,6 +28,7 @@ class Event extends ModelEx {
 			case Event::TYPE_START    : return "Start";
 			case Event::TYPE_SUBMIT   : return "Submit";
 			case Event::TYPE_END      : return "End";
+			case Event::TYPE_EDIT     : return "Edit";
 			default: return "Error - unknown event type";
 			 	
         }	

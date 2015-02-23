@@ -163,7 +163,7 @@ function create_t_event($dbh) {
    `stationId` int unsigned NOT NULL default '0',
   `eventType` int NOT NULL,
  `points` int NOT NULL,   
-   `data` varchar(255) NOT NULL,
+   `data` TEXT NOT NULL,
    PRIMARY KEY  (`OID`),"
  ." CONSTRAINT `fk_teamId_event` FOREIGN KEY (`teamId`) REFERENCES `t_team` (`OID`),"
     ." CONSTRAINT `fk_stationId` FOREIGN KEY (`stationId`) REFERENCES `t_station` (`OID`)"

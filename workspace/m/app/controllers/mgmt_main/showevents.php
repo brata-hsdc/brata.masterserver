@@ -3,7 +3,7 @@ function _showevents($n=0) {
   $n=(int)$n;
   $data['body'][]='<h2>Show Events</h2><br />';
   _make_html_table($n,$data);
-  View::do_dump(VIEW_PATH.'layouts/studentlayout.php',$data);
+  View::do_dump(VIEW_PATH.'layouts/mgmtlayout.php',$data);
 }
 
 function _make_html_table($n,&$data) {
@@ -14,7 +14,7 @@ function _make_html_table($n,&$data) {
   $total=$stmt->fetchColumn();
   $limit=$GLOBALS['pagination']['per_page'];
   $data['body'][]='<p>Showing records '.($n+1).' to '. min($total,($n+$limit)).' of '.$total.'</p>';
-  $data['body'][]=pagination::makePagination($n,$total,myUrl('student/manage'),$GLOBALS['pagination']);
+  $data['body'][]=pagination::makePagination($n,$total,myUrl('mgmt_main/manage'),$GLOBALS['pagination']);
 
   //table
   $stmt = $dbh->query("SELECT created_dt,teamId,stationId,points,data FROM t_event LIMIT $n,$limit");
@@ -27,6 +27,6 @@ function _make_html_table($n,&$data) {
     $tablearr[]=$row;
   };
   $data['body'][]=table::makeTable($tablearr);
-  $data['body'][]='<p><a href="'.myUrl("student").'">Back</a></p>';
+  $data['body'][]='<p><a href="'.myUrl("mgmt_main").'">Back</a></p>';
   $data['head'][]='<script type="text/javascript" src="'.myUrl('js/jsconfirm.js').'"></script>';
 }
