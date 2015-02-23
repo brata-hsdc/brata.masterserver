@@ -140,7 +140,8 @@ class Team extends ModelEx {
   
   // called after updateXXXScore to compute new totals and update the DB.
   // returns updated object or false on error
-  private function updateTotalScore() {
+  // used to update totalScore/totalDuration after edit
+  /*private*/ function updateTotalScore() {
   	$this->set('totalScore',$this->get('regScore')+$this->get('ctsScore')+
   			  $this->get('fslScore0')+$this->get('fslScore1')+$this->get('fslScore2')+$this->get('fslScore3')+$this->get('cpaScore'));
   	$this->set('totalDuration',$this->get('regDuration')+$this->get('ctsDuration')+$this->get('fslDuration')+$this->get('cpaDuration'));
