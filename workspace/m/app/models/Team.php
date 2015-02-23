@@ -38,10 +38,14 @@ class Team extends ModelEx {
     if ($oid && $cid)
     $this->retrieve($oid,$cid);
   }
-  
+
   function getSchoolName() {
   	return School::getSchoolNameFromId($this->rs['schoolId']);
   }
+
+  function getPin() {
+  	return $this->rs['pin'];
+  }  
 
   // setup the common data fields needed to start a challenge
   private function startXXXChallenge($jsonObject=null) {
@@ -103,6 +107,7 @@ class Team extends ModelEx {
   // set the json object holding the challenge state
   function setChallengeData($json) {
   	$this->rs['json'] = json_encode($json);
+  	$this->update();  	
   }
   
   // must be called at end of challenge to clear challenge state

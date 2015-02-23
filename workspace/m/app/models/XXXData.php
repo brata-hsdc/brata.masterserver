@@ -62,7 +62,14 @@ class XXXData extends ModelEx {
 	{	
 	   $this->fetchData($station->get('OID')); // polymorphic callback to derived class      
 	   // putcomputed challenge parameters into a php hash which will be sent to rPI and used to populate message sent to team
-       $parms = $this->generateParameters();   // polymorphic callback to derivce class 
+	$parms = null;
+	if ($stationType->get('typeCode') == StationType::STATION_TYPE_CPA) {
+	   $parms = $team->getChallengeData();
+           trace("CPA startChallenge for team ".$team->getPin()." with ".print_r($parms,true));
+  	}
+	else {
+           $parms = $this->generateParameters();   // polymorphic callback to derivce class 
+	}
 
        $rpi = null;
        if ($stationType->get('hasrPI')) {

@@ -15,27 +15,10 @@ class CPAData extends XXXData {
   }
   
   
-  protected function generateParameters() {
-  	$tmp =  array(
-  			"label"=> $this->rs['label'],
-  			"fence"=> $this->rs['fence'], 
-  			"building"=>$this->rs['building'],
-  			"sum" => $this->rs['sum']
-  	);
-	// We are to randomly select a time between 2-6 seconds for the time
-	// the fence distance is traversed, and apply same to the building
-	$fence_time = rand(2, 6);
-        $building_time = (int)((float)$fence_time * (float)$this->rs['building'] / (float)$this->rs['fence']);
-  	return array("cpa_velocity" => $fence_time,
-  			"cpa_velocity_tolerance_ms"=>1000,
-  			"cpa_window_time_ms"=>$building_time, 
-  			"cpa_window_time_tolerance_ms"=> 500,
-  			"cpa_pulse_width_ms"=> 100, 
-  			"cpa_pulse_width_tolerance_ms"=> 75,
-  			"fence"=>$this->rs['fence'], 
-  			"building"=>$this->rs['building']);
+  //protected function generateParameters() {
+    // we have a problem as ideally this would be get from the team json object
+  //}
 
-  }
   // all stations share data pool stationId ignored
   protected function fetchData($stationId) {
   	$this->retrieveRandom();  	
@@ -64,9 +47,21 @@ class CPAData extends XXXData {
   	$cpa = CPAData::getFromStationId($stationId); // WARNING BUG HERE CPA data is not unique to station
   	return $cpa->generateParameters();
   }
-  static function getItemsToMeasure($stationId) {
-  	$cpa = CPAData::_getFromStationId($stationId);
-  	return $cpa->generateParameters();
+  public function getItemsToMeasure() {
+        $this->retrieveRandom();   // now replace that object with a real ramdon object.
+	// We are to randomly select a time between 2-6 seconds for the time
+	// the fence distance is traversed, and apply same to the building
+	$fence_time = rand(2000, 6000);
+        $building_time = (int)((float)$fence_time * (float)$this->rs['building'] / (float)$this->rs['fence']);
+  	return array("cpa_velocity" => $fence_time,
+  			"cpa_velocity_tolerance_ms"=>1000,
+  			"cpa_window_time_ms"=>$fence_time+$building_time, 
+  			"cpa_window_time_tolerance_ms"=> 400,
+  			"cpa_pulse_width_ms"=> 100, 
+  			"cpa_pulse_width_tolerance_ms"=> 75,
+  			"fence"=>$this->rs['fence'], 
+  			"building"=>$this->rs['building'],
+                        "label"=>$this->rs['label']);
   }
 }
 

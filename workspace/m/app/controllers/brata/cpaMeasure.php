@@ -36,7 +36,11 @@ function _cpaMeasure($stationTag=null)
 	switch($stationType->get('typeCode'))
 	{
 	    case StationType::STATION_TYPE_CPA:
-	        $parms = CPAData::getItemsToMeasure($stationId);
+                $random = new CPAData();
+	        $parms = $random->getItemsToMeasure();
+                trace("CPA measure generated for team ".$teamPIN." this data ".print_r($parms,true));
+                // record the challenge data randomly generated
+                $team->setChallengeData($parms);
 	        break;
             default:
 		trace("_cpaMeasure can't find station tyecode=".$teamPIN,__FILE__,__LINE__,__METHOD__);
@@ -48,7 +52,7 @@ function _cpaMeasure($stationTag=null)
 		rest_sendBadRequestResponse(500, "database create failed");
 	}
 
-	$msg = $team->expandMessage("PA is trying to escape. Quickly measure [fence=[fence]] [building=[building]] and scan Start QR Code.", $parms );
+	$msg = $team->expandMessage("PA is trying to escape. Quickly measure [fence=[label]] [building=[label]] and scan Start QR Code.", $parms );
 	trace("message before decode $msg",__FILE__,__LINE__,__METHOD__);
     $msg = $team->encodeText($msg);
 	json_sendObject(array('message' => $msg ) );

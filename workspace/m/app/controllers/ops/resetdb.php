@@ -405,7 +405,7 @@ function _resetdb() {
     if ($stationType===false) echo "Create StationType HMB failed";
     else createStations($numStations,"hmb",$stationType->get('OID'));
     
-     $stationType = StationType::makeStationType(StationType::STATION_TYPE_CPA,"Catch Provessor Aardvark"   ,true, 60,
+     $stationType = StationType::makeStationType(StationType::STATION_TYPE_CPA,"Catch Provessor Aardvark"   ,true, 2000,
        "PA is trying to escape. Quickly measure the [fence=label] [building=[label]] and scan Start QR Code.",
        "Watch now as the professor attempts to escape. Get him!",
        "Success! Go quickly to the team finish area.",
