@@ -40,7 +40,7 @@ protected function markTeamAtStation($team,$station) {
 	$station->updateTeamAtStation($team);
 }
 protected function testSolution($msg,$rPI=null) {
-	$answer = $this->getOneValue("answer", $msg);
+	$answer = $this->getOneIntValue("answer", $msg);
 	if($answer===false){
 		trace("Answer not provided in submit message.msg=".$msg,__FILE__,__LINE__,__METHOD__);
 	    rest_sendBadRequestResponse(500,"The [answer=ddd] field was not provided in your message or was malformed.");

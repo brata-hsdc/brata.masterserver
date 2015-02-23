@@ -1,0 +1,3 @@
+# Ignore mac data store files
+*.DS_Store
+
