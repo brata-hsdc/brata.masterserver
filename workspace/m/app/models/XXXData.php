@@ -9,25 +9,25 @@ class XXXData extends ModelEx {
 		if (preg_match($regex,$msg,$matches)==0) return false;
 		return $matches[1];
 	}
+	// use this to extract a namedfloating point value from a brata message
+	//  assume regex has one and only one capture clause a.k.a. "()"
+	protected function getOneFloatValue($keyword,$msg) {
+		$matches = array();
+		if (preg_match("/.*$keyword\s*=\s*(-?\d*\.?\d*)/",$msg,$matches)==0) return false;
+		return $matches[1];
+	}
 	// use this to extract a named value from a brata message
 	//  assume regex has one and only one capture clause a.k.a. "()"
 	protected function getOneValue($keyword,$msg) {
-		return getOneFloatValue($keyword,$msg);
+		return $this->getOneFloatValue($keyword,$msg);
 	}
 	// use this to extract a named integer value from a brata message
 	//  assume regex has one and only one capture clause a.k.a. "()"
 	protected function getOneIntValue($keyword,$msg) {
 		$matches = array();
-		if (preg_match("/.*$keyword.*=.*(\d+)/",$msg,$matches)==0) return false;
+		if (preg_match("/.*$keyword\s*=\s*(\d+)/",$msg,$matches)==0) return false;
 		return $matches[1];
 	}	
-	// use this to extract a namedfloating point value from a brata message
-	//  assume regex has one and only one capture clause a.k.a. "()"
-	protected function getOneFloatValue($keyword,$msg) {
-		$matches = array();
-		if (preg_match("/.*$keyword.*=.*(-?\d*\.?\d*)/",$msg,$matches)==0) return false;
-		return $matches[1];
-	}
 	// fetch the challenge data for this station
 	protected function fetchData($stationId) {
 		// implement as follows if all stations share all data 
@@ -155,19 +155,22 @@ class XXXData extends ModelEx {
 			case StationType::STATION_TYPE_EXT:
 				break;
 		}
-
-      $points = 3-$count;
-      $this->updateTeamScore($team, $points);  // save count
-		
 	  $isCorrect = $this->testRpiSolution($team->getChallengeData());
-	  
+
+          $points = 1; // one for showing up
+
 	  if (!$isCorrect) {
-		$challenge_complete=($count<3?false:true);
+	     $challenge_complete=($count<3?false:true);
+   	     if ($challenge_complete) {
+               $points = 2; // two points even if you fail out completely
+             }
 	  }
 	  else {
 	    $challenge_complete=true;
+            $points = 3; // full points as long as you eventually got it right
              trace('SUCCESS');
 	  }
+         $this->updateTeamScore($team, $points);  // save score
 		
 	  if ($challenge_complete) {
               $station->endChallenge();
@@ -180,10 +183,21 @@ class XXXData extends ModelEx {
 	  }
 		
 	  if       ($isCorrect) $msg = $stationType->get('success_msg');
-	  else if  ($count >=3) $msg = $stationType->get('failed_msg');
+	  else if  ($count >=2) $msg = $stationType->get('failed_msg');
 	  else                  $msg = $stationType->get('retry_msg');
+
+          if($stationType->get('typeCode') == StationType::STATION_TYPE_CPA){
+  	    // The CPA has 5 messages not 4 but new DB structure only supports 4 so shift
+            if       ($isCorrect) $msg = $stationType->get('failed_msg');
+	    else if  ($count >=2) $msg = $stationType->get('retry_msg');
+	    else                  $msg = "Miss! Try again!";
+          }
+
 	  // TODO this is broek from merge
           //$msg = $team->expandMessage($msg, $parms );
+
+          trace("isCorrect=".$isCorrect." challenge complete=".$challenge_complete." msg =".$msg);
+          trace("success_msg=".$stationType->get('success_msg'));
 	  
           // TODO ineresing this is still needed afer the refactoring
           $msg = $team->encodeText($msg);

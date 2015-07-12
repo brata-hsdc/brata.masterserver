@@ -50,10 +50,12 @@ protected function testSolution($msg,$rPI=null) {
 	        ((int)$this->rs['_2nd_on'] + (int)$this->rs['_2nd_off']) / 1000 *
 	        ((int)$this->rs['_3rd_on'] + (int)$this->rs['_3rd_off']) / 1000
 	);
+        trace('answer='.$answer.' correctAnswer='.$correctAnswer);
 	return ($answer > $correctAnswer - $correctAnswer * 0.01 and $answer < $correctAnswer + $correctAnswer * 0.01);
 
 }
 protected function updateTeamScore($team,$points) {
+        trace('updateHMBScore='.$points);
 	$team->updateHMBScore($points);
 }
 function brataSubmit($msg,$team,$station,$stationType)
@@ -72,11 +74,17 @@ function brataSubmit($msg,$team,$station,$stationType)
 //	$this->rs['cycle']    = $json['hmb_vibration_pattern_ms'][6];
 	
 	$count = $team->get('count');
-	$points = 3-$count;
+	$points = 1; // 1 for showing up
 	$team->set('count',$count+1);
 	$team->updateHMBScore(0);                   // save count 
         $isCorrect = $this->testSolution($msg);
 	$challengeComplete=($count+1<3?false:true);
+        if($challengeComplete){
+          $points = 2;
+        }
+        if($isCorrect){
+          $points = 3;
+        }
 	
 	$rpi = RPI::getFromStationId($station->get('OID'));
 	if ($rpi!=null){
@@ -101,7 +109,7 @@ function brataSubmit($msg,$team,$station,$stationType)
 	}
 
 	if       ($isCorrect) $msg = $stationType->get('success_msg');
-	else if  ($count >=3) $msg = $stationType->get('failed_msg');
+	else if  ($count >=2) $msg = $stationType->get('failed_msg');
 	else                  $msg = $stationType->get('retry_msg');
 	//$msg = $team->expandMessage($msg, $parms ); // nothing to expand
 	$msg = $team->encodeText($msg);

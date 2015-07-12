@@ -44,10 +44,15 @@ function _at_waypoint($waypointId=null)
 
   $isCorrect = FSLData::isMatch($fslState, $waypointId);
   $challengeComplete = false;
-  $points = 0;
-  
+  $points = 1; // one for showing up
+  if ($count >= 2) {
+    $points = 2; // two for pushing all the way through
+  } 
+  if ($isCorrect) {
+    $points = 3; // full credit regardless of tries if get it right
+  }
   if ($isCorrect || $count >= 2) {
-  	$team->updateFSLScore(3-$count,$fslState['index'] );
+    $team->updateFSLScore($points,$fslState['index'] );
     $challengeComplete = !FSLData::nextSection($fslState);
     $team->set('count',0);
   } else {

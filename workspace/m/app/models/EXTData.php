@@ -20,7 +20,7 @@ class EXTData extends XXXData {
   
   // depreciated
   static function _startChallenge($stationId) {
-  	$ext = new EXTData(1,-1);  // there is only one record
+  	$ext = new EXTData(2,1);  // there is only one record
   	return array(
   	'a_lat' => $ext->rs['a_lat'],
     'a_lng' => $ext->rs['a_lng'],
@@ -36,7 +36,7 @@ class EXTData extends XXXData {
   
   // fetch the challenge data for this station
   protected function fetchData($stationId) {
-  	$this->retrieve(1,-1);
+  	$this->retrieve(2,1);
   }
   
   // Called to generate challenge parameters from this object
@@ -62,9 +62,10 @@ class EXTData extends XXXData {
   // process the submit request
   // returns message for team, or false if DB error
   function brataSubmit($msg,$team,$station,$stationType) {
-  	$lat    = getOneValue("tower-lat", $msg);
-  	$lng    = getOneValue("tower-lon", $msg);
-  	$height = getOneValue("tower-height", $msg);
+        trace("Tower Fall Answer for Team = ".$team->getPin()." was ".$msg);
+  	$lat    = $this->getOneValue("tower-lat", $msg);
+  	$lng    = $this->getOneValue("tower-lon", $msg);
+  	$height = $this->getOneValue("tower-height", $msg);
 
   	if ($lat === false || $lng === false || $height === false) $msg = $stationType->get('failed_msg');
   	else                                                       $msg = $stationType->get('success_msg');

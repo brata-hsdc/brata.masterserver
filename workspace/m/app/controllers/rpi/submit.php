@@ -47,7 +47,7 @@ function _submit($stationTag=null)
 	$count = $team->get('count');
 	$team->setChallengeData($json);
         trace("count=".$count);
-	$points = 3-$count;
+        $points = 3-$count;
 	if (!$json['is_correct']) {
 		$count++;
 		$team->set('count',$count);
@@ -61,10 +61,11 @@ function _submit($stationTag=null)
 	
 	if ($challenge_complete)
 	{
-	   $team->_updateScore($stationType, $points);
            switch($stationType->get('typeCode'))
            {
              case StationType::STATION_TYPE_HMB:
+               // Leave scoring up to brata submit for CPA and CTS but HMB needs it 
+	       $team->_updateScore($stationType, $points);
 	       $station->endChallenge();
 	       $team->endChallenge();
                break;
