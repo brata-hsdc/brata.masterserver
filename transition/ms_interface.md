@@ -12,8 +12,8 @@ I'm attempting to group them by the sender/purpose:  BRATA, RPi, Admin.
 (JIA: Here are some notes from the beginning of last year's API document.)
 
 * This document describes the API exposed by the Master Server (MS). All calls are REST over HTTP using JSON request and response objects.
-* [TODO: Move this document’s contents to Mike’s sequence diagram slides.]
-* TODO: Any problem having port 514 available on the MS for forwarding station logs via syslog? Config items for this would be log server IP address and port number; it’s possible log server might be different from MS.
+* [TODO: Move this document's contents to Mike's sequence diagram slides.]
+* TODO: Any problem having port 514 available on the MS for forwarding station logs via syslog? Config items for this would be log server IP address and port number; it's possible log server might be different from MS.
 * TODO: Low-priority issue (nice-to-have): Create Network Management screen on MS with R/G/Y status for each station, and probably a Reset button for each station that will send it the reset message.
 TODO: Need to specify somewhere that these are the config params for each station:
     * station_id
@@ -65,18 +65,18 @@ message   |        |         | could be anything including a null string
 #### JSON Response
 ```json
 {
-   "messageteam_id" : "Welcome <school name> to the Design Challenge! Your app has successfully communicated with the Master Server! Congratulations! <Instructions><team’s DB id>"
+   "messageteam_id" : "Welcome <school name> to the Design Challenge! Your app has successfully communicated with the Master Server! Congratulations! <Instructions><team's DB id>"
 }
 ```
 #### Status Codes
 * 200 OK - no error
 * 400 Bad Request - message not JSON, request missing required header, request method incorrect
-* 404 Not Found – failed to initiate shutdown
+* 404 Not Found - failed to initiate shutdown
 
 #### Remarks
 The message response is the encoded greeting and instructions of where to proceed.
 
-The team’s name, school affiliation and Key will be entered into M during the registration process.  The team will scan the register QR code appending their key.  (The key will be assigned by a random draw).  M will translate the key into its internal DB value which it will return to the framework to be saved for latter messages.
+The team's name, school affiliation and Key will be entered into M during the registration process.  The team will scan the register QR code appending their key.  (The key will be assigned by a random draw).  M will translate the key into its internal DB value which it will return to the framework to be saved for latter messages.
 
 
 ===
@@ -97,43 +97,45 @@ Name      | Format | Example | Meaning
 LAT       |        |         | latitude in decimal degrees
 LON       |        |         | longitude in decimal degrees
 
-(TODO: Last year's document specified ```at_waypoint/<waypointId>```.)
+(TODO: Last year's document specified `at_waypoint/<waypointId>`.)
 
-```
-Example Request:
+#### Example Request
+```json
 POST /m/brata/at_waypoint/<waypointId> HTTP/1.1
 Host: example.com
 Content-Type: application/json
 {
-"team_id": "<team’s DB id>"
-"message": "" 
+   "team_id": "<team's DB id>",
+   "message": "" 
 }
+```
 
-Example Response:
+#### Example Response
+```json
 HTTP/1.1 200 OK
 {
-"team_id":
-"message": "<message to be displayed to user>"
+   "team_id": ,
+   "message": "<message to be displayed to user>"
 }
-
-Query Parameters:
-* waypointId – Note this is technically part of the URI not the content. This is the RDBMS object id of the waypoint
-* teamId – the team Id assigned during the registration process
-* message – could be anything including the null string.
-
-Request Headers:
-* Accept – the response content type depends on Accept header
-
-Response Headers:
-* Content-Type – application/json
-
-Status Codes:
-* 200 OK – no error
-* 404 Not Found – failed to initiate shutdown
-
-Remarks:
-The message may be encoded or unencoded depding on the waypoint’s definition the the DB.
 ```
+
+#### Query Parameters
+* waypointId - Note this is technically part of the URI not the content. This is the RDBMS object id of the waypoint
+* teamId - the team Id assigned during the registration process
+* message - could be anything including the null string.
+
+#### Request Headers
+* Accept - the response content type depends on Accept header
+
+#### Response Headers
+* Content-Type - application/json
+
+#### Status Codes
+* 200 OK - no error
+* 404 Not Found - failed to initiate shutdown
+
+#### Remarks
+The message may be encoded or unencoded depding on the waypoint's definition in the DB.
 
 ===
 
@@ -168,20 +170,20 @@ STATIONID |        |         | could be anything including a null string
 #### JSON Response
 ```json
 {
-   "message": "“<instruction for the challenge to be displayed to user>"
+   "message": "<instruction for the challenge to be displayed to user>"
 }
 ```
 
 #### Request Headers
-* Accept – the response content type depends on Accept header
+* Accept - the response content type depends on Accept header
 
 #### Response Headers
-* Content-Type – application/json
+* Content-Type - application/json
 
 #### Status Codes
-* 200 OK – no error
-* 400 Error - extended error message eg. Device didn’t response to start_challenge etc.
-* 404 Not Found – standard HTTP response
+* 200 OK - no error
+* 400 Error - extended error message eg. Device didn't response to start_challenge etc.
+* 404 Not Found - standard HTTP response
 
 #### Remarks
 The message is always encoded and is the same for all teams and stations.
@@ -251,9 +253,9 @@ URL       |        | http://192.168.0.2:9876 | the url used to call back from th
 
 #### Status Codes
 
-* 202 Accepted – no error
-* 400 Bad Request – message not JSON, request missing required header, request method incorrect
-* 404 Not Found – standard HTTP status
+* 202 Accepted - no error
+* 400 Bad Request - message not JSON, request missing required header, request method incorrect
+* 404 Not Found - standard HTTP status
 
 #### Remarks
 
@@ -278,7 +280,7 @@ Name      | Format | Example | Meaning
 ID        |        |         | the same value provided in the join message
 message_version   ||         | message schema version, default is 0
 message_timestamp ||         | timestamp that the message was sent
-`candidate_answer`  ||         | For the CTS this is a list of three values providing the combination for the safe in brackets and coma separated. As an example “ [31, 41, 59]”.  The range for each value is 0..99.  For the CPA the string “True” if the flash was within tolerance or “False” if the flash was not detected or there was an issue with the flash timing.  The details if a failure if a CPA are included in the fail_message parameter.  This message parameter is used by a CTS and CPA only.
+`candidate_answer`  ||         | For the CTS this is a list of three values providing the combination for the safe in brackets and coma separated. As an example "[31, 41, 59]".  The range for each value is 0..99.  For the CPA the string "True" if the flash was within tolerance or "False" if the flash was not detected or there was an issue with the flash timing.  The details if a failure if a CPA are included in the fail_message parameter.  This message parameter is used by a CTS and CPA only.
 is_correct        ||         | "True" if the submitted answer is the correct answer; "False" otherwise. This message parameter is used by a CPA and CTS only. 
 fail_message      ||         | a message logged by MS for debugging/troubleshooting
 
@@ -304,7 +306,7 @@ fail_message      ||         | a message logged by MS for debugging/troubleshoot
 ```json
 {
   "message_version": "0",
-  "message_timestamp": "2014-09-15 14:08:59"
+  "message_timestamp": "2014-09-15 14:08:59",
   "theatric_delay_ms": 3000,
   "challenge_complete": "False"
 }
@@ -312,12 +314,12 @@ fail_message      ||         | a message logged by MS for debugging/troubleshoot
 
 #### Request Headers
 
-* Accept – the response content type depends on Accept header
-* Authorization – optional Oauth token to authenticate todo
+* Accept - the response content type depends on Accept header
+* Authorization - optional Oauth token to authenticate todo
 
 #### Response Headers
 
-* Content-Type – this depends on _Accept_ header of request
+* Content-Type - this depends on _Accept_ header of request
 
 #### Response Parameters
 
@@ -358,12 +360,12 @@ ID        |        |         | the same value provided in the join message
 
 #### Request Headers
 
-* Accept – the response content type depends on _Accept_ header
-* Authorization – optional Oauth token to authenticate todo
+* Accept - the response content type depends on _Accept_ header
+* Authorization - optional Oauth token to authenticate todo
 
 #### Response Headers
 
-* Content-Type – this depends on _Accept_ header of request
+* Content-Type - this depends on _Accept_ header of request
 
 #### Status Codes
 
@@ -399,11 +401,11 @@ ID        |        |         | the same value provided in the join message
 
 #### Request Headers
 
-* Accept – the response content type depends on Accept header
+* Accept - the response content type depends on Accept header
 
 #### Response Headers
 
-* Content-Type – this depends on _Accept_ header of request
+* Content-Type - this depends on _Accept_ header of request
 
 #### Status Codes
 
@@ -440,11 +442,11 @@ PIN       |        |         | a value to confirm that the reset is intentional
 
 #### Request Headers
 
-* Accept – the response content type depends on _Accept_ header
+* Accept - the response content type depends on _Accept_ header
 
 #### Response Headers
 
-* Content-Type – this depends on _Accept_ header of request
+* Content-Type - this depends on _Accept_ header of request
 
 #### Status Codes
 
@@ -474,7 +476,7 @@ Name      | Format | Example | Meaning
 message_version   ||         | message schema version, default is 0
 message_timestamp ||         | timestamp that the message was sent
 `theatric_delay_ms` ||       | the amount of time in milliseconds before the station transitions to its challenge started state. This gives the user time to read any text on the SAT and fully appreciate the hardware starting up.
-`hmb_vibration_pattern_ms` ||| a list of six values providing the on/off times for the HMB vibration motors. This field will only be provided to a station that has joined specifying itself as the “hmb” station type.
+`hmb_vibration_pattern_ms` ||| a list of six values providing the on/off times for the HMB vibration motors. This field will only be provided to a station that has joined specifying itself as the "hmb" station type.
 ||| * The first two values provide the on/off times for Vibration Motor #1; the next two values for Motor #2; and the last two for Motor #3.
 ||| * For each pair, the first specifies the ON time and the second specifies the OFF time.
 cpa_velocity ||| a single value providing a temporal measurement from the initial position to the start of the building in ms. This field will only be provided to a station that has joined specifying itself as the "cpa" station type.
@@ -498,11 +500,11 @@ cts_combo ||| a list of three values providing the combination for the safe. The
 
 #### Request Headers
 
-* Accept – the response content type depends on Accept header
+* Accept - the response content type depends on Accept header
 
 #### Response Headers
 
-* Content-Type – this depends on _Accept_ header of request
+* Content-Type - this depends on _Accept_ header of request
 
 #### Status Codes
 
@@ -549,12 +551,12 @@ is_correct        ||         | "True" if the submitted answer is the correct ans
 
 #### Request Headers
 
-* Accept – the response content type depends on _Accept_ header
-* Authorization – optional Oauth token to authenticate todo
+* Accept - the response content type depends on _Accept_ header
+* Authorization - optional Oauth token to authenticate todo
 
 #### Response Headers
 
-* Content-Type – this depends on _Accept_ header of request
+* Content-Type - this depends on _Accept_ header of request
 
 #### Status Codes
 
@@ -585,11 +587,11 @@ PIN       |        |         | a value to confirm that the reset is intentional
 
 #### Request Headers
 
-* Accept – the response content type depends on _Accept_ header
+* Accept - the response content type depends on _Accept_ header
 
 #### Response Headers
 
-* Content-Type – this depends on _Accept_ header of request
+* Content-Type - this depends on _Accept_ header of request
 
 #### Status Codes
 
