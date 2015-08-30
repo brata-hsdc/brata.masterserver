@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'fp=76zxtrrui7@18mu901+0f!l!^9e_m3q#!49yts42vg8p_c*'
+SECRET_KEY = '-4@1rw9sp&emici+=!_h51y-&0wfs1n3mmd@*o4a^*_7(m^kxe'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -37,6 +37,10 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'dbkeeper',     # database maintenance & management interface
+    'scoreboard',   # leaderboard
+    'piservice',    # background pi station REST API
+    'teamcentral',  # team info clearinghouse; also team reg.
 )
 
 MIDDLEWARE_CLASSES = (
@@ -75,10 +79,21 @@ WSGI_APPLICATION = 'ms.wsgi.application'
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+#     # sqlite
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+    # PostgreSQL/PostGIS
+        'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',   # plain PostgreSQL
+        #'ENGINE': 'django.contrib.gis.db.backends.postgis',  # PostgreSQL + PostGIS
+        'NAME': 'msdb',
+        'USER': 'pi',
+        'PASSWORD': 'raspberry',
+        'HOST': '',      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP
+        'PORT': '5432',  # Set to empty string for default
+    }    
 }
 
 
