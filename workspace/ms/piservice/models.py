@@ -12,8 +12,8 @@ class PiStation(models.Model):
         managed = True  # We want manage.py to migrate database changes for us
     
     # Constants
-    NAME_FIELD_LENGTH = 100  # Make it long because some team will have a "creative" name
-    PIN_FIELD_LENGTH  = 20
+    HOSTNAME_FIELD_LENGTH  = 20
+    IPADDRESS_FIELD_LENGTH = 16
     
     # Values for type
     UNKNOWN_STATION_TYPE = 0
@@ -35,8 +35,8 @@ class PiStation(models.Model):
                       )
     
     # Schema definition
-    hostname    = models.CharField()
-    ipAddress   = models.CharField()
+    hostname    = models.CharField(max_length=HOSTNAME_FIELD_LENGTH)
+    ipAddress   = models.CharField(max_length=IPADDRESS_FIELD_LENGTH)
     stationType = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
     piType      = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
     
