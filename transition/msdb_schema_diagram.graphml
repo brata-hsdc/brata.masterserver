@@ -14,14 +14,65 @@
   <key for="edge" id="d10" yfiles.type="edgegraphics"/>
   <graph edgedefault="directed" id="G">
     <data key="d0"/>
-    <node id="n0" yfiles.foldertype="group">
+    <node id="n0">
+      <data key="d5"/>
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="18.701171875" width="250.546875" x="559.5068359375" y="95.5"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="16" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="23.6015625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="251.25" x="-0.3515625" y="-2.4501953125">Master Server Database Schema</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n1">
+      <data key="d5"/>
+      <data key="d6">
+        <y:ShapeNode>
+          <y:Geometry height="18.701171875" width="254.09765625" x="342.654296875" y="54.798828125"/>
+          <y:Fill hasColor="false" transparent="false"/>
+          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
+          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="33.40234375" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="244.09765625" x="5.0" y="-7.3505859375">File:  brata.masterserver/transition/msdb_schema_diagram.graphml
+
+(edit with yEd)</y:NodeLabel>
+          <y:Shape type="rectangle"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+    <node id="n2">
+      <data key="d5"/>
+      <data key="d6">
+        <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
+          <y:Geometry height="116.0" width="88.689453125" x="415.3154296875" y="131.662353515625"/>
+          <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
+          <y:BorderStyle color="#000000" type="line" width="1.0"/>
+          <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#B7C9E3" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="t" textColor="#000000" visible="true" width="78.689453125" x="5.0" y="4.0">(Django) User</y:NodeLabel>
+          <y:NodeLabel alignment="left" autoSizePolicy="content" configuration="com.yworks.entityRelationship.label.attributes" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="77.505859375" modelName="custom" textColor="#000000" visible="true" width="60.021484375" x="2.0" y="30.701171875">username
+password
+email
+first_name
+last_name<y:LabelModel>
+              <y:ErdAttributesNodeLabelModel/>
+            </y:LabelModel>
+            <y:ModelParameter>
+              <y:ErdAttributesNodeLabelModelParameter/>
+            </y:ModelParameter>
+          </y:NodeLabel>
+          <y:StyleProperties>
+            <y:Property class="java.lang.Boolean" name="y.view.ShadowNodePainter.SHADOW_PAINTING" value="true"/>
+          </y:StyleProperties>
+        </y:GenericNode>
+      </data>
+    </node>
+    <node id="n3" yfiles.foldertype="group">
       <data key="d4"/>
       <data key="d5"/>
       <data key="d6">
         <y:ProxyAutoBoundsNode>
           <y:Realizers active="0">
             <y:GroupNode>
-              <y:Geometry height="365.87646484375" width="329.01953125" x="342.654296875" y="153.12353515625"/>
+              <y:Geometry height="365.87646484375" width="329.01953125" x="342.654296875" y="265.12353515625"/>
               <y:Fill color="#F5F5F5" transparent="false"/>
               <y:BorderStyle color="#000000" type="dashed" width="1.0"/>
               <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#EBEBEB" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="22.37646484375" modelName="internal" modelPosition="t" textColor="#000000" visible="true" width="329.01953125" x="0.0" y="0.0">dbkeeper</y:NodeLabel>
@@ -44,12 +95,12 @@
           </y:Realizers>
         </y:ProxyAutoBoundsNode>
       </data>
-      <graph edgedefault="directed" id="n0:">
-        <node id="n0::n0">
+      <graph edgedefault="directed" id="n3:">
+        <node id="n3::n0">
           <data key="d5"/>
           <data key="d6">
             <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-              <y:Geometry height="128.0" width="86.34765625" x="525.49462890625" y="190.5"/>
+              <y:Geometry height="128.0" width="86.34765625" x="525.49462890625" y="302.5"/>
               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#B7C9E3" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="t" textColor="#000000" visible="true" width="41.34765625" x="22.5" y="4.0">Mentor</y:NodeLabel>
@@ -71,11 +122,11 @@ teamIDs<y:LabelModel>
             </y:GenericNode>
           </data>
         </node>
-        <node id="n0::n1">
+        <node id="n3::n1">
           <data key="d5"/>
           <data key="d6">
             <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-              <y:Geometry height="90.0" width="65.69140625" x="378.654296875" y="295.0"/>
+              <y:Geometry height="90.0" width="65.69140625" x="378.654296875" y="407.0"/>
               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#B7C9E3" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="t" textColor="#000000" visible="true" width="40.69140625" x="12.5" y="4.0">School</y:NodeLabel>
@@ -92,11 +143,11 @@ teamIDs<y:LabelModel>
             </y:GenericNode>
           </data>
         </node>
-        <node id="n0::n2">
+        <node id="n3::n2">
           <data key="d5"/>
           <data key="d6">
             <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-              <y:Geometry height="101.0" width="176.0107421875" x="480.6630859375" y="403.0"/>
+              <y:Geometry height="101.0" width="176.0107421875" x="480.6630859375" y="515.0"/>
               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#B7C9E3" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="t" textColor="#000000" visible="true" width="34.673828125" x="70.66845703125" y="4.0">Team</y:NodeLabel>
@@ -118,14 +169,14 @@ multiple competition attributes<y:LabelModel>
         </node>
       </graph>
     </node>
-    <node id="n1" yfiles.foldertype="group">
+    <node id="n4" yfiles.foldertype="group">
       <data key="d4"/>
       <data key="d5"/>
       <data key="d6">
         <y:ProxyAutoBoundsNode>
           <y:Realizers active="0">
             <y:GroupNode>
-              <y:Geometry height="365.87646484375" width="225.029296875" x="797.4853515625" y="153.12353515625"/>
+              <y:Geometry height="365.87646484375" width="225.029296875" x="797.4853515625" y="265.12353515625"/>
               <y:Fill color="#F5F5F5" transparent="false"/>
               <y:BorderStyle color="#000000" type="dashed" width="1.0"/>
               <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#EBEBEB" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="22.37646484375" modelName="internal" modelPosition="t" textColor="#000000" visible="true" width="225.029296875" x="0.0" y="0.0">piservice</y:NodeLabel>
@@ -148,12 +199,12 @@ multiple competition attributes<y:LabelModel>
           </y:Realizers>
         </y:ProxyAutoBoundsNode>
       </data>
-      <graph edgedefault="directed" id="n1:">
-        <node id="n1::n0">
+      <graph edgedefault="directed" id="n4:">
+        <node id="n4::n0">
           <data key="d5"/>
           <data key="d6">
             <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-              <y:Geometry height="101.0" width="75.029296875" x="877.4853515625" y="403.0"/>
+              <y:Geometry height="101.0" width="75.029296875" x="877.4853515625" y="515.0"/>
               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#B7C9E3" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="t" textColor="#000000" visible="true" width="45.35546875" x="14.8369140625" y="4.0">PiEvent</y:NodeLabel>
@@ -173,11 +224,11 @@ piID<y:LabelModel>
             </y:GenericNode>
           </data>
         </node>
-        <node id="n1::n1">
+        <node id="n4::n1">
           <data key="d5"/>
           <data key="d6">
             <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-              <y:Geometry height="101.0" width="75.029296875" x="877.4853515625" y="217.5"/>
+              <y:Geometry height="101.0" width="75.029296875" x="877.4853515625" y="329.5"/>
               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#B7C9E3" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="t" textColor="#000000" visible="true" width="52.029296875" x="11.5" y="4.0">PiStation</y:NodeLabel>
@@ -199,33 +250,7 @@ piType<y:LabelModel>
         </node>
       </graph>
     </node>
-    <node id="n2">
-      <data key="d5"/>
-      <data key="d6">
-        <y:ShapeNode>
-          <y:Geometry height="18.701171875" width="250.546875" x="559.5068359375" y="95.5"/>
-          <y:Fill hasColor="false" transparent="false"/>
-          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="center" autoSizePolicy="content" fontFamily="Dialog" fontSize="16" fontStyle="bold" hasBackgroundColor="false" hasLineColor="false" height="23.6015625" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="251.25" x="-0.3515625" y="-2.4501953125">Master Server Database Schema</y:NodeLabel>
-          <y:Shape type="rectangle"/>
-        </y:ShapeNode>
-      </data>
-    </node>
-    <node id="n3">
-      <data key="d5"/>
-      <data key="d6">
-        <y:ShapeNode>
-          <y:Geometry height="18.701171875" width="254.09765625" x="342.654296875" y="54.798828125"/>
-          <y:Fill hasColor="false" transparent="false"/>
-          <y:BorderStyle hasColor="false" type="line" width="1.0"/>
-          <y:NodeLabel alignment="left" autoSizePolicy="content" fontFamily="Dialog" fontSize="8" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="33.40234375" modelName="internal" modelPosition="c" textColor="#000000" visible="true" width="244.09765625" x="5.0" y="-7.3505859375">File:  brata.masterserver/transition/msdb_schema_diagram.graphml
-
-(edit with yEd)</y:NodeLabel>
-          <y:Shape type="rectangle"/>
-        </y:ShapeNode>
-      </data>
-    </node>
-    <edge id="n0::e0" source="n0::n0" target="n0::n2">
+    <edge id="n3::e0" source="n3::n0" target="n3::n2">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -235,11 +260,11 @@ piType<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="n0::e1" source="n0::n0" target="n0::n1">
+    <edge id="n3::e1" source="n3::n0" target="n3::n1">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
-            <y:Point x="411.5" y="254.5"/>
+            <y:Point x="411.5" y="366.5"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="crows_foot_many" target="none"/>
@@ -247,11 +272,11 @@ piType<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="n0::e2" source="n0::n2" target="n0::n1">
+    <edge id="n3::e2" source="n3::n2" target="n3::n1">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
-            <y:Point x="411.5" y="453.5"/>
+            <y:Point x="411.5" y="565.5"/>
           </y:Path>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="crows_foot_many" target="none"/>
@@ -259,7 +284,7 @@ piType<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="e0" source="n1::n0" target="n0::n2">
+    <edge id="e0" source="n4::n0" target="n3::n2">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
@@ -269,12 +294,24 @@ piType<y:LabelModel>
         </y:PolyLineEdge>
       </data>
     </edge>
-    <edge id="n1::e0" source="n1::n0" target="n1::n1">
+    <edge id="n4::e0" source="n4::n0" target="n4::n1">
       <data key="d10">
         <y:PolyLineEdge>
           <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0"/>
           <y:LineStyle color="#000000" type="line" width="1.0"/>
           <y:Arrows source="crows_foot_many" target="none"/>
+          <y:BendStyle smoothed="false"/>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+    <edge id="e1" source="n2" target="n3::n0">
+      <data key="d10">
+        <y:PolyLineEdge>
+          <y:Path sx="0.0" sy="0.0" tx="0.0" ty="0.0">
+            <y:Point x="568.66845703125" y="189.662353515625"/>
+          </y:Path>
+          <y:LineStyle color="#000000" type="line" width="1.0"/>
+          <y:Arrows source="none" target="none"/>
           <y:BendStyle smoothed="false"/>
         </y:PolyLineEdge>
       </data>
