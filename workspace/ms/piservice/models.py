@@ -1,7 +1,8 @@
 from django.db import models
 from dbkeeper.models import Team
 
-# Create your models here.
+# See the schema diagram and other documentation in the
+# brata.workstation/transitions folder.
 
 #----------------------------------------------------------------------------
 class PiStation(models.Model):
@@ -12,8 +13,7 @@ class PiStation(models.Model):
         managed = True  # We want manage.py to migrate database changes for us
     
     # Constants
-    HOSTNAME_FIELD_LENGTH  = 20
-    IPADDRESS_FIELD_LENGTH = 16
+    HOST_FIELD_LENGTH  = 60  # might need to hold FQDN
     
     # Values for type
     UNKNOWN_STATION_TYPE = 0
@@ -35,10 +35,10 @@ class PiStation(models.Model):
                       )
     
     # Schema definition
-    hostname    = models.CharField(max_length=HOSTNAME_FIELD_LENGTH)
-    ipAddress   = models.CharField(max_length=IPADDRESS_FIELD_LENGTH)
-    stationType = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
-    piType      = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
+    host            = models.CharField(max_length=HOST_FIELD_LENGTH)
+    stationType     = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
+    piType          = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
+    stationInstance = models.PositiveSmallIntegerField(default=0)
     
 #----------------------------------------------------------------------------
 class PiEvent(models.Model):
@@ -54,8 +54,10 @@ class PiEvent(models.Model):
     TYPE_CHOICES = (
                     (UNKNOWN_TYPE, "Unknown"),
                    )
-    time = models.TimeField()
-    type = models.PositiveSmallIntegerField(choices=TYPE_CHOICES, default=UNKNOWN_TYPE)
+    
+    # Schema definition
+    time   = models.TimeField()
+    type   = models.PositiveSmallIntegerField(choices=TYPE_CHOICES, default=UNKNOWN_TYPE)
     teamID = models.ForeignKey(Team)
     piID   = models.ForeignKey(PiStation)
 
@@ -64,5 +66,5 @@ class PiEvent(models.Model):
     # should it be a separate table that this one has a ForeignKey to?
     # I think modern RDBMS's don't store the full field size for every
     # record for char fields.  Am I wrong?
-    data = models.CharField(max_length=DATA_FIELD_LENGTH, blank=True)
+    data = models.TextField(blank=True)
     
