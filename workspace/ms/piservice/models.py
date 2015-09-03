@@ -1,7 +1,8 @@
 from django.db import models
 from dbkeeper.models import Team
 
-# Create your models here.
+# See the schema diagram and other documentation in the
+# brata.workstation/transitions folder.
 
 #----------------------------------------------------------------------------
 class PiStation(models.Model):
@@ -12,8 +13,7 @@ class PiStation(models.Model):
         managed = True  # We want manage.py to migrate database changes for us
     
     # Constants
-    HOSTNAME_FIELD_LENGTH  = 20
-    IPADDRESS_FIELD_LENGTH = 16
+    HOST_FIELD_LENGTH  = 60  # might need to hold FQDN
     
     # Values for type
     UNKNOWN_STATION_TYPE = 0
@@ -23,22 +23,26 @@ class PiStation(models.Model):
                            )
     
     UNKNOWN_PI_TYPE = 0
-    A_PI_TYPE       = 1
-    B_PI_TYPE       = 2
-    BPLUS_PI_TYPE   = 3
+    A1_PI_TYPE      = 1
+    A1PLUS_PI_TYPE  = 2
+    B1_PI_TYPE      = 3
+    B1PLUS_PI_TYPE  = 4
+    B2_PI_TYPE      = 5
     # TODO: add other types as appropriate
     PI_TYPE_CHOICES = (
                         (UNKNOWN_PI_TYPE, "Unknown"),
-                        (A_PI_TYPE,       "Model A"),
-                        (B_PI_TYPE,       "Model B"),
-                        (BPLUS_PI_TYPE,   "Model B+"),
+                        (A1_PI_TYPE,      "Gen 1 Model A"),
+                        (A1PLUS_PI_TYPE,  "Gen 1 Model A+"),
+                        (B1_PI_TYPE,      "Gen 1 Model B"),
+                        (B1PLUS_PI_TYPE,  "Gen 1 Model B+"),
+                        (B2_PI_TYPE,      "Gen 2 Model B"),
                       )
     
     # Schema definition
-    hostname     = models.CharField(max_length=HOSTNAME_FIELD_LENGTH)
-    ip_address   = models.CharField(max_length=IPADDRESS_FIELD_LENGTH)
-    station_type = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
-    pi_type      = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
+    host            = models.CharField(max_length=HOST_FIELD_LENGTH, blank=True)
+    stationType     = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
+    piType          = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
+    stationInstance = models.PositiveSmallIntegerField(default=0)
     
 #----------------------------------------------------------------------------
 class PiEvent(models.Model):
@@ -56,17 +60,11 @@ class PiEvent(models.Model):
                     (UNKNOWN_TYPE, "Unknown"),
                    )
     
-    time    = models.TimeField()
-    type    = models.PositiveSmallIntegerField(choices=TYPE_CHOICES, default=UNKNOWN_TYPE)
+    # Schema definition
+    time   = models.TimeField()
+    type   = models.PositiveSmallIntegerField(choices=TYPE_CHOICES, default=UNKNOWN_TYPE)
     team_id = models.ForeignKey(Team)
     pi_id   = models.ForeignKey(PiStation)
-    success = models.BooleanField()
+    data   = models.TextField(blank=True)
     message = models.CharField(max_length=MESSAGE_FIELD_LENGTH)
-
-    # TODO: The data field could potentially be large if we start shoving
-    # big JSON objects into it.  Should it be part of this table or
-    # should it be a separate table that this one has a ForeignKey to?
-    # I think modern RDBMS's don't store the full field size for every
-    # record for char fields.  Am I wrong?
-    data = models.CharField(max_length=DATA_FIELD_LENGTH, blank=True)
     
