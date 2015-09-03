@@ -48,6 +48,7 @@ class PiEvent(models.Model):
     """
     # Constants
     DATA_FIELD_LENGTH = 2000
+    MESSAGE_FIELD_LENGTH = 100
     # Values for type
     UNKNOWN_TYPE = 0
     # TODO: add other types as appropriate
@@ -59,6 +60,8 @@ class PiEvent(models.Model):
     type    = models.PositiveSmallIntegerField(choices=TYPE_CHOICES, default=UNKNOWN_TYPE)
     team_id = models.ForeignKey(Team)
     pi_id   = models.ForeignKey(PiStation)
+    success = models.BooleanField()
+    message = models.CharField(max_length=MESSAGE_FIELD_LENGTH)
 
     # TODO: The data field could potentially be large if we start shoving
     # big JSON objects into it.  Should it be part of this table or
