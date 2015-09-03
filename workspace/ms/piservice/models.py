@@ -23,19 +23,23 @@ class PiStation(models.Model):
                            )
     
     UNKNOWN_PI_TYPE = 0
-    A_PI_TYPE       = 1
-    B_PI_TYPE       = 2
-    BPLUS_PI_TYPE   = 3
+    A1_PI_TYPE      = 1
+    A1PLUS_PI_TYPE  = 2
+    B1_PI_TYPE      = 3
+    B1PLUS_PI_TYPE  = 4
+    B2_PI_TYPE      = 5
     # TODO: add other types as appropriate
     PI_TYPE_CHOICES = (
                         (UNKNOWN_PI_TYPE, "Unknown"),
-                        (A_PI_TYPE,       "Model A"),
-                        (B_PI_TYPE,       "Model B"),
-                        (BPLUS_PI_TYPE,   "Model B+"),
+                        (A1_PI_TYPE,      "Gen 1 Model A"),
+                        (A1PLUS_PI_TYPE,  "Gen 1 Model A+"),
+                        (B1_PI_TYPE,      "Gen 1 Model B"),
+                        (B1PLUS_PI_TYPE,  "Gen 1 Model B+"),
+                        (B2_PI_TYPE,      "Gen 2 Model B"),
                       )
     
     # Schema definition
-    host            = models.CharField(max_length=HOST_FIELD_LENGTH)
+    host            = models.CharField(max_length=HOST_FIELD_LENGTH, blank=True)
     stationType     = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
     piType          = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
     stationInstance = models.PositiveSmallIntegerField(default=0)
@@ -60,11 +64,5 @@ class PiEvent(models.Model):
     type   = models.PositiveSmallIntegerField(choices=TYPE_CHOICES, default=UNKNOWN_TYPE)
     teamID = models.ForeignKey(Team)
     piID   = models.ForeignKey(PiStation)
-
-    # TODO: The data field could potentially be large if we start shoving
-    # big JSON objects into it.  Should it be part of this table or
-    # should it be a separate table that this one has a ForeignKey to?
-    # I think modern RDBMS's don't store the full field size for every
-    # record for char fields.  Am I wrong?
-    data = models.TextField(blank=True)
+    data   = models.TextField(blank=True)
     
