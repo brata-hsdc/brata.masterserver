@@ -1,4 +1,4 @@
-"""ms URL Configuration
+"""ms.piservice URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.8/topics/http/urls/
@@ -16,10 +16,12 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from piservice import urls as piservice_urls
+from . import views
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^piservice/', include(piservice_urls)),
-    url(r'^serve_pi/', include(piservice_urls)),
+    url(r'^$', views.index, name="index"),
+    url(r'^index.html$', views.index, name="index"),
+#     url(r'^register/', views.register, name="register"),
+    url(r'^register/$', views.Register.as_view(), name="register"),
+    url(r'^register/brata-(?P<brataVersion>[0-9]+)', views.Register.as_view(), name="register-brata"),
 ]

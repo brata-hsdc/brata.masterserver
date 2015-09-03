@@ -35,10 +35,10 @@ class PiStation(models.Model):
                       )
     
     # Schema definition
-    hostname    = models.CharField(max_length=HOSTNAME_FIELD_LENGTH)
-    ipAddress   = models.CharField(max_length=IPADDRESS_FIELD_LENGTH)
-    stationType = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
-    piType      = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
+    hostname     = models.CharField(max_length=HOSTNAME_FIELD_LENGTH)
+    ip_address   = models.CharField(max_length=IPADDRESS_FIELD_LENGTH)
+    station_type = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
+    pi_type      = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
     
 #----------------------------------------------------------------------------
 class PiEvent(models.Model):
@@ -54,10 +54,11 @@ class PiEvent(models.Model):
     TYPE_CHOICES = (
                     (UNKNOWN_TYPE, "Unknown"),
                    )
-    time = models.TimeField()
-    type = models.PositiveSmallIntegerField(choices=TYPE_CHOICES, default=UNKNOWN_TYPE)
-    teamID = models.ForeignKey(Team)
-    piID   = models.ForeignKey(PiStation)
+    
+    time    = models.TimeField()
+    type    = models.PositiveSmallIntegerField(choices=TYPE_CHOICES, default=UNKNOWN_TYPE)
+    team_id = models.ForeignKey(Team)
+    pi_id   = models.ForeignKey(PiStation)
 
     # TODO: The data field could potentially be large if we start shoving
     # big JSON objects into it.  Should it be part of this table or
