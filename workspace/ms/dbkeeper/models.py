@@ -45,13 +45,13 @@ class Team(models.Model):
     PIN_FIELD_LENGTH  = 20
     
     # Schema definition
-    name            = models.CharField(max_length=NAME_FIELD_LENGTH, unique=True)
-    school          = models.ForeignKey(School)
-    pin             = models.CharField(max_length=PIN_FIELD_LENGTH, default="generated")  # TODO: what's this for? Do we need it or will the password be sufficient?
+    name             = models.CharField(max_length=NAME_FIELD_LENGTH, unique=True)
+    school           = models.ForeignKey(School)
+    pin              = models.CharField(max_length=PIN_FIELD_LENGTH, default="generated")  # TODO: what's this for? Do we need it or will the password be sufficient?
     
     #    Score fields for the different competitions
-    totalScore      = models.IntegerField(default=0)
-    totalDuration_s = models.IntegerField(default=0)  # total duration of competition in seconds
+    total_score      = models.IntegerField(default=0)
+    total_duration_s = models.IntegerField(default=0)  # total duration of competition in seconds
     # TODO:  Add more fields here as needed
     
 #----------------------------------------------------------------------------
@@ -67,11 +67,11 @@ class Mentor(models.Model):
     PHONE_FIELD_LENGTH = 20
     
     # Schema definition
-    name        = models.CharField(max_length=NAME_FIELD_LENGTH, unique=True)
-    school      = models.ForeignKey(School)
-    workPhone   = models.CharField(max_length=PHONE_FIELD_LENGTH, blank=True)
-    mobilePhone = models.CharField(max_length=PHONE_FIELD_LENGTH, blank=True)
-    otherPhone  = models.CharField(max_length=PHONE_FIELD_LENGTH, blank=True)
-    note        = models.TextField(blank=True)
-    teams       = models.ManyToManyField(Team)
+    name         = models.CharField(max_length=NAME_FIELD_LENGTH, unique=True)
+    school       = models.ForeignKey(School)
+    work_phone   = models.CharField(max_length=PHONE_FIELD_LENGTH, blank=True)
+    mobile_phone = models.CharField(max_length=PHONE_FIELD_LENGTH, blank=True)
+    other_phone  = models.CharField(max_length=PHONE_FIELD_LENGTH, blank=True)
+    note         = models.TextField(blank=True)
+    teams        = models.ManyToManyField(Team)
     

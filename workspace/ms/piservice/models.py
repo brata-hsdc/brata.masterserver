@@ -40,8 +40,8 @@ class PiStation(models.Model):
     
     # Schema definition
     host            = models.CharField(max_length=HOST_FIELD_LENGTH, blank=True)
-    stationType     = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
-    piType          = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
+    station_type    = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
+    pi_type         = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
     stationInstance = models.PositiveSmallIntegerField(default=0)
     
 #----------------------------------------------------------------------------
@@ -53,18 +53,33 @@ class PiEvent(models.Model):
     # Constants
     DATA_FIELD_LENGTH = 2000
     MESSAGE_FIELD_LENGTH = 100
+
     # Values for type
-    UNKNOWN_TYPE = 0
-    # TODO: add other types as appropriate
+    UNKNOWN_TYPE = -1
+    REGISTER_MSG_TYPE = 1
+
     TYPE_CHOICES = (
                     (UNKNOWN_TYPE, "Unknown"),
+                    (REGISTER_MSG_TYPE, "Register"),
                    )
     
+    # Values for status
+    UNKNOWN_STATUS = -1
+    FAIL_STATUS    = 0
+    SUCCESS_STATUS = 1
+    
+    STATUS_CHOICES = (
+                      (UNKNOWN_STATUS, "Unknown"),
+                      (FAIL_STATUS, "Fail"),
+                      (SUCCESS_STATUS, "Success"),
+                     )
+    
     # Schema definition
-    time   = models.TimeField()
-    type   = models.PositiveSmallIntegerField(choices=TYPE_CHOICES, default=UNKNOWN_TYPE)
+    time    = models.TimeField()
+    type    = models.SmallIntegerField(choices=TYPE_CHOICES, default=UNKNOWN_TYPE)
     team_id = models.ForeignKey(Team)
     pi_id   = models.ForeignKey(PiStation)
-    data   = models.TextField(blank=True)
-    message = models.CharField(max_length=MESSAGE_FIELD_LENGTH)
+    status  = models.SmallIntegerField(choices=STATUS_CHOICES, default=UNKNOWN_STATUS)
+    data    = models.TextField(blank=True)
+    message = models.CharField(max_length=MESSAGE_FIELD_LENGTH, blank=True)
     

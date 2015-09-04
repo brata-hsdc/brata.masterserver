@@ -53,37 +53,6 @@ class JSONHandlerView(View):
                 return True
             
         return False
-    
-    def storeFailure(self, **kwargs):
-        """ Create a PiEvent record with the success flag set to False.
-        
-            Accepts the following keyword arguments:
-            team_id
-            pi_id
-            type
-            message
-            data
-        """
-        success = kwargs.get("success", False)  # force failure flag
-        return self.storeEvent(**kwargs)
-    
-    def storeEvent(self, **kwargs):
-        """ Create a new PiEvent record and store it in the database.
-        
-            Accepts the following keyword arguments:
-            team_id
-            pi_id
-            type
-            message
-            data
-        """
-        transaction = PiEvent(time=timezone.now(),
-                              type=event_type if event_type is not None else PiEvent.UNKNOWN_TYPE,
-                              status=PiEvent.SUCCESS if success else PiEvent.FAIL,
-                              msg=msg
-                             )
-        transaction.save()
-        return transaction
         
 #----------------------------------------------------------------------------
 class Register(JSONHandlerView):
@@ -91,34 +60,44 @@ class Register(JSONHandlerView):
     
     def post(self, request, *args, **kwargs):
         """ Handle the Registration POST message and update the database """
+        
         # Check that the client sends and receives JSON-formatted data
         if not self.clientSpeaksJSON(request):
-            return HttpResponse("Not a JSON speaker", status=400)
+            return HttpResponse("Cannot converse in JSON", status=400)
         
         # Get input parameters from URL and/or POST data
         data = json.loads(request.body)  # POST data (in JSON format)
         
         try:
-            brata_version = data["brata_version"]
+#             brata_version = data["brata_version"]
             team_id       = data["team_id"]
         except KeyError,e:
             # Send a fail response
-            return HttpResponse("Badly formed request: {}".format(repr(msg)), status=400)
+            return HttpResponse("Badly formed request: {}".format(repr(data)), status=400)
         
         # Update the database
         team = Team.objects.get(team_id)
         
+        event = PiEvent(time=timezone.now(),
+                        type=PiEvent.REGISTER_MSG_TYPE,
+                        team_id=team_id,
+                        data=request.body,
+                       )
+        
         if team is None:
-            # Record the transaction
-            trans = StoreEvent(team_id=team_id, event_type=PiEvent.REGISTER_EVENT, success=False, msg="Failed to retrieve Team from the database")
+            # Failed:  Record the transaction and what went wrong
+            event.status = PiEvent.FAIL_STATUS
+            event.message = "Failed to retrieve Team from the database"
+            event.save()
             return HttpResponse()
-        else:
-            # Record the transaction
-            trans = StoreEvent(team_id=team_id, event_type=PiEvent.REGISTER_EVENT, msg="Successful Team registration")
-            
-            # Update the team record
-            team.registered = trans.id  # not checking for multiple registrations, so multiple is ok
+
+        # Succeeded:  Record the transaction and update the team record
+        event.status = PiEvent.SUCCESS_STATUS
+        event.save()
+        
+        team.registered = event.id  # not checking for multiple registrations, so multiple is ok
+        team.save()
         
         # Send a success response
-        return HttpResponse("Welcome, Team {}, to the 2016 Harris High School Design Challenge!  You have successfully registered for the competition.  Good luck!!".format(teamName))
+        return HttpResponse("Welcome, Team {}, to the 2016 Harris High School Design Challenge!  You have successfully registered for the competition.  Good luck!!".format(team.name))
     

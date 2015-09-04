@@ -24,6 +24,18 @@ there are four Django apps:
 
 ### Install Django
 
+### Install httpie
+
+`httpie` is a command line tool that has a lot of the same functionality as `curl` and `wget`, but with
+a more user-friendly command line structure, and colorful syntax highlighting.  See the
+[httpie website](http://httpie.org) for more info.
+
+`httpie` is written in Python, so it can be installed with `pip`, like this:
+
+```sh
+# pip install httpie
+```
+
 ### Install psycopg2
 
 ### Install PostgreSQL
