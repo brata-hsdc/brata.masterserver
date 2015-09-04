@@ -10,13 +10,13 @@ Raspberry Pi competition stations.
 
 ## Overview
 
-The code is organized as a single Django project called `ms`.  Within `ms`
+The code is organized as a single Django project called **ms**.  Within **ms**
 there are four Django apps:
 
-* dbkeeper - provides Master Server database administration functions
-* scoreboard - drives the main scoreboard or leaderboard for the competition, and possibly other status displays
-* piservice - provides a RESTful interface for the BRATA devices and the RPi competition stations
-* teamcentral - provides status info to competitors through a mobile device interface
+* `dbkeeper` - provides Master Server database administration functions and management interface
+* `scoreboard` - drives the main scoreboard or leaderboard for the competition, and possibly other status displays
+* `piservice` - provides a RESTful interface for the BRATA devices and the RPi competition stations
+* `teamcentral` - provides status info to competitors through a mobile device interface
 
 ## Installation
 
