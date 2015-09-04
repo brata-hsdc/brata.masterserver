@@ -1,3 +1,58 @@
+# Master Server for the HSDC
+
+The Master Server is a collection of Python applications written using 
+the Django framework.  The applications talk to a common database.  This
+configuration uses a PostgreSQL database, although MySQL could be easily
+substituted.  The applications are run in an Apache web server environment.
+Some applications provide both user-facing web pages, such as a scoreboard
+display for the competition, and others provide a RESTful web API for the
+Raspberry Pi competition stations.
+
+## Overview
+
+The code is organized as a single Django project called **ms**.  Within **ms**
+there are four Django apps:
+
+* `dbkeeper` - provides Master Server database administration functions and management interface
+* `scoreboard` - drives the main scoreboard or leaderboard for the competition, and possibly other status displays
+* `piservice` - provides a RESTful interface for the BRATA devices and the RPi competition stations
+* `teamcentral` - provides status info to competitors through a mobile device interface
+
+## Installation
+
+### Install Python
+
+### Install Django
+
+### Install psycopg2
+
+### Install PostgreSQL
+
+### Install the Apache Web Server
+
+
+## Setup
+
+### Clone this repository
+
+### Create the database
+
+Create a new PostgreSQL database called `msdb`.
+
+### Modify the Apache configuration
+
+## Test
+
+Do the following to test whether everything got set up correctly:
+
+```
+```
+
+---
+---
+
+*[delete everything below here; keeping it around for reference for now]*
+
 This document provides a quick description of how to build, install, and
 run the application. Refer to the RaspberryPiGub page on the project wiki
 for instructions on setting up hardware and a build environment prior to
