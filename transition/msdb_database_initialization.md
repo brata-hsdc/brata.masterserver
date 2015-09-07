@@ -23,7 +23,7 @@ msdb       | Master Server database name
 
 ## Procedure
 
-## 1. Create a database user named "pi" and a database named "msdb"
+### 1. Create a database user named "pi" and a database named "msdb"
 
 Use the `psql` command line utility that comes with PostgreSQL.  You can
 also accomplish the same thing through the `pgadmin` GUI, but it is harder
@@ -48,7 +48,7 @@ postgres=# \q
 
 Now you should have an empty database.
 
-## 2. Initialize the database structure
+### 2. Initialize the database structure
 
 This is done by Django's `manage.py` utility.  It will create tables based
 on the Django models in our code.
@@ -109,7 +109,7 @@ Running migrations:
 Now you should have a database with tables named School, Mentor, Team,
 PiStation, PiEvent, and a few other Django administrative tables.
 
-## 3. Load content into the database
+### 3. Load content into the database
 
 We can pre-populate the database with some initial content for testing
 during development.  We could also use the same technique to load up any
@@ -124,7 +124,7 @@ be multiple of these files:  some for testing, and some for actual deployment.
 `initial_content.sql` would be a file created using the `pg_dump` command
 to dump the contents of a previous version of the `msdb` database.
 
-## 4. Create a Django *superuser*
+### 4. Create a Django *superuser*
 
 You will need this to log into the Django *admin* interface.
 
@@ -137,7 +137,7 @@ Password (again): raspberry
 Superuser created successfully.
 ```
 
-## 5. See if it worked
+### 5. See if it worked
 
 To see if it worked, connect to the Django app's *admin* interface using your
 web browser.  If you already have the Django app deployed in Apache, just
@@ -164,3 +164,62 @@ After logging in successfully, you should see the top level of the
 *Django administration* panel.  From there you can add other
 administrative and non-adminstrative users and assign them to groups with
 specific permissions.
+
+
+# Deleting the Database and Starting Over during Development
+
+Sometimes during development you may cause the database to get corrupted, and you just
+want to delete it and start from scratch or from some earlier saved state.
+
+## Preparation
+
+If you want to preserve any of the database contents, back up the database using the
+procedure described [here](ms_deployment.md).  The backup may not be restorable if
+the database schema changes between the backup and the restore.  If that is the case
+you may be better off trying to use
+
+```sh
+# python manage.py makemigrations
+# python manage.py migrate
+```
+
+## 1.  Delete the existing database
+
+```sh
+# psql -U postgres -c "DROP DATABASE msdb;"
+```
+
+## 2.  Create a new database
+
+```sh
+# psql -U postgres -c "CREATE DATABASE msdb;"
+# psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE msdb TO pi;"
+```
+
+## 3.  Run the Django migrations on the new database
+
+This will create the tables.
+
+```sh
+# python manage.py migrate
+```
+
+## 4.  Restore the database contents
+
+```sh
+# psql -U pi -d msdb < db_backup.sql
+```
+
+## 5.  (Re-)Create a superuser
+
+You need to create a super user account to be able to log in to
+the Django *admin* interface.
+
+```sh
+# python manage.py createsuperuser
+Username (leave blank to use 'currentuser'): pi
+Email address: pi@example.com
+Password: raspberry
+Password (again): raspberry
+Superuser created successfully.
+```

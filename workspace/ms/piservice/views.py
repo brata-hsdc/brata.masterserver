@@ -70,12 +70,13 @@ class Register(JSONHandlerView):
         
         try:
 #             brata_version = data["brata_version"]
-            team_id       = data["team_id"]
+            team_id = data["team_id"]
         except KeyError,e:
             # Send a fail response
             return HttpResponse("Badly formed request: {}".format(repr(data)), status=400)
         
         # Update the database
+        return HttpResponse("Debug early exit", status=200)
         team = Team.objects.get(team_id)
         
         event = PiEvent(time=timezone.now(),

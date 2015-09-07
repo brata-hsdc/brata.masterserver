@@ -1,0 +1,10 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}{{ title }}{% endblock %}
+{% block header %}{{ title }}{% endblock %}
+
+{% block main %}
+<p>{{ msg }}</p><br/>
+<br/>
+<a href="{{ url }}"><button>{{ button_text }}</button><br/></a>
+{% endblock %}

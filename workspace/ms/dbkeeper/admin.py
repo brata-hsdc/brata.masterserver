@@ -1,13 +1,13 @@
 from django.contrib import admin
-from .models import School, Team, Mentor
+from .models import Organization, Team, MSUser
 
 # Register your models here.
 
-@admin.register(School)
+@admin.register(Organization)
 class SchoolAdmin(admin.ModelAdmin):
     pass
 
-@admin.register(Mentor)
+@admin.register(MSUser)
 class MentorAdmin(admin.ModelAdmin):
     pass
 

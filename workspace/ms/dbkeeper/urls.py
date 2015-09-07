@@ -1,4 +1,4 @@
-"""ms.piservice URL Configuration
+"""ms.dbkeeper URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.8/topics/http/urls/
@@ -22,10 +22,14 @@ urlpatterns = [
     url(r'^$', views.index, name="index"),
     url(r'^index.html$', views.index, name="index"),
 #     url(r'^register/', views.register, name="register"),
-    url(r'^register/$', views.Register.as_view(), name="register"),
-    url(r'^register/brata-(?P<brataVersion>[0-9]+)', views.Register.as_view(), name="register-brata"),
-]
+    url(r'^add/org/$', views.AddOrganization.as_view(), name="AddOrg"),
+    url(r'^add/organization/$', views.AddOrganization.as_view(), name="AddOrganization"),
+    url(r'^add/user/$', views.AddUser.as_view(), name="AddUser"),
+    ]
 
 # Test commands:
 #
-# http POST :8000
+# http://localhost:8000/
+# http://localhost:8000/index.html
+# http://localhost:8000/add         (404)
+# http://localhost:8000/add/school
