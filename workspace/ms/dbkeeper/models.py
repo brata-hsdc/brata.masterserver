@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 
+from .team_code import TeamCode
+
 # See the schema diagram and other documentation in the
 # brata.workstation/transitions folder.
 
@@ -23,6 +25,7 @@ from django.utils import timezone
 # last_name.  If that's all we need, we don't have to do this at all.
 # class UserMSUser(models.Model):
 #     user = models.OneToOneField(User)
+
 
 #----------------------------------------------------------------------------
 class Organization(models.Model):
@@ -55,17 +58,28 @@ class Team(models.Model):
     
     # Constants
     NAME_FIELD_LENGTH = 100  # Make it long because some team will have a "creative" name
-    PIN_FIELD_LENGTH  = 20
+    CODE_FIELD_LENGTH  = TeamCode.LENGTH
     
     # Schema definition
     name             = models.CharField(max_length=NAME_FIELD_LENGTH, unique=True)
     organization     = models.ForeignKey(Organization)
-    pin              = models.CharField(max_length=PIN_FIELD_LENGTH, default="generated")  # TODO: what's this for? Do we need it or will the password be sufficient?
+    code             = models.CharField(max_length=CODE_FIELD_LENGTH, blank=True)
     
     #    Score fields for the different competitions
     total_score      = models.IntegerField(default=0)
     total_duration_s = models.IntegerField(default=0)  # total duration of competition in seconds
     # TODO:  Add more fields here as needed
+    
+    @staticmethod
+    def makeTeamCode(existingCodes=None):
+        """ Create a code for the team.
+            If you want the code to be unique, pass in a list of existing codes.
+            For example:  team.makeTeamCode(list(Team.objects.values_list("code")))
+        """
+        return TeamCode.newCode(existingCodes)
+    
+    def __unicode__(self):
+        return self.name
     
 #----------------------------------------------------------------------------
 class MSUser(models.Model):

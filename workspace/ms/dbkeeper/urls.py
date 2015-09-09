@@ -21,10 +21,11 @@ from . import views
 urlpatterns = [
     url(r'^$', views.index, name="index"),
     url(r'^index.html$', views.index, name="index"),
-#     url(r'^register/', views.register, name="register"),
     url(r'^add/org/$', views.AddOrganization.as_view(), name="AddOrg"),
     url(r'^add/organization/$', views.AddOrganization.as_view(), name="AddOrganization"),
     url(r'^add/user/$', views.AddUser.as_view(), name="AddUser"),
+    url(r'^add/team/$', views.AddTeam.as_view(), name="AddTeam"),
+    url(r'^checkin/team/$', views.CheckInTeam.as_view(), name="CheckInTeam"),
     ]
 
 # Test commands:
@@ -32,4 +33,6 @@ urlpatterns = [
 # http://localhost:8000/
 # http://localhost:8000/index.html
 # http://localhost:8000/add         (404)
-# http://localhost:8000/add/school
+# http://localhost:8000/add/org
+# http://localhost:8000/add/organization
+# http://localhost:8000/add/user

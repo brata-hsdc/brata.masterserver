@@ -21,11 +21,11 @@ from . import views
 urlpatterns = [
     url(r'^$', views.index, name="index"),
     url(r'^index.html$', views.index, name="index"),
-#     url(r'^register/', views.register, name="register"),
     url(r'^register/$', views.Register.as_view(), name="register"),
-    url(r'^register/brata-(?P<brataVersion>[0-9]+)', views.Register.as_view(), name="register-brata"),
+#     url(r'^register/brata-(?P<brataVersion>[0-9]+)', views.Register.as_view(), name="register-brata"),
 ]
 
 # Test commands:
 #
 # http POST :8000
+# http --json POST :8000/piservice/register/ Content-type:application/json Accept:application/json team_id="Dev Team"

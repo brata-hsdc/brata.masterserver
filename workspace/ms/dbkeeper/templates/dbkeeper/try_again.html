@@ -4,7 +4,7 @@
 {% block header %}{{ title }}{% endblock %}
 
 {% block main %}
-<p>{{ msg }}</p><br/>
+<p>{% autoescape off %}{{ msg }}{% endautoescape %}</p><br/>
 <br/>
 <a href="{{ url }}"><button>{{ button_text }}</button><br/></a>
 {% endblock %}

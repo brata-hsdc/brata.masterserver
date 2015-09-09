@@ -183,6 +183,12 @@ you may be better off trying to use
 # python manage.py migrate
 ```
 
+Sometimes `migrate` will not work either, because there is existing content in the
+database and Django cannot figure out how to convert it from the current database
+representation to the new representation.  Sometimes it will just throw an
+exception during the migration.  If that occurs, you may have to delete the
+database and start over.
+
 ## 1.  Delete the existing database
 
 ```sh
@@ -222,4 +228,74 @@ Email address: pi@example.com
 Password: raspberry
 Password (again): raspberry
 Superuser created successfully.
+```
+
+# What to do if your migrations are broken
+
+Sometimes the accumulation of incremental migrations might get broken to a point where they
+can no longer be successfully applied.  Then you need to delete them, delete the database, 
+and let Django create a new set of migrations starting with the current state of your models.
+This is very similar to the previous procedure of deleting the database and re-creating it.
+
+## Delete the migrations
+
+First, delete the old migrations.
+
+```sh
+# rm dbkeeper/migrations/*
+# rm piservice/migrations/*
+```
+
+## Generate new migrations
+
+You may find that when you try to do the `makemigrations`, this happens:
+
+```sh
+# python manage.py makemigrations
+No changes detected
+```
+
+So do this instead:  create the initial migrations for each app individually.
+
+```sh
+# python manage.py makemigrations dbkeeper
+Migrations for 'dbkeeper':
+  0001_initial.py:
+    - Create model MSUser
+    - Create model Organization
+    - Create model Team
+    - Add field organization to msuser
+    - Add field teams to msuser
+    - Add field user to msuser
+
+# python manage.py makemigrations piservice
+Migrations for 'piservice':
+  0001_initial.py:
+    - Create model PiEvent
+    - Create model PiStation
+    - Add field pi to pievent
+    - Add field team to pievent
+
+# python manage.py migrate
+Operations to perform:
+  Synchronize unmigrated apps: staticfiles, messages
+  Apply all migrations: sessions, admin, auth, contenttypes, piservice, dbkeeper
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+  Installing custom SQL...
+Running migrations:
+  Rendering model states... DONE
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying dbkeeper.0001_initial... OK
+  Applying piservice.0001_initial... OK
+  Applying sessions.0001_initial... OK
 ```
