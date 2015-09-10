@@ -64,6 +64,7 @@ class Team(models.Model):
     name             = models.CharField(max_length=NAME_FIELD_LENGTH, unique=True)
     organization     = models.ForeignKey(Organization)
     code             = models.CharField(max_length=CODE_FIELD_LENGTH, blank=True)
+    registered       = models.ForeignKey("piservice.PiEvent", null=True, related_name="teams")  # give name as string to avoid cyclic import dependency
     
     #    Score fields for the different competitions
     total_score      = models.IntegerField(default=0)

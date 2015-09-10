@@ -1,8 +1,6 @@
 from django.db import models
 from django.utils import timezone
 
-from dbkeeper.models import Team
-
 # See the schema diagram and other documentation in the
 # brata.workstation/transitions folder.
 
@@ -98,14 +96,15 @@ class PiEvent(models.Model):
     # Schema definition
     time    = models.DateTimeField(auto_now_add=True) # automatically set the current datetime on creation
     type    = models.SmallIntegerField(choices=TYPE_CHOICES, default=UNKNOWN_TYPE)
-    team    = models.ForeignKey(Team, null=True)
+    team    = models.ForeignKey("dbkeeper.Team", null=True)  # give name as string to avoid cyclic import dependency
     pi      = models.ForeignKey(PiStation, null=True)
     status  = models.SmallIntegerField(choices=STATUS_CHOICES, default=UNKNOWN_STATUS)
     data    = models.TextField(blank=True, null=True)
     message = models.CharField(max_length=MESSAGE_FIELD_LENGTH, blank=True)
     
     @staticmethod
-    def createEvent(time=None, type=None, team=None, pi=None, status=None, data=None, message=None):
+    def createEvent(type=None, team=None, pi=None, status=None, data=None, message=None):
+        """ Convenience function that makes and returns a new PiEvent, but caller must call ev.save() """
         ev = PiEvent(type=type, team=team, pi=pi, status=status, data=data, message=message)
         if type is None:
             type = PiEvent.UNKNOWN_TYPE
@@ -115,6 +114,13 @@ class PiEvent(models.Model):
             message = ""
         return ev
     
+    @staticmethod
+    def addEvent(type=None, team=None, pi=None, status=None, data=None, message=None):
+        """ Convenience function that makes, saves, and returns a new PiEvent """
+        ev = PiEvent.createEvent(type=type, team=team, pi=pi, status=status, data=data, message=message)
+        ev.save()
+        return ev
+
     def __unicode__(self):
         return "{}: {}".format(self.time, self.message)
 

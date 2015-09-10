@@ -28,4 +28,4 @@ urlpatterns = [
 # Test commands:
 #
 # http POST :8000
-# http --json POST :8000/piservice/register/ Content-type:application/json Accept:application/json team_id="Dev Team"
+# http --json POST :8000/piservice/register/ Content-type:application/json Accept:application/json team_id="Dev Team" brata_version="01"
