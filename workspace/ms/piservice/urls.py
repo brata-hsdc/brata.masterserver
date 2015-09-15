@@ -19,13 +19,23 @@ from django.contrib import admin
 from . import views
 
 urlpatterns = [
+    # Browser messages
     url(r'^$', views.index, name="index"),
     url(r'^index.html$', views.index, name="index"),
+    
+    # BRATA messages
     url(r'^register/$', views.Register.as_view(), name="register"),
 #     url(r'^register/brata-(?P<brataVersion>[0-9]+)', views.Register.as_view(), name="register-brata"),
+
+    # RPi station messages
+    url(r'^join/$', views.Join.as_view(), name="join"),
+    url(r'^leave/(?P<station_id>[0-9]+)', views.Leave.as_view(), name="leave"),
 ]
 
 # Test commands:
+# (These commands use the "httpie" http utility)
 #
 # http POST :8000
 # http --json POST :8000/piservice/register/ Content-type:application/json Accept:application/json team_id="Dev Team" brata_version="01"
+# http --json POST :8000/piservice/join/ Content-type:application/json Accept:application/json station_id="First RPi Station"
+# http --json POST :8000/piservice/leave/12345 Content-type:application/json Accept:application/json

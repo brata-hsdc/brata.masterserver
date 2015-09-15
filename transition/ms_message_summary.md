@@ -10,20 +10,16 @@ document.
 These messages are sent from a BRATA device to the Master Server.
 These transactions are handled by the Master Server `piservice` app.
 
-The last component of the URL in these messages is the BRATA message protocol
-version.  For the 2016 competition, the protocol version is *brata-v01*.  The
-version is included for backward compatibility.  However, for the 2016 competition,
-*brata-v01* is the only protocol version that is guaranteed to be recognized.
-
-The URL format follows this pattern:  http://*ms-host-or-ip*/*msg_type*/*brata_ver*/*params*
+The URL format follows this pattern:  http://*ms-host-or-ip*/*msg_type*/*params*
 
 Message         | Type | URL                                                | Params Sent | Params Received
 ----------------|------|----------------------------------------------------|-------------|----------------
-Register        | POST | <b>http://</b><i>ms</i><b>/register/brata-v01</b>                     | team_id     | message
-At Waypoint     | POST | <b>http://</b><i>ms</i><b>/at_waypoint/brata-v01/</b><i>&lt;lat&gt;</i><b>/</b><i>&lt;lon&gt;</i>      | team_id     | message
-Start Challenge | GET  | <b>http://</b><i>ms</i><b>/start_challenge/brata-v01/</b><i>&lt;station_id&gt;</i> | team_id     | message
-Submit          | POST | <b>http://</b><i>ms</i><b>/submit/brata-v01/</b><i>&lt;station_id&gt;</i>          | message_version, station_key, station_type, station_callback_url | message
+Register        | POST | <b>http://</b><i>ms</i><b>/register/</b>           | team_id     | message
+At Waypoint     | POST | <b>http://</b><i>ms</i><b>/at_waypoint/</b><i>&lt;lat&gt;</i><b>/</b><i>&lt;lon&gt;</i>      | team_id     | message
+Start Challenge | GET  | <b>http://</b><i>ms</i><b>/start_challenge/</b><i>&lt;station_id&gt;</i> | team_id     | message
+Submit          | POST | <b>http://</b><i>ms</i><b>/submit/</b><i>&lt;station_id&gt;</i>          | message_version, station_key, station_type, station_callback_url | message
 
+The MS response to these messages consist of a human-readable (although it may need to be decrypted first) `message` string that is intended to be read by the competitors.  There is also the opportunity to return other items in the JSON data that the BRATA software could receive directly, but this option is currently not being utilized.
 
 ### Questions about BRATA Messages
 
@@ -36,25 +32,20 @@ Submit          | POST | <b>http://</b><i>ms</i><b>/submit/brata-v01/</b><i>&lt;
 These messages are sent from an RPi station to the Master Server.
 These transactions are handled by the Master Server `piservice` app.
 
-The last component of the URL in these messages is the RPi message protocol
-version.  For the 2016 competition, the protocol version is *rpi-v01*.  The
-version is included for backward compatibility.  However, for the 2016 competition,
-*rpi-v01* is the only protocol version that is guaranteed to be recognized.
-
-The URL format follows this pattern:  http://*ms-host-or-ip*/*msg_type*/*rpi_ver*/*params*
+The URL format follows this pattern:  http://*ms-host-or-ip*/*msg_type*/*params*
 
 Message         | Type | URL                                           | Params Sent | Params Received
 ----------------|------|-----------------------------------------------|-------------|----------------
-Join            | POST | <b>http://</b><i>ms</i><b>/join/rpi-v01</b>                      | station_id  | message
-Submit          | POST | <b>http://</b><i>ms</i><b>/submit/rpi-v01</b>                    | *multiple*  | *multiple*
-Leave           | POST | <b>http://</b><i>ms</i><b>/leave/rpi-v01/</b><i>&lt;station_id&gt;</i>        |             | 
-Time Expired    | POST | <b>http://</b><i>ms</i><b>/time_expired/rpi-v01/</b><i>&lt;station_id&gt;</i> | timestamp   | 
+Join            | POST | <b>http://</b><i>ms</i><b>/join/</b>          | station_id  | message
+Submit          | POST | <b>http://</b><i>ms</i><b>/submit/</b>                    | *multiple*  | *multiple*
+Leave           | POST | <b>http://</b><i>ms</i><b>/leave/</b><i>&lt;station_id&gt;</i>        |             | 
+Time Expired    | POST | <b>http://</b><i>ms</i><b>/time_expired/</b><i>&lt;station_id&gt;</i> | timestamp   | 
 
 ### Questions about RPi Messages
 
-1. Why was the version for **Submit** in the [**ms_interface**](ms_interface.md) document *rest-v00* instead
-of *rpi_v00* like **Join**?
-2. The **Leave** message is not well documented.
+1. The **Leave** message is not well documented.  I assume that it means the station (or at least the station app)
+is going offline.  Why are we passing the *station_id* as a URL param in this message, whereas the **Join** message
+sends it as POST data?
 
 
 ## MS Messages
@@ -62,14 +53,14 @@ of *rpi_v00* like **Join**?
 These messages are sent from the Master Server to an RPi station.
 These transactions are handled by the Master Server `piservice` app.
 
-The URL format follows this pattern:  http://*rpi-host-or-ip*/*msg_type*/*ms_ver*/*params*
+The URL format follows this pattern:  http://*rpi-host-or-ip*/*msg_type*/*params*
 
 Message           | Type | URL                                              | Params Sent | Params Received
 ------------------|------|--------------------------------------------------|-------------|----------------
-Reset             | GET  | <b>http://</b><i>rpi</i><b>/reset/ms-v01/</b><i>&lt;pin&gt;</i>                  |             | 
-Start Challenge   | POST | <b>http://</b><i>rpi</i><b>/start_challenge/ms-v01</b>              | *multiple*  | 
-Handle Submission | POST | <b>http://</b><i>rpi</i><b>/handle_submission/ms-v01</b>            | *multiple*  | 
-Shutdown          | GET  | <b>http://</b><i>rpi</i><b>/shutdown/ms-v01/</b><i>&lt;pin&gt;</i>               |             | 
+Reset             | GET  | <b>http://</b><i>rpi</i><b>/reset/</b><i>&lt;pin&gt;</i>                  |             | 
+Start Challenge   | POST | <b>http://</b><i>rpi</i><b>/start_challenge/</b>              | *multiple*  | 
+Handle Submission | POST | <b>http://</b><i>rpi</i><b>/handle_submission/</b>            | *multiple*  | 
+Shutdown          | GET  | <b>http://</b><i>rpi</i><b>/shutdown/</b><i>&lt;pin&gt;</i>               |             | 
 
 
 ## Admin Messages

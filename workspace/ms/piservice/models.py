@@ -17,9 +17,11 @@ class PiStation(models.Model):
     
     # Values for type
     UNKNOWN_STATION_TYPE = 0
+    RTE_STATION_TYPE     = 1
     # TODO: add other types as appropriate
     STATION_TYPE_CHOICES = (
                              (UNKNOWN_STATION_TYPE, "Unknown"),
+                             (RTE_STATION_TYPE,     "Return to Earth (RTE)"),
                            )
     
     UNKNOWN_PI_TYPE = 0
@@ -40,9 +42,10 @@ class PiStation(models.Model):
     
     # Schema definition
     host            = models.CharField(max_length=HOST_FIELD_LENGTH, blank=True)
-    station_type    = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
     pi_type         = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
+    station_type    = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
     stationInstance = models.PositiveSmallIntegerField(default=0)
+    joined          = models.ForeignKey("PiEvent", null=True)
     
 #----------------------------------------------------------------------------
 class PiEvent(models.Model):
@@ -64,6 +67,8 @@ class PiEvent(models.Model):
     ADDORG_TYPE       = 3
     ADDUSER_TYPE      = 4
     ADDTEAM_TYPE      = 5
+    JOIN_MSG_TYPE     = 6
+    LEAVE_MSG_TYPE    = 7
 
     TYPE_CHOICES = (
                     (UNKNOWN_TYPE,      "Unknown"),
@@ -72,6 +77,8 @@ class PiEvent(models.Model):
                     (ADDORG_TYPE,       "Add Organization"),
                     (ADDUSER_TYPE,      "Add User"),
                     (ADDTEAM_TYPE,      "Add Team"),
+                    (JOIN_MSG_TYPE,     "Join"),
+                    (LEAVE_MSG_TYPE,    "Leave"),
                    )
     
     # Values for status
