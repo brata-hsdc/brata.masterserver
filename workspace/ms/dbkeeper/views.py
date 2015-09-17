@@ -27,9 +27,17 @@ def tryAgain(request, msg=None, url=None, buttonText=None,
                "title": title}
     return render(request, "dbkeeper/try_again.html", context)
     
+#----------------------------------------------------------------------------
 def index(request):
     """ Display the dbkeeper home page. """
     return render(request, "dbkeeper/index.html")
+
+#----------------------------------------------------------------------------
+def station_status(request):
+    """ Home page view for piservice.  Since this is a service, we could
+        return 404, or we could put up a helpful page with some options.
+    """
+    return render(request, "dbkeeper/station_status.html", {})
 
 #----------------------------------------------------------------------------
 class AddOrganization(View):

@@ -291,7 +291,7 @@ class Leave(JSONHandlerView):
         
         # Attempt to retrieve the PiStation record using the station_id
         try:
-            station = PiStation.objects.get(host=station_id)
+            station = PiStation.objects.get(id=station_id)
         except ObjectDoesNotExist:
             station = None
         
@@ -317,4 +317,35 @@ class Leave(JSONHandlerView):
         
         # Send a success response
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
+class StationStatus(JSONHandlerView):
+    """ A class-based view to handle a Station Status Ajax request.
     
+        The client sends a GET message with the following JSON data:
+        {
+        }
+        
+        The MS sends the following response on success:
+        {
+            "message":  ""
+        }
+    """
+    def __init__(self):
+        super(StationStatus, self).__init__(PiEvent.STATION_STATUS_MSG_TYPE, methods=[self.GET])
+    
+    def get(self, request, *args, **kwargs):
+        """ Return the status of all the PiStations """
+        super(StationStatus, self).get(request, *args, **kwargs)
+        #return HttpResponse(json.dumps("stations"), content_type="application/json", status=200)
+        
+        stations = PiStation.objects.all()
+        stationList = []
+        stationTypes = dict(PiStation.STATION_TYPE_CHOICES)
+        for s in stations:
+            station = {"id": s.id, "host": s.host, "type": stationTypes[s.station_type], "joined": ""}
+            if s.joined is not None:
+                station["joined"] = str(s.joined.time).split(".")[0]
+            stationList.append(station)
+        return HttpResponse(json.dumps(stationList), content_type="application/json", status=200)
+        

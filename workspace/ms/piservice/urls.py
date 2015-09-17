@@ -30,6 +30,9 @@ urlpatterns = [
     # RPi station messages
     url(r'^join/$', views.Join.as_view(), name="join"),
     url(r'^leave/(?P<station_id>[0-9]+)', views.Leave.as_view(), name="leave"),
+    
+    # Ajax requests
+    url(r'^station_status/$', views.StationStatus.as_view(), name="station_status"),
 ]
 
 # Test commands:

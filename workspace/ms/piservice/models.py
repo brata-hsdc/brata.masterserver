@@ -69,6 +69,7 @@ class PiEvent(models.Model):
     ADDTEAM_TYPE      = 5
     JOIN_MSG_TYPE     = 6
     LEAVE_MSG_TYPE    = 7
+    STATION_STATUS_MSG_TYPE = 8
 
     TYPE_CHOICES = (
                     (UNKNOWN_TYPE,      "Unknown"),
@@ -79,6 +80,7 @@ class PiEvent(models.Model):
                     (ADDTEAM_TYPE,      "Add Team"),
                     (JOIN_MSG_TYPE,     "Join"),
                     (LEAVE_MSG_TYPE,    "Leave"),
+                    (STATION_STATUS_MSG_TYPE, "Station Status"),
                    )
     
     # Values for status
