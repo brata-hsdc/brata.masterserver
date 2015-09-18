@@ -29,7 +29,7 @@ urlpatterns = [
 
     # RPi station messages
     url(r'^join/$', views.Join.as_view(), name="join"),
-    url(r'^leave/(?P<station_id>[0-9]+)', views.Leave.as_view(), name="leave"),
+    url(r'^leave/$', views.Leave.as_view(), name="leave"),
     
     # Ajax requests
     url(r'^station_status/$', views.StationStatus.as_view(), name="station_status"),
@@ -40,5 +40,5 @@ urlpatterns = [
 #
 # http POST :8000
 # http --json POST :8000/piservice/register/ Content-type:application/json Accept:application/json team_id="Dev Team" brata_version="01"
-# http --json POST :8000/piservice/join/ Content-type:application/json Accept:application/json station_id="First RPi Station"
-# http --json POST :8000/piservice/leave/12345 Content-type:application/json Accept:application/json
+# http --json POST :8000/piservice/join/ Content-type:application/json Accept:application/json host="First RPi Station" pi_type="B+" station_type=1
+# http --json POST :8000/piservice/leave/ Content-type:application/json Accept:application/json station_id="8:8b14"

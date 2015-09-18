@@ -36,16 +36,21 @@ The URL format follows this pattern:  http://*ms-host-or-ip*/*msg_type*/*params*
 
 Message         | Type | URL                                           | Params Sent | Params Received
 ----------------|------|-----------------------------------------------|-------------|----------------
-Join            | POST | <b>http://</b><i>ms</i><b>/join/</b>          | station_id  | message
-Submit          | POST | <b>http://</b><i>ms</i><b>/submit/</b>                    | *multiple*  | *multiple*
-Leave           | POST | <b>http://</b><i>ms</i><b>/leave/</b><i>&lt;station_id&gt;</i>        |             | 
-Time Expired    | POST | <b>http://</b><i>ms</i><b>/time_expired/</b><i>&lt;station_id&gt;</i> | timestamp   | 
+Join            | POST | <b>http://</b><i>ms</i><b>/join/</b>          | host, pi_type, station_type  | station_id
+Submit          | POST | <b>http://</b><i>ms</i><b>/submit/</b>        | *multiple*  | *multiple*
+Leave           | POST | <b>http://</b><i>ms</i><b>/leave/</b>         | station_id  | message
+Time Expired    | POST | <b>http://</b><i>ms</i><b>/time_expired/</b>  | station_id, timestamp   | 
+
+*station_id* will be a unique identifier prepended with the PiStation database record id field value followed
+by a colon, so for example, it might look like this:  `42:980a7df789g`.
 
 ### Questions about RPi Messages
 
 1. The **Leave** message is not well documented.  I assume that it means the station (or at least the station app)
 is going offline.  Why are we passing the *station_id* as a URL param in this message, whereas the **Join** message
-sends it as POST data?
+sends it as POST data? (Changing it to send *station_id* as POST data.)
+2. Is station_instance useful for anything?  It is kind of bothersome to compute the station_instance (like RTE #3)
+because stations can join and leave at any time.
 
 
 ## MS Messages

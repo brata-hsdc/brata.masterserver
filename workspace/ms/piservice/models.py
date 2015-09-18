@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+import random
+
 # See the schema diagram and other documentation in the
 # brata.workstation/transitions folder.
 
@@ -13,7 +15,8 @@ class PiStation(models.Model):
         managed = True  # We want manage.py to migrate database changes for us
     
     # Constants
-    HOST_FIELD_LENGTH  = 60  # might need to hold FQDN
+    HOST_FIELD_LENGTH       = 60  # might need to hold FQDN
+    STATION_ID_FIELD_LENGTH = 20
     
     # Values for type
     UNKNOWN_STATION_TYPE = 0
@@ -40,12 +43,35 @@ class PiStation(models.Model):
                         (B2_PI_TYPE,      "Gen 2 Model B"),
                       )
     
+    PI_TYPE_STRINGS = (
+                         ("A+", A1PLUS_PI_TYPE),
+                         ("B+", B1PLUS_PI_TYPE),
+                         ("B2", B2_PI_TYPE),
+                         ("B",  B1_PI_TYPE),
+                         ("A",  A1_PI_TYPE),
+                      )
+    
     # Schema definition
     host            = models.CharField(max_length=HOST_FIELD_LENGTH, blank=True)
     pi_type         = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
     station_type    = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
-    stationInstance = models.PositiveSmallIntegerField(default=0)
+    station_id      = models.CharField(max_length=STATION_ID_FIELD_LENGTH, blank=True)
     joined          = models.ForeignKey("PiEvent", null=True)
+    
+    @staticmethod
+    def piType(typeStr):
+        """ Try to convert a string into one of the known Pi Type choices """
+        for s,t in PiStation.PI_TYPE_STRINGS:
+            if s in typeStr:
+                return t
+        return PiStation.UNKNOWN_PI_TYPE
+    
+    def setStationId(self):
+        """ Create a unique station_id value """
+        st_id = "{}:{:04x}".format(self.id, random.getrandbits(4*4))
+        self.station_id = st_id
+        return st_id
+        
     
 #----------------------------------------------------------------------------
 class PiEvent(models.Model):

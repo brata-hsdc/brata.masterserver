@@ -15,7 +15,12 @@
    // Initiate an Ajax call to retrieve status information
    $.getJSON('/piservice/station_status/', function(data) {
       // Handle the data returned from the Ajax call
-      $('#stationTable').html(data);
+      var tableBody = "";
+      data.sort(function(a,b){ return a.id - b.id; });
+      $.each(data, function(index, value) {
+        tableBody = tableBody + "<tr><td>" + value.station_id + "</td><td>" + value.host + "</td><td>" + value.type + "</td><td>" + value.joined + "</td></tr>";
+      });
+      $('#stationTable table > tbody:first').html(tableBody);
       // Now that we've completed the request, schedule the next one
       setTimeout(worker, 5000);
    });
@@ -26,8 +31,13 @@ $(document).ready(function (event) {});
 {% endblock %}
 
 {% block main %}
-<table id="stationTable">
-    <tr><th>Station ID</th><th>Status</th></tr>
-    <tr><td class="stationIDCell"></td><td class="stationStatusCell"></td></tr>
+<div id="stationTable">
+<table>
+   <thead>
+      <tr><th>Station ID</th><th>Host</th><th>Type</th><th>Status</th></tr>
+   </thead>
+   <tbody>
+   </tbody>
 </table>
+</div>
 {% endblock %}

@@ -201,12 +201,14 @@ class Join(JSONHandlerView):
     
         The client sends a POST message with the following JSON data:
         {
-            "station_id":        "<station id>",
+            "host":         "rte01", // hostname or ip address
+            "pi_type":      "B+",    // "A", "A+", "B", "B+", or "B2"
+            "station_type": "RTE"    //
         }
         
-        The MS sends the following response on success:
+        The MS sends the following JSON response on success:
         {
-            "message":  ""
+            "station_id":  "42:xxxx"
         }
     """
     def __init__(self):
@@ -220,8 +222,10 @@ class Join(JSONHandlerView):
         data = json.loads(request.body)  # POST data (in JSON format)
         
         try:
-            station_id = data["station_id"]
-        except KeyError,e:
+            host = data["host"]
+            pi_type = data["pi_type"]
+            station_type = data["station_type"]
+        except KeyError:
             # Send a fail response
             self.addEvent(data=request.body,
                           status=PiEvent.FAIL_STATUS,
@@ -230,30 +234,31 @@ class Join(JSONHandlerView):
             self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
         
-        # Attempt to retrieve the PiStation record using the station_id
+        # Attempt to retrieve the PiStation record using the host info
         try:
-            station = PiStation.objects.get(host=station_id)
+            station = PiStation.objects.get(host=host)
         except ObjectDoesNotExist:
             station = None
         
         if station is None:
             # Create a new PiStation record
-            station = PiStation(host=station_id,
-                                # TODO: add other relevant fields
-                               )
+            station = PiStation(host=host, pi_type=PiStation.piType(pi_type), station_type=station_type)
+            station.save()
+            station_id = station.setStationId()
             station.save()
         
         # Succeeded:  Record the transaction and update the station record
         event = self.addEvent(pi=station,
                               data=request.body,
                               status=PiEvent.SUCCESS_STATUS,
-                              message="Station '{}' sent a Join message".format(station.host),
+                              message="Station '{}' ({}) sent a Join message".format(station.host, station.station_id),
                              )
         
         station.joined = event  # not checking for multiple joins, so multiple is ok
         station.save()
         
         # Send a success response
+        self.jsonResponse = {"station_id": station.station_id}
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
@@ -273,25 +278,27 @@ class Leave(JSONHandlerView):
     def __init__(self):
         super(Leave, self).__init__(PiEvent.LEAVE_MSG_TYPE, methods=[self.POST])
     
-    def post(self, request, station_id=None, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         """ Handle the Registration POST message and update the database """
         super(Leave, self).post(request, *args, **kwargs)
 
         # Get input parameters from URL and/or POST data
         data = json.loads(request.body)  # POST data (in JSON format)
         
-        if station_id is None:
+        try:
+            station_id = data["station_id"]
+        except KeyError:
             # Send a fail response
             self.addEvent(data=request.body,
                           status=PiEvent.FAIL_STATUS,
-                          message="Badly formed request (station_id missing)",
+                          message="Badly formed request",
                          )
-            self.jsonResponse["message"] = "Badly formed request (station_id missing): {}".format(repr(data))
+            self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
-        
+
         # Attempt to retrieve the PiStation record using the station_id
         try:
-            station = PiStation.objects.get(id=station_id)
+            station = PiStation.objects.get(station_id=station_id)
         except ObjectDoesNotExist:
             station = None
         
@@ -316,6 +323,7 @@ class Leave(JSONHandlerView):
         station.save()
         
         # Send a success response
+        self.jsonResponse["message"] = "Station {} has left".format(station_id)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
@@ -327,9 +335,20 @@ class StationStatus(JSONHandlerView):
         }
         
         The MS sends the following response on success:
-        {
-            "message":  ""
-        }
+        [
+            {
+                "host": "Second RPi Station",
+                "station_id": "2:ab45",
+                "joined": "2015-09-17 03:36:58",
+                "type": "Unknown"
+            },
+            {
+                "host": "First RPi Station",
+                "station_id": "1:03cc",
+                "joined": "",
+                "type": "Unknown"
+            }
+        ]
     """
     def __init__(self):
         super(StationStatus, self).__init__(PiEvent.STATION_STATUS_MSG_TYPE, methods=[self.GET])
@@ -343,7 +362,7 @@ class StationStatus(JSONHandlerView):
         stationList = []
         stationTypes = dict(PiStation.STATION_TYPE_CHOICES)
         for s in stations:
-            station = {"id": s.id, "host": s.host, "type": stationTypes[s.station_type], "joined": ""}
+            station = {"station_id": s.station_id, "host": s.host, "type": stationTypes[s.station_type], "joined": ""}
             if s.joined is not None:
                 station["joined"] = str(s.joined.time).split(".")[0]
             stationList.append(station)
