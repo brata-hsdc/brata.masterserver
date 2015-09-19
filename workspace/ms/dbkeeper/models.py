@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 
 from .team_code import TeamCode
 
@@ -111,3 +112,44 @@ class MSUser(models.Model):
                                         self.user.last_name,
                                         self.user.username,
                                         self.organization.name)
+
+#----------------------------------------------------------------------------
+class Setting(models.Model):
+    """ Simple table to hold application settings.
+    
+        Each row in the table has setting name and value.  The value will be
+        stored as a string.  It is up to the application to parse the string.
+        
+        Other code in the app can easily access Setting values using the get()
+        static method.
+        
+        Examples:
+        
+           timeout = Setting.get("REFRESH_INTERVAL_MS", default=2000)  # returns 2000 if name not found
+           timeout = Setting.get("REFRESH_INTERVAL_MS")                # returns None if name not found
+    """
+    class Meta:
+        managed = True  # We want manage.py to migrate database changes for us
+        
+    # Constants
+    NAME_FIELD_LENGTH  = 50
+
+    # Schema definition
+    name        = models.SlugField(max_length=NAME_FIELD_LENGTH, unique=True)
+    value       = models.TextField(blank=True)
+    description = models.TextField(blank=True)
+    
+    @staticmethod
+    def get(name, default=None):
+        """ Return the value of the Setting with name=name.
+            Return default if Setting not found.  Return
+            None if no default value is specified.
+        """
+        try:
+            return Setting.objects.get(name=name).value
+        except ObjectDoesNotExist:
+            return default
+        
+    def __unicode(self):
+        return self.name
+    

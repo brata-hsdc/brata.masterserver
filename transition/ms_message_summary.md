@@ -36,13 +36,20 @@ The URL format follows this pattern:  http://*ms-host-or-ip*/*msg_type*/*params*
 
 Message         | Type | URL                                           | Params Sent | Params Received
 ----------------|------|-----------------------------------------------|-------------|----------------
-Join            | POST | <b>http://</b><i>ms</i><b>/join/</b>          | host, pi_type, station_type  | station_id
+Join            | POST | <b>http://</b><i>ms</i><b>/join/</b>          | pi_type, station_type, [station_id]  | station_id
 Submit          | POST | <b>http://</b><i>ms</i><b>/submit/</b>        | *multiple*  | *multiple*
 Leave           | POST | <b>http://</b><i>ms</i><b>/leave/</b>         | station_id  | message
 Time Expired    | POST | <b>http://</b><i>ms</i><b>/time_expired/</b>  | station_id, timestamp   | 
 
 *station_id* will be a unique identifier prepended with the PiStation database record id field value followed
-by a colon, so for example, it might look like this:  `42:980a7df789g`.
+by a colon, so for example, it might look like this:  `42:980a`.
+
+*station_id* may be provided by the station when it sends a **Join**.  If it is a "re-Join", the station should
+send its current ID.  However, the station should always capture and use the *station_id* returned from the
+**Join**.
+
+RPi messages will be rejected if they do not originate from a valid station IP address.  The list of valid station
+IP addresses is set in the Master Server Settings **STATION_IPS**.
 
 ### Questions about RPi Messages
 

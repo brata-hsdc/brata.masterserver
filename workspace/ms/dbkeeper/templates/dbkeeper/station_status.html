@@ -18,11 +18,11 @@
       var tableBody = "";
       data.sort(function(a,b){ return a.id - b.id; });
       $.each(data, function(index, value) {
-        tableBody = tableBody + "<tr><td>" + value.station_id + "</td><td>" + value.host + "</td><td>" + value.type + "</td><td>" + value.joined + "</td></tr>";
+        tableBody = tableBody + "<tr><td>" + value.station_id + "</td><td>" + value.host + "</td><td>" + value.type + "</td><td>" + value.last_active + "</td><td>" + value.joined + "</td></tr>";
       });
       $('#stationTable table > tbody:first').html(tableBody);
       // Now that we've completed the request, schedule the next one
-      setTimeout(worker, 5000);
+      setTimeout(worker, {{ PAGE_REFRESH_INTERVAL }});
    });
 })();  // Make the initial call
 
@@ -34,7 +34,7 @@ $(document).ready(function (event) {});
 <div id="stationTable">
 <table>
    <thead>
-      <tr><th>Station ID</th><th>Host</th><th>Type</th><th>Status</th></tr>
+      <tr><th>Station ID</th><th>Host</th><th>Type</th><th>Last Activity</th><th>Up Time</th></tr>
    </thead>
    <tbody>
    </tbody>

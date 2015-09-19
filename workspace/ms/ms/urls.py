@@ -22,6 +22,6 @@ from dbkeeper import urls as dbkeeper_urls
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^piservice/', include(piservice_urls)),
-    url(r'^serve_pi/', include(piservice_urls)),
-    url(r'dbkeeper/', include(dbkeeper_urls)),
+    url(r'^serve_pi/', include(piservice_urls)),  # appetizing alias for piservice
+    url(r'^dbkeeper/', include(dbkeeper_urls)),
 ]

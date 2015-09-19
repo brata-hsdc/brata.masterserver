@@ -1,7 +1,10 @@
 from django.db import models
 from django.utils import timezone
+from django.core.exceptions import ObjectDoesNotExist
 
 import random
+
+from dbkeeper.models import Setting
 
 # See the schema diagram and other documentation in the
 # brata.workstation/transitions folder.
@@ -56,7 +59,7 @@ class PiStation(models.Model):
     pi_type         = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
     station_type    = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
     station_id      = models.CharField(max_length=STATION_ID_FIELD_LENGTH, blank=True)
-    joined          = models.ForeignKey("PiEvent", null=True)
+    joined          = models.ForeignKey("PiEvent", null=True, on_delete=models.SET_NULL)
     
     @staticmethod
     def piType(typeStr):
@@ -66,11 +69,39 @@ class PiStation(models.Model):
                 return t
         return PiStation.UNKNOWN_PI_TYPE
     
+    @staticmethod
+    def allowedHost(host):
+        """ Verify that the host is in STATION_IPS """
+        try:
+            return host in Setting.get("STATION_IPS").strip().split()
+        except ObjectDoesNotExist:
+            return False
+        
+    @staticmethod
+    def validateStation(host, station_id):
+        """ Return a PiStation object that matches host and station_id, or return None """
+        try:
+            station = PiStation.objects.get(host=host, station_id=station_id)
+        except ObjectDoesNotExist:
+            station = None
+        return station
+    
     def setStationId(self):
-        """ Create a unique station_id value """
+        """ Create a unique station_id value.
+        
+            The station_id is guaranteed to be unique because it contains
+            the record id, which is unique.  However, the station_id cannot
+            be constructed until the record has been saved, because that is
+            when the record id is created.
+        """
+        # The station_id is guaranteed to be unique because it contains
+        # the record id, which is unique.
         st_id = "{}:{:04x}".format(self.id, random.getrandbits(4*4))
         self.station_id = st_id
         return st_id
+    
+    def __unicode__(self):
+        return "{} ({} | {})".format(self.host, self.station_id, self.station_type)
         
     
 #----------------------------------------------------------------------------
@@ -81,6 +112,7 @@ class PiEvent(models.Model):
     """
     class Meta:
         managed = True  # We want manage.py to migrate database changes for us
+        ordering = ['time']
     
     # Constants
     DATA_FIELD_LENGTH = 2000
@@ -131,8 +163,8 @@ class PiEvent(models.Model):
     # Schema definition
     time    = models.DateTimeField(auto_now_add=True) # automatically set the current datetime on creation
     type    = models.SmallIntegerField(choices=TYPE_CHOICES, default=UNKNOWN_TYPE)
-    team    = models.ForeignKey("dbkeeper.Team", null=True)  # give name as string to avoid cyclic import dependency
-    pi      = models.ForeignKey(PiStation, null=True)
+    team    = models.ForeignKey("dbkeeper.Team", null=True, on_delete=models.SET_NULL)  # give name as string to avoid cyclic import dependency
+    pi      = models.ForeignKey(PiStation, null=True, on_delete=models.SET_NULL)
     status  = models.SmallIntegerField(choices=STATUS_CHOICES, default=UNKNOWN_STATUS)
     data    = models.TextField(blank=True, null=True)
     message = models.CharField(max_length=MESSAGE_FIELD_LENGTH, blank=True)

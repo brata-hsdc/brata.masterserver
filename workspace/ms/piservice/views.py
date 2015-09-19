@@ -9,6 +9,8 @@ from .models import PiEvent, PiStation
 from dbkeeper.models import Team
 from dbkeeper.team_code import TeamCode
 
+from datetime import timedelta, datetime
+
 # Create your views here.
 
 #----------------------------------------------------------------------------
@@ -217,32 +219,40 @@ class Join(JSONHandlerView):
     def post(self, request, *args, **kwargs):
         """ Handle the Registration POST message and update the database """
         super(Join, self).post(request, *args, **kwargs)
-
+        
         # Get input parameters from URL and/or POST data
         data = json.loads(request.body)  # POST data (in JSON format)
         
-        try:
-            host = data["host"]
-            pi_type = data["pi_type"]
-            station_type = data["station_type"]
-        except KeyError:
+        # Validate the source of the message
+        senderIP = request.META["REMOTE_ADDR"]  # IP address of sender
+        if "station_id" in data:
+            # Look for an existing PiStation record (this is a re-Join)
+            station_id = data["station_id"]
+            station = PiStation.validateStation(senderIP, station_id)
+        elif not PiStation.allowedHost(senderIP):
             # Send a fail response
             self.addEvent(data=request.body,
                           status=PiEvent.FAIL_STATUS,
-                          message="Badly formed request",
+                          message="Join request from invalid host: {}.  See MS setting STATION_IPS.".format(senderIP),
                          )
-            self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
+            self.jsonResponse["message"] = "Join request from invalid host: {}".format(senderIP)
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+        else:   
+            try:
+                #host = data["host"]
+                pi_type = data["pi_type"]
+                station_type = data["station_type"]
+            except KeyError:
+                # Send a fail response
+                self.addEvent(data=request.body,
+                              status=PiEvent.FAIL_STATUS,
+                              message="Badly formed request",
+                             )
+                self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
+                return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
         
-        # Attempt to retrieve the PiStation record using the host info
-        try:
-            station = PiStation.objects.get(host=host)
-        except ObjectDoesNotExist:
-            station = None
-        
-        if station is None:
             # Create a new PiStation record
-            station = PiStation(host=host, pi_type=PiStation.piType(pi_type), station_type=station_type)
+            station = PiStation(host=senderIP, pi_type=PiStation.piType(pi_type), station_type=station_type)
             station.save()
             station_id = station.setStationId()
             station.save()
@@ -254,8 +264,11 @@ class Join(JSONHandlerView):
                               message="Station '{}' ({}) sent a Join message".format(station.host, station.station_id),
                              )
         
-        station.joined = event  # not checking for multiple joins, so multiple is ok
-        station.save()
+        # Update the station.joined field if not currently online
+        # If currently online, this is a re-Join
+        if not station.joined:
+            station.joined = event  # not checking for multiple joins, so multiple is ok
+            station.save()
         
         # Send a success response
         self.jsonResponse = {"station_id": station.station_id}
@@ -281,7 +294,7 @@ class Leave(JSONHandlerView):
     def post(self, request, *args, **kwargs):
         """ Handle the Registration POST message and update the database """
         super(Leave, self).post(request, *args, **kwargs)
-
+        
         # Get input parameters from URL and/or POST data
         data = json.loads(request.body)  # POST data (in JSON format)
         
@@ -296,20 +309,18 @@ class Leave(JSONHandlerView):
             self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
 
-        # Attempt to retrieve the PiStation record using the station_id
-        try:
-            station = PiStation.objects.get(station_id=station_id)
-        except ObjectDoesNotExist:
-            station = None
-        
+        # Validate the source of the message
+        senderIP = request.META["REMOTE_ADDR"]  # IP address of sender
+        station = PiStation.validateStation(senderIP, station_id)
+
         if station is None:
             # Could not retrieve a PiStation record using station_id.
             # Send a fail response
             self.addEvent(data=request.body,
                           status=PiEvent.FAIL_STATUS,
-                          message="Unknown station '{}'.  (Bad station_id?)".format(station_id),
+                          message="Could not find a valid station: {}".format(station_id),
                          )
-            self.jsonResponse["message"] = "Unknown station '{}'.  (Bad station_id?): {}".format(station_id, repr(data))
+            self.jsonResponse["message"] = "Could not find a valid station: {}".format(station_id, repr(data))
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
         
         # Succeeded:  Record the transaction and update the station record
@@ -356,15 +367,34 @@ class StationStatus(JSONHandlerView):
     def get(self, request, *args, **kwargs):
         """ Return the status of all the PiStations """
         super(StationStatus, self).get(request, *args, **kwargs)
-        #return HttpResponse(json.dumps("stations"), content_type="application/json", status=200)
         
         stations = PiStation.objects.all()
         stationList = []
         stationTypes = dict(PiStation.STATION_TYPE_CHOICES)
         for s in stations:
-            station = {"station_id": s.station_id, "host": s.host, "type": stationTypes[s.station_type], "joined": ""}
+            station = {"station_id": s.station_id, 
+                       "host": s.host,
+                       "type": stationTypes[s.station_type],
+                       "joined": "",
+                       "last_active": "",
+                      }
             if s.joined is not None:
-                station["joined"] = str(s.joined.time).split(".")[0]
+                sec = int((timezone.now() - s.joined.time).total_seconds())
+                station["joined"] = self.formatSeconds(sec)
+            try:
+                latest = PiEvent.objects.filter(pi=s).latest("time").time
+                station["last_active"] = self.formatSeconds(int((timezone.now() - latest).total_seconds()))
+            except ObjectDoesNotExist:
+                pass
             stationList.append(station)
         return HttpResponse(json.dumps(stationList), content_type="application/json", status=200)
+    
+    def formatSeconds(self, seconds):
+        """ Convert seconds to hh:mm:ss
         
+            Args:
+                seconds (int): number of seconds
+            Returns:
+                string containing hh:mm:ss
+        """
+        return "{:02d}:{:02d}:{:02d}".format(int(seconds/3600),int((seconds%3600)/60), seconds%60)

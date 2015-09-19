@@ -3,7 +3,7 @@ from django.views.generic import View
 from django.contrib.auth.models import User
 
 from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm
-from .models import Organization, MSUser, Team
+from .models import Organization, MSUser, Team, Setting
 from piservice.models import PiEvent
 from .team_code import TeamCode
 
@@ -37,7 +37,9 @@ def station_status(request):
     """ Home page view for piservice.  Since this is a service, we could
         return 404, or we could put up a helpful page with some options.
     """
-    return render(request, "dbkeeper/station_status.html", {})
+    refreshInterval = Setting.get("STATION_STATUS_REFRESH_INTERVAL_MS", default="5000")
+    return render(request, "dbkeeper/station_status.html",
+                  {"PAGE_REFRESH_INTERVAL": refreshInterval})
 
 #----------------------------------------------------------------------------
 class AddOrganization(View):
