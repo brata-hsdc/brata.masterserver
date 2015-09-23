@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
-from random import randint
+from random import randint, getrandbits
 
 #----------------------------------------------------------------------------
-class TeamCode(object):
+class TeamPassCode(object):
     """ Creates and manipulates a user-friendly Team identification code.
         Each code is made of 3 components:  2 letters and an integer.
         Each component is represented by a word.  The letters use the military
@@ -73,7 +73,7 @@ class TeamCode(object):
 #                 "rocky-road":          15,
 
     
-    CODE_LENGTH = 2  # Max # of codes = 26 * 26 = 626  
+    CODE_LENGTH  = 3  # Max # of codes = 26 * 26 = 626  
     CHECK_LENGTH = 2
     LENGTH = CODE_LENGTH + CHECK_LENGTH  # length in chars of the whole code
     
@@ -81,10 +81,10 @@ class TeamCode(object):
 
     @staticmethod
     def maxUniqueCodes():
-        return len(TeamCode.CHAR_LETTERS)**TeamCode.CODE_LENGTH
+        return len(TeamPassCode.CHAR_LETTERS)**TeamPassCode.CODE_LENGTH
     
     @staticmethod
-    def newCode(existingCodes=None):
+    def newPassCode(existingCodes=None):
         """ Create a random code.
             existingCodes is an optional list of codes to avoid.  If provided,
             newCode() will guarantee returning a code not in the list (if it can),
@@ -92,13 +92,13 @@ class TeamCode(object):
             The maximum number of unique codes is len(CHAR_LETTERS)**CODE_LENGTH.
             existingCodes must be properly in lower case.
         """
-        code = TeamCode._genCode()
+        code = TeamPassCode._genCode()
         count = 1
         if existingCodes is not None:
             while code in existingCodes:
-                code = TeamCode._genCode()
+                code = TeamPassCode._genCode()
                 count += 1
-                if count >= TeamCode.MAX_TRIES:
+                if count >= TeamPassCode.MAX_TRIES:
                     return None
         return code
     
@@ -106,7 +106,7 @@ class TeamCode(object):
     def _genCode():
         code = ""
         n = 0
-        for _ in range(TeamCode.CODE_LENGTH):
+        for _ in range(TeamPassCode.CODE_LENGTH):
             c = randint(0, 25) + ord('a')
             n += c
             code += chr(c)
@@ -120,8 +120,8 @@ class TeamCode(object):
             Ignores leading and trailing whitespace.
         """
         code = code.strip().lower()
-        return len(code) == (TeamCode.LENGTH) and \
-               sum([ord(n) for n in code[0:TeamCode.CODE_LENGTH]]) % 16 == int(code[2:])
+        return len(code) == (TeamPassCode.LENGTH) and \
+               sum([ord(n) for n in code[0:TeamPassCode.CODE_LENGTH]]) % 16 == int(code[2:])
     
     @staticmethod
     def wordify(code):
@@ -131,14 +131,14 @@ class TeamCode(object):
             valid in order to wordify.  As long as the check number
             is in the valid range, words will be returned.
         """
-        if len(code) != TeamCode.LENGTH:
+        if len(code) != TeamPassCode.LENGTH:
             return ""
         words = ""
         try:
             code = code.strip().lower()
-            for c in code[0:TeamCode.CODE_LENGTH]:
-                words += TeamCode.CALL_LETTERS[ord(c) - ord('a')] + " "
-            words += TeamCode.NUMBER_WORDS[int(code[TeamCode.CODE_LENGTH:])]
+            for c in code[0:TeamPassCode.CODE_LENGTH]:
+                words += TeamPassCode.CALL_LETTERS[ord(c) - ord('a')] + " "
+            words += TeamPassCode.NUMBER_WORDS[int(code[TeamPassCode.CODE_LENGTH:])]
         except:
             return ""
         return words
@@ -151,18 +151,45 @@ class TeamCode(object):
             whitespace as long as it is not within a word.
         """
         words = wordCode.strip().lower().split()
-        if len(words) != TeamCode.CODE_LENGTH + 1:
+        if len(words) != TeamPassCode.CODE_LENGTH + 1:
             return None
         code = ""
         try:
-            for i in range(TeamCode.CODE_LENGTH):
-                code += TeamCode.LETTER[words[i]]
-            code += "{:02}".format(TeamCode.NUMBER[words[-1]])
+            for i in range(TeamPassCode.CODE_LENGTH):
+                code += TeamPassCode.LETTER[words[i]]
+            code += "{:02}".format(TeamPassCode.NUMBER[words[-1]])
         except KeyError:
                 return None
-        if TeamCode.isValid(code):
+        if TeamPassCode.isValid(code):
             return code
         return None
+
+class TeamRegCode(object):
+    """ Create a unique Team registration code for authentication.
+        The BRATA will send the reg_code with each message, so the
+        MS can determine the validity of the sender.
+    """
+    MAX_TRIES   = 10  # dups are a low-probability event with 64 random bits
+    LENGTH      = 16          # characters
+    CODE_BITS   = LENGTH * 4  # bits
+    
+    @staticmethod
+    def newRegCode(existingCodes=None):
+        """ Create a random code.
+            existingCodes is an optional list of codes to avoid.  If provided,
+            generateRegCode() will guarantee returning a code not in the list
+            (if it can), or None (if it can't find one after MAX_TRIES).
+            The maximum number of unique codes is 2**CODE_LENGTH.
+            The RegCode is a sequence of bits represented as a hexadecimal string
+            literal.
+        """
+        for _ in range(TeamRegCode.MAX_TRIES):
+            formatStr = "{:0" + str(TeamRegCode.LENGTH) + "x}"
+            code = formatStr.format(getrandbits(TeamRegCode.CODE_BITS))
+            if code not in existingCodes:
+                return code
+        return None
+        
 
 #----------------------------------------------------------------------------
 if __name__ == "__main__":
@@ -170,24 +197,27 @@ if __name__ == "__main__":
     import unittest
     from collections import defaultdict
     
-    class TeamCodeTestCase(unittest.TestCase):
+    class TeamPassCodeTestCase(unittest.TestCase):
         def testIsValid(self):
-            self.assertTrue(TeamCode.isValid("aa02"))
-            self.assertTrue(TeamCode.isValid("ab03")) # note that check value does not prevent transposing of chars
-            self.assertTrue(TeamCode.isValid("ba03"))
-            self.assertTrue(TeamCode.isValid("sz13"))
-            self.assertFalse(TeamCode.isValid("sz12"))
-            self.assertFalse(TeamCode.isValid("sz14"))
+            # Check that check digits work properly
+            # TODO: generate some codes with valid check digits to test
+            self.assertTrue(TeamPassCode.isValid("aaa03"))
+            self.assertTrue(TeamPassCode.isValid("ab03")) # note that check value does not prevent transposing of chars
+            self.assertTrue(TeamPassCode.isValid("ba03"))
+            self.assertTrue(TeamPassCode.isValid("sz13"))
+            self.assertFalse(TeamPassCode.isValid("sz12"))
+            self.assertFalse(TeamPassCode.isValid("sz14"))
             
-            self.assertTrue(TeamCode.isValid("  sz13"))
-            self.assertTrue(TeamCode.isValid("sz13 "))
-            self.assertTrue(TeamCode.isValid(" sz13 "))
+            # Check for ignore leading/trailing whitespace
+            self.assertTrue(TeamPassCode.isValid("  sz13"))
+            self.assertTrue(TeamPassCode.isValid("sz13 "))
+            self.assertTrue(TeamPassCode.isValid(" sz13 "))
             
         def testNewCode(self):
             counts = defaultdict(int)
             codes = []
             while True:
-                c = TeamCode.newCode(codes)
+                c = TeamPassCode.newCode(codes)
                 if c is None:
                     break
                 codes.append(c)
@@ -195,7 +225,7 @@ if __name__ == "__main__":
             
             # This checks that MAX_TRIES is sufficiently large to get
             # most of the codes before newCode() gives up
-            self.assertTrue(len(codes) >= 0.9 * TeamCode.maxUniqueCodes())
+            self.assertTrue(len(codes) >= 0.9 * TeamPassCode.maxUniqueCodes())
             
             # Check that no duplicate codes were generated
             for v in counts.itervalues():
@@ -203,8 +233,8 @@ if __name__ == "__main__":
         
         def testWordifyUnwordify(self):
             for _ in xrange(1000):
-                c = TeamCode.newCode()
-                self.assertEqual(c, TeamCode.unwordify(TeamCode.wordify(c)))
+                c = TeamPassCode.newCode()
+                self.assertEqual(c, TeamPassCode.unwordify(TeamPassCode.wordify(c)))
     
     unittest.main()  # run the unit tests
     sys.exit(0)

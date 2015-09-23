@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
-from .team_code import TeamCode
+from .team_code import TeamPassCode, TeamRegCode
 
 # See the schema diagram and other documentation in the
 # brata.workstation/transitions folder.
@@ -58,13 +58,15 @@ class Team(models.Model):
         managed = True  # We want manage.py to migrate database changes for us
     
     # Constants
-    NAME_FIELD_LENGTH = 100  # Make it long because some team will have a "creative" name
-    CODE_FIELD_LENGTH  = TeamCode.LENGTH
+    NAME_FIELD_LENGTH      = 100  # Make it long because some team will have a "creative" name
+    PASS_CODE_FIELD_LENGTH = 50
+    REG_CODE_FIELD_LENGTH  = 32
     
     # Schema definition
     name             = models.CharField(max_length=NAME_FIELD_LENGTH, unique=True)
     organization     = models.ForeignKey(Organization)
-    code             = models.CharField(max_length=CODE_FIELD_LENGTH, blank=True)
+    pass_code        = models.CharField(max_length=PASS_CODE_FIELD_LENGTH, blank=True)
+    reg_code         = models.CharField(max_length=REG_CODE_FIELD_LENGTH, blank=True)
     registered       = models.ForeignKey("piservice.PiEvent", null=True, related_name="teams")  # give name as string to avoid cyclic import dependency
     
     #    Score fields for the different competitions
@@ -74,11 +76,19 @@ class Team(models.Model):
     
     @staticmethod
     def makeTeamCode(existingCodes=None):
-        """ Create a code for the team.
-            If you want the code to be unique, pass in a list of existing codes.
-            For example:  team.makeTeamCode(list(Team.objects.values_list("code")))
+        """ Create a unique pass_code for the team """
+        return TeamPassCode.newPassCode(list(Team.objects.values_list("pass_code")))
+    
+    @staticmethod
+    def generateRegCode():
+        """ Create a unique reg_code for the team """
+        return TeamRegCode.newRegCode(list(Team.objects.values_list("reg_code")))
+    
+    def checkRegCode(self, code):
+        """ Return True if code == this team's reg_code field.
+            This method ignores case and leading or trailing whitespace.
         """
-        return TeamCode.newCode(existingCodes)
+        return code.strip().lower() == self.reg_code
     
     def __unicode__(self):
         return self.name

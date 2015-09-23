@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm
 from .models import Organization, MSUser, Team, Setting
 from piservice.models import PiEvent
-from .team_code import TeamCode
+from .team_code import TeamPassCode
 
 # Create your views here.
 def tryAgain(request, msg=None, url=None, buttonText=None,
@@ -172,7 +172,7 @@ class AddTeam(View):
             
             org = form.cleaned_data["organization"]
             team = Team(name=name, organization=org)
-            team.code = team.makeTeamCode(list(Team.objects.values_list("code")))
+            team.pass_code = team.makeTeamCode(list(Team.objects.values_list("pass_code")))
             team.save()
             
             ev = PiEvent.createEvent(type=PiEvent.ADDTEAM_TYPE, status=PiEvent.SUCCESS_STATUS, team=team,
@@ -188,6 +188,13 @@ class CheckInTeam(View):
         This View class checks a Team in for the competition by verifying
         that the Team exists, and that the entered team code matches the
         team code in the database.
+        
+        Team CheckIn is distinct from BRATA Registration.  Team CheckIn
+        authenticates the Team to use the TeamCentral site to see their
+        stats.
+        
+        This will need to be modified from its current state.  Maybe it
+        should just use the Django authentication mechanism.
     """
     context = {
                "form":   None,
@@ -207,16 +214,17 @@ class CheckInTeam(View):
         form = self.context["form"]
         if form.is_valid():
             team = form.cleaned_data["team"]
-            code = "{}{}{:02}".format(form.cleaned_data["teamCode1"],
-                                      form.cleaned_data["teamCode2"],
-                                      int(form.cleaned_data["teamCode3"]))
+            code = "{}{}{}{:02}".format(form.cleaned_data["teamCode1"],
+                                        form.cleaned_data["teamCode2"],
+                                        form.cleaned_data["teamCode3"],
+                                        int(form.cleaned_data["teamCode4"]))
             
-            if not code or code != team.code:
+            if not code or code != team.pass_code:
                 self.context["title"] = "Invalid Team Code"
                 self.context["msg"] = """The code '<b>{}</b>' is either not a valid code or is not
                                          the code assigned to your team.<br/>
                                          Please press the Try Again button to go back and
-                                         enter a different code.""".format(TeamCode.wordify(code))
+                                         enter a different code.""".format(TeamPassCode.wordify(code))
                 self.context["button_text"] = "Try Again"
                 
                 ev = PiEvent.createEvent(type=PiEvent.CHECKIN_TYPE, status=PiEvent.FAIL_STATUS, team=team,

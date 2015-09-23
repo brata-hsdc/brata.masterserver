@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.forms.widgets import Textarea
 
 from .models import Organization, Team, MSUser, Setting
-from .team_code import TeamCode
+from .team_code import TeamPassCode
 
 # Register your models here.
 
@@ -18,21 +18,21 @@ class MSUserAdmin(admin.ModelAdmin):
 class TeamAdmin(admin.ModelAdmin):
     fieldsets = [("Info", {"fields": ["name",
                                       "organization",
-                                      ("code", "registered")],
+                                      ("pass_code", "reg_code", "registered")],
                           }),
                  ("Competition Scores", {"fields": ["total_score",
                                                     "total_duration_s"],
                                         }),
                 ]
     list_filter = ("organization",)
-    list_display = ("name", "organization", "code", "wordCode", "registered", "total_score", "total_duration_s")
+    list_display = ("name", "organization", "pass_code", "wordCode", "reg_code", "registered", "total_score", "total_duration_s")
     ordering = ("name",)
-    search_fields = ("name", "code",)
-    readonly_fields = ("code",)
+    search_fields = ("name", "pass_code", "reg_code")
+    readonly_fields = ("pass_code", "reg_code")
     show_full_result_count = True
     
     def wordCode(self, team):
-        return TeamCode.wordify(team.code)
+        return TeamPassCode.wordify(team.pass_code)
     
     def save_model(self, request, obj, form, change):
         obj.code = obj.makeTeamCode()

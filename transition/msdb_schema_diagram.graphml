@@ -68,7 +68,7 @@ last_name<y:LabelModel>
         <y:ProxyAutoBoundsNode>
           <y:Realizers active="0">
             <y:GroupNode>
-              <y:Geometry height="392.87646484375" width="329.01953125" x="342.654296875" y="265.12353515625"/>
+              <y:Geometry height="417.18701171875" width="329.01953125" x="342.654296875" y="265.12353515625"/>
               <y:Fill color="#F5F5F5" transparent="false"/>
               <y:BorderStyle color="#000000" type="dashed" width="1.0"/>
               <y:NodeLabel alignment="right" autoSizePolicy="node_width" backgroundColor="#EBEBEB" borderDistance="0.0" fontFamily="Dialog" fontSize="15" fontStyle="plain" hasLineColor="false" height="22.37646484375" modelName="internal" modelPosition="t" textColor="#000000" visible="true" width="329.01953125" x="0.0" y="0.0">dbkeeper</y:NodeLabel>
@@ -76,7 +76,7 @@ last_name<y:LabelModel>
               <y:State closed="false" closedHeight="50.0" closedWidth="50.0" innerGraphDisplayEnabled="false"/>
               <y:NodeBounds considerNodeLabelSize="true"/>
               <y:Insets bottom="15" bottomF="15.0" left="15" leftF="15.0" right="15" rightF="15.0" top="15" topF="15.0"/>
-              <y:BorderInsets bottom="14" bottomF="13.5" left="13" leftF="12.826171875" right="39" rightF="39.0" top="0" topF="0.0"/>
+              <y:BorderInsets bottom="22" bottomF="21.810546875" left="13" leftF="12.826171875" right="39" rightF="39.0" top="0" topF="0.0"/>
             </y:GroupNode>
             <y:GroupNode>
               <y:Geometry height="50.0" width="50.0" x="208.5" y="112.5"/>
@@ -141,13 +141,15 @@ type<y:LabelModel>
         <node id="n3::n2">
           <data key="d6">
             <y:GenericNode configuration="com.yworks.entityRelationship.big_entity">
-              <y:Geometry height="128.0" width="98.0107421875" x="519.6630859375" y="501.5"/>
+              <y:Geometry height="160.0" width="98.0107421875" x="519.6630859375" y="485.5"/>
               <y:Fill color="#E8EEF7" color2="#B7C9E3" transparent="false"/>
               <y:BorderStyle color="#000000" type="line" width="1.0"/>
               <y:NodeLabel alignment="center" autoSizePolicy="content" backgroundColor="#B7C9E3" configuration="com.yworks.entityRelationship.label.name" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasLineColor="false" height="18.701171875" modelName="internal" modelPosition="t" textColor="#000000" visible="true" width="34.673828125" x="31.66845703125" y="4.0">Team</y:NodeLabel>
-              <y:NodeLabel alignment="left" autoSizePolicy="content" configuration="com.yworks.entityRelationship.label.attributes" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="92.20703125" modelName="custom" textColor="#000000" visible="true" width="90.0390625" x="2.0" y="30.701171875">name
+              <y:NodeLabel alignment="left" autoSizePolicy="content" configuration="com.yworks.entityRelationship.label.attributes" fontFamily="Dialog" fontSize="12" fontStyle="plain" hasBackgroundColor="false" hasLineColor="false" height="121.609375" modelName="custom" textColor="#000000" visible="true" width="90.0390625" x="2.0" y="30.701171875">name
 organization (fk)
-code
+pass_code
+reg_code
+registered (fk)
 
 total_score
 total_duration_s<y:LabelModel>
