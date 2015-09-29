@@ -60,6 +60,7 @@ class PiStation(models.Model):
     station_type    = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
     station_id      = models.CharField(max_length=STATION_ID_FIELD_LENGTH, blank=True)
     joined          = models.ForeignKey("PiEvent", null=True, on_delete=models.SET_NULL)
+    last_activity   = models.DateTimeField(auto_now_add=True, blank=True)
     
     @staticmethod
     def piType(typeStr):
@@ -128,6 +129,7 @@ class PiEvent(models.Model):
     JOIN_MSG_TYPE     = 6
     LEAVE_MSG_TYPE    = 7
     STATION_STATUS_MSG_TYPE = 8
+    UNREGISTER_MSG_TYPE = 9
 
     TYPE_CHOICES = (
                     (UNKNOWN_TYPE,      "Unknown"),
@@ -139,6 +141,7 @@ class PiEvent(models.Model):
                     (JOIN_MSG_TYPE,     "Join"),
                     (LEAVE_MSG_TYPE,    "Leave"),
                     (STATION_STATUS_MSG_TYPE, "Station Status"),
+                    (UNREGISTER_MSG_TYPE, "Unregister"),
                    )
     
     # Values for status

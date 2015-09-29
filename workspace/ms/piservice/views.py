@@ -1,13 +1,13 @@
 from django.shortcuts import render, Http404, HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from django.utils import timezone
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 import json
 
 from .models import PiEvent, PiStation
 from dbkeeper.models import Team
-from dbkeeper.team_code import TeamCode
+from dbkeeper.team_code import TeamPassCode
 
 from datetime import timedelta, datetime
 
@@ -126,15 +126,15 @@ class Register(JSONHandlerView):
     
         The client sends a POST message with the following JSON data:
         {
-            "team_id":        "<team id code>",
-            "brata_version":  "nn",
-            "message":        "<anything>"
+            "team_passcode":  "<passcode>",
+            "brata_version":  "nn"
         }
         
         The MS sends the following response on success:
         {
-            "message":  "Welcome, Team '<team_name>', to the 2016 Harris High School Design Challenge!
-                        You have successfully registered for the competition.  Good luck!!"
+            "reg_code":  "<registration_code>",
+            "message":   "Welcome, Team '<team_name>', to the 2016 Harris High School Design Challenge!
+                          You have successfully registered for the competition.  Good luck!!"
         }
     """
     def __init__(self):
@@ -151,9 +151,8 @@ class Register(JSONHandlerView):
         data = json.loads(request.body)  # POST data (in JSON format)
         
         try:
-            team_id       = data["team_id"]
+            team_passcode = data["team_passcode"]
             brata_version = data["brata_version"]
-#             message       = data["message"]  # unused
         except KeyError,e:
             # Send a fail response
             self.addEvent(data=request.body,
@@ -162,39 +161,128 @@ class Register(JSONHandlerView):
                          )
             self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
-        
-        # Retrieve the Team record using the team_code from the Register request
+
+        # Retrieve the Team record using the team_passcode from the Register request
         # Try it as-is and decoded.
         try:
-            team = Team.objects.get(code=team_id)
+            team = Team.objects.get(pass_code=team_passcode)
         except ObjectDoesNotExist:
             try:
-                team = Team.objects.get(code=TeamCode.unwordify(team_id))
+                team = Team.objects.get(pass_code=TeamPassCode.unwordify(team_passcode))
             except ObjectDoesNotExist:
                 team = None
         
         if team is None:
             # Failed:  Record the transaction and what went wrong
-            self.addEvent(team=team,
-                          data=request.body,
+            self.addEvent(data=request.body,
                           status=PiEvent.FAIL_STATUS,
-                          message="Failed to retrieve Team '{}' from the database".format(team_id),
+                          message="Failed to retrieve Team '{}' from the database".format(team_passcode),
                          )
-            self.jsonResponse["message"] = "Invalid team_code: '{}'".format(team_id)
+            self.jsonResponse["message"] = "Invalid team_passcode: '{}'".format(team_passcode)
+            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+        
+        if team.reg_code is not None and team.reg_code != "":
+            # Failed:  Record the transaction and what went wrong
+            self.addEvent(data=request.body,
+                          status=PiEvent.FAIL_STATUS,
+                          message="Device {} already registered to Team {}".format(team.reg_code, team.pass_code),
+                         )
+            self.jsonResponse["message"] = "You already have a device registered.  You must Unregister it before Registering another device.".format(team_passcode)
+            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+            
+        # Create a unique registration code for this Team's registration
+        team.reg_code = Team.generateRegCode()
+        
+        # Succeeded:  Record the transaction and update the team record
+        event = self.addEvent(team=team,
+                              data=request.body,
+                              status=PiEvent.SUCCESS_STATUS,
+                              message="Team '{}' Registered with brata_version '{}'. Assigned reg_code {}.".format(team.name, brata_version, team.reg_code),
+                             )
+        
+#         self.jsonResponse["message"] = "DEBUG"
+#         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+    
+        team.registered = event  # not checking for multiple registrations, so multiple is ok
+        team.save()
+        
+        # Send a success response
+        self.jsonResponse["reg_code"] = team.reg_code
+        self.jsonResponse["message"] = "Welcome, Team '{}', to the 2016 Harris High School Design Challenge!  You have successfully registered for the competition.  Good luck!!".format(team.name)
+        return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
+class Unregister(JSONHandlerView):
+    """ A class-based view to handle a BRATA Unregister message.
+    
+        The client sends a POST message with the following JSON data:
+        {
+            "reg_code":  "<registration_code>"
+        }
+        
+        The MS sends the following response on success:
+        {
+            "message":   "You have unregistered your BRATA device.  You may re-register it or register a different BRATA device."
+        }
+    """
+    def __init__(self):
+        """ Initialize the base class with the type of message we will handle
+            and the HTTP methods that we will accept.
+        """
+        super(Unregister, self).__init__(PiEvent.UNREGISTER_MSG_TYPE, methods=[self.POST])
+    
+    def post(self, request, *args, **kwargs):
+        """ Handle the Registration POST message and update the database """
+        super(Unregister, self).post(request, *args, **kwargs)
+
+        # Get input parameters from URL and/or POST data
+        data = json.loads(request.body)  # POST data (in JSON format)
+        
+        try:
+            reg_code = data["reg_code"]
+        except KeyError,e:
+            # Send a fail response
+            self.addEvent(data=request.body,
+                          status=PiEvent.FAIL_STATUS,
+                          message="Badly formed request",
+                         )
+            self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
+            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+
+        # Retrieve the Team record using the team_passcode from the Register request
+        # Try it as-is and decoded.
+        if reg_code is None or reg_code == "":
+            reg_code = "INVALID REG CODE"
+        try:
+            team = Team.objects.get(reg_code=reg_code)
+        except (ObjectDoesNotExist, MultipleObjectsReturned):
+            # Failed:  Record the transaction and what went wrong
+            self.addEvent(data=request.body,
+                          status=PiEvent.FAIL_STATUS,
+                          message="Failed to retrieve Team from the database with reg_code {}".format(reg_code),
+                         )
+            self.jsonResponse["message"] = "Unable to find registered device to unregister."
+            self.jsonResponse["reg_code"] = data["reg_code"]  # return the reg_code that was sent
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
         
         # Succeeded:  Record the transaction and update the team record
         event = self.addEvent(team=team,
                               data=request.body,
                               status=PiEvent.SUCCESS_STATUS,
-                              message="Team '{}' sent a Register message with brata_version '{}'".format(team.name, brata_version),
+                              message="Team '{}' Unregistered device with reg_code '{}'.".format(team.name, team.reg_code),
                              )
         
-        team.registered = event  # not checking for multiple registrations, so multiple is ok
+        # Erase the reg_code
+        team.reg_code = ""
+        
+#         self.jsonResponse["message"] = "DEBUG"
+#         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+    
+        team.registered = event  # store the Unregister event in the registered field
         team.save()
         
         # Send a success response
-        self.jsonResponse["message"] = "Welcome, Team '{}', to the 2016 Harris High School Design Challenge!  You have successfully registered for the competition.  Good luck!!".format(team.name)
+        self.jsonResponse["message"] = "You have unregistered your BRATA device.  You may re-register it or register a different BRATA device."
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
@@ -225,6 +313,7 @@ class Join(JSONHandlerView):
         
         # Validate the source of the message
         senderIP = request.META["REMOTE_ADDR"]  # IP address of sender
+        station = None
         if "station_id" in data:
             # Look for an existing PiStation record (this is a re-Join)
             station_id = data["station_id"]
@@ -237,7 +326,8 @@ class Join(JSONHandlerView):
                          )
             self.jsonResponse["message"] = "Join request from invalid host: {}".format(senderIP)
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
-        else:   
+        
+        if not station:
             try:
                 #host = data["host"]
                 pi_type = data["pi_type"]
@@ -272,6 +362,61 @@ class Join(JSONHandlerView):
         
         # Send a success response
         self.jsonResponse = {"station_id": station.station_id}
+        return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
+class Heartbeat(JSONHandlerView):
+    """ A class-based view to handle an RPi Station Heartbeat message.
+    
+        The client sends a GET message with the following JSON data:
+        {
+            "station_id":   "xxxxxxx", // unique station_id
+        }
+        
+        The MS sends the following JSON response on success:
+        {
+            "station_id":  "xxxxxxx"
+        }
+    """
+    def __init__(self):
+        super(Heartbeat, self).__init__(PiEvent.JOIN_MSG_TYPE, methods=[self.GET])
+    
+    def get(self, request, *args, **kwargs):
+        """ Handle the Registration GET message and update the database """
+        super(Heartbeat, self).get(request, *args, **kwargs)
+        
+        # Get input parameters from URL and/or POST data
+        data = json.loads(request.body)  # POST data (in JSON format)
+        
+        # Validate the source of the message
+        senderIP = request.META["REMOTE_ADDR"]  # IP address of sender
+        station = None
+        if "station_id" in data:
+            # Look for an existing PiStation record (this is a re-Join)
+            station_id = data["station_id"]
+            station = PiStation.validateStation(senderIP, station_id)
+        if not station or not PiStation.allowedHost(senderIP):
+            # Send a fail response
+            self.addEvent(data=request.body,
+                          status=PiEvent.FAIL_STATUS,
+                          message="Heartbeat received from invalid host: {}, station_id {}.  See MS setting STATION_IPS.".format(senderIP, station_id),
+                         )
+            self.jsonResponse["message"] = "Heartbeat message from unrecognized station: {} at address {}".format(station_id, senderIP)
+            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+        
+#         # Succeeded:  Record the transaction and update the station record
+#         event = self.addEvent(pi=station,
+#                               data=request.body,
+#                               status=PiEvent.SUCCESS_STATUS,
+#                               message="Station '{}' ({}) sent a Heartbeat message".format(station.host, station.station_id),
+#                              )
+        
+        # Record the current time in the station record
+        station.last_activity = timezone.now()
+        station.save()
+        
+        # Send a success response
+        self.jsonResponse = {"time": str(station.last_activity)} # return the time the Heartbeat was received
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------

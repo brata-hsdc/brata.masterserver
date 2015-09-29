@@ -14,12 +14,15 @@ The URL format follows this pattern:  http://*ms-host-or-ip*/*msg_type*/*params*
 
 Message         | Type | URL                                                | Params Sent | Params Received
 ----------------|------|----------------------------------------------------|-------------|----------------
-Register        | POST | <b>http://</b><i>ms</i><b>/register/</b>           | team_id     | message
-At Waypoint     | POST | <b>http://</b><i>ms</i><b>/at_waypoint/</b><i>&lt;lat&gt;</i><b>/</b><i>&lt;lon&gt;</i>      | team_id     | message
-Start Challenge | GET  | <b>http://</b><i>ms</i><b>/start_challenge/</b><i>&lt;station_id&gt;</i> | team_id     | message
-Submit          | POST | <b>http://</b><i>ms</i><b>/submit/</b><i>&lt;station_id&gt;</i>          | message_version, station_key, station_type, station_callback_url | message
+Register        | POST | <b>http://</b><i>ms</i><b>/register/</b>           | pass_code   | message, reg_code
+Unregister      | POST | <b>http://</b><i>ms</i><b>/unregister/</b>         | reg_code    | message
+At Waypoint     | POST | <b>http://</b><i>ms</i><b>/at_waypoint/</b><i>&lt;lat&gt;</i><b>/</b><i>&lt;lon&gt;</i>      | reg_code     | message
+Start Challenge | GET  | <b>http://</b><i>ms</i><b>/start_challenge/</b><i>&lt;station_id&gt;</i> | reg_code     | message
+Submit          | POST | <b>http://</b><i>ms</i><b>/submit/</b><i>&lt;station_id&gt;</i>          | reg_code, message_version, station_key, station_type, station_callback_url | message
 
 The MS response to these messages consist of a human-readable (although it may need to be decrypted first) `message` string that is intended to be read by the competitors.  There is also the opportunity to return other items in the JSON data that the BRATA software could receive directly, but this option is currently not being utilized.
+
+NOTE:  *pass_code* used to be called *team_id*.
 
 ### Questions about BRATA Messages
 
@@ -36,20 +39,21 @@ The URL format follows this pattern:  http://*ms-host-or-ip*/*msg_type*/*params*
 
 Message         | Type | URL                                           | Params Sent | Params Received
 ----------------|------|-----------------------------------------------|-------------|----------------
-Join            | POST | <b>http://</b><i>ms</i><b>/join/</b>          | pi_type, station_type, [station_id]  | station_id
-Submit          | POST | <b>http://</b><i>ms</i><b>/submit/</b>        | *multiple*  | *multiple*
-Leave           | POST | <b>http://</b><i>ms</i><b>/leave/</b>         | station_id  | message
-Time Expired    | POST | <b>http://</b><i>ms</i><b>/time_expired/</b>  | station_id, timestamp   | 
+Join            | POST | <b>http://</b><i>ms</i><b>/join/</b>          | station_type, serial_num | station_id
+Heartbeat       | GET  | <b>http://</b><i>ms</i><b>/heartbeat/</b>     | station_id               | time
+Submit          | POST | <b>http://</b><i>ms</i><b>/submit/</b>        | station_id, *multiple*   | *multiple*
+Leave           | POST | <b>http://</b><i>ms</i><b>/leave/</b>         | station_id               | message
+Time Expired    | POST | <b>http://</b><i>ms</i><b>/time_expired/</b>  | station_id, timestamp    | 
 
-*station_id* will be a unique identifier prepended with the PiStation database record id field value followed
-by a colon, so for example, it might look like this:  `42:980a`.
+*serial_num* will be a unique identifier containing the processor serial number from the RPi.
 
-*station_id* may be provided by the station when it sends a **Join**.  If it is a "re-Join", the station should
-send its current ID.  However, the station should always capture and use the *station_id* returned from the
-**Join**.
+The **Join** message may be sent multiple times, but subsequent **Join**s before a **Leave** will be ignored.
 
-RPi messages will be rejected if they do not originate from a valid station IP address.  The list of valid station
-IP addresses is set in the Master Server Settings **STATION_IPS**.
+The station should always capture and use the *station_id* returned from the **Join** in subsequent transactions.
+
+RPi messages will be rejected if they do not originate from a valid station IP address and contain a valid *station_id*
+(or *serial_num* in the case of a **Join**).  The list of valid station IP addresses is set in the Master Server
+Settings **STATION_IPS**.
 
 ### Questions about RPi Messages
 

@@ -25,10 +25,11 @@ urlpatterns = [
     
     # BRATA messages
     url(r'^register/$', views.Register.as_view(), name="register"),
-#     url(r'^register/brata-(?P<brataVersion>[0-9]+)', views.Register.as_view(), name="register-brata"),
+    url(r'^unregister/$', views.Unregister.as_view(), name="unregister"),
 
     # RPi station messages
     url(r'^join/$', views.Join.as_view(), name="join"),
+    url(r'^heartbeat/$', views.Heartbeat.as_view(), name="heartbeat"),
     url(r'^leave/$', views.Leave.as_view(), name="leave"),
     
     # Ajax requests
