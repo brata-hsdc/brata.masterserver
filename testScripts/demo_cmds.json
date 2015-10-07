@@ -70,13 +70,13 @@
     },
     {
         "button":  "Join",
-        "cmd":     "http --json POST :8000/piservice/join/ Content-type:application/json Accept:application/json pi_type=\"B+\" station_type=1",
+        "cmd":     "http --json POST :8000/piservice/join/ Content-type:application/json Accept:application/json host=\"192.168.1.5\" station_type=\"RTE\" serial_num=\"1234567\" url=\"http://129.168.1.5/station/\"",
         "tooltip": "Sent by a Station to the MS when it is ready to come online"
     },
     {
         "button":  "Re-Join",
-        "cmd":     "http --json POST :8000/piservice/join/ Content-type:application/json Accept:application/json station_id=\"1:b1c9\" pi_type=\"B+\" station_type=1",
-        "tooltip": "Sent by a Station to the MS when it is ready to come online"
+        "cmd":     "http --json POST :8000/piservice/join/ Content-type:application/json Accept:application/json host=\"192.168.1.5\" station_type=\"RTE\" serial_num=\"1234567\" url=\"http://129.168.1.5/station/\"",
+        "tooltip": "Testing when a second Join is sent by a station already joined.  This should behave just like a Join, and the station should receive a new station_id"
     },
     {
         "button":  "Heartbeat",
