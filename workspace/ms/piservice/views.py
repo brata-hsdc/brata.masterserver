@@ -292,14 +292,17 @@ class Join(JSONHandlerView):
         The client sends a POST message with the following JSON data:
         {
             "host":         "rte01", // hostname or ip address
-            "pi_type":      "B+",    // "A", "A+", "B", "B+", or "B2"
-            "station_type": "RTE"    //
+            "station_type": "RTE"    // the type of competition station
+            "serial_num":   "123456789" // the CPU serial number
+            "url":          "http://rte01:8080/control"  // URL to send commands to station
         }
         
         The MS sends the following JSON response on success:
         {
             "station_id":  "42:xxxx"
         }
+        
+        This class uses STATION_IPS and STATION_SERIAL_NUMS to validate the sender.
     """
     def __init__(self):
         super(Join, self).__init__(PiEvent.JOIN_MSG_TYPE, methods=[self.POST])
@@ -311,54 +314,48 @@ class Join(JSONHandlerView):
         # Get input parameters from URL and/or POST data
         data = json.loads(request.body)  # POST data (in JSON format)
         
-        # Validate the source of the message
-        senderIP = request.META["REMOTE_ADDR"]  # IP address of sender
-        station = None
-        if "station_id" in data:
-            # Look for an existing PiStation record (this is a re-Join)
-            station_id = data["station_id"]
-            station = PiStation.validateStation(senderIP, station_id)
-        elif not PiStation.allowedHost(senderIP):
+        # Validate the message format
+        try:
+            host         = data["host"]
+            station_type = data["station_type"]
+            serial_num   = data["serial_num"]
+            url          = data["url"] if "url" in data else ""
+        except KeyError:
             # Send a fail response
             self.addEvent(data=request.body,
                           status=PiEvent.FAIL_STATUS,
-                          message="Join request from invalid host: {}.  See MS setting STATION_IPS.".format(senderIP),
+                          message="Badly formed request",
+                          )
+            self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
+            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+    
+        # Validate the source of the message
+        senderIP = request.META["REMOTE_ADDR"]  # IP address of sender
+        if not PiStation.allowedHost(senderIP) or not PiStation.allowedSerialNum(serial_num):
+            # Send a fail response
+            self.addEvent(data=request.body,
+                          status=PiEvent.FAIL_STATUS,
+                          message="Join request from invalid host ({}) or serial_num ({}).  See MS setting STATION_IPS and STATION_SERIAL_NUMS.".format(senderIP, serial_num),
                          )
-            self.jsonResponse["message"] = "Join request from invalid host: {}".format(senderIP)
+            self.jsonResponse["message"] = "Join request from invalid host ({}) or serial_num ({})".format(senderIP, serial_num)
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
         
-        if not station:
-            try:
-                #host = data["host"]
-                pi_type = data["pi_type"]
-                station_type = data["station_type"]
-            except KeyError:
-                # Send a fail response
-                self.addEvent(data=request.body,
-                              status=PiEvent.FAIL_STATUS,
-                              message="Badly formed request",
-                             )
-                self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
-                return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
-        
-            # Create a new PiStation record
-            station = PiStation(host=senderIP, pi_type=PiStation.piType(pi_type), station_type=station_type)
-            station.save()
-            station_id = station.setStationId()
+        # Retrieve existing PiStation record or create a new one
+        try:
+            station = PiStation.objects.get(serial_num=serial_num)
+        except ObjectDoesNotExist:
+            station = PiStation(host=senderIP, station_type=station_type, serial_num=serial_num, url=url)
             station.save()
         
         # Succeeded:  Record the transaction and update the station record
-        event = self.addEvent(pi=station,
-                              data=request.body,
-                              status=PiEvent.SUCCESS_STATUS,
-                              message="Station '{}' ({}) sent a Join message".format(station.host, station.station_id),
-                             )
-        
-        # Update the station.joined field if not currently online
-        # If currently online, this is a re-Join
-        if not station.joined:
-            station.joined = event  # not checking for multiple joins, so multiple is ok
-            station.save()
+        station_id = station.setStationId()
+        station.joined = self.addEvent(pi=station,
+                                       data=request.body,
+                                       status=PiEvent.SUCCESS_STATUS,
+                                       message="Station '{}' ({}) sent a Join message".format(station.host, station.station_id),
+                                       )
+        station.last_activity = timezone.now()
+        station.save()
         
         # Send a success response
         self.jsonResponse = {"station_id": station.station_id}
@@ -519,7 +516,7 @@ class StationStatus(JSONHandlerView):
         for s in stations:
             station = {"station_id": s.station_id, 
                        "host": s.host,
-                       "type": stationTypes[s.station_type],
+                       "type": stationTypes.get(s.station_type, "Unknown"),
                        "joined": "",
                        "last_active": "",
                       }
@@ -527,7 +524,8 @@ class StationStatus(JSONHandlerView):
                 sec = int((timezone.now() - s.joined.time).total_seconds())
                 station["joined"] = self.formatSeconds(sec)
             try:
-                latest = PiEvent.objects.filter(pi=s).latest("time").time
+#                 latest = PiEvent.objects.filter(pi=s).latest("time").time
+                latest = s.last_activity
                 station["last_active"] = self.formatSeconds(int((timezone.now() - latest).total_seconds()))
             except ObjectDoesNotExist:
                 pass

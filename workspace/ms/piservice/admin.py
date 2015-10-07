@@ -5,10 +5,10 @@ from .models import PiStation, PiEvent
 
 @admin.register(PiStation)
 class PiStationAdmin(admin.ModelAdmin):
-    fieldsets = [("Information", {"fields": [("host", "station_type", "station_id"),
+    fieldsets = [("Information", {"fields": [("host", "station_type", "station_id", "serial_num"),
                                              ("last_activity", "joined")]}),
                 ]
-    list_display = ("host", "station_type", "station_id", "last_activity", "joined")
+    list_display = ("host", "station_type", "station_id", "serial_num", "last_activity", "joined")
     ordering = ("host",)
     readonly_fields = ("last_activity", "joined")
     

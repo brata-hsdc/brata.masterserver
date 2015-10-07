@@ -18,63 +18,44 @@ class PiStation(models.Model):
         managed = True  # We want manage.py to migrate database changes for us
     
     # Constants
-    HOST_FIELD_LENGTH       = 60  # might need to hold FQDN
-    STATION_ID_FIELD_LENGTH = 20
+    HOST_FIELD_LENGTH         = 60  # might need to hold FQDN
+    STATION_ID_FIELD_LENGTH   = 20
+    STATION_TYPE_FIELD_LENGTH = 20
+    SERIAL_NUM_FIELD_LENGTH   = 50
+    URL_FIELD_LENGTH          = 200
     
     # Values for type
-    UNKNOWN_STATION_TYPE = 0
-    RTE_STATION_TYPE     = 1
+    UNKNOWN_STATION_TYPE = "Unknown"
+    RTE_STATION_TYPE     = "RTE"
+    
     # TODO: add other types as appropriate
     STATION_TYPE_CHOICES = (
                              (UNKNOWN_STATION_TYPE, "Unknown"),
                              (RTE_STATION_TYPE,     "Return to Earth (RTE)"),
                            )
     
-    UNKNOWN_PI_TYPE = 0
-    A1_PI_TYPE      = 1
-    A1PLUS_PI_TYPE  = 2
-    B1_PI_TYPE      = 3
-    B1PLUS_PI_TYPE  = 4
-    B2_PI_TYPE      = 5
-    # TODO: add other types as appropriate
-    PI_TYPE_CHOICES = (
-                        (UNKNOWN_PI_TYPE, "Unknown"),
-                        (A1_PI_TYPE,      "Gen 1 Model A"),
-                        (A1PLUS_PI_TYPE,  "Gen 1 Model A+"),
-                        (B1_PI_TYPE,      "Gen 1 Model B"),
-                        (B1PLUS_PI_TYPE,  "Gen 1 Model B+"),
-                        (B2_PI_TYPE,      "Gen 2 Model B"),
-                      )
-    
-    PI_TYPE_STRINGS = (
-                         ("A+", A1PLUS_PI_TYPE),
-                         ("B+", B1PLUS_PI_TYPE),
-                         ("B2", B2_PI_TYPE),
-                         ("B",  B1_PI_TYPE),
-                         ("A",  A1_PI_TYPE),
-                      )
-    
     # Schema definition
     host            = models.CharField(max_length=HOST_FIELD_LENGTH, blank=True)
-    pi_type         = models.PositiveSmallIntegerField(choices=PI_TYPE_CHOICES, default=UNKNOWN_PI_TYPE)
-    station_type    = models.PositiveSmallIntegerField(choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
+    station_type    = models.CharField(max_length=STATION_TYPE_FIELD_LENGTH, choices=STATION_TYPE_CHOICES, default=UNKNOWN_STATION_TYPE)
     station_id      = models.CharField(max_length=STATION_ID_FIELD_LENGTH, blank=True)
+    serial_num      = models.CharField(max_length=SERIAL_NUM_FIELD_LENGTH, blank=True, unique=True)
+    url             = models.CharField(max_length=URL_FIELD_LENGTH, blank=True)
     joined          = models.ForeignKey("PiEvent", null=True, on_delete=models.SET_NULL)
     last_activity   = models.DateTimeField(auto_now_add=True, blank=True)
-    
-    @staticmethod
-    def piType(typeStr):
-        """ Try to convert a string into one of the known Pi Type choices """
-        for s,t in PiStation.PI_TYPE_STRINGS:
-            if s in typeStr:
-                return t
-        return PiStation.UNKNOWN_PI_TYPE
     
     @staticmethod
     def allowedHost(host):
         """ Verify that the host is in STATION_IPS """
         try:
             return host in Setting.get("STATION_IPS").strip().split()
+        except ObjectDoesNotExist:
+            return False
+        
+    @staticmethod
+    def allowedSerialNum(serialNum):
+        """ Verify that the serialNum is in STATION_SERIAL_NUMS """
+        try:
+            return serialNum in Setting.get("STATION_SERIAL_NUMS").strip().split()
         except ObjectDoesNotExist:
             return False
         
@@ -117,7 +98,7 @@ class PiEvent(models.Model):
     
     # Constants
     DATA_FIELD_LENGTH = 2000
-    MESSAGE_FIELD_LENGTH = 100
+    MESSAGE_FIELD_LENGTH = 1000
 
     # Values for type
     UNKNOWN_TYPE      = -1
