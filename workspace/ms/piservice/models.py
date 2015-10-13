@@ -26,12 +26,18 @@ class PiStation(models.Model):
     
     # Values for type
     UNKNOWN_STATION_TYPE = "Unknown"
-    RTE_STATION_TYPE     = "RTE"
+    LAUNCH_STATION_TYPE  = "Launch"
+    DOCK_STATION_TYPE    = "Dock"
+    SECURE_STATION_TYPE  = "Secure"
+    RETURN_STATION_TYPE  = "Return"
     
     # TODO: add other types as appropriate
     STATION_TYPE_CHOICES = (
                              (UNKNOWN_STATION_TYPE, "Unknown"),
-                             (RTE_STATION_TYPE,     "Return to Earth (RTE)"),
+                             (LAUNCH_STATION_TYPE,  "Launch"),
+                             (DOCK_STATION_TYPE,    "Dock"),
+                             (SECURE_STATION_TYPE,  "Secure"),
+                             (RETURN_STATION_TYPE,  "Return to Earth"),
                            )
     
     # Schema definition
@@ -110,7 +116,10 @@ class PiEvent(models.Model):
     JOIN_MSG_TYPE     = 6
     LEAVE_MSG_TYPE    = 7
     STATION_STATUS_MSG_TYPE = 8
-    UNREGISTER_MSG_TYPE = 9
+    UNREGISTER_MSG_TYPE  = 9
+    AT_WAYPOINT_MSG_TYPE = 10
+    START_CHALLENGE_MSG_TYPE = 11
+    SUBMIT_MSG_TYPE = 12
 
     TYPE_CHOICES = (
                     (UNKNOWN_TYPE,      "Unknown"),
@@ -123,6 +132,9 @@ class PiEvent(models.Model):
                     (LEAVE_MSG_TYPE,    "Leave"),
                     (STATION_STATUS_MSG_TYPE, "Station Status"),
                     (UNREGISTER_MSG_TYPE, "Unregister"),
+                    (AT_WAYPOINT_MSG_TYPE, "At Waypoint"),
+                    (START_CHALLENGE_MSG_TYPE, "Start Challenge"),
+                    (SUBMIT_MSG_TYPE, "Submit"),
                    )
     
     # Values for status

@@ -26,6 +26,9 @@ urlpatterns = [
     # BRATA messages
     url(r'^register/$', views.Register.as_view(), name="register"),
     url(r'^unregister/$', views.Unregister.as_view(), name="unregister"),
+    url(r'^at_waypoint/(?P<lat>[0-9.-]+)/(?P<lon>[0-9.-]+)$', views.AtWaypoint.as_view(), name="at_waypoint"),
+    url(r'^start_challenge/(?P<station_id>[^/]+)$', views.StartChallenge.as_view(), name="start_challenge"),
+    url(r'^submit/(?P<station_id>[^/]+)$', views.Submit.as_view(), name="submit"),
 
     # RPi station messages
     url(r'^join/$', views.Join.as_view(), name="join"),
