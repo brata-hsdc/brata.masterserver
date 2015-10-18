@@ -30,6 +30,30 @@ NOTE:  *pass_code* used to be called *team_id*.
 2. **Submit** is not well documented.  What is its purpose?  What are the params?
 
 
+## 2015 BRATA Messages
+
+These messages are supported from last year's competition (2015).
+These messages are sent from a BRATA device to the Master Server.
+These transactions are handled by the Master Server `piservice` app.
+
+Message         | Type | URL                                                 | Params Sent | Params Received
+----------------|------|-----------------------------------------------------|-------------|----------------
+Register (2015)      | POST | <b>http://</b><i>ms</i><b>/m/brata-v00/register</b> | team_id     | message
+At Waypoint (2015)     | POST | <b>http://</b><i>ms</i><b>/m/brata-v00/atWaypoint/</b><i>&lt;waypointId&gt;</i>      | team_id | message
+Start Challenge (2015) | POST | <b>http://</b><i>ms</i><b>/m/brata-v00/start_challenge/</b><i>&lt;station_id&gt;</i> | team_id | message
+Submit (2015)          | POST | <b>http://</b><i>ms</i><b>/m/brata-v00/submit/</b><i>&lt;station_id&gt;</i>          | team_id | message
+
+The MS response to these messages consist of a human-readable (although it may need to be decrypted first)
+`message` string that is intended to be read by the competitors.  There is also the opportunity to return
+other items in the JSON data that the BRATA software could receive directly, but this option is currently
+not being utilized.
+
+### Questions about BRATA Messages
+
+1. Why is **Start Challenge** a **GET** message, while the others are **POST**?  (I changed it to POST)
+2. **Submit** is not well documented.  What is its purpose?  What are the params?  (I got rid of the params)
+
+
 ## RPi Messages
 
 These messages are sent from an RPi station to the Master Server.
