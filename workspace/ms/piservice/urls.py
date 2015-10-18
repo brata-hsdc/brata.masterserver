@@ -37,6 +37,12 @@ urlpatterns = [
     
     # Ajax requests
     url(r'^station_status/$', views.StationStatus.as_view(), name="station_status"),
+    
+    # Backward compatible 2015 message formats
+    url(r'^brata-v00/register$', views.Register_2015.as_view(), name="register_2015"),
+    url(r'^brata-v00/atWaypoint/(?P<waypointId>[^/#?]+)$', views.AtWaypoint_2015.as_view(), name="at_waypoint_2015"),
+    url(r'^brata-v00/start_challenge/(?P<station_id>[^/#?]+)$', views.StartChallenge_2015.as_view(), name="start_challenge_2015"),
+    url(r'^brata-v00/submit/(?P<station_id>[^/#?]+)$', views.Submit_2015.as_view(), name="submit_2015"), # this one needs a little work
 ]
 
 # Test commands:

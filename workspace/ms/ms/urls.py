@@ -23,5 +23,6 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^piservice/', include(piservice_urls)),
     url(r'^serve_pi/', include(piservice_urls)),  # appetizing alias for piservice
+    url(r'^m/', include(piservice_urls)),  # alias for 2015 backward compatibility
     url(r'^dbkeeper/', include(dbkeeper_urls)),
 ]

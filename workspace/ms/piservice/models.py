@@ -107,35 +107,49 @@ class PiEvent(models.Model):
     MESSAGE_FIELD_LENGTH = 1000
 
     # Values for type
-    UNKNOWN_TYPE      = -1
-    REGISTER_MSG_TYPE = 1
-    CHECKIN_TYPE      = 2
-    ADDORG_TYPE       = 3
-    ADDUSER_TYPE      = 4
-    ADDTEAM_TYPE      = 5
-    JOIN_MSG_TYPE     = 6
-    LEAVE_MSG_TYPE    = 7
-    STATION_STATUS_MSG_TYPE = 8
-    UNREGISTER_MSG_TYPE  = 9
-    AT_WAYPOINT_MSG_TYPE = 10
-    START_CHALLENGE_MSG_TYPE = 11
-    SUBMIT_MSG_TYPE = 12
+    UNKNOWN_TYPE                  = -1
+    REGISTER_MSG_TYPE             = 1
+    CHECKIN_TYPE                  = 2
+    ADDORG_TYPE                   = 3
+    ADDUSER_TYPE                  = 4
+    ADDTEAM_TYPE                  = 5
+    JOIN_MSG_TYPE                 = 6
+    LEAVE_MSG_TYPE                = 7
+    STATION_STATUS_MSG_TYPE       = 8
+    UNREGISTER_MSG_TYPE           = 9
+    AT_WAYPOINT_MSG_TYPE          = 10
+    START_CHALLENGE_MSG_TYPE      = 11
+    SUBMIT_MSG_TYPE               = 12
+    REGISTER_2015_MSG_TYPE        = 13
+    AT_WAYPOINT_2015_MSG_TYPE     = 14
+    START_CHALLENGE_2015_MSG_TYPE = 15
+    SUBMIT_2015_MSG_TYPE          = 16
 
     TYPE_CHOICES = (
-                    (UNKNOWN_TYPE,      "Unknown"),
-                    (REGISTER_MSG_TYPE, "Register"),
-                    (CHECKIN_TYPE,      "Check In"),
-                    (ADDORG_TYPE,       "Add Organization"),
-                    (ADDUSER_TYPE,      "Add User"),
-                    (ADDTEAM_TYPE,      "Add Team"),
-                    (JOIN_MSG_TYPE,     "Join"),
-                    (LEAVE_MSG_TYPE,    "Leave"),
-                    (STATION_STATUS_MSG_TYPE, "Station Status"),
-                    (UNREGISTER_MSG_TYPE, "Unregister"),
-                    (AT_WAYPOINT_MSG_TYPE, "At Waypoint"),
-                    (START_CHALLENGE_MSG_TYPE, "Start Challenge"),
-                    (SUBMIT_MSG_TYPE, "Submit"),
+                    (UNKNOWN_TYPE,                  "Unknown"),
+                    (REGISTER_MSG_TYPE,             "Register"),
+                    (CHECKIN_TYPE,                  "Check In"),
+                    (ADDORG_TYPE,                   "Add Organization"),
+                    (ADDUSER_TYPE,                  "Add User"),
+                    (ADDTEAM_TYPE,                  "Add Team"),
+                    (JOIN_MSG_TYPE,                 "Join"),
+                    (LEAVE_MSG_TYPE,                "Leave"),
+                    (STATION_STATUS_MSG_TYPE,       "Station Status"),
+                    (UNREGISTER_MSG_TYPE,           "Unregister"),
+                    (AT_WAYPOINT_MSG_TYPE,          "At Waypoint"),
+                    (START_CHALLENGE_MSG_TYPE,      "Start Challenge"),
+                    (SUBMIT_MSG_TYPE,               "Submit"),
+                    (REGISTER_2015_MSG_TYPE,        "Register (2015)"),
+                    (AT_WAYPOINT_2015_MSG_TYPE,     "At Waypoint (2015)"),
+                    (START_CHALLENGE_2015_MSG_TYPE, "Start Challenge (2015)"),
+                    (SUBMIT_2015_MSG_TYPE,          "Submit (2015)"),
                    )
+    
+    MSG_TYPES_2015 = (REGISTER_2015_MSG_TYPE,
+                      AT_WAYPOINT_2015_MSG_TYPE,
+                      START_CHALLENGE_2015_MSG_TYPE,
+                      SUBMIT_2015_MSG_TYPE,
+                      )
     
     # Values for status
     FATAL_STATUS    = -10  # a message indicating a serious or fatal problem

@@ -177,6 +177,33 @@ class JSONHandlerView(View):
             self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
             resp = HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
             return (None, resp)
+    
+    def validateTeam(self, request, teamCode, failureMsg):
+        """ Use teamCode to retrieve a Team record.
+        
+            Returns:
+                A tuple containing (team record, HttpResponse) where one of the two
+                elements will be None.
+        """
+        msg2015 = self.type in PiEvent.MSG_TYPES_2015
+        try:
+            if msg2015:
+                team = Team.objects.get(pass_code=teamCode)
+            else:
+                team = Team.objects.get(reg_code=teamCode)
+        except ObjectDoesNotExist:
+            team = None
+        
+        resp = None
+        if team is None:
+            # Failed:  Record the transaction and what went wrong
+            self.addEvent(data=request.body,
+                          status=PiEvent.FAIL_STATUS,
+                          message="Invalid {} {}".format("team_id" if msg2015 else "reg_code", teamCode),
+                         )
+            self.jsonResponse["message"] = failureMsg
+            resp = HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+        return (team, resp)
             
 #----------------------------------------------------------------------------
 class Register(JSONHandlerView):
@@ -225,6 +252,7 @@ class Register(JSONHandlerView):
 
         # Retrieve the Team record using the team_passcode from the Register request
         # Try it as-is and decoded.
+        # TODO: refactor this to use self.validateTeam()
         try:
             team = Team.objects.get(pass_code=m.team_passcode)
         except ObjectDoesNotExist:
@@ -571,7 +599,7 @@ class AtWaypoint(JSONHandlerView):
         # Succeeded:  Record the transaction and update the station record
         event = self.addEvent(data=request.body,
                               status=PiEvent.SUCCESS_STATUS,
-                              message="AtWaypoint msg received from {}".format(m.reg_code),
+                              message="AtWaypoint ({}, {}) msg received from {}".format(lat, lon, m.reg_code),
                              )
         
         # Send a success response
@@ -716,3 +744,180 @@ class StationStatus(JSONHandlerView):
                 string containing hh:mm:ss
         """
         return "{:02d}:{:02d}:{:02d}".format(int(seconds/3600),int((seconds%3600)/60), seconds%60)
+
+#----------------------------------------------------------------------------
+class Register_2015(JSONHandlerView):
+    """ A class-based view to handle a 2015 BRATA Register message.
+    
+        The client sends a POST message with the following JSON data:
+        {
+            "team_id":        "<team ID>",
+        }
+        
+        The MS sends the following response on success:
+        {
+            "message":  "..."
+        }
+    """
+    def __init__(self):
+        super(Register_2015, self).__init__(PiEvent.REGISTER_2015_MSG_TYPE, methods=[self.POST])
+    
+    def post(self, request, *args, **kwargs):
+        """ Handle the POST message and update the database """
+        super(Register_2015, self).post(request, *args, **kwargs)
+
+        # Get input parameters from URL and/or POST data
+        m,response = self.validateJSONFields(request, ("team_id",))
+        if m is None:
+            return response
+        
+        try:
+            team = Team.objects.get(pass_code=m.team_id)
+        except ObjectDoesNotExist:
+            team = None
+        if team is None:
+            # Failed:  Record the transaction and what went wrong
+            self.addEvent(data=request.body,
+                          status=PiEvent.FAIL_STATUS,
+                          message="Invalid team_id {}".format(m.team_id),
+                         )
+            self.jsonResponse["message"] = "You have tried to Register your BRATA device with an invalid team_id: {}".format(m.team_id)
+            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+            
+        # Create a unique registration code for this Team's registration
+        team.reg_code = Team.generateRegCode()
+        
+        # Succeeded:  Record the transaction and update the team record
+        event = self.addEvent(team=team,
+                              data=request.body,
+                              status=PiEvent.SUCCESS_STATUS,
+                              message="Team '{}' Registered with brata_version 'v00'. Assigned reg_code {} (not used).".format(team.name, team.reg_code),
+                             )
+        
+        team.registered = event  # not checking for multiple registrations, so multiple is ok
+        team.save()
+        
+        # Send a success response
+        self.jsonResponse["message"] = "Welcome, Team '{}', to the 2016 Harris High School Design Challenge!  You have successfully registered for the competition.  Good luck!!".format(team.name)
+        return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
+class AtWaypoint_2015(JSONHandlerView):
+    """ A class-based view to handle a BRATA AtWaypoint message.
+    
+        The client sends a POST message with the following JSON data:
+        {
+            "team_id":        "<team_id>",
+        }
+        
+        The MS sends the following response on success:
+        {
+            "message":  "You have ..."
+        }
+    """
+    def __init__(self):
+        super(AtWaypoint_2015, self).__init__(PiEvent.AT_WAYPOINT_2015_MSG_TYPE, methods=[self.POST])
+    
+    def post(self, request, waypointId, *args, **kwargs):
+        """ Handle the POST message and update the database """
+        super(AtWaypoint_2015, self).post(request, *args, **kwargs)
+
+        # Get input parameters from URL and/or POST data
+        m,response = self.validateJSONFields(request, ("team_id",))
+        if m is None:
+            return response
+        
+        team,response = self.validateTeam(request, m.team_id, "Received an invalid team_id: '{}'.  You may need to re-register.".format(m.team_id))
+        
+        # TODO:  Add message processing
+        
+        # Succeeded:  Record the transaction and update the station record
+        event = self.addEvent(data=request.body,
+                              status=PiEvent.SUCCESS_STATUS,
+                              message="AtWaypoint '{}' msg received from team {}".format(waypointId, m.team_id),
+                             )
+        
+        # Send a success response
+        self.jsonResponse["message"] = "You have successfully navigated to waypoint {}".format(waypointId)
+        return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
+class StartChallenge_2015(JSONHandlerView):
+    """ A class-based view to handle a BRATA StartChallenge message.
+    
+        The client sends a POST message with the following JSON data:
+        {
+            "team_id":        "<team_id>",
+        }
+        
+        The MS sends the following response on success:
+        {
+            "message":  "..."
+        }
+    """
+    def __init__(self):
+        super(StartChallenge_2015, self).__init__(PiEvent.START_CHALLENGE_2015_MSG_TYPE, methods=[self.POST])
+    
+    def post(self, request, station_id, *args, **kwargs):
+        """ Handle the POST message and update the database """
+        super(StartChallenge_2015, self).post(request, *args, **kwargs)
+
+        # Get input parameters from URL and/or POST data
+        m,response = self.validateJSONFields(request, ("team_id",))
+        if m is None:
+            return response
+        
+        team,response = self.validateTeam(request, m.team_id, "Received an invalid team_id: '{}'.  You may need to re-register.".format(m.team_id))
+        
+        # TODO:  Add message processing
+        
+        # Succeeded:  Record the transaction and update the station record
+        event = self.addEvent(data=request.body,
+                              status=PiEvent.SUCCESS_STATUS,
+                              message="StartChallenge msg received from team {} at station {}".format(m.team_id, station_id),
+                             )
+        
+        # Send a success response
+        self.jsonResponse["message"] = "You are starting the challenge at station {}".format(station_id)
+        return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
+class Submit_2015(JSONHandlerView):
+    """ A class-based view to handle a BRATA Submit message.
+    
+        The client sends a POST message with the following JSON data:
+        {
+            "team_id":        "<team_id>",
+        }
+        
+        The MS sends the following response on success:
+        {
+            "message":  "..."
+        }
+    """
+    def __init__(self):
+        super(Submit_2015, self).__init__(PiEvent.SUBMIT_2015_MSG_TYPE, methods=[self.POST])
+    
+    def post(self, request, station_id, *args, **kwargs):
+        """ Handle the POST message and update the database """
+        super(Submit_2015, self).post(request, *args, **kwargs)
+
+        # Get input parameters from URL and/or POST data
+        m,response = self.validateJSONFields(request, ("team_id",))
+        if m is None:
+            return response
+        
+        team,response = self.validateTeam(request, m.team_id, "Received an invalid team_id: '{}'.  You may need to re-register.".format(m.team_id))
+        
+        # TODO:  Add message processing
+        
+        # Succeeded:  Record the transaction and update the station record
+        event = self.addEvent(data=request.body,
+                              team=team,
+                              status=PiEvent.SUCCESS_STATUS,
+                              message="Submit msg received from team {} at station {}".format(m.team_id, station_id),
+                             )
+        
+        # Send a success response
+        self.jsonResponse["message"] = "Your results for the challenge at station {} have been submitted".format(station_id)
+        return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
