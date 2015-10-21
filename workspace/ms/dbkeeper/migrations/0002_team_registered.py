@@ -7,18 +7,14 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
+        ('piservice', '0002_auto_20150910_0052'),
         ('dbkeeper', '0001_initial'),
     ]
 
     operations = [
-        migrations.RenameField(
+        migrations.AddField(
             model_name='team',
-            old_name='totalDuration',
-            new_name='totalDuration_s',
-        ),
-        migrations.AlterField(
-            model_name='mentor',
-            name='note',
-            field=models.TextField(blank=True),
+            name='registered',
+            field=models.ForeignKey(related_name='teams', to='piservice.PiEvent', null=True),
         ),
     ]

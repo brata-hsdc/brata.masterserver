@@ -7,31 +7,27 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('piservice', '0001_initial'),
+        ('piservice', '0007_auto_20150928_2352'),
     ]
 
     operations = [
         migrations.RemoveField(
             model_name='pistation',
-            name='hostname',
-        ),
-        migrations.RemoveField(
-            model_name='pistation',
-            name='ipAddress',
+            name='pi_type',
         ),
         migrations.AddField(
             model_name='pistation',
-            name='host',
-            field=models.CharField(max_length=60, blank=True),
+            name='serial_num',
+            field=models.CharField(max_length=50, blank=True),
         ),
         migrations.AddField(
             model_name='pistation',
-            name='stationInstance',
-            field=models.PositiveSmallIntegerField(default=0),
+            name='url',
+            field=models.CharField(max_length=200, blank=True),
         ),
         migrations.AlterField(
-            model_name='pievent',
-            name='data',
-            field=models.TextField(blank=True),
+            model_name='pistation',
+            name='station_type',
+            field=models.CharField(default=b'Unknown', max_length=20, choices=[(b'Unknown', b'Unknown'), (b'RTE', b'Return to Earth (RTE)')]),
         ),
     ]

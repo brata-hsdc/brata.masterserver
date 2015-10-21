@@ -1,0 +1,112 @@
+{
+"title":  "MS Demo Commands",
+"width":  1,
+"cmds":
+[
+    {
+        "button":  "Create Empty Database",
+        "cmd":     "\"C:\\Program Files (x86)\\PostgreSQL\\9.4\\bin\\psql\" -U postgres -c \"DROP DATABASE msdb\" && \"C:\\Program Files (x86)\\PostgreSQL\\9.4\\bin\\psql\" -U postgres -c \"CREATE DATABASE msdb\" && start cmd /k \"call c:\\tools\\geodjango && python d:\\ellery\\workspace\\brata.masterserver\\workspace\\ms\\manage.py migrate\"",
+        "tooltip": "Drop and Create a new empty database"
+    },
+    {
+        "button":  "Create superuser",
+        "cmd":     "start cmd /k \"call c:\\tools\\geodjango && python d:\\ellery\\workspace\\brata.masterserver\\workspace\\ms\\manage.py createsuperuser\"",
+        "tooltip": "Create a Django admin user who can modify the database"
+    },
+    {
+        "button":  "Restore Settings",
+        "cmd":     "\"C:\\Program Files (x86)\\PostgreSQL\\9.4\\bin\\psql\" -U pi -d msdb < d:\\ellery\\workspace\\brata.masterserver\\transition\\generated\\db_backup\\msdb_setting_backup.sql",
+        "tooltip": "Restore the contents of the Setting table"
+    },
+    {
+        "button":  "Run Server",
+        "cmd":     "start cmd /k \"call c:\\tools\\geodjango && python d:\\ellery\\workspace\\brata.masterserver\\workspace\\ms\\manage.py runserver\"",
+        "tooltip": "Start the Django Development Server"
+    },
+    {
+        "button":  "Add Organization",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/dbkeeper/add/organization/",
+        "tooltip": "Add an Organization (a school) through the web interface"
+    },
+    {
+        "button":  "Add User",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/dbkeeper/add/user/",
+        "tooltip": "Add a person (User) through the web interface"
+    },
+    {
+        "button":  "Add Team",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/dbkeeper/add/team/",
+        "tooltip": "Add a Team through the web interface"
+    },
+    {
+        "button":  "dbkeeper Admin",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/admin/dbkeeper/",
+        "tooltip": "Open the piservice Admin web interface"
+    },
+    {
+        "button":  "Check In Team",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/dbkeeper/checkin/team/",
+        "tooltip": "Check a Team in for competition through the web interface"
+    },
+    {
+        "button":  "Register",
+        "cmd":     "http --json POST :8000/piservice/register/ Content-type:application/json Accept:application/json team_passcode=\"khk14\" brata_version=\"02\"",
+        "tooltip": "Sent by the BRATA to the MS to authenticate and get a reg_code"
+    },
+    {
+        "button":  "Unregister",
+        "cmd":     "http --json POST :8000/piservice/unregister/ Content-type:application/json Accept:application/json reg_code=\"xxxxxxxxx\"",
+        "tooltip": "Sent by the BRATA to the MS to unregister itself"
+    },
+    {
+        "button":  "piservice Admin",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/admin/piservice/",
+        "tooltip": "Open the dbkeeper Admin web interface"
+    },
+    {
+        "button":  "Settings",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/admin/dbkeeper/setting",
+        "tooltip": "Open the dbkeeper Admin web interface"
+    },
+    {
+        "button":  "Join",
+        "cmd":     "http --json POST :8000/piservice/join/ Content-type:application/json Accept:application/json host=\"192.168.1.5\" station_type=\"RTE\" serial_num=\"1234567\" url=\"http://129.168.1.5/station/\"",
+        "tooltip": "Sent by a Station to the MS when it is ready to come online"
+    },
+    {
+        "button":  "Re-Join",
+        "cmd":     "http --json POST :8000/piservice/join/ Content-type:application/json Accept:application/json host=\"192.168.1.5\" station_type=\"RTE\" serial_num=\"1234567\" url=\"http://129.168.1.5/station/\"",
+        "tooltip": "Testing when a second Join is sent by a station already joined.  This should behave just like a Join, and the station should receive a new station_id"
+    },
+    {
+        "button":  "Heartbeat",
+        "cmd":     "http --json GET :8000/piservice/heartbeat/ Content-type:application/json Accept:application/json station_id=\"1:b1c9\"",
+        "tooltip": "Sent by a Station to the MS periodically to show it is alive"
+    },
+    {
+        "button":  "Leave",
+        "cmd":     "http --json POST :8000/piservice/leave/ Content-type:application/json Accept:application/json station_id=\"1:b1c9\"",
+        "tooltip": "Sent by a Station to the MS when it wants to go offline"
+    },
+    {
+        "button":  "dbkeeper station_status",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/dbkeeper/station_status/",
+        "tooltip": "Display the Station Status page (with Ajax refresh)"
+    },
+    {
+        "button":  "dbkeeper index",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/dbkeeper/",
+        "tooltip": "Open the dbkeeper home page"
+    },
+    {
+        "button":  "Backup Database",
+        "cmd":     "\"C:\\Program Files (x86)\\PostgreSQL\\9.4\\bin\\pg_dump\" -U pi msdb | c:\\cygwin\\bin\\bzip2 > d:\\ellery\\workspace\\brata.masterserver\\transition\\generated\\db_backup\\msdb_backup.sql.bz2",
+        "tooltip": "Back up the entire database contents"
+    },
+    {
+        "button":  "Restore Database",
+        "cmd":     "\"C:\\Program Files (x86)\\PostgreSQL\\9.4\\bin\\psql\" -U postgres -c \"DROP DATABASE msdb\" && \"C:\\Program Files (x86)\\PostgreSQL\\9.4\\bin\\psql\" -U postgres -c \"CREATE DATABASE msdb\" && c:\\cygwin\\bin\\bzcat d:\\ellery\\workspace\\brata.masterserver\\transition\\generated\\db_backup\\msdb_backup.sql.bz2 | \"C:\\Program Files (x86)\\PostgreSQL\\9.4\\bin\\psql\" -U pi -d msdb",
+        "tooltip": "Restore the database contents from a backup"
+    }
+]
+}

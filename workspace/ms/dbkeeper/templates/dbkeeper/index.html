@@ -1,0 +1,19 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}Populate Database{% endblock %}
+{% block header %}Populate Database{% endblock %}
+
+{% block main %}
+From here you can perform the following operations:<br/>
+<br/>
+<a href="add/org/"><button>Add Organization</button><br/></a>
+<a href="add/user/"><button>Add User</button><br/></a>
+<a href="add/team/"><button>Add Team</button><br/></a>
+<br/>
+<a href="checkin/team/"><button>Check In Team</button><br/></a>
+<br/>
+<a href="station_status/"><button>Monitor Station Status</button><br/></a>
+<br/>
+<a href="/admin/dbkeeper/"><button><b>dbkeeper</b> Admin Interface</button><br/></a>
+<a href="/admin/piservice/"><button><b>piservice</b> Admin Interface</button><br/></a>
+{% endblock %}

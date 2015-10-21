@@ -1,0 +1,67 @@
+{
+"title":  "MS 2015 BRATA Test Commands",
+"width":  1,
+"cmds":
+[
+    {
+        "button":  "Register 2015",
+        "cmd":     "http --json POST :8000/m/brata-v00/register Content-type:application/json Accept:application/json team_id=\"ulg08\" message=\"\"",
+        "tooltip": "Sent by BRATA to MS to check in the team and receive an instructional message"
+    },
+    {
+        "button":  "At Waypoint 2015",
+        "cmd":     "http --json POST :8000/m/brata-v00/atWaypoint/WP1234 Content-type:application/json Accept:application/json team_id=\"ulg08\" message=\"\"",
+        "tooltip": "Sent by BRATA to MS to report that it is at a waypoint (some coords: 28.033934 -80.600333)"
+    },
+    {
+        "button":  "Start Challenge 2015",
+        "cmd":     "http --json POST :8000/m/brata-v00/start_challenge/1234 Content-type:application/json Accept:application/json team_id=\"ulg08\" message=\"\"",
+        "tooltip": "Sent by BRATA to MS to start a challenge at Pi Station 1234"
+    },
+    {
+        "button":  "Submit 2015",
+        "cmd":     "http --json POST :8000/m/brata-v00/submit/1234 Content-type:application/json Accept:application/json team_id=\"ulg08\" message=\"\"",
+        "tooltip": "Sent by BRATA to MS to submit a solution from Pi Station 1234."
+    },
+    {
+        "button":  "Add User",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/dbkeeper/add/user/",
+        "tooltip": "Add a person (User) through the web interface"
+    },
+    {
+        "button":  "Add Team",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/dbkeeper/add/team/",
+        "tooltip": "Add a Team through the web interface"
+    },
+    {
+        "button":  "Check In Team",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/dbkeeper/checkin/team/",
+        "tooltip": "Check a Team in for competition through the web interface"
+    },
+    {
+        "button":  "dbkeeper index",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/dbkeeper/",
+        "tooltip": "Open the dbkeeper home page"
+    },
+    {
+        "button":  "dbkeeper Admin",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/admin/dbkeeper/",
+        "tooltip": "Open the piservice Admin web interface"
+    },
+    {
+        "button":  "piservice Admin",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/admin/piservice/",
+        "tooltip": "Open the dbkeeper Admin web interface"
+    },
+    {
+        "button":  "dbkeeper station_status",
+        "cmd":     "\"C:\\Program Files (x86)\\Mozilla Firefox\\firefox.exe\" http://localhost:8000/dbkeeper/station_status/",
+        "tooltip": "Display the Station Status page (with Ajax refresh)"
+    },
+    {
+        "button":  "Run Server",
+        "cmd":     "start cmd /k \"call c:\\tools\\geodjango && python d:\\ellery\\workspace\\brata.masterserver\\workspace\\ms\\manage.py runserver\"",
+        "tooltip": "Start the Django Development Server"
+    }
+]
+}

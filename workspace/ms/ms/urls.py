@@ -16,6 +16,13 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
+from piservice import urls as piservice_urls
+from dbkeeper import urls as dbkeeper_urls
+
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^piservice/', include(piservice_urls)),
+    url(r'^serve_pi/', include(piservice_urls)),  # appetizing alias for piservice
+    url(r'^m/', include(piservice_urls)),  # alias for 2015 backward compatibility
+    url(r'^dbkeeper/', include(dbkeeper_urls)),
 ]

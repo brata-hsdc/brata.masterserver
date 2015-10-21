@@ -1,0 +1,43 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}Station Status{% endblock %}
+{% block header %}Station Status{% endblock %}
+
+{% block extra_javascript %}
+<script src="/static/dbkeeper/jquery-2.1.4.js"></script>
+{% endblock %}
+
+{% block body_start %}
+<script type="text/javascript">
+//TODO:  This is just sample code.  Need to modify it to do what we want.
+// Use a named immediately-invoked function expression.
+(function worker() {
+   // Initiate an Ajax call to retrieve status information
+   $.getJSON('/piservice/station_status/', function(data) {
+      // Handle the data returned from the Ajax call
+      var tableBody = "";
+      data.sort(function(a,b){ return a.id - b.id; });
+      $.each(data, function(index, value) {
+        tableBody = tableBody + "<tr><td>" + value.station_id + "</td><td>" + value.host + "</td><td>" + value.type + "</td><td>" + value.last_active + "</td><td>" + value.joined + "</td></tr>";
+      });
+      $('#stationTable table > tbody:first').html(tableBody);
+      // Now that we've completed the request, schedule the next one
+      setTimeout(worker, {{ PAGE_REFRESH_INTERVAL }});
+   });
+})();  // Make the initial call
+
+$(document).ready(function (event) {});
+</script>
+{% endblock %}
+
+{% block main %}
+<div id="stationTable">
+<table>
+   <thead>
+      <tr><th>Station ID</th><th>Host</th><th>Type</th><th>Last Activity</th><th>Up Time</th></tr>
+   </thead>
+   <tbody>
+   </tbody>
+</table>
+</div>
+{% endblock %}

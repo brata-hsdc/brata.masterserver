@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1  /DTD/xhtml1-strict.dtd">
+<html>
+<head>
+<title>{% block title %}Master Server Caretaker Interface{% endblock %} | DB Keeper</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+{% load staticfiles %}
+<link rel="stylesheet" type="text/css" href="{% static "dbkeeper/base.css" %}" />
+{% block extra_css %}{% endblock %}
+{% block extra_javascript %}{% endblock %}
+{% block extra_headerstuff %}{% endblock %}
+<link rel="shortcut icon" type="image/ico" href="{% static "dbkeeper/favicon.ico" %}" />
+</head>
+<body>
+{% block body_start %}{% endblock %}
+<div id="header">
+  <div id="headerHome"><a href="/dbkeeper/"><img src="{% static "dbkeeper/home-icon_30.png" %}" alt="Home" /></a></div>
+  <div id="headerText">{% block header %}Master Server Caretaker Interface{% endblock %}</div>
+</div>
+<div id="sidebarLeft">
+  {% block sidebar %}
+  <h2 class="sidebar">ABOUT</h2>
+  <p>The Master Server Caretaker Interface provides functions for HSDC organizers
+     and administrators.  For more information about the HSDC, click <a href="">here</a>.
+     <!--  TODO:  Add HSDC info url  --> 
+  </p>
+  {% endblock %}
+</div>
+<div id="mainRight">
+  {% block main %}{% endblock %}
+</div>
+<div id="footer">
+  Implemented using <a href="http://www.djangoproject.com/" target="_blank">Django</a> and
+  <a href="http://www.postgresql.org/" target="_blank">PostgreSQL</a><br/>
+  by <a href="http://github.com/brata-hsdc/" target="_blank">The HSDC Team</a>
+  <div id="copyright">Distributed under the terms of the <a href="" target="_blank">Apache License</a></div>
+</div> 
+
+</body>
+</html>

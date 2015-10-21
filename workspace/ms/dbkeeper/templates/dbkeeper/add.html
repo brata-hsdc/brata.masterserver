@@ -1,0 +1,27 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}Add {{ entity|title }}{% endblock %}
+{% block header %}Add {{ entity|title }}{% endblock %}
+
+{% block main %}
+<form action="/dbkeeper/add/{{ entity|lower }}/" method="post">
+    {% csrf_token %}
+    {# Include the hidden fields #}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    {# Include the visible fields #}
+    <table class="fieldWrapper">
+       {% for field in form.visible_fields %}
+       <tr>
+          <td style="text-align: right;">{% if field.field.required %}* {% endif %}{{ field.label_tag }}</td>
+          <td style="text-align: left;">{{ field }}</td>
+          <td style="text-align: left; color: red;">{{ field.errors }}</td>
+       </tr>
+       {% endfor %}
+       <tr class="submitRow">
+          <td colspan="3"><input type="submit" value="{{ submit }}" /></td>
+       </tr>
+    </table>
+</form>
+{% endblock %}
