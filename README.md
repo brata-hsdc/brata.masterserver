@@ -19,8 +19,33 @@ there are four Django apps:
 * `teamcentral` - provides status info to competitors through a mobile device interface
 
 ## Installation
+```sh
+# sudo apt-get update
+```
 
 ### Install Python
+
+### Install the Apache Web Server
+```sh
+# sudo apt-get install apache2
+```
+
+### Install mod_wsgi
+```sh
+# sudo pip install mod_wsgi
+```
+
+### Install PostgreSQL
+```sh
+sudo apt-get install postgresql-9.1
+```
+
+### Install psycopg2
+```sh
+sudo apt-get install python-psycopg2
+```
+
+TODO do we need to create a virtual environment first?
 
 ### Install Django
 
@@ -33,14 +58,8 @@ a more user-friendly command line structure, and colorful syntax highlighting.  
 `httpie` is written in Python, so it can be installed with `pip`, like this:
 
 ```sh
-# pip install httpie
+# sudo pip install httpie
 ```
-
-### Install psycopg2
-
-### Install PostgreSQL
-
-### Install the Apache Web Server
 
 
 ## Setup
