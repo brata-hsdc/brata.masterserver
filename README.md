@@ -48,6 +48,9 @@ sudo apt-get install python-psycopg2
 TODO do we need to create a virtual environment first?
 
 ### Install Django
+```sh
+# sudo pip install Django
+```
 
 ### Install httpie
 
@@ -61,10 +64,15 @@ a more user-friendly command line structure, and colorful syntax highlighting.  
 # sudo pip install httpie
 ```
 
-
 ## Setup
 
 ### Clone this repository
+```sh
+# sudo mkdir /opt/designchallenge2016
+# sudo chown pi:pi /opt/designchallenge2016
+# cd /opt/designchallenge2016
+# git clone https://code.google.com/p/brata.masterserver/
+```
 
 ### Create the database
 
