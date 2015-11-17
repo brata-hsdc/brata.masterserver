@@ -21,9 +21,12 @@ there are four Django apps:
 ## Installation
 ```sh
 # sudo apt-get update
+# sudo apt-get upgrade
 ```
 
 ### Install Python
+N/A Python already installed and upgraded
+Ah crud need to reinstall python from source with --enabled-shared? This error came from mod_wsgi install.  Suggests there will be major performance and memory hit if not done.
 
 ### Install the Apache Web Server
 ```sh
@@ -33,6 +36,10 @@ there are four Django apps:
 ### Install mod_wsgi
 ```sh
 # sudo pip install mod_wsgi
+```
+if you get an error about not being able to find apxs then run the following and then try installing mod_wsgi again:
+```sh
+# sudo apt-get install apache2-threaded-dev
 ```
 
 ### Install PostgreSQL
@@ -71,12 +78,21 @@ a more user-friendly command line structure, and colorful syntax highlighting.  
 # sudo mkdir /opt/designchallenge2016
 # sudo chown pi:pi /opt/designchallenge2016
 # cd /opt/designchallenge2016
-# git clone https://code.google.com/p/brata.masterserver/
+# git clone https://github.com/brata-hsdc/brata.masterserver.git
 ```
 
 ### Create the database
-
 Create a new PostgreSQL database called `msdb`.
+```sh
+# cd /usr/lib/postgresql/9.1/bin
+# sudo -u postgres psql
+# create database msdb;
+# create user pi password '<get from team>';
+# grant all privileges on database msdb to pi;
+# \q
+# cd brata.masterserver/workspace/ms
+# python manage.py migrate
+```
 
 ### Modify the Apache configuration
 
