@@ -21,9 +21,12 @@ there are four Django apps:
 ## Installation
 ```sh
 # sudo apt-get update
+# sudo apt-get upgrade
 ```
 
 ### Install Python
+N/A Python already installed and upgraded
+Ah crud need to reinstall python from source with --enabled-shared? This error came from mod_wsgi install.  Suggests there will be major performance and memory hit if not done.
 
 ### Install the Apache Web Server
 ```sh
@@ -32,7 +35,10 @@ there are four Django apps:
 
 ### Install mod_wsgi
 ```sh
+# sudo apt-get install apache2-threaded-dev
 # sudo pip install mod_wsgi
+# sudo apt-get install libapache2-mod-wsgi
+# sudo a2enmod wsgi <TBD is this really needed?>
 ```
 
 ### Install PostgreSQL
@@ -48,6 +54,9 @@ sudo apt-get install python-psycopg2
 TODO do we need to create a virtual environment first?
 
 ### Install Django
+```sh
+# sudo pip install Django
+```
 
 ### Install httpie
 
@@ -61,16 +70,55 @@ a more user-friendly command line structure, and colorful syntax highlighting.  
 # sudo pip install httpie
 ```
 
-
 ## Setup
 
-### Clone this repository
-
 ### Create the database
-
 Create a new PostgreSQL database called `msdb`.
+```sh
+# cd /usr/lib/postgresql/9.1/bin
+# sudo -u postgres psql
+# create database msdb;
+# create user pi password '<get from team>';
+# grant all privileges on database msdb to pi;
+# \q
+```
+
+### Clone this repository
+```sh
+# sudo mkdir /opt/designchallenge2016
+# sudo chown pi:pi /opt/designchallenge2016
+# cd /opt/designchallenge2016
+# git clone https://github.com/brata-hsdc/brata.masterserver.git
+```
 
 ### Modify the Apache configuration
+```sh
+# sudo nano /etc/apache2/sites-enabled/000-default
+```
+Add
+```sh
+WSGIScriptAlias / /opt/designchallenge2016/brata.masterserver/workspace/ms/ms/wsgi.py
+WSGIPythonPath /opt/designchallenge2016/brata.masterserver/workspace/ms
+<Directory /opt/designchallenge2016/brata.masterserver/workspace/ms/ms>
+<Files wsgi.py>
+Order deny,allow
+Allow from all
+</Files>
+</Directory>
+```
+
+### install the ms Django project
+First change the default password from the source to match the one you set above for the pi postgress user.
+```sh
+# cd brata.masterserver/workspace/ms/ms
+# nano settings.py
+```
+Find raspberry (the default pi password) and change it to your password. Save and exit the file.
+Then:
+```sh
+# cd ..
+# python manage.py migrate
+```
 
 ## Test
 
