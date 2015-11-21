@@ -1,4 +1,4 @@
-"""ms URL Configuration
+"""ms.scoreboard URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/1.8/topics/http/urls/
@@ -16,15 +16,13 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
-from piservice import urls as piservice_urls
-from dbkeeper import urls as dbkeeper_urls
-from scoreboard import urls as scoreboard_urls
+from . import views
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls)),
-    url(r'^piservice/', include(piservice_urls)),
-    url(r'^serve_pi/', include(piservice_urls)),  # appetizing alias for piservice
-    url(r'^m/', include(piservice_urls)),  # alias for 2015 backward compatibility
-    url(r'^dbkeeper/', include(dbkeeper_urls)),
-    url(r'^scoreboard/', include(scoreboard_urls)),
-]
+    url(r'^$', views.Scoreboard.as_view(), name="scoreboard"),
+    url(r'^scores/', views.Scores.as_view(), name="scores"),
+    ]
+
+# Test commands:
+#
+# http://localhost:8000/scoreboard
