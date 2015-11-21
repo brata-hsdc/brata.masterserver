@@ -28,7 +28,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_display = ("name", "organization", "pass_code", "wordCode", "reg_code", "registered", "total_score", "total_duration_s")
     ordering = ("name",)
     search_fields = ("name", "pass_code", "reg_code")
-    readonly_fields = ("pass_code", "reg_code")
+    readonly_fields = ("pass_code", "reg_code", "registered")
     show_full_result_count = True
     
     def wordCode(self, team):
@@ -37,7 +37,7 @@ class TeamAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         obj.code = obj.makeTeamCode()
         obj.save()
-
+    
 @admin.register(Setting)
 class SettingAdmin(admin.ModelAdmin):
     fieldsets = [("Setting", {"fields": [("name", "value"), "description"]})]
