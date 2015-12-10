@@ -145,7 +145,7 @@ Notifies M that the given team is starting a challenge again this URL is scanned
 
 ```
          URL:  http://ms/m/brata-v00/start_challenge/<TEAMID>/<STATIONID>
-      Method:  GET
+      Method:  POST
 Content type:  application/json
 Return value:  ??
 ```
