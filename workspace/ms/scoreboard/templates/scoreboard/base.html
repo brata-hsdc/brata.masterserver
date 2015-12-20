@@ -21,8 +21,14 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 
-  <link rel="stylesheet" type="text/css" href="{% static "scoreboard/base.css" %}" />
+  <!--TODO[Delete here and file in /static?] -->
+  <!--link rel="stylesheet" type="text/css" href="{% static "scoreboard/base.css" %}" /-->
+
   {% block extra_css %}{% endblock %}
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <script src="{% static "scoreboard/jquery-2.1.4.js" %}" /><script>;</script>
+
   {% block extra_javascript %}{% endblock %}
   {% block extra_headerstuff %}{% endblock %}
   <link rel="shortcut icon" type="image/ico" href="{% static "scoreboard/favicon.ico" %}" />
@@ -30,16 +36,32 @@
 
 <body>
   {% block body_start %}{% endblock %}
-  <div id="sidebarLeft">
-    {% block sidebar %}
-      <p>
-        TODO: Sidebar
-      </p>
-    {% endblock %}
+
+  <div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <a href="../" class="navbar-brand">{% block header %}(Default Scoreboard Header){% endblock %}</a>
+        <button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#navbar-main">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+      </div>
+      <div class="navbar-collapse collapse" id="navbar-main">
+        <ul class="nav navbar-nav navbar-right">
+        </ul>
+      </div>
+    </div>
   </div>
 
-  <div id="mainRight">
-    {% block main %}{% endblock %}
+  <div class="container">
+    <div class="page-header" id="banner">
+      <div class="row">
+        <div class="col-lg-8 col-md-7 col-sm-6">
+          {% block main %}{% endblock %}
+        </div>
+      </div>
+    </div>
   </div>
 
   <div id="footer">
@@ -53,8 +75,6 @@
     </div>
   </div> 
 
-  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-  <script src="{% static "scoreboard/jquery-2.1.4.js" %}" />
   <!-- Include all compiled plugins (below), or include individual files as needed -->
   <script src="{% static "scoreboard/js/bootstrap.min.js" %}" />
 </body>

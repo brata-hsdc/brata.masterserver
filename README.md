@@ -125,6 +125,12 @@ Then:
    # Edit /opt/.../workspace/ms/ms/settings.py and set HOST to localhost in order to get migrate to run successfully. 
    # Edit /etc/apache2/envvars to change APACHE_RUN_USER and APACHE_RUN_GROUP from www-data to the development user; restart apache2.
    # In the /etc/apache2/sites-enabled/000-default.conf, added after "Allow from all", then restarted Apache:
+   # In the /etc/apache2/sites-enabled/000-default.conf, I currently hard-coded the following just for scorekeeper; don't know what Jaron has planned for a more robust solution though Ellery did mention the installation script copying all statics to a central location, so settings.py might need a STATIC_ROOT set:
+
+      Alias /static/ /opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/static/
+      <Directory /opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/static>
+        Require all granted
+      </Directory>
 
 ```
 Require all granted

@@ -1,7 +1,7 @@
 {% extends "scoreboard/base.html" %}
 
 {% block title  %}Main Page{% endblock %}
-{% block header %}Leader Board{% endblock %}
+{% block header %}High School Design Challenge 2016{% endblock %}
 
 {% block extra_javascript %}
   <script src="/static/scoreboard/jquery-2.1.4.js"></script>
@@ -14,19 +14,29 @@
        var tableBody = "";
        data.sort(function(a,b){ return a.id - b.id; });
 
+       var rank = 0;
+       var prevScore = 9999999999;
+
        $.each(data, function(index, value) {
+          if (value.total_score < prevScore) { rank++; }
+
           tableBody = tableBody + "<tr>"
+                      + "<td>" + rank + "</td>"
                       + "<td>" + value.team_icon + "</td>"
                       + "<td>" + value.team_name + "</td>"
                       + "<td>" + value.team_id + "</td>"
                       + "<td>" + value.organization + "</td>"
                       + "<td>" + value.is_registered + "</td>"
+                      + "<td>" + value.launch_score + "</td>"
+                      + "<td>" + value.dock_score + "</td>"
+                      + "<td>" + value.secure_score + "</td>"
+                      + "<td>" + value.return_score + "</td>"
                       + "<td>" + value.total_score + "</td>"
                       + "<td>" + value.total_duration + "(TODO user-friendly e.g. mm:ss)</td>"
                       + "</tr>";
        });
 
-       $('#overallTable table > tbody:first').html(tableBody);
+       $('#stationTable table > tbody:first').html(tableBody);
 
        // Now that we've completed the request, schedule the next one
        setTimeout(getScoreboardStatus, {{ PAGE_REFRESH_INTERVAL }});
@@ -36,24 +46,31 @@
        $.getJSON('/scoreboard/scoreboard_status/', handleScoreboardStatus);
     }
 
-    $(document).ready(function (event) {
+    function onReady(event) {
        getScoreboardStatus();
-    });
+    }
+
+    $(document).ready(onReady);
   </script>
 {% endblock %}{# body_start #}
 
 {% block main %}
-  <div id="overallTable">
+  <div id="stationTable">
     <table>
       <thead>
         <tr>
-           <th>Team Icon/Avatar</th>
+           <th>Position</th>
+           <th>Team Icon/Avatar (TBD)</th>
            <th>Team Name</th>
            <th>Team Code</th>
            <th>Organization</th>
-           <th>Registered</th>
+           <th>Registered (TBD)</th>
+           <th>Launch</th>
+           <th>Dock</th>
+           <th>Secure</th>
+           <th>Return to Earth</th>
            <th>Total Score</th>
-           <th>Total Duration</th>
+           <th>Total Duration (TBD)</th>
         </tr>
       </thead>
 

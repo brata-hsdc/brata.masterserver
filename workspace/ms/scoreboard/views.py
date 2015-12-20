@@ -13,8 +13,14 @@ def index(request):
     logging.debug('Entered scoreboard.views.index')
     refreshInterval = 5000 # TODO Setting.get("SCOREBOARD_STATUS_REFRESH_INTERVAL_MS", default="5000")
 
-    return render(request, "scoreboard/index.html",
-                  {"PAGE_REFRESH_INTERVAL": refreshInterval})
+    context = {
+       "PAGE_REFRESH_INTERVAL": refreshInterval
+    }
+
+    result = render(request, "scoreboard/index.html", context)
+
+    logging.debug('Exiting scoreboard.views.index')
+    return result
 
 
 #-------------------------------------------------------------------------------
@@ -113,8 +119,10 @@ class ScoreboardStatus(View):
 
             teamList.append(team)
 
+        result = HttpResponse(json.dumps(teamList), content_type="application/json", status=200)
+
         logging.debug('Exiting Scores.get')
-        return HttpResponse(json.dumps(teamList), content_type="application/json", status=200)
+        return result
 
 
     @staticmethod

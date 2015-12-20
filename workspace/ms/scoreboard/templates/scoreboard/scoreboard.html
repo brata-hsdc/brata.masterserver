@@ -1,52 +1,78 @@
 {% extends "dbkeeper/base.html" %}
 
 {% block title  %}Leader Board{% endblock %}
-{% block header %}Leader Board{% endblock %}
+{% block header %}High School Design Challenge 2016{% endblock %}
 
 {% block extra_javascript %}
 <script src="/static/dbkeeper/jquery-2.1.4.js"></script>
 {% endblock %}
 
 {% block body_start %}
-<script type="text/javascript">
-//TODO:  This is just sample code.  Need to modify it to do what we want.
-// Use a named immediately-invoked function expression.
-(function worker() {
-   // Initiate an Ajax call to retrieve status information
-   $.getJSON('/scoreboard/scores/', function(data) {
-      // Handle the data returned from the Ajax call
-      var tableBody = "";
-      data.sort(function(a,b){ return a.total - b.total; });
-      var rank = 0;
-      var prevScore = 9999999999;
-      $.each(data, function(index, value) {
-        if (value.total_score < prevScore) { rank++; }
-        tableBody = tableBody + "<tr><td>" + rank +
-                                "</td><td>" + value.name +
-                                "</td><td>" + value.launch_score +
-                                "</td><td>" + value.dock_score +
-                                "</td><td>" + value.return_score +
-                                "</td><td>" + value.total_score +
-                                "</td></tr>";
-      });
-      $('#stationTable table > tbody:first').html(tableBody);
-      // Now that we've completed the request, schedule the next one
-      setTimeout(worker, {{ PAGE_REFRESH_INTERVAL }});
-   });
-})();  // Make the initial call
+  <script type="text/javascript">
+    function handleScoreboardStatus(data) {
+       // Handle the data returned from the Ajax call
+       var tableBody = "";
+       data.sort(function(a,b){ return a.id - b.id; });
 
-$(document).ready(function (event) {});
-</script>
-{% endblock %}
+       var rank = 0;
+       var prevScore = 9999999999;
+
+       $.each(data, function(index, value) {
+          if (value.total_score < prevScore) { rank++; }
+
+          tableBody = tableBody + "<tr>"
+                      + "<td>" + rank + "</td>"
+                      + "<td>" + value.team_icon + "</td>"
+                      + "<td>" + value.team_name + "</td>"
+                      + "<td>" + value.team_id + "</td>"
+                      + "<td>" + value.organization + "</td>"
+                      + "<td>" + value.is_registered + "</td>"
+                      + "<td>" + value.launch_score + "</td>"
+                      + "<td>" + value.dock_score + "</td>"
+                      + "<td>" + value.secure_score + "</td>"
+                      + "<td>" + value.return_score + "</td>"
+                      + "<td>" + value.total_score + "</td>"
+                      + "<td>" + value.total_duration + "(TODO user-friendly e.g. mm:ss)</td>"
+                      + "</tr>";
+       });
+
+       $('#stationTable table > tbody:first').html(tableBody);
+
+       // Now that we've completed the request, schedule the next one
+       setTimeout(getScoreboardStatus, {{ PAGE_REFRESH_INTERVAL }});
+    }
+
+    function getScoreboardStatus() {
+       $.getJSON('/scoreboard/scoreboard_status/', handleScoreboardStatus);
+    }
+
+    function onReady(event) {
+       getScoreboardStatus();
+    }
+
+    $(document).ready(onReady);
+  </script>
+{% endblock %}{ # body_start # }
 
 {% block main %}
-<div id="stationTable">
-<table>
-   <thead>
-      <tr><th>Position</th><th>Team</th><th>Launch</th><th>Dock</th><th>Return to Earth</th><th>Total</th></tr>
-   </thead>
-   <tbody>
-   </tbody>
-</table>
-</div>
-{% endblock %}
+  <div id="overallTable">
+    <table class="table table-striped table-hover ">
+      <thead>
+        <tr>
+          <th>Position</th>
+          <th>Team Icon/Avatar (TBD)</th>
+          <th>Team</th>
+          <th>Organization (TBD)</th>
+          <th>Registered (TBD)</th>
+          <th>Launch</th>
+          <th>Dock</th>
+          <th>Return to Earth</th>
+          <th>Total Score</th>
+          <th>Total Duration (TBD)</th>
+        </tr>
+      </thead>
+
+      <tbody/>
+    </table>
+  </div>
+{% endblock %}{ # main # }
