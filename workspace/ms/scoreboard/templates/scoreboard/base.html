@@ -21,8 +21,8 @@
     <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
   <![endif]-->
 
-  <!--TODO[Delete here and file in /static?] TODO This was brought back in. -->
-  <link rel="stylesheet" type="text/css" href="{% static "scoreboard/base.css" %}" />
+  <!--TODO[Delete here and file in /static?] -->
+  <!--link rel="stylesheet" type="text/css" href="{% static "scoreboard/base.css" %}" /-->
 
   {% block extra_css %}{% endblock %}
 
@@ -64,17 +64,6 @@
     </div>
   </div>
 
-{% comment %}
-  <!-- TODO: This was merged-in. Do we want to keep it? -->
-  <div id="sidebarLeft">
-    {% block sidebar %}
-      <p>
-        TODO: Sidebar
-      </p>
-    {% endblock %}
-  </div>
-{% endcomment %}
-
   <div id="footer">
     {% block page_footer %}{% endblock %}<br/>
 
@@ -88,9 +77,6 @@
     </div>
   </div> 
 
-  <!-- TODO Why jquery included here and above too? -->
-  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-  <script src="{% static "scoreboard/jquery-2.1.4.js" %}" />
   <!-- Include all compiled plugins (below), or include individual files as needed -->
   <script src="{% static "scoreboard/js/bootstrap.min.js" %}" />
 </body>

@@ -1,7 +1,7 @@
 {% extends "dbkeeper/base.html" %}
 
 {% block title  %}Leader Board{% endblock %}
-{% block header %}Leader Board{% endblock %}
+{% block header %}High School Design Challenge 2016{% endblock %}
 
 {% block extra_javascript %}
 <script src="/static/dbkeeper/jquery-2.1.4.js"></script>
@@ -98,6 +98,33 @@
 
     function getScoreboardStatus() {
        $.getJSON('/scoreboard/scoreboard_status/', handleScoreboardStatus);
+    }
+
+    function onReady(event) {
+       getScoreboardStatus();
+    }
+
+    $(document).ready(onReady);
+  </script>
+{% endblock %}{ # body_start # }
+
+{% block main %}
+<div id="stationTable">
+<table>
+   <thead>
+      <tr><th>Position</th><th>Team</th><th>Launch</th><th>Dock</th><th>Return to Earth</th><th>Total</th></tr>
+   </thead>
+   <tbody>
+   </tbody>
+</table>
+</div>
+{% endblock %}
+       // Now that we've completed the request, schedule the next one
+       setTimeout(getScoreboardStatus, {{ PAGE_REFRESH_INTERVAL }});
+    }
+
+    function getScoreboardStatus() {
+       $.getJSON('/scoreboard/scores/', handleScoreboardStatus);
     }
 
     function onReady(event) {
