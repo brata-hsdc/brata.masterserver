@@ -32,6 +32,7 @@ def index(request):
     """ Display the scoreboard page. Updating is driven by the page making REST requests.
     """
     logging.debug('Entered scoreboard.views.index')
+
     refreshInterval = 5000 # TODO Setting.get("SCOREBOARD_STATUS_REFRESH_INTERVAL_MS", default="5000")
 
     context = {
@@ -70,7 +71,7 @@ class ScoreboardStatus(View):
         ]
     """
     def __init__(self):
-        logging.debug('Entered ScoreboardStatus.__init__')
+        logging.debug('Entered Scores.__init__')
 
 
     @staticmethod
@@ -348,8 +349,8 @@ class ScoreboardStatus(View):
                 "secure_duration": Scores._formatSeconds(s['secure_duration_s']),
                 "return_score"   : s['return_score'],
                 "return_duration": Scores._formatSeconds(s['return_duration_s']),
-                "total_score"    : s['total_score'],
-                "total_duration" : Scores._formatSeconds(s['total_duration_s']),
+                "total_score"   : t.total_score,
+                "total_duration": Scores._formatSeconds(t.total_duration_s),
             }
 
             teamList.append(team)
