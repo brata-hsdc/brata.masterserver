@@ -45,8 +45,10 @@ class ScoreboardStatus(View):
     def __init__(self):
         logging.debug('Entered ScoreboardStatus.__init__')
 
-    def get(self, request, *args, **kwargs):
-        """ Return the status of all the Teams """
+
+    """ A REST request to get scores from the database for the leaderboard """
+    def get(self, request):
+        """ Retrieve score information from the database and return it """
         logging.debug('Entered ScoreboardStatus.get')
         
         #TODO        teams = Team.objects.all()
@@ -106,13 +108,14 @@ class ScoreboardStatus(View):
                 "organization"  : t.organization.name,
                 #"is_registered" : t.registered,
                 "total_score"   : t.total_score,
-                "total_duration": ScoreboardStatus._formatSeconds(t.total_duration_s),
+                "total_duration": Scores._formatSeconds(t.total_duration_s),
             }
 
             teamList.append(team)
 
-        logging.debug('Exiting ScoreboardStatus.get')
+        logging.debug('Exiting Scores.get')
         return HttpResponse(json.dumps(teamList), content_type="application/json", status=200)
+
 
     @staticmethod
     def _formatSeconds(seconds):
