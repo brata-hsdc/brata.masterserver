@@ -71,12 +71,12 @@ class ScoreboardStatus(View):
         ]
     """
     def __init__(self):
-        logging.debug('Entered Scores.__init__')
+        logging.debug('Entered ScoreboardStatus.__init__')
 
 
     @staticmethod
     def _recomputeLaunchScore(teamName):
-        logging.debug('Entered Scores._recomputeLaunchScore({})'.format(teamName))
+        logging.debug('Entered ScoreboardStatus._recomputeLaunchScore({})'.format(teamName))
 
         events = PiEvent.objects.filter(
             team__name=teamName
@@ -134,13 +134,13 @@ class ScoreboardStatus(View):
         score = 0
         duration_s = 0
 
-        logging.debug('Exiting Scores._recomputeLaunchScore')
+        logging.debug('Exiting ScoreboardStatus._recomputeLaunchScore')
         return (score, duration_s)
 
 
     @staticmethod
     def _recomputeDockScore(teamName):
-        logging.debug('Entered Scores._recomputeDockScore({})'.format(teamName))
+        logging.debug('Entered ScoreboardStatus._recomputeDockScore({})'.format(teamName))
 
         events = PiEvent.objects.filter(
             team__name=teamName
@@ -203,13 +203,13 @@ class ScoreboardStatus(View):
         score = 0
         duration_s = 0
 
-        logging.debug('Exiting Scores._recomputeDockScore')
+        logging.debug('Exiting ScoreboardStatus._recomputeDockScore')
         return (score, duration_s)
 
 
     @staticmethod
     def _recomputeSecureScore(teamName):
-        logging.debug('Entered Scores._recomputeSecureScore({})'.format(teamName))
+        logging.debug('Entered ScoreboardStatus._recomputeSecureScore({})'.format(teamName))
 
         events = PiEvent.objects.filter(
             team__name=teamName
@@ -271,13 +271,13 @@ class ScoreboardStatus(View):
         score = 0
         duration_s = 0
 
-        logging.debug('Exiting Scores._recomputeSecureScore')
+        logging.debug('Exiting ScoreboardStatus._recomputeSecureScore')
         return (score, duration_s)
 
 
     @staticmethod
     def _recomputeReturnScore(teamName):
-        logging.debug('Entered Scores._recomputeReturnScore({})'.format(teamName))
+        logging.debug('Entered ScoreboardStatus._recomputeReturnScore({})'.format(teamName))
 
         events = PiEvent.objects.filter(
             team__name=teamName
@@ -291,18 +291,18 @@ class ScoreboardStatus(View):
         score = 0
         duration_s = 0
 
-        logging.debug('Exiting Scores._recomputeReturnScore')
+        logging.debug('Exiting ScoreboardStatus._recomputeReturnScore')
         return (score, duration_s)
 
 
     @staticmethod
     def _recomputeTeamScore(teamName):
-        logging.debug('Entered Scores._recomputeScores')
+        logging.debug('Entered ScoreboardStatus._recomputeScores')
 
-        (launch_score, launch_duration_s) = Scores._recomputeLaunchScore(teamName)
-        (dock_score,   dock_duration_s)   = Scores._recomputeDockScore(teamName)
-        (secure_score, secure_duration_s) = Scores._recomputeSecureScore(teamName)
-        (return_score, return_duration_s) = Scores._recomputeReturnScore(teamName)
+        (launch_score, launch_duration_s) = ScoreboardStatus._recomputeLaunchScore(teamName)
+        (dock_score,   dock_duration_s)   = ScoreboardStatus._recomputeDockScore(teamName)
+        (secure_score, secure_duration_s) = ScoreboardStatus._recomputeSecureScore(teamName)
+        (return_score, return_duration_s) = ScoreboardStatus._recomputeReturnScore(teamName)
 
         total_score = launch_score + dock_score + secure_score + return_score
         total_duration_s = launch_duration_s + dock_duration_s + secure_duration_s + return_duration_s
@@ -320,7 +320,7 @@ class ScoreboardStatus(View):
             total_duration_s=total_duration_s
         )
 
-        logging.debug('Exiting Scores._recomputeScores')
+        logging.debug('Exiting ScoreboardStatus._recomputeScores')
         return result
 
 
@@ -336,21 +336,21 @@ class ScoreboardStatus(View):
             s = ScoreboardStatus._recomputeTeamScore(t.name)
 
             team = {
-                "team_icon"     : "TODO", 
-                "team_name"     : t.name,
-                "team_id"       : "TODO",
-                "organization"  : t.organization.name,
-                "is_registered" : t.registered,
+                "team_icon"      : "TODO", 
+                "team_name"      : t.name,
+                "team_id"        : "TODO",
+                "organization"   : t.organization.name,
+                "is_registered"  : t.registered,
                 "launch_score"   : s['launch_score'],
-                "launch_duration": Scores._formatSeconds(s['launch_duration_s']),
+                "launch_duration": ScoreboardStatus._formatSeconds(s['launch_duration_s']),
                 "dock_score"     : s['dock_score'],
-                "dock_duration"  : Scores._formatSeconds(s['dock_duration_s']),
+                "dock_duration"  : ScoreboardStatus._formatSeconds(s['dock_duration_s']),
                 "secure_score"   : s['secure_score'],
-                "secure_duration": Scores._formatSeconds(s['secure_duration_s']),
+                "secure_duration": ScoreboardStatus._formatSeconds(s['secure_duration_s']),
                 "return_score"   : s['return_score'],
-                "return_duration": Scores._formatSeconds(s['return_duration_s']),
-                "total_score"   : t.total_score,
-                "total_duration": Scores._formatSeconds(t.total_duration_s),
+                "return_duration": ScoreboardStatus._formatSeconds(s['return_duration_s']),
+                "total_score"    : 0, #TODO t.total_score,
+                "total_duration" : 0, #TODO ScoreboardStatus._formatSeconds(t.total_duration_s),
             }
 
             teamList.append(team)

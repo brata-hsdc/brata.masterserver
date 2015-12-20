@@ -85,14 +85,15 @@ class Team(models.Model):
 
     # TODO:  Add more fields here as needed
     
-    @property
-    def total_score(self):
-        return self.launch_score + self.dock_score + self.secure_score + self.return_score
-
-    @property
-    def total_duration_s(self):
-        # total duration of competition in seconds
-        return self.launch_duration_s + self.dock_duration_s + self.secure_duration_s + self.return_duration_s
+    # TODO Disabling for now; enable if needed for performance, o/w delete.    
+    #@property
+    #def total_score(self):
+    #    return self.launch_score + self.dock_score + self.secure_score + self.return_score
+    #
+    #@property
+    #def total_duration_s(self):
+    #    # total duration of competition in seconds
+    #    return self.launch_duration_s + self.dock_duration_s + self.secure_duration_s + self.return_duration_s
 
     @staticmethod
     def makeTeamCode(existingCodes=None):
