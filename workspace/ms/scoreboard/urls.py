@@ -19,10 +19,15 @@ from django.contrib import admin
 from . import views
 
 urlpatterns = [
-    url(r'^$', views.Scoreboard.as_view(), name="scoreboard"),
-    url(r'^scores/', views.Scores.as_view(), name="scores"),
-    ]
+    url(r'^$', views.index, name="index"),
+    url(r'^index.html$', views.index, name="index"),
+
+    # Ajax requests
+    url(r'^scoreboard_status/$', views.ScoreboardStatus.as_view(), name="scoreboard_status"),
+]
 
 # Test commands:
 #
+# http://localhost:8000/
+# http://localhost:8000/index.html
 # http://localhost:8000/scoreboard

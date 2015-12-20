@@ -1,0 +1,62 @@
+{% extends "scoreboard/base.html" %}
+
+{% block title  %}Main Page{% endblock %}
+
+{% block extra_javascript %}
+  <script src="/static/scoreboard/jquery-2.1.4.js"></script>
+{% endblock %}
+
+{% block body_start %}
+  <script type="text/javascript">
+    function handleScoreboardStatus(data) {
+       // Handle the data returned from the Ajax call
+       var tableBody = "";
+       data.sort(function(a,b){ return a.id - b.id; });
+
+       $.each(data, function(index, value) {
+          tableBody = tableBody + "<tr>"
+                      + "<td>" + value.team_icon + "</td>"
+                      + "<td>" + value.team_name + "</td>"
+                      + "<td>" + value.team_id + "</td>"
+                      + "<td>" + value.organization + "</td>"
+                      + "<td>" + value.is_registered + "</td>"
+                      + "<td>" + value.total_score + "</td>"
+                      + "<td>" + value.total_duration + "(TODO user-friendly e.g. mm:ss)</td>"
+                      + "</tr>";
+       });
+
+       $('#overallTable table > tbody:first').html(tableBody);
+
+       // Now that we've completed the request, schedule the next one
+       setTimeout(getScoreboardStatus, {{ PAGE_REFRESH_INTERVAL }});
+    }
+
+    function getScoreboardStatus() {
+       $.getJSON('/scoreboard/scoreboard_status/', handleScoreboardStatus);
+    }
+
+    $(document).ready(function (event) {
+       getScoreboardStatus();
+    });
+  </script>
+{% endblock %}{# body_start #}
+
+{% block main %}
+  <div id="overallTable">
+    <table>
+      <thead>
+        <tr>
+           <th>Team Icon/Avatar</th>
+           <th>Team Name</th>
+           <th>Team Code</th>
+           <th>Organization</th>
+           <th>Registered</th>
+           <th>Total Score</th>
+           <th>Total Duration</th>
+        </tr>
+      </thead>
+
+      <tbody/>
+    </table>
+  </div>
+{% endblock %}{# main #}

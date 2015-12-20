@@ -107,7 +107,7 @@ Allow from all
 </Directory>
 ```
 
-### install the ms Django project
+### Install the ms Django project
 First change the default password from the source to match the one you set above for the pi postgress user.
 ```sh
 # cd brata.masterserver/workspace/ms/ms
@@ -120,12 +120,24 @@ Then:
 # python manage.py migrate
 ```
 
+**Note:** (JIA 12/17/2015) I had to make the following edits. FYI this was for a Debian Jessie VM running on a laptop:
+
+   # Edit /opt/.../workspace/ms/ms/settings.py and set HOST to localhost in order to get migrate to run successfully. 
+   # Edit /etc/apache2/envvars to change APACHE_RUN_USER and APACHE_RUN_GROUP from www-data to the development user; restart apache2.
+   # In the /etc/apache2/sites-enabled/000-default.conf, added after "Allow from all", then restarted Apache:
+
+```
+Require all granted
+```
+
 ## Test
 
 Do the following to test whether everything got set up correctly:
 
-```
-```
+In a Web browser, navigate to the following URLs:
+
+   * http://localhost/admin
+   * http://localhost/dbkeeper
 
 ---
 ---

@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1  /DTD/xhtml1-strict.dtd">
+<html>
+
+<head>
+  <title>{% block title %}(Default Scoreboard Title){% endblock %} | Scoreboard</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  {% load staticfiles %}
+  <link rel="stylesheet" type="text/css" href="{% static "scoreboard/base.css" %}" />
+  {% block extra_css %}{% endblock %}
+  {% block extra_javascript %}{% endblock %}
+  {% block extra_headerstuff %}{% endblock %}
+  <link rel="shortcut icon" type="image/ico" href="{% static "scoreboard/favicon.ico" %}" />
+</head>
+
+<body>
+  {% block body_start %}{% endblock %}
+  <div id="sidebarLeft">
+    {% block sidebar %}
+      <p>
+        TODO: Sidebar
+      </p>
+    {% endblock %}
+  </div>
+
+  <div id="mainRight">
+    {% block main %}{% endblock %}
+  </div>
+
+  <div id="footer">
+    Implemented using <a href="http://www.djangoproject.com/" target="_blank">Django</a> and
+    <a href="http://www.postgresql.org/" target="_blank">PostgreSQL</a><br/>
+    by <a href="http://github.com/brata-hsdc/" target="_blank">The HSDC Team</a>
+
+    <div id="copyright">
+      Distributed under the terms of the
+      <a href="http://www.apache.org/licenses/LICENSE-2.0" target="_blank">Apache License</a>.
+    </div>
+  </div> 
+
+</body>
+
+</html>

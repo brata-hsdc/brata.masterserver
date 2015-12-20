@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 import os
 # The following is a hack to keep our passwords from accidentally being checked in
 import sys
+import site_logging
 sys.path.append(os.path.abspath("/opt/designchallenge2016"))
 from NoCMConfigValues import *
 
