@@ -6,6 +6,27 @@ from dbkeeper.models import Organization, Team
 from piservice.models import PiEvent, PiStation
 
 
+#TODO
+##----------------------------------------------------------------------------
+#class Scoreboard(View):
+#    """ Display the scoreboard page.
+#        Updating is driven by the page making REST requests.
+#    """
+#    context = {}
+#    def get(self, request):
+#        return render(request, "scoreboard/scoreboard.html", self.context)
+#
+##----------------------------------------------------------------------------
+#class Scores(View):
+#    """ A REST request to get scores from the database for the leaderboard """
+#    def get(self, request):
+#        """ Retrieve score information from the database and return it """
+#        # Get scores from the database
+#        # Format scores into JSON
+#        # Return
+#        return HttpResponse("")
+
+
 #-------------------------------------------------------------------------------
 def index(request):
     """ Display the scoreboard page. Updating is driven by the page making REST requests.
@@ -50,18 +71,6 @@ class ScoreboardStatus(View):
     """
     def __init__(self):
         logging.debug('Entered ScoreboardStatus.__init__')
-
-
-    @staticmethod
-    def _formatSeconds(seconds):
-        """ Convert seconds to mm:ss
-        
-            Args:
-                seconds (int): number of seconds
-            Returns:
-                string containing mm:ss
-        """
-        return "{:02d}:{:02d}".format(int(seconds/60), seconds%60)
 
 
     @staticmethod
@@ -317,7 +326,7 @@ class ScoreboardStatus(View):
     """ A REST request to get scores from the database for the leaderboard """
     def get(self, request):
         """ Retrieve score information from the database and return it """
-        logging.debug('Entered Scores.get')
+        logging.debug('Entered ScoreboardStatus.get')
 
         teams = Team.objects.all()
         teamList = []
@@ -326,12 +335,11 @@ class ScoreboardStatus(View):
             s = ScoreboardStatus._recomputeTeamScore(t.name)
 
             team = {
-                "rank"           : 1, # TODO
-                "icon"           : "TODO",
-                "name"           : t.name,
-                "team_id"        : "TODO",
-                "organization"   : t.organization.name,
-                "is_registered"  : t.registered,
+                "team_icon"     : "TODO", 
+                "team_name"     : t.name,
+                "team_id"       : "TODO",
+                "organization"  : t.organization.name,
+                "is_registered" : t.registered,
                 "launch_score"   : s['launch_score'],
                 "launch_duration": Scores._formatSeconds(s['launch_duration_s']),
                 "dock_score"     : s['dock_score'],
@@ -348,5 +356,17 @@ class ScoreboardStatus(View):
 
         result = HttpResponse(json.dumps(teamList), content_type="application/json", status=200)
 
-        logging.debug('Exiting Scores.get')
+        logging.debug('Exiting ScoreboardStatus.get')
         return result
+
+
+    @staticmethod
+    def _formatSeconds(seconds):
+        """ Convert seconds to mm:ss
+        
+            Args:
+                seconds (int): number of seconds
+            Returns:
+                string containing mm:ss
+        """
+        return "{:02d}:{:02d}".format(int(seconds/60), seconds%60)

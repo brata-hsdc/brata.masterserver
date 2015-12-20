@@ -64,8 +64,20 @@
     </div>
   </div>
 
+{% comment %}
+  <!-- TODO: This was merged-in. Do we want to keep it? -->
+  <div id="sidebarLeft">
+    {% block sidebar %}
+      <p>
+        TODO: Sidebar
+      </p>
+    {% endblock %}
+  </div>
+{% endcomment %}
+
   <div id="footer">
     {% block page_footer %}{% endblock %}<br/>
+
     Implemented using <a href="http://www.djangoproject.com/" target="_blank">Django</a> and
     <a href="http://www.postgresql.org/" target="_blank">PostgreSQL</a><br/>
     by <a href="http://github.com/brata-hsdc/" target="_blank">The HSDC Team</a>
