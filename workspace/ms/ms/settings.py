@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+# The following is a hack to keep our passwords from accidentally being checked in
+import sys
+sys.path.append(os.path.abspath("/opt/designchallenge2016"))
+from NoCMConfigValues import *
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -25,7 +29,7 @@ SECRET_KEY = '-4@1rw9sp&emici+=!_h51y-&0wfs1n3mmd@*o4a^*_7(m^kxe'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Application definition
@@ -90,8 +94,8 @@ DATABASES = {
         #'ENGINE': 'django.contrib.gis.db.backends.postgis',  # PostgreSQL + PostGIS
         'NAME': 'msdb',
         'USER': 'pi',
-        'PASSWORD': 'raspberry',
-        'HOST': '',      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP
+        'PASSWORD': DB_PASSWORD,
+        'HOST': '127.0.0.1',      # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP
         'PORT': '5432',  # Set to empty string for default
     }    
 }
@@ -113,5 +117,5 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
-
+STATIC_ROOT = '/opt/designchallenge2016/brata.masterserver/workspace/ms/static/'
 STATIC_URL = '/static/'
