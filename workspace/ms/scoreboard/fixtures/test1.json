@@ -1,0 +1,58 @@
+[
+    {
+        "model": "dbkeeper.Organization",
+        "pk": "1",
+        "fields": {
+            "name": "School1",
+            "type": 1
+        }
+    },
+    {
+        "model": "dbkeeper.Team",
+        "pk": "1",
+        "fields": {
+            "name": "Moe",
+            "organization": 1,
+            "launch_score": 1,
+            "launch_duration_s": 200,
+            "dock_score": 40,
+            "dock_duration_s": 230,
+            "secure_score": 2,
+            "secure_duration_s": 260,
+            "return_score": 11,
+            "return_duration_s": 9
+        }
+    },
+    {
+        "model": "dbkeeper.Team",
+        "pk": "2",
+        "fields": {
+            "name": "Larry",
+            "organization": 1,
+            "launch_score": 80,
+            "launch_duration_s": 20,
+            "dock_score": 720,
+            "dock_duration_s": 30,
+            "secure_score": 23,
+            "secure_duration_s": 35,
+            "return_score": 88,
+            "return_duration_s": 4
+        }
+    },
+    {
+        "model": "dbkeeper.Team",
+        "pk": "3",
+        "fields": {
+            "name": "Curly",
+            "organization": 1,
+            "launch_score": 3,
+            "launch_duration_s": 2000,
+            "dock_score": 4,
+            "dock_duration_s": 1000,
+            "secure_score": 18,
+            "secure_duration_s": 600,
+            "return_score": 5,
+            "return_duration_s": 62
+        }
+    }
+]
