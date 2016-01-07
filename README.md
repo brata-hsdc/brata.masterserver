@@ -108,7 +108,7 @@ Allow from all
 ```
 
 ### Install the ms Django project
-First change the default password from the source to match the one you set above for the pi postgress user.
+First change the default password from the source to match the one you set above for the pi postgres user.
 ```sh
 # cd brata.masterserver/workspace/ms/ms
 # nano settings.py
@@ -135,6 +135,10 @@ Then:
 ```
 Require all granted
 ```
+
+**Note:** (JIA 1/6/2016) I had to make the following edits. FYI this was for a Debian Jessie VM running on a laptop:
+
+   # Edit /etc/postgresql/9.4/main/pg_hba.conf to change "peer" to "md5" on the local/all/all line.
 
 ## Test
 

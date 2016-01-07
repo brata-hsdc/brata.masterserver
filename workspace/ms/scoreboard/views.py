@@ -57,53 +57,7 @@ class ScoreboardStatus(View):
         """ Retrieve score information from the database and return it """
         logging.debug('Entered ScoreboardStatus.get')
         
-        #TODO        teams = Team.objects.all()
-        #------------------------------------------------
-        #TODO Delete
-        teams = []
-        s = Team()
-        setattr(s, 'name', 'team1')
-
-        org = Organization()
-        setattr(org, 'name', 'org1')
-        setattr(s, 'organization', org)
-
-        #evt = PiEvent()
-        #setattr(s, 'registered', evt)
-
-        setattr(s, 'total_score', 42)
-        setattr(s, 'total_duration_s', 43)
-        teams.append(s)
-
-        s = Team()
-        setattr(s, 'name', 'team2')
-
-        org = Organization()
-        setattr(org, 'name', 'org2')
-        setattr(s, 'organization', org)
-
-        #evt = PiEvent()
-        #setattr(s, 'registered', evt)
-
-        setattr(s, 'total_score', 44)
-        setattr(s, 'total_duration_s', 90)
-        teams.append(s)
-
-        s = Team()
-        setattr(s, 'name', 'team3')
-
-        org = Organization()
-        setattr(org, 'name', 'org1')
-        setattr(s, 'organization', org)
-
-        #evt = PiEvent()
-        #setattr(s, 'registered', evt)
-
-        setattr(s, 'total_score', 46)
-        setattr(s, 'total_duration_s', 3661)
-        teams.append(s)
-        #------------------------------------------------
-
+        teams = Team.objects.all()
         teamList = []
 
         for t in teams:
@@ -113,8 +67,16 @@ class ScoreboardStatus(View):
                 "team_id"       : "TODO",
                 "organization"  : t.organization.name,
                 #"is_registered" : t.registered,
-                "total_score"   : t.total_score,
-                "total_duration": Scores._formatSeconds(t.total_duration_s),
+                "launch_score"   : t.launch_score,
+                "launch_duration": Scores._formatSeconds(t.launch_duration_s),
+                "dock_score"     : t.dock_score,
+                "dock_duration"  : Scores._formatSeconds(t.dock_duration_s),
+                "secure_score"   : t.secure_score,
+                "secure_duration": Scores._formatSeconds(t.secure_duration_s),
+                "return_score"   : t.return_score,
+                "return_duration": Scores._formatSeconds(t.return_duration_s),
+                "total_score"    : t.total_score,
+                "total_duration" : Scores._formatSeconds(t.total_duration_s),
             }
 
             teamList.append(team)

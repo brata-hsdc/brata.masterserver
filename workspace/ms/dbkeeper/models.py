@@ -71,11 +71,27 @@ class Team(models.Model):
     reg_code         = models.CharField(max_length=REG_CODE_FIELD_LENGTH, blank=True)
     registered       = models.ForeignKey("piservice.PiEvent", null=True, related_name="teams", default="")  # give name as string to avoid cyclic import dependency
     
-    #    Score fields for the different competitions
-    total_score      = models.IntegerField(default=0)
-    total_duration_s = models.IntegerField(default=0)  # total duration of competition in seconds
+    # Score/time fields for the different competitions
+    launch_score      = models.IntegerField(default=0)
+    launch_duration_s = models.IntegerField(default=0)
+    dock_score        = models.IntegerField(default=0)
+    dock_duration_s   = models.IntegerField(default=0)
+    secure_score      = models.IntegerField(default=0)
+    secure_duration_s = models.IntegerField(default=0)
+    return_score      = models.IntegerField(default=0)
+    return_duration_s = models.IntegerField(default=0)
+
     # TODO:  Add more fields here as needed
     
+    @property
+    def total_score(self):
+        return self.launch_score + self.dock_score + self.secure_score + self.return_score
+
+    @property
+    def total_duration_s(self):
+        # total duration of competition in seconds
+        return self.launch_duration_s + self.dock_duration_s + self.secure_duration_s + self.return_duration_s
+
     @staticmethod
     def makeTeamCode(existingCodes=None):
         """ Create a unique pass_code for the team """

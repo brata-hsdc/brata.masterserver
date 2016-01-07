@@ -20,20 +20,19 @@
        $.each(data, function(index, value) {
           if (value.total_score < prevScore) { rank++; }
 
-          tableBody = tableBody + "<tr>"
-                      + "<td>" + rank + "</td>"
-                      + "<td>" + value.team_icon + "</td>"
-                      + "<td>" + value.team_name + "</td>"
-                      + "<td>" + value.team_id + "</td>"
-                      + "<td>" + value.organization + "</td>"
-                      + "<td>" + value.is_registered + "</td>"
-                      + "<td>" + value.launch_score + "</td>"
-                      + "<td>" + value.dock_score + "</td>"
-                      + "<td>" + value.secure_score + "</td>"
-                      + "<td>" + value.return_score + "</td>"
-                      + "<td>" + value.total_score + "</td>"
-                      + "<td>" + value.total_duration + "(TODO user-friendly e.g. mm:ss)</td>"
-                      + "</tr>";
+          tableBody = tableBody + "<tr id=\"" + rank + "\">"
+                    + "<td>" + rank + "</td>"
+                    + "<td>" + value.team_icon + "</td>" // TODO
+                    + "<td>" + value.team_name + "</td>"
+                    + "<td>" + value.team_id + "</td>"
+                    + "<td>" + value.organization + "</td>" // TODO
+                    + "<td>" + value.is_registered + "</td>" // TODO
+                    + "<td>" + value.launch_score + " (" + value.launch_duration + ")</td>"
+                    + "<td>" + value.dock_score + " (" + value.dock_duration + ")</td>"
+                    + "<td>" + value.secure_score + " (" + value.secure_duration + ")</td>"
+                    + "<td>" + value.return_score + " (" + value.return_duration + ")</td>"
+                    + "<td>" + value.total_score + "</td>"
+                    + "<td>" + value.total_duration + "(TODO user-friendly e.g. mm:ss)</td>"
        });
 
        $('#stationTable table > tbody:first').html(tableBody);
@@ -66,6 +65,7 @@
           <th>Registered (TBD)</th>
           <th>Launch</th>
           <th>Dock</th>
+          <th>Secure</th>
           <th>Return to Earth</th>
           <th>Total Score</th>
           <th>Total Duration (TBD)</th>
@@ -76,3 +76,7 @@
     </table>
   </div>
 {% endblock %}{ # main # }
+
+{% block page_footer %}
+   <div id="timestamp" />
+{% endblock %}{ # page_footer # }
