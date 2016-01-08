@@ -7,17 +7,20 @@
 <script src="/static/dbkeeper/jquery-2.1.4.js"></script>
 {% endblock %}
 
+
+
+
+
 {% block body_start %}
   <script type="text/javascript">
     function handleScoreboardStatus(data) {
-       // Handle the data returned from the Ajax call
-       var tableBody = "";
        data.sort(function(a,b){ return a.id - b.id; });
 
        var rank = 0;
        var prevScore = 9999999999;
 
        // Handle the data returned from the Ajax call
+       $.each(data, function(index, value) {
        $.each(data, function(index, value) {
           if (value.total_score < prevScore) { rank++; }
 
@@ -107,6 +110,11 @@
     $(document).ready(onReady);
   </script>
 {% endblock %}{ # body_start # }
+
+
+
+
+
 
 {% block main %}
   <div id="stationTable">

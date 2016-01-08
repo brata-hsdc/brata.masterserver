@@ -6,40 +6,6 @@ from dbkeeper.models import Organization, Team
 from piservice.models import PiEvent, PiStation
 
 
-#TODO
-##----------------------------------------------------------------------------
-#class Scoreboard(View):
-#    """ Display the scoreboard page.
-#        Updating is driven by the page making REST requests.
-#    """
-#    context = {}
-#    def get(self, request):
-#        return render(request, "scoreboard/scoreboard.html", self.context)
-#
-##----------------------------------------------------------------------------
-class Scores(View):
-    """ A REST request to get scores from the database for the leaderboard """
-    def get(self, request):
-        """ Retrieve score information from the database and return it """
-        # TODO
-        # Get scores from the database
-        # Format scores into JSON
-        # Return
-        return HttpResponse("")
-
-    # TODO Consolidate with copy below
-    @staticmethod
-    def _formatSeconds(seconds):
-        """ Convert seconds to mm:ss
-        
-            Args:
-                seconds (int): number of seconds
-            Returns:
-                string containing mm:ss
-        """
-        return "{:02d}:{:02d}".format(int(seconds/60), seconds%60)
-
-
 #-------------------------------------------------------------------------------
 def index(request):
     """ Display the scoreboard page. Updating is driven by the page making REST requests.
