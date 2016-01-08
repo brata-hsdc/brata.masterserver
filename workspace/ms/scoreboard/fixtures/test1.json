@@ -11,6 +11,7 @@
         "model": "dbkeeper.Team",
         "pk": "1",
         "fields": {
+            "rank": 1
             "name": "Moe",
             "organization": 1,
             "launch_score": 1,
@@ -27,6 +28,7 @@
         "model": "dbkeeper.Team",
         "pk": "2",
         "fields": {
+            "rank": 2
             "name": "Larry",
             "organization": 1,
             "launch_score": 80,
@@ -43,6 +45,7 @@
         "model": "dbkeeper.Team",
         "pk": "3",
         "fields": {
+            "rank": 3
             "name": "Curly",
             "organization": 1,
             "launch_score": 3,

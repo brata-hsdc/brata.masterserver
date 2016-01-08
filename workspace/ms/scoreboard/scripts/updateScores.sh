@@ -14,6 +14,7 @@ UPDATE_INTERVAL_S=2
 
    # Assumes passwordless authentication is set up properly, e.g. using .pgpass
 
+   moeRank=0
    moeLaunchDuration_s=0
    moeLaunchScore=1
    moeDockDuration_s=0
@@ -22,6 +23,7 @@ UPDATE_INTERVAL_S=2
    moeSecureScore=0
    moeReturnDuration_s=0
    moeReturnScore=0
+   larryRank=0
    larryLaunchDuration_s=0
    larryLaunchScore=21
    larryDockDuration_s=0
@@ -30,6 +32,7 @@ UPDATE_INTERVAL_S=2
    larrySecureScore=0
    larryReturnDuration_s=0
    larryReturnScore=0
+   curlyRank=0
    curlyLaunchDuration_s=0
    curlyLaunchScore=41
    curlyDockDuration_s=0
@@ -38,8 +41,51 @@ UPDATE_INTERVAL_S=2
    curlySecureScore=0
    curlyReturnDuration_s=0
    curlyReturnScore=0
+   index=0
 
    while [ 1 ]; do
+
+      index="`${EXPR} ${index} + 1`"
+
+      if [ ${index} -eq 1 ]; then
+         moeRank=1
+         larryRank=2
+         curlyRank=3
+      elif [ ${index} -eq 2 ]; then
+         moeRank=2
+         larryRank=1
+         curlyRank=3
+      elif [ ${index} -eq 3 ]; then
+         moeRank=1
+         larryRank=3
+         curlyRank=2
+      elif [ ${index} -eq 4 ]; then
+         moeRank=2
+         larryRank=3
+         curlyRank=1
+      elif [ ${index} -eq 5 ]; then
+         moeRank=3
+         larryRank=1
+         curlyRank=2
+      elif [ ${index} -eq 6 ]; then
+         moeRank=3
+         larryRank=2
+         curlyRank=1
+      elif [ ${index} -eq 7 ]; then
+         moeRank=1
+         larryRank=2
+         curlyRank=3
+      elif [ ${index} -eq 8 ]; then
+         moeRank=3
+         larryRank=1
+         curlyRank=2
+      elif [ ${index} -eq 9 ]; then
+         moeRank=2
+         larryRank=3
+         curlyRank=1
+         index=0
+      fi
+
       moeLaunchDuration_s="`${EXPR} ${moeLaunchDuration_s} + 1`"
       moeLaunchScore="`${EXPR} ${moeLaunchScore} + 2`"
       moeDockDuration_s="`${EXPR} ${moeDockDuration_s} + 1`"
@@ -80,7 +126,8 @@ UPDATE_INTERVAL_S=2
       ${PSQL} -U ${PGUSER} ${PGDB} << END_OF_FILE
 
          UPDATE ${TEAM_TABLE}
-         SET launch_duration_s = ${moeLaunchDuration_s},
+         SET rank              = ${moeRank},
+             launch_duration_s = ${moeLaunchDuration_s},
              launch_score      = ${moeLaunchScore},
              dock_duration_s   = ${moeDockDuration_s},
              dock_score        = ${moeDockScore},
@@ -91,7 +138,8 @@ UPDATE_INTERVAL_S=2
          WHERE name = 'Moe';
 
          UPDATE ${TEAM_TABLE}
-         SET launch_duration_s = ${larryLaunchDuration_s},
+         SET rank              = ${larryRank},
+             launch_duration_s = ${larryLaunchDuration_s},
              launch_score      = ${larryLaunchScore},
              dock_duration_s   = ${larryDockDuration_s},
              dock_score        = ${larryDockScore},
@@ -102,7 +150,8 @@ UPDATE_INTERVAL_S=2
          WHERE name = 'Larry';
 
          UPDATE ${TEAM_TABLE}
-         SET launch_duration_s = ${curlyLaunchDuration_s},
+         SET rank              = ${curlyRank},
+             launch_duration_s = ${curlyLaunchDuration_s},
              launch_score      = ${curlyLaunchScore},
              dock_duration_s   = ${curlyDockDuration_s},
              dock_score        = ${curlyDockScore},
@@ -112,7 +161,7 @@ UPDATE_INTERVAL_S=2
              return_score      = ${curlyReturnScore}
          WHERE name = 'Curly';
 
-         SELECT id, name, launch_duration_s, launch_score, dock_duration_s, dock_score, secure_duration_s, secure_score, return_duration_s, return_score
+         SELECT id, name, rank, launch_duration_s, launch_score, dock_duration_s, dock_score, secure_duration_s, secure_score, return_duration_s, return_score
          FROM ${TEAM_TABLE};
 
 END_OF_FILE

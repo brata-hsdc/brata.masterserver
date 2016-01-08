@@ -82,7 +82,7 @@ class Team(models.Model):
     #secure_duration_s = models.IntegerField(default=0)
     #return_score      = models.IntegerField(default=0)
     #return_duration_s = models.IntegerField(default=0)
-
+    
     # TODO:  Add more fields here as needed
     
     # TODO Disabling for now; enable if needed for performance, o/w delete.    
