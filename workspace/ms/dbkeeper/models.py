@@ -72,6 +72,7 @@ class Team(models.Model):
     registered       = models.ForeignKey("piservice.PiEvent", null=True, related_name="teams", default="")  # give name as string to avoid cyclic import dependency
     
     # Score/time fields for the different competitions
+    rank              = models.IntegerField(default=0)
     launch_score      = models.IntegerField(default=0)
     launch_duration_s = models.IntegerField(default=0)
     dock_score        = models.IntegerField(default=0)
