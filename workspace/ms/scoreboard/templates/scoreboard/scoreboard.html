@@ -7,10 +7,6 @@
 <script src="/static/dbkeeper/jquery-2.1.4.js"></script>
 {% endblock %}
 
-
-
-
-
 {% block body_start %}
   <script type="text/javascript">
     function handleScoreboardStatus(data) {
@@ -20,7 +16,6 @@
        var prevScore = 9999999999;
 
        // Handle the data returned from the Ajax call
-       $.each(data, function(index, value) {
        $.each(data, function(index, value) {
           if (value.total_score < prevScore) { rank++; }
 
@@ -85,8 +80,24 @@
 /*TODO
 
        // Reorder the table to sort by descending rank
-/*
+       var numRows = $("tbody").find("tr").length;
        var top = 26;
+
+       for (var i = 1; i <= numRows; ++i) {
+          var elem = $("tbody").find("tr:nth-child(" + i + ")");
+          var id = elem.attr('id');
+          var rank = elem.find("td:nth-child( 1)").html();
+//          console.log("top=["+top+"] rank=["+rank+"] prod=["+(top*rank)+"]");
+
+          elem.animate({
+             position: 'absolute',
+             top: 0 + 'px'
+          }, 400);
+
+          top += elem.outerHeight();
+       }
+
+/*
 
        $.each(order_arr, function(idx, val) {
           var el = $('tbody tr#user-' + val);
