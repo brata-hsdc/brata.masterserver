@@ -40,22 +40,24 @@
        $('#stationTable table > tbody:first').html(tableBody);
 */
 
-          numRows = $("tbody").find("tr").length;
+          var numRows = $("tbody").find("tr").length;
 
           for (var i = 1; i <= numRows; ++i) {
              var id = $("tbody").find("tr:nth-child(" + i + ")").attr('id');
 
              if(id == ('team-' + value.name)) {
-                $("tbody").find("tr:nth-child(" + i + ") td:nth-child( 2)").html(value.team_icon) // TODO
-                $("tbody").find("tr:nth-child(" + i + ") td:nth-child( 3)").html(value.team_name)
-                $("tbody").find("tr:nth-child(" + i + ") td:nth-child( 4)").html(value.organization) // TODO
-                $("tbody").find("tr:nth-child(" + i + ") td:nth-child( 5)").html(value.is_registered) // TODO
-                $("tbody").find("tr:nth-child(" + i + ") td:nth-child( 6)").html(value.launch_score + " (" + value.launch_duration + ")")
-                $("tbody").find("tr:nth-child(" + i + ") td:nth-child( 7)").html(value.dock_score + " (" + value.dock_duration + ")")
-                $("tbody").find("tr:nth-child(" + i + ") td:nth-child( 8)").html(value.secure_score + " (" + value.secure_duration + ")")
-                $("tbody").find("tr:nth-child(" + i + ") td:nth-child( 9)").html(value.return_score + " (" + value.return_duration + ")")
-                $("tbody").find("tr:nth-child(" + i + ") td:nth-child(10)").html(value.total_score)
-                $("tbody").find("tr:nth-child(" + i + ") td:nth-child(11)").html(value.total_duration)
+                var elem = $("tbody").find("tr:nth-child(" + i + ")");
+                elem.find("td:nth-child( 1)").html(value.rank)
+                elem.find("td:nth-child( 2)").html(value.icon) // TODO
+                elem.find("td:nth-child( 3)").html(value.name)
+                elem.find("td:nth-child( 4)").html(value.organization) // TODO
+                elem.find("td:nth-child( 5)").html(value.is_registered) // TODO
+                elem.find("td:nth-child( 6)").html(value.launch_score + " (" + value.launch_duration + ")")
+                elem.find("td:nth-child( 7)").html(value.dock_score + " (" + value.dock_duration + ")")
+                elem.find("td:nth-child( 8)").html(value.secure_score + " (" + value.secure_duration + ")")
+                elem.find("td:nth-child( 9)").html(value.return_score + " (" + value.return_duration + ")")
+                elem.find("td:nth-child(10)").html(value.total_score)
+                elem.find("td:nth-child(11)").html(value.total_duration)
                 return true;
              }
           }

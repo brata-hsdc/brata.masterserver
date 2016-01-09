@@ -57,6 +57,11 @@ class ScoreboardStatus(View):
         """ Retrieve score information from the database and return it """
         logging.debug('Entered ScoreboardStatus.get')
         
+        # TODO move this out of here; should this be run via cron somehow? We don't
+        # want the scoreboard web page driving scoring computation--just display
+        # precomputed scores.
+        ScoreboardStatus._recomputeScores()
+
         teams = Team.objects.all()
         teamList = []
 
@@ -85,6 +90,62 @@ class ScoreboardStatus(View):
 
         logging.debug('Exiting Scores.get')
         return result
+
+
+    @staticmethod
+    def _recomputeLaunchScore(teamName):
+        logging.debug('Entered Scores._recomputeLaunchScore({})'.format(teamName))
+
+        events = PiEvent.objects.all().filter(team__name=teamName)
+        # TODO filter by current challenge?
+        # TODO compute score
+        # TODO compute duration
+        # TODO update score and duration for team's challenge in Team table
+
+        logging.debug('Exiting Scores._recomputeLaunchScore')
+
+
+    @staticmethod
+    def _recomputeDockScore(teamName):
+        logging.debug('Entered Scores._recomputeDockScore({})'.format(teamName))
+
+        # TODO
+
+        logging.debug('Exiting Scores._recomputeDockScore')
+
+
+    @staticmethod
+    def _recomputeSecureScore(teamName):
+        logging.debug('Entered Scores._recomputeSecureScore({})'.format(teamName))
+
+        # TODO
+
+        logging.debug('Exiting Scores._recomputeSecureScore')
+
+
+    @staticmethod
+    def _recomputeReturnScore(teamName):
+        logging.debug('Entered Scores._recomputeReturnScore({})'.format(teamName))
+
+        # TODO
+
+        logging.debug('Exiting Scores._recomputeReturnScore')
+
+
+    @staticmethod
+    def _recomputeScores():
+        logging.debug('Entered Scores._recomputeScores')
+
+        if True: # TODO if recomputation necessary (i.e. challenge not over):
+            teams = Team.objects.all()
+
+            for t in teams:
+                Scores._recomputeLaunchScore(t.name)
+                Scores._recomputeDockScore(t.name)
+                Scores._recomputeSecureScore(t.name)
+                Scores._recomputeReturnScore(t.name)
+
+        logging.debug('Exiting Scores._recomputeScores')
 
 
     @staticmethod
