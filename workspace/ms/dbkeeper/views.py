@@ -33,6 +33,11 @@ def index(request):
     return render(request, "dbkeeper/index.html")
 
 #----------------------------------------------------------------------------
+def test(request):
+    """ Display the QR Code test page. """
+    return render(request, "dbkeeper/test.html")
+
+#----------------------------------------------------------------------------
 def station_status(request):
     """ Home page view for piservice.  Since this is a service, we could
         return 404, or we could put up a helpful page with some options.
