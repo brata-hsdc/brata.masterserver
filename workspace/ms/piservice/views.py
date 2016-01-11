@@ -117,10 +117,11 @@ class JSONHandlerView(View):
         """ Determine whether requester can send and receive JSON. """
         # Check that the client is sending JSON-formatted data
         if "application/json" in request.META["CONTENT_TYPE"]:
-        
+            return True
+            # This extra checek is failing and don't know why removing for now
             # Check that client accepts a JSON-formatted response
-            if "application/json" in request.META["HTTP_ACCEPT"]:
-                return True
+            #if "application/json" in request.META["HTTP_ACCEPT"]:
+            #    return True
             
         return False
     
@@ -152,11 +153,12 @@ class JSONHandlerView(View):
         try:
             msgFields = self.Namespace()
             data = json.loads(request.body)  # POST data (in JSON format)
-            
+            lastError = "none"
             for f in fields:
                 if isinstance(f, (str, unicode)):
                     # Mandatory field
                     if f not in data:
+                        lastError = f + " not found"
                         raise
                     setattr(msgFields, f, data[f])
                 else:
@@ -171,7 +173,7 @@ class JSONHandlerView(View):
             # Log the message
             self.addEvent(data=request.body,
                           status=PiEvent.FAIL_STATUS,
-                          message="Badly formed request",
+                          message="Badly formed JSON " + lastError,
                          )
             # Send a fail response
             self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
@@ -211,9 +213,10 @@ class Register(JSONHandlerView):
     
         The client sends a POST message with the following JSON data:
         {
-            "team_passcode":  "<passcode>",
-            "brata_version":  "nn"
+            "message":  "",
+            "reg_code":  "may have data from a previoius registration"
         }
+        and the ned of the url is the team_passcode
         
         The MS sends the following response on success:
         {
@@ -228,15 +231,16 @@ class Register(JSONHandlerView):
         """
         super(Register, self).__init__(PiEvent.REGISTER_MSG_TYPE, methods=[self.POST])
     
-    def post(self, request, *args, **kwargs):
+    def post(self, request, team_passcode, *args, **kwargs):
         """ Handle the Registration POST message and update the database """
         super(Register, self).post(request, *args, **kwargs)
 
         # Get input parameters from URL and/or POST data
 #         data = json.loads(request.body)  # POST data (in JSON format)
-        m,response = self.validateJSONFields(request, ("team_passcode", "brata_version"))
-        if m is None:
-            return response
+
+        #m,response = self.validateJSONFields(request, (("brata_version")))
+        #if m is None:
+        #    return response
         
 #         try:
 #             team_passcode = data["team_passcode"]
@@ -254,10 +258,10 @@ class Register(JSONHandlerView):
         # Try it as-is and decoded.
         # TODO: refactor this to use self.validateTeam()
         try:
-            team = Team.objects.get(pass_code=m.team_passcode)
+            team = Team.objects.get(pass_code=team_passcode)
         except ObjectDoesNotExist:
             try:
-                team = Team.objects.get(pass_code=TeamPassCode.unwordify(m.team_passcode))
+                team = Team.objects.get(pass_code=TeamPassCode.unwordify(team_passcode))
             except ObjectDoesNotExist:
                 team = None
         
@@ -265,9 +269,9 @@ class Register(JSONHandlerView):
             # Failed:  Record the transaction and what went wrong
             self.addEvent(data=request.body,
                           status=PiEvent.FAIL_STATUS,
-                          message="Failed to retrieve Team '{}' from the database".format(m.team_passcode),
+                          message="Failed to retrieve Team '{}' from the database".format(team_passcode),
                          )
-            self.jsonResponse["message"] = "Invalid team_passcode: '{}'".format(m.team_passcode)
+            self.jsonResponse["message"] = "Invalid team_passcode: '{}'".format(team_passcode)
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
         
         if team.reg_code is not None and team.reg_code != "":
@@ -276,7 +280,7 @@ class Register(JSONHandlerView):
                           status=PiEvent.FAIL_STATUS,
                           message="Device {} already registered to Team {}".format(team.reg_code, team.pass_code),
                          )
-            self.jsonResponse["message"] = "You already have a device registered.  You must Unregister it before Registering another device.".format(m.team_passcode)
+            self.jsonResponse["message"] = "You already have a device registered.  You must Unregister it before Registering another device.".format(team_passcode)
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
             
         # Create a unique registration code for this Team's registration
@@ -286,7 +290,7 @@ class Register(JSONHandlerView):
         event = self.addEvent(team=team,
                               data=request.body,
                               status=PiEvent.SUCCESS_STATUS,
-                              message="Team '{}' Registered with brata_version '{}'. Assigned reg_code {}.".format(team.name, m.brata_version, team.reg_code),
+                              message="Team '{}' Registered with brata_version '{}'. Assigned reg_code {}.".format(team.name, "m.brata_version", team.reg_code),
                              )
         
 #         self.jsonResponse["message"] = "DEBUG"
