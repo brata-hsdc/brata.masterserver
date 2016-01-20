@@ -18,7 +18,7 @@ I'm attempting to group them by the sender/purpose:  BRATA, RPi, Admin.
 TODO: Need to specify somewhere that these are the config params for each station:
     * station_id
     * station_type
-    * station_url (at least IP and port, maybe determined instead of configured)
+    * station_url (http://sta.tio.npi.ip:5000/rpi)
     * ms_base_url (at least host/IP and port)
 
 
@@ -32,20 +32,20 @@ TODO: Need to specify somewhere that these are the config params for each statio
 Notifies  M that the given team wants to register for the challenge.
 
 ```
-         URL:  http://ms/m/brata-v00/register
+         URL:  http://msip:80/piservice/register/<team passcode>
       Method:  POST
 Content type:  application/json
 Return value:  ??
 ```
 
 #### Parameters
-None
+team passcode||| The passcode for the particular team registering.
 
 
 #### JSON Data
 ```json
 {
-   "team_id" : "<team's DB id>" ,
+   "reg_code" : "" ,
    "message" : ""
 }
 ```
@@ -53,7 +53,7 @@ None
 #### Query Parameters
 Name      | Format | Example | Meaning
 ----------|--------|---------|--------
-team_id   |        |         | the team Id assigned during the registration process
+reg_code  |        |         | the reg_code assigned during the registration process
 message   |        |         | could be anything including a null string
 
 #### Request Headers
@@ -65,7 +65,8 @@ message   |        |         | could be anything including a null string
 #### JSON Response
 ```json
 {
-   "messageteam_id" : "Welcome <school name> to the Design Challenge! Your app has successfully communicated with the Master Server! Congratulations! <Instructions><team's DB id>"
+   "reg_code" : "02u024u34oi"
+   "message" : "Welcome <school name> to the Design Challenge! Your app has successfully communicated with the Master Server! Congratulations! <Instructions><team's DB id>"
 }
 ```
 #### Status Codes
@@ -76,7 +77,7 @@ message   |        |         | could be anything including a null string
 #### Remarks
 The message response is the encoded greeting and instructions of where to proceed.
 
-The team's name, school affiliation and Key will be entered into M during the registration process.  The team will scan the register QR code appending their key.  (The key will be assigned by a random draw).  M will translate the key into its internal DB value which it will return to the framework to be saved for latter messages.
+The team's name, school affiliation and Key will be entered into M during the registration process.  The team will scan the register QR code.  A unique reg_code will be generated and sent back which must be used for all future transations from this brata.
 
 
 ===
@@ -85,7 +86,7 @@ The team's name, school affiliation and Key will be entered into M during the re
 Notifies M that the given team is at the given waypoint.
 
 ```
-         URL:  http://ms/m/brata-v00/atWaypoint/<LAT>/<LON>
+         URL:  http://msip:80/atWaypoint/<LAT>/<LON>
       Method:  GET
 Content type:  application/json
 Return value:  ??
@@ -105,7 +106,7 @@ POST /m/brata/at_waypoint/<waypointId> HTTP/1.1
 Host: example.com
 Content-Type: application/json
 {
-   "team_id": "<team's DB id>",
+   "reg_code": "<team's reg_code>",
    "message": "" 
 }
 ```
@@ -114,7 +115,7 @@ Content-Type: application/json
 ```json
 HTTP/1.1 200 OK
 {
-   "team_id": ,
+   "reg_code": ,
    "message": "<message to be displayed to user>"
 }
 ```
@@ -144,25 +145,22 @@ The message may be encoded or unencoded depding on the waypoint's definition in 
 Notifies M that the given team is starting a challenge again this URL is scanned from the QR code attached to the station.
 
 ```
-         URL:  http://ms/m/brata-v00/start_challenge/<TEAMID>/<STATIONID>
+         URL:  http://ms.ip.add.drs:80/piservice/start_challenge/<STATIONID>/
       Method:  POST
 Content type:  application/json
 Return value:  ??
 ```
 
-(Note: Last year's API document does not mention these parameters at all--only JSON data.)
-
 #### Parameters
 Name      | Format | Example | Meaning
 ----------|--------|---------|--------
-TEAMID    |        |         | the team Id assigned during the registration process
 STATIONID |        |         | could be anything including a null string
 
 
 #### JSON Data
 ```json
 {
-   "team_id": "<team id>",
+   "reg_code": "<registration code provided back from the registration message>",
    "message": ""
 }
 ```
@@ -190,41 +188,18 @@ The message is always encoded and is the same for all teams and stations.
 
 M will forward the start_challenge to the rPI device associated with this station if one exists.
 
-
 ===
-
-### BRATA Submit
-Not sure what this one is. (No mention of this in last year's API document.)
-```
-         URL:  http://ms/m/rest-v00/submit/1of7
-      Method:  POST
-Content type:  application/json
-Return value:  ??
-```
-
-#### Parameters
-*None?*
-
-#### JSON Data
-```json
-{
-   "message_version"      : "0" ,
-   "station_key"          : "1of7" ,
-   "station_type"         : "hmb" ,
-   "station_callback_url" : "callback"
-}
-```
 
 ---
 
-## RPi Messages from RPi to MS
+## RPi Messages to MS from RPi
 
 ### RPi Join
 
 The caller wants to join the system.
 
 ```
-         URL:  http://ms/m/rpi/join/<ID>
+         URL:  http://msip:80/piservice/join/
       Method:  POST
 Content type:  application/json
 Return value:  ??
@@ -236,16 +211,18 @@ Name      | Format | Example | Meaning
 ID        |        |         | ID of the Raspberry Pi station. Note: The ID is associated with a station in M's RDBMS, and will be sent by the device to M on subsequent requests to avoid the additional lookup.
 message_version   ||         | message schema version, default is 0
 message_timestamp ||         | timestamp that the message was sent
-TYP       |        | hmb     | one of "hmb", "cpa", or "cts"
-URL       |        | http://192.168.0.2:9876 | the url used to call back from the MS to the station
+station_id        | | the station type followed by 2 digit id of the station.
+station_type      |        | dock     | one of "launch", "dock", "secure" or "return"
+station_url       |        | http://192.168.0.2:5000/rpi | the url used to call back from the MS to the station
 
 #### JSON Data
 ```json
 {
    "message_version"   : "0" ,
    "message_timestamp" : "2014-09-15 14:08:59",
-   "station_type"      : "$TYP" ,
-   "station_url"       : "$URL"
+   "station_id"        : "dock01",
+   "station_type"      : "dock" ,
+   "station_url"       : "http://192.168.4.37:5000/rpi"
 }
 ```
 
@@ -265,10 +242,10 @@ The join message will be sent by each station periodically. As long as join mess
 
 ### RPi Submit
 
-Indicates to the MS that the CTS or CPA user has submitted an answer.
+Indicates to the MS that the secure, or return station has submitted an answer. It is also used by dock to inform the MS if the simulation was a success or failure.
 
 ```
-         URL:  http://ms/m/rest-v00/submit/<ID>
+         URL:  http://msip:80/submit/
       Method:  POST
 Content type:  application/json
 Return value:  ??
@@ -280,9 +257,10 @@ Name      | Format | Example | Meaning
 ID        |        |         | the same value provided in the join message
 message_version   ||         | message schema version, default is 0
 message_timestamp ||         | timestamp that the message was sent
-`candidate_answer`  ||         | For the CTS this is a list of three values providing the combination for the safe in brackets and coma separated. As an example "[31, 41, 59]".  The range for each value is 0..99.  For the CPA the string "True" if the flash was within tolerance or "False" if the flash was not detected or there was an issue with the flash timing.  The details if a failure if a CPA are included in the fail_message parameter.  This message parameter is used by a CTS and CPA only.
-is_correct        ||         | "True" if the submitted answer is the correct answer; "False" otherwise. This message parameter is used by a CPA and CTS only. 
+`candidate_answer`  ||         | For secure this is a string of bracketed four values combination in brackets and coma separated. The range of each value is 0-7.  For return this is astring of six values providing the combination. For dock this is the time the simulation would have taken in seconds stringified python float with a value up to 120000 seconds
+is_correct        ||         | "True" if the submitted answer is the correct answer; "False" otherwise. This message parameter is used by dock, secure and return. 
 fail_message      ||         | a message logged by MS for debugging/troubleshooting
+station_id  || | the same value provided in the join message
 
 
 #### JSON Data
@@ -419,8 +397,6 @@ This message to the MS will be followed by a submit message coming back from the
 
 ## RPi Messages to RPi from MS
 
-(Note: These messages were specified in last year's API document; you didn't have them listed here.)
-
 Messages from MS to station use URL and station_id from join message.
 
 ### Reset
@@ -428,7 +404,7 @@ Messages from MS to station use URL and station_id from join message.
 Abort an currently-running challenge and reinitialize to the resting state.
 
 ```
-         URL:  http://ms/rpi/reset/<PIN>
+         URL:  <station_url>/reset/<PIN>
       Method:  GET
 Content type:  application/json
 Return value:  ??
@@ -464,7 +440,7 @@ The reset PIN will always be "31415". Note that there is nothing covert about th
 Start the challenge because the MS has been notified that a user has scanned the QR code for the current station.
 
 ```
-         URL:  http://ms/rpi/start_challenge
+         URL:  <station_url>/start_challenge
       Method:  POST
 Content type:  application/json
 Return value:  ??
@@ -475,26 +451,18 @@ Name      | Format | Example | Meaning
 ----------|--------|---------|-------------------------------
 message_version   ||         | message schema version, default is 0
 message_timestamp ||         | timestamp that the message was sent
-`theatric_delay_ms` ||       | the amount of time in milliseconds before the station transitions to its challenge started state. This gives the user time to read any text on the SAT and fully appreciate the hardware starting up.
-`hmb_vibration_pattern_ms` ||| a list of six values providing the on/off times for the HMB vibration motors. This field will only be provided to a station that has joined specifying itself as the "hmb" station type.
-||| * The first two values provide the on/off times for Vibration Motor #1; the next two values for Motor #2; and the last two for Motor #3.
-||| * For each pair, the first specifies the ON time and the second specifies the OFF time.
-cpa_velocity ||| a single value providing a temporal measurement from the initial position to the start of the building in ms. This field will only be provided to a station that has joined specifying itself as the "cpa" station type.
-cpa_velocity_tolerance_ms ||| [TODO: Mike]. This field will only be provided to a station that has joined specifying itself as the "cpa" station type.  This time has been deprecated, but not removed in case it is later determined it is needed.
-cpa_window_time_ms ||| [TODO: Mike]. This field will only be provided to a station that has joined specifying itself as the "cpa" station type. This is the time from the initial starting position to the middle of the window of time that would accept a pulse detection.
-cpa_window_time_tolerance_ms ||| [TODO: Mike]. This field will only be provided to a station that has joined specifying itself as the "cpa" station type. This is the tolerance plus or minus milliseconds around the cpa_window_time_ms in which the pulse must occur including the start and end of the flash.
-cpa_pulse_width_ms ||| [TODO: Mike]. This field will only be provided to a station that has joined specifying itself as the "cpa" station type. **This is the expected duration of time the flash should be on during the window time.**
-cpa_pulse_width_tolerance_ms ||| [TODO: Mike]. This field will only be provided to a station that has joined specifying itself as the "cpa" station type. This is the tolerance for the duration of the flash pulse or minus ms.
-cts_combo ||| a list of three values providing the combination for the safe. The range for each value is 0..99. This field will only be provided to a station that has joined specifying itself as the "cts" station type.
-
+`secure_tone_pattern` ||| a list of nine Tone ID indicators of values 0-7.  Where the frequency to generate = d*100+300. So for the value 0 a tone of 300 Hz is generated or for 4 700 Hz woudl be generated.
+'return_guidance_pattern' ||| a list of six values that should be entered for a successful return to Earth. The range for each value is 00..99. This field will only be provided to a station that has joined specifying itself as the "return" station type.
+team_name || | the name of the team to display on the simulator.  This field will only be provided to a station that has joined specifying itself as the "dock" station type.
 
 #### JSON Data
 ```json
 {
-   "message_version"      : "0" ,
-   "message_timestamp"    : "2014-09-15 14:08:59",
-   "theatric_delay_ms": 3000,
-   "hmb_vibration_pattern_ms": [1000, 3000, 1000, 5000, 1000, 11000]
+   "message_version"        : "0" ,
+   "message_timestamp"      : "2014-09-15 14:08:59",
+   "secure_tone_pattern"    : "[d, d, d, d, d, d, d, d, d]",
+   "return_guidance_pattern": "[dd, dd, dd, dd, dd, dd]",
+   "team_name"              : "some name"
 }
 ```
 
@@ -517,12 +485,12 @@ In the example above, the ON time for each motor is always one second, whereas t
 
 ===
 
-### Handle Submission
+### Post Challenge
 
-Indicates to the station that the HMB user has submitted an answer and whether or not the answer is correct for the challenge.
+Indicates to the station the extra data that is required for a 2 part challenge.  This is used by Secure to switch from tone generation to light pulse detection and by Dock to submit the docking parameters for simulation.
 
 ```
-         URL:  http://ms/rpi/handle_submission
+         URL:  <station_url>/post_challenge
       Method:  POST
 Content type:  application/json
 Return value:  ??
@@ -533,22 +501,39 @@ Name      | Format | Example | Meaning
 ----------|--------|---------|-------------------------------
 message_version   ||         | message schema version, default is 0
 message_timestamp ||         | timestamp that the message was sent
-`theatric_delay_ms` ||       | the amount of time in milliseconds before the station transitions to its challenge completed state. This keeps the user in suspense for a couple extra seconds before finding out whether the answer is correct or not.
-is_correct        ||         | "True" if the submitted answer is the correct answer; "False" otherwise.
-`challenge_complete` ||      | "False" if the challenge has concluded without completion, i.e. the user has attempted and failed three (TBD) times; "True" otherwise
+`secure_pulse_pattern` | "[d, d, d, d]" | "[1, 1, 1, 1]" | a list of 4 values indicating the correct encoded light pulse pattern that should be received. This field will noly be provided to a station that has joined specifying as the "secure" station type.
+secure_max_pulse_width | "[ddd]" || This is the maximum milliseconds for a detected pulse width.
+`secure_max_gap` ||      | The maximum duration in ms for the gap between pulses.
+secure_min_gap || | The mimimum duration in ms for the gap between pulses.
+t_aft||| only for "dock"
+t_coast||| only for "dock"
+t_fore||| only for "dock"
+a_aft||| only for "dock"
+a_fore||| only for "dock"
+r_fuel||| only for "dock"
+q_fuel||| only for "dock"
+dist||| only for "dock"
+v_min||| only for "dock"
+v_max||| only for "dock"
+v_init||| only for "dock"
+t_sim||| only for "dock"
 
-
-#### JSON Data
+#### JSON Data for secure
 ```json
 {
    "message_version"      : "0" ,
    "message_timestamp"    : "2014-09-15 14:08:59",
-   "theatric_delay_ms": 3000,
-   "is_correct": "False",
-   "challenge_complete": "False"
+   TBD
 }
 ```
-
+#### JSON Data for dock
+```json
+{
+   "message_version"      : "0" ,
+   "message_timestamp"    : "2014-09-15 14:08:59",
+   TBD
+}
+```
 #### Request Headers
 
 * Accept - the response content type depends on _Accept_ header
@@ -564,8 +549,7 @@ is_correct        ||         | "True" if the submitted answer is the correct ans
 
 #### Remarks
 
-Note that this message is sent to a CTS station even though the CTS sends a submit message to the MS to provide the answer.
-
+Note that this message is sent to dock when when the Dock QR Code is scanned by the brata to submit their answer, and this is sent for secure when the Open QR code is scanned by the brata.
 ===
 
 ### Shutdown
@@ -573,7 +557,7 @@ Note that this message is sent to a CTS station even though the CTS sends a subm
 Indicates to the station that it should shutdown.
 
 ```
-         URL:  http://ms/rpi/shutdown/<PIN>
+         URL:  <station_url>/shutdown/<PIN>
       Method:  GET
 Content type:  application/json
 Return value:  ??
