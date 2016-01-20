@@ -24,11 +24,12 @@ urlpatterns = [
     url(r'^index.html$', views.index, name="index"),
     
     # BRATA messages
-    url(r'^register/$', views.Register.as_view(), name="register"),
+    url(r'^register/(?P<team_passcode>[a-z]+[0-9]+)$', views.Register.as_view(), name="register"),
     url(r'^unregister/$', views.Unregister.as_view(), name="unregister"),
     url(r'^at_waypoint/(?P<lat>[0-9.-]+)/(?P<lon>[0-9.-]+)$', views.AtWaypoint.as_view(), name="at_waypoint"),
     url(r'^start_challenge/(?P<station_id>[^/]+)$', views.StartChallenge.as_view(), name="start_challenge"),
     url(r'^submit/(?P<station_id>[^/]+)$', views.Submit.as_view(), name="submit"),
+    url(r'^dock/(?P<station_id>[^/]+)/$', views.Dock.as_view(), name="dock"),
 
     # RPi station messages
     url(r'^join/$', views.Join.as_view(), name="join"),

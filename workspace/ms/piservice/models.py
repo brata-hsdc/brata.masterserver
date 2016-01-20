@@ -124,6 +124,7 @@ class PiEvent(models.Model):
     AT_WAYPOINT_2015_MSG_TYPE     = 14
     START_CHALLENGE_2015_MSG_TYPE = 15
     SUBMIT_2015_MSG_TYPE          = 16
+    DOCK_MSG_TYPE                 = 17
 
     TYPE_CHOICES = (
                     (UNKNOWN_TYPE,                  "Unknown"),
@@ -143,6 +144,7 @@ class PiEvent(models.Model):
                     (AT_WAYPOINT_2015_MSG_TYPE,     "At Waypoint (2015)"),
                     (START_CHALLENGE_2015_MSG_TYPE, "Start Challenge (2015)"),
                     (SUBMIT_2015_MSG_TYPE,          "Submit (2015)"),
+                    (DOCK_MSG_TYPE,                  "Dock"),
                    )
     
     MSG_TYPES_2015 = (REGISTER_2015_MSG_TYPE,

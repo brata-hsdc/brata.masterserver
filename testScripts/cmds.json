@@ -5,17 +5,22 @@
 [
     {
         "button":  "Register",
-        "cmd":     "http --json POST :8000/piservice/register/ Content-type:application/json Accept:application/json team_passcode=\"khk14\" brata_version=\"02\"",
+        "cmd":     "http --json POST :80/piservice/register/auth10/ Content-type:application/json Accept:application/json brata_version=\"02\"",
         "tooltip": "Sent by the BRATA to the MS to authenticate and get a reg_code"
     },
     {
+        "button":  "Dock",
+        "cmd":     "http --json POST :80/piservice/dock/DOCK01/ Content-type:application/json Accept:application/json reg_code=\"9f4007bc6cdb00e8\" message=\"[T-AFT=111.1] [L-COAST=111.1] [T-FORE=111.1]\"",
+        "tooltip": "Sent by the BRATA to submit docking paramaters"
+    },
+    {
         "button":  "Join",
-        "cmd":     "http --json POST :8000/piservice/join/ Content-type:application/json Accept:application/json host=\"First RPi Station\" pi_type=\"B+\" station_type=1",
+        "cmd":     "http --json POST :80/piservice/join/ Content-type:application/json Accept:application/json host=\"First RPi Station\" pi_type=\"B+\" station_type=1",
         "tooltip": "Sent by a Station to the MS when it is ready to come online"
     },
     {
         "button":  "Leave",
-        "cmd":     "http --json POST :8000/piservice/leave/ Content-type:application/json Accept:application/json station_id=\"8:8b14\"",
+        "cmd":     "http --json POST :80/piservice/leave/ Content-type:application/json Accept:application/json station_id=\"8:8b14\"",
         "tooltip": "Sent by a Station to the MS when it wants to go offline"
     },
     {
