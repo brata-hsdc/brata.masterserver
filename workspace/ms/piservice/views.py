@@ -419,8 +419,8 @@ class Join(JSONHandlerView):
         
         # Validate the message format
         try:
-            host         = data["station_id"]
-            station_type = data["station_type"]
+            station_id         = data["station_id"].lower()
+            station_type = data["station_type"].lower()
             serial_num   = data["station_serial"]
             url          = data["station_url"] if "station_url" in data else ""
         except KeyError:
@@ -447,11 +447,11 @@ class Join(JSONHandlerView):
         try:
             station = PiStation.objects.get(serial_num=serial_num)
         except ObjectDoesNotExist:
-            station = PiStation(host=senderIP, station_type=station_type, serial_num=serial_num, url=url)
+            station = PiStation(host=senderIP, station_id=station_id, station_type=station_type, serial_num=serial_num, url=url)
             station.save()
         
         # Succeeded:  Record the transaction and update the station record
-        station_id = station.setStationId()
+        station.station_id = station_id #station.setStationId()
         station.joined = self.addEvent(pi=station,
                                        data=request.body,
                                        status=PiEvent.SUCCESS_STATUS,
@@ -627,6 +627,7 @@ class StartChallenge(JSONHandlerView):
         The client sends a POST message with the following JSON data:
         {
             "reg_code":        "current reg_code",
+            "message":         ""
         }
         
         The MS sends the following response on success:
@@ -647,7 +648,57 @@ class StartChallenge(JSONHandlerView):
             return response
         
         # TODO:  Add message processing
+        message="StartChallenge msg received from {}".format(m.reg_code)
+
+        # Get the station from the station_id
+        try:
+            station = PiStation.objects.get(station_id=station_id)
+        except ObjectDoesNotExist:
+                station = None
         
+        if station is None:
+            # Failed:  Record the transaction and what went wrong
+            self.addEvent(data=request.body,
+                          status=PiEvent.FAIL_STATUS,
+                          message="Failed to retrieve Station using station_id '{}' from the database".format(station_id),
+                         )
+            self.jsonResponse["message"] = cipher("Could not find a valid station: {}".format(station_id))
+            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+
+        # For Dock get the team name from the reg_code
+        try:
+            team = Team.objects.get(reg_code=m.reg_code)
+        except ObjectDoesNotExist:
+                team = None
+        
+        if team is None:
+            # Failed:  Record the transaction and what went wrong
+            self.addEvent(data=request.body,
+                          status=PiEvent.FAIL_STATUS,
+                          message="Failed to retrieve Team using reg_code '{}' from the database".format(m.reg_code),
+                         )
+            self.jsonResponse["message"] = cipher("Could not find a valid team: {}".format(m.reg_code))
+            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+
+	# Send message to the Pi this team is registered with to start the simulation
+        url = "{}/start_challenge".format(station.url)
+        headers = { "Content-type": "application/json", "Accept": "application.json" }
+        data = json.dumps({
+                 "team_name": team.name,
+               })
+	response = requests.post(url, data=data, headers=headers)
+        if response.status_code != 200:
+            message = "Could not contact simulation server '{}'.  Contact a competition official.".format(station_id)	
+            # Failed:  Record the transaction and what went wrong
+            self.addEvent(data=request.body,
+                          status=PiEvent.FAIL_STATUS,
+                          message=message,
+                         )
+            self.jsonResponse["message"] = cipher(message)
+            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+
+        message = "Dock using [TAPE=d] [AFT=d.ddd] [FORE=d.ddd] [FUEL=dd.dd] [F-RATE=dd.dd]"
+
         # Succeeded:  Record the transaction and update the station record
         event = self.addEvent(data=request.body,
                               status=PiEvent.SUCCESS_STATUS,
@@ -655,7 +706,7 @@ class StartChallenge(JSONHandlerView):
                              )
         
         # Send a success response
-        self.jsonResponse["message"] = "You have successfully started ...."
+        self.jsonResponse["message"] = cipher(message)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
@@ -686,6 +737,19 @@ class Dock(JSONHandlerView):
             return response
         
         # TODO:  Add message processing
+        # Get the station from the station_id
+        station_id = station_id.lower()
+        try:
+            station = PiStation.objects.get(station_id=station_id)
+        except ObjectDoesNotExist:
+                station = None
+        
+        if station is None:
+            # Failed:  Record the transaction and what went wrong
+            self.addEvent(data=request.body,
+                          status=PiEvent.FAIL_STATUS,
+                          message="Failed to retrieve Station using station_id '{}' from the database".format(station_id),
+                         )
         
         # Succeeded:  Record the transaction and update the station record
         event = self.addEvent(data=request.body,
@@ -696,7 +760,7 @@ class Dock(JSONHandlerView):
         message = "Docking Parameters received!"
 
 	# Send message to the Pi this team is registered with to start the simulation
-        url = "http://192.168.4.39:5000/rpi/start_challenge"
+        url = "{}/post_challenge".format(station.url)
         headers = { "Content-type": "application/json", "Accept": "application.json" }
         data = json.dumps({
                  "t_aft": "8.2",
@@ -710,7 +774,7 @@ class Dock(JSONHandlerView):
                  "v_min": "0.01",
                  "v_max": "0.1",
                  "v_init": "0.0",
-                 "t_sim": "45",
+                 "t_sim": "5",
                })
 	response = requests.post(url, data=data, headers=headers)
         if response.status_code != 200:
@@ -723,27 +787,27 @@ class Dock(JSONHandlerView):
 
 #----------------------------------------------------------------------------
 class Submit(JSONHandlerView):
-    """ A class-based view to handle a BRATA Submit message.
+    """ A class-based view to handle a Stations Submit message.
     
         The client sends a POST message with the following JSON data:
         {
-            "reg_code":        "current reg_code",
+            "station_id":        "id of the station",
         }
         
         The MS sends the following response on success:
         {
-            "message":  "..."
+            "challenge_complete":  "True"
         }
     """
     def __init__(self):
         super(Submit, self).__init__(PiEvent.SUBMIT_MSG_TYPE, methods=[self.POST])
     
-    def post(self, request, station_id, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         """ Handle the POST message and update the database """
         super(Submit, self).post(request, *args, **kwargs)
 
         # Get input parameters from URL and/or POST data
-        m,response = self.validateJSONFields(request, ("reg_code",))
+        m,response = self.validateJSONFields(request, ("station_id","is_correct","fail_message","candidate_answer"))
         if m is None:
             return response
         
@@ -752,7 +816,7 @@ class Submit(JSONHandlerView):
         # Succeeded:  Record the transaction and update the station record
         event = self.addEvent(data=request.body,
                               status=PiEvent.SUCCESS_STATUS,
-                              message="Submit msg received from {}".format(m.reg_code),
+                              message="Submit msg received from {}".format(m.station_id),
                              )
         # Figure out if the attempt was successful
 	# TODO
@@ -762,6 +826,7 @@ class Submit(JSONHandlerView):
 	    message = "TODO some error message"
 	# Send a success response
         self.jsonResponse["message"] = "Docking latches engaged! Continue to next Challenge!"
+        self.jsonResponse["challenge_complete"] = "True"
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
