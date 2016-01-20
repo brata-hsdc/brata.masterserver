@@ -29,6 +29,7 @@ urlpatterns = [
     url(r'^at_waypoint/(?P<lat>[0-9.-]+)/(?P<lon>[0-9.-]+)$', views.AtWaypoint.as_view(), name="at_waypoint"),
     url(r'^start_challenge/(?P<station_id>[^/]+)$', views.StartChallenge.as_view(), name="start_challenge"),
     url(r'^submit/(?P<station_id>[^/]+)$', views.Submit.as_view(), name="submit"),
+    url(r'^dock/(?P<station_id>[^/]+)/$', views.Dock.as_view(), name="dock"),
 
     # RPi station messages
     url(r'^join/$', views.Join.as_view(), name="join"),

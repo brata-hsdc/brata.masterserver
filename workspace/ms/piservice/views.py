@@ -11,6 +11,14 @@ from dbkeeper.team_code import TeamPassCode
 
 from datetime import timedelta, datetime
 
+import requests
+
+# The following is a hack to keep our cipher from accidentally being checked in
+import os
+import sys
+sys.path.append(os.path.abspath("/opt/designchallenge2016"))
+from NoCMConfigValues import *
+
 # Create your views here.
 
 #----------------------------------------------------------------------------
@@ -273,15 +281,16 @@ class Register(JSONHandlerView):
                          )
             self.jsonResponse["message"] = "Invalid team_passcode: '{}'".format(team_passcode)
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
-        
-        if team.reg_code is not None and team.reg_code != "":
-            # Failed:  Record the transaction and what went wrong
-            self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
-                          message="Device {} already registered to Team {}".format(team.reg_code, team.pass_code),
-                         )
-            self.jsonResponse["message"] = "You already have a device registered.  You must Unregister it before Registering another device.".format(team_passcode)
-            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+        # We are allowing resgistration but it now generates a new code for the new registration 
+        # to ensure the team is only using one device at a time
+        #if team.reg_code is not None and team.reg_code != "":
+        #    # Failed:  Record the transaction and what went wrong
+        #    self.addEvent(data=request.body,
+        #                  status=PiEvent.FAIL_STATUS,
+        #                  message="Device {} already registered to Team {}".format(team.reg_code, team.pass_code),
+        #                 )
+        #    self.jsonResponse["message"] = "You already have a device registered.  You must Unregister it before Registering another device.".format(team_passcode)
+        #    return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
             
         # Create a unique registration code for this Team's registration
         team.reg_code = Team.generateRegCode()
@@ -301,7 +310,8 @@ class Register(JSONHandlerView):
         
         # Send a success response
         self.jsonResponse["reg_code"] = team.reg_code
-        self.jsonResponse["message"] = "Welcome, Team '{}', to the 2016 Harris High School Design Challenge!  You have successfully registered for the competition.  Good luck!!".format(team.name)
+        message = "Welcome, Team '{}', to the 2016 Harris High School Design Challenge!  You have successfully registered for the competition.  Good luck!!".format(team.name)
+        self.jsonResponse["message"] = cipher(message)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
@@ -384,10 +394,10 @@ class Join(JSONHandlerView):
     
         The client sends a POST message with the following JSON data:
         {
-            "host":         "rte01", // hostname or ip address
+            "station_id":         "rte01", // hostname or ip address
             "station_type": "RTE"    // the type of competition station
-            "serial_num":   "123456789" // the CPU serial number
-            "url":          "http://rte01:8080/control"  // URL to send commands to station
+            "station_serial":   "123456789" // the CPU serial number
+            "station_url":          "http://rte01:8080/control"  // URL to send commands to station
         }
         
         The MS sends the following JSON response on success:
@@ -409,10 +419,10 @@ class Join(JSONHandlerView):
         
         # Validate the message format
         try:
-            host         = data["host"]
+            host         = data["station_id"]
             station_type = data["station_type"]
-            serial_num   = data["serial_num"]
-            url          = data["url"] if "url" in data else ""
+            serial_num   = data["station_serial"]
+            url          = data["station_url"] if "station_url" in data else ""
         except KeyError:
             # Send a fail response
             self.addEvent(data=request.body,
@@ -649,6 +659,69 @@ class StartChallenge(JSONHandlerView):
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
+class Dock(JSONHandlerView):
+    """ A class-based view to handle a BRATA Dock message.
+    
+        The client sends a POST message with the following JSON data:
+        {
+            "reg_code":        "current reg_code",
+            "message":         "see ICD"
+        }
+        
+        The MS sends the following response on success:
+        {
+            "message":  "..."
+        }
+    """
+    def __init__(self):
+        super(Dock, self).__init__(PiEvent.DOCK_MSG_TYPE, methods=[self.POST])
+    
+    def post(self, request, station_id, *args, **kwargs):
+        """ Handle the POST message and update the database """
+        super(Dock, self).post(request, *args, **kwargs)
+
+        # Get input parameters from URL and/or POST data
+        m,response = self.validateJSONFields(request, ("reg_code","message",))
+        if m is None:
+            return response
+        
+        # TODO:  Add message processing
+        
+        # Succeeded:  Record the transaction and update the station record
+        event = self.addEvent(data=request.body,
+                              status=PiEvent.SUCCESS_STATUS,
+                              message="Dock msg received from {}".format(m.reg_code),
+                             )
+        
+        message = "Docking Parameters received!"
+
+	# Send message to the Pi this team is registered with to start the simulation
+        url = "http://192.168.4.39:5000/rpi/start_challenge"
+        headers = { "Content-type": "application/json", "Accept": "application.json" }
+        data = json.dumps({
+                 "t_aft": "8.2",
+                 "t_coast": "1",
+                 "t_fore": "13.1",
+                 "a_aft": "0.15",
+                 "a_fore": "0.09",
+                 "r_fuel": "0.7",
+                 "q_fuel": "20",
+                 "dist": "15.0",
+                 "v_min": "0.01",
+                 "v_max": "0.1",
+                 "v_init": "0.0",
+                 "t_sim": "45",
+               })
+	response = requests.post(url, data=data, headers=headers)
+        if response.status_code != 200:
+            message = "Could not contact simulation server.  Contact a competition official."	
+            
+        # Send a success response
+        self.jsonResponse["message"] = message
+
+        return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
 class Submit(JSONHandlerView):
     """ A class-based view to handle a BRATA Submit message.
     
@@ -679,11 +752,16 @@ class Submit(JSONHandlerView):
         # Succeeded:  Record the transaction and update the station record
         event = self.addEvent(data=request.body,
                               status=PiEvent.SUCCESS_STATUS,
-                              message="StartChallenge msg received from {}".format(m.reg_code),
+                              message="Submit msg received from {}".format(m.reg_code),
                              )
-        
-        # Send a success response
-        self.jsonResponse["message"] = "You have successfully started ...."
+        # Figure out if the attempt was successful
+	# TODO
+	wasDocked = True
+        message = "Docking latches engaged! Continue to next Challenge!"
+	if not wasDocked:
+	    message = "TODO some error message"
+	# Send a success response
+        self.jsonResponse["message"] = "Docking latches engaged! Continue to next Challenge!"
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
