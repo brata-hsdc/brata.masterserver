@@ -18,7 +18,7 @@ I'm attempting to group them by the sender/purpose:  BRATA, RPi, Admin.
 TODO: Need to specify somewhere that these are the config params for each station:
     * station_id
     * station_type
-    * station_url (at least IP and port, maybe determined instead of configured)
+    * station_url (http://sta.tio.npi.ip:5000/rpi)
     * ms_base_url (at least host/IP and port)
 
 
@@ -32,20 +32,20 @@ TODO: Need to specify somewhere that these are the config params for each statio
 Notifies  M that the given team wants to register for the challenge.
 
 ```
-         URL:  http://ms/m/brata-v00/register
+         URL:  http://msip:80/piservice/register/<team passcode>
       Method:  POST
 Content type:  application/json
 Return value:  ??
 ```
 
 #### Parameters
-None
+team passcode||| The passcode for the particular team registering.
 
 
 #### JSON Data
 ```json
 {
-   "team_id" : "<team's DB id>" ,
+   "reg_code" : "" ,
    "message" : ""
 }
 ```
@@ -53,7 +53,7 @@ None
 #### Query Parameters
 Name      | Format | Example | Meaning
 ----------|--------|---------|--------
-team_id   |        |         | the team Id assigned during the registration process
+reg_code  |        |         | the reg_code assigned during the registration process
 message   |        |         | could be anything including a null string
 
 #### Request Headers
@@ -65,7 +65,8 @@ message   |        |         | could be anything including a null string
 #### JSON Response
 ```json
 {
-   "messageteam_id" : "Welcome <school name> to the Design Challenge! Your app has successfully communicated with the Master Server! Congratulations! <Instructions><team's DB id>"
+   "reg_code" : "02u024u34oi"
+   "message" : "Welcome <school name> to the Design Challenge! Your app has successfully communicated with the Master Server! Congratulations! <Instructions><team's DB id>"
 }
 ```
 #### Status Codes
@@ -76,7 +77,7 @@ message   |        |         | could be anything including a null string
 #### Remarks
 The message response is the encoded greeting and instructions of where to proceed.
 
-The team's name, school affiliation and Key will be entered into M during the registration process.  The team will scan the register QR code appending their key.  (The key will be assigned by a random draw).  M will translate the key into its internal DB value which it will return to the framework to be saved for latter messages.
+The team's name, school affiliation and Key will be entered into M during the registration process.  The team will scan the register QR code.  A unique reg_code will be generated and sent back which must be used for all future transations from this brata.
 
 
 ===
@@ -85,7 +86,7 @@ The team's name, school affiliation and Key will be entered into M during the re
 Notifies M that the given team is at the given waypoint.
 
 ```
-         URL:  http://ms/m/brata-v00/atWaypoint/<LAT>/<LON>
+         URL:  http://msip:80/atWaypoint/<LAT>/<LON>
       Method:  GET
 Content type:  application/json
 Return value:  ??
@@ -105,7 +106,7 @@ POST /m/brata/at_waypoint/<waypointId> HTTP/1.1
 Host: example.com
 Content-Type: application/json
 {
-   "team_id": "<team's DB id>",
+   "reg_code": "<team's reg_code>",
    "message": "" 
 }
 ```
@@ -114,7 +115,7 @@ Content-Type: application/json
 ```json
 HTTP/1.1 200 OK
 {
-   "team_id": ,
+   "reg_code": ,
    "message": "<message to be displayed to user>"
 }
 ```
@@ -187,30 +188,7 @@ The message is always encoded and is the same for all teams and stations.
 
 M will forward the start_challenge to the rPI device associated with this station if one exists.
 
-
 ===
-
-### BRATA Submit
-Not sure what this one is. (No mention of this in last year's API document.)
-```
-         URL:  http://ms/m/rest-v00/submit/1of7
-      Method:  POST
-Content type:  application/json
-Return value:  ??
-```
-
-#### Parameters
-*None?*
-
-#### JSON Data
-```json
-{
-   "message_version"      : "0" ,
-   "station_key"          : "1of7" ,
-   "station_type"         : "hmb" ,
-   "station_callback_url" : "callback"
-}
-```
 
 ---
 
@@ -279,7 +257,7 @@ Name      | Format | Example | Meaning
 ID        |        |         | the same value provided in the join message
 message_version   ||         | message schema version, default is 0
 message_timestamp ||         | timestamp that the message was sent
-`candidate_answer`  ||         | For secure this is a string of bracketed four values combination in brackets and coma separated. The range of each value is 0-7.  For return this is astring of six values providing the combination
+`candidate_answer`  ||         | For secure this is a string of bracketed four values combination in brackets and coma separated. The range of each value is 0-7.  For return this is astring of six values providing the combination. For dock this is the time the simulation would have taken in seconds stringified python float with a value up to 120000 seconds
 is_correct        ||         | "True" if the submitted answer is the correct answer; "False" otherwise. This message parameter is used by dock, secure and return. 
 fail_message      ||         | a message logged by MS for debugging/troubleshooting
 station_id  || | the same value provided in the join message
