@@ -214,7 +214,7 @@ Return value:  ??
 
 ---
 
-## RPi Messages from RPi to MS
+## RPi Messages to MS from RPi
 
 ### RPi Join
 
@@ -233,17 +233,18 @@ Name      | Format | Example | Meaning
 ID        |        |         | ID of the Raspberry Pi station. Note: The ID is associated with a station in M's RDBMS, and will be sent by the device to M on subsequent requests to avoid the additional lookup.
 message_version   ||         | message schema version, default is 0
 message_timestamp ||         | timestamp that the message was sent
-TYP       |        | hmb     | one of "hmb", "cpa", or "cts"
-URL       |        | http://192.168.0.2:9876 | the url used to call back from the MS to the station
+station_id        | | the station type followed by 2 digit id of the station.
+station_type      |        | dock     | one of "launch", "dock", "secure" or "return"
+station_url       |        | http://192.168.0.2:5000/rpi | the url used to call back from the MS to the station
 
 #### JSON Data
 ```json
 {
    "message_version"   : "0" ,
    "message_timestamp" : "2014-09-15 14:08:59",
-   "station_id"        : "$",
-   "station_type"      : "$TYP" ,
-   "station_url"       : "$URL"
+   "station_id"        : "dock01",
+   "station_type"      : "dock" ,
+   "station_url"       : "http://192.168.4.37:5000/rpi"
 }
 ```
 
@@ -425,7 +426,7 @@ Messages from MS to station use URL and station_id from join message.
 Abort an currently-running challenge and reinitialize to the resting state.
 
 ```
-         URL:  http://sta.tio.npi.ip:5000/rpi/reset/<PIN>
+         URL:  <station_url>/reset/<PIN>
       Method:  GET
 Content type:  application/json
 Return value:  ??
@@ -461,7 +462,7 @@ The reset PIN will always be "31415". Note that there is nothing covert about th
 Start the challenge because the MS has been notified that a user has scanned the QR code for the current station.
 
 ```
-         URL:  http://sta.tio.npi.ip:5000/rpi/start_challenge
+         URL:  <station_url>/start_challenge
       Method:  POST
 Content type:  application/json
 Return value:  ??
@@ -511,7 +512,7 @@ In the example above, the ON time for each motor is always one second, whereas t
 Indicates to the station the extra data that is required for a 2 part challenge.  This is used by Secure to switch from tone generation to light pulse detection and by Dock to submit the docking parameters for simulation.
 
 ```
-         URL:  http://sta.tio.npi.ip:5000/rpi/post_challenge
+         URL:  <station_url>/post_challenge
       Method:  POST
 Content type:  application/json
 Return value:  ??
@@ -578,7 +579,7 @@ Note that this message is sent to dock when when the Dock QR Code is scanned by 
 Indicates to the station that it should shutdown.
 
 ```
-         URL:  http://sta.tio.npi.ip:5000/rpi/shutdown/<PIN>
+         URL:  <station_url>/shutdown/<PIN>
       Method:  GET
 Content type:  application/json
 Return value:  ??
