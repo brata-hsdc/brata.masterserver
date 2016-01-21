@@ -485,7 +485,7 @@ cpa_window_time_ms ||| [TODO: Mike]. This field will only be provided to a stati
 cpa_window_time_tolerance_ms ||| [TODO: Mike]. This field will only be provided to a station that has joined specifying itself as the "cpa" station type. This is the tolerance plus or minus milliseconds around the cpa_window_time_ms in which the pulse must occur including the start and end of the flash.
 cpa_pulse_width_ms ||| [TODO: Mike]. This field will only be provided to a station that has joined specifying itself as the "cpa" station type. **This is the expected duration of time the flash should be on during the window time.**
 cpa_pulse_width_tolerance_ms ||| [TODO: Mike]. This field will only be provided to a station that has joined specifying itself as the "cpa" station type. This is the tolerance for the duration of the flash pulse or minus ms.
-cts_combo ||| a list of three values providing the combination for the safe. The range for each value is 0..99. This field will only be provided to a station that has joined specifying itself as the "cts" station type.
+return_guidance_pattern ||| a list of six values that should be entered for a successful return to Earth. The range for each value is 00..99. This field will only be provided to a station that has joined specifying itself as the "RETURN" station type.
 
 
 #### JSON Data
@@ -493,8 +493,8 @@ cts_combo ||| a list of three values providing the combination for the safe. The
 {
    "message_version"      : "0" ,
    "message_timestamp"    : "2014-09-15 14:08:59",
-   "theatric_delay_ms": 3000,
-   "hmb_vibration_pattern_ms": [1000, 3000, 1000, 5000, 1000, 11000]
+   "secure_tone_pattern": "[d, d, d, d, d, d, d, d, d]",
+   "return_guidance_pattern": "[dd, dd, dd, dd, dd, dd]"
 }
 ```
 
