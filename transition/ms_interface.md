@@ -144,25 +144,22 @@ The message may be encoded or unencoded depding on the waypoint's definition in 
 Notifies M that the given team is starting a challenge again this URL is scanned from the QR code attached to the station.
 
 ```
-         URL:  http://ms/m/brata-v00/start_challenge/<TEAMID>/<STATIONID>
+         URL:  http://ms.ip.add.drs:80/piservice/start_challenge/<STATIONID>/
       Method:  POST
 Content type:  application/json
 Return value:  ??
 ```
 
-(Note: Last year's API document does not mention these parameters at all--only JSON data.)
-
 #### Parameters
 Name      | Format | Example | Meaning
 ----------|--------|---------|--------
-TEAMID    |        |         | the team Id assigned during the registration process
 STATIONID |        |         | could be anything including a null string
 
 
 #### JSON Data
 ```json
 {
-   "team_id": "<team id>",
+   "reg_code": "<registration code provided back from the registration message>",
    "message": ""
 }
 ```
@@ -266,10 +263,10 @@ The join message will be sent by each station periodically. As long as join mess
 
 ### RPi Submit
 
-Indicates to the MS that the CTS or CPA user has submitted an answer.
+Indicates to the MS that the secure, or return station has submitted an answer. It is also used by dock to inform the MS if the simulation was a success or failure.
 
 ```
-         URL:  http://ms/m/rest-v00/submit/<ID>
+         URL:  http://msip:80/submit/
       Method:  POST
 Content type:  application/json
 Return value:  ??
@@ -281,9 +278,10 @@ Name      | Format | Example | Meaning
 ID        |        |         | the same value provided in the join message
 message_version   ||         | message schema version, default is 0
 message_timestamp ||         | timestamp that the message was sent
-`candidate_answer`  ||         | For the CTS this is a list of three values providing the combination for the safe in brackets and coma separated. As an example "[31, 41, 59]".  The range for each value is 0..99.  For the CPA the string "True" if the flash was within tolerance or "False" if the flash was not detected or there was an issue with the flash timing.  The details if a failure if a CPA are included in the fail_message parameter.  This message parameter is used by a CTS and CPA only.
-is_correct        ||         | "True" if the submitted answer is the correct answer; "False" otherwise. This message parameter is used by a CPA and CTS only. 
+`candidate_answer`  ||         | For secure this is a string of bracketed four values combination in brackets and coma separated. The range of each value is 0-7.  For return this is astring of six values providing the combination
+is_correct        ||         | "True" if the submitted answer is the correct answer; "False" otherwise. This message parameter is used by dock, secure and return. 
 fail_message      ||         | a message logged by MS for debugging/troubleshooting
+station_id  || | the same value provided in the join message
 
 
 #### JSON Data
@@ -475,15 +473,17 @@ Name      | Format | Example | Meaning
 message_version   ||         | message schema version, default is 0
 message_timestamp ||         | timestamp that the message was sent
 `secure_tone_pattern` ||| a list of nine Tone ID indicators of values 0-7.  Where the frequency to generate = d*100+300. So for the value 0 a tone of 300 Hz is generated or for 4 700 Hz woudl be generated.
-'return_guidance_pattern' ||| a list of six values that should be entered for a successful return to Earth. The range for each value is 00..99. This field will only be provided to a station that has joined specifying itself as the "Return" station type.
+'return_guidance_pattern' ||| a list of six values that should be entered for a successful return to Earth. The range for each value is 00..99. This field will only be provided to a station that has joined specifying itself as the "return" station type.
+team_name || | the name of the team to display on the simulator.  This field will only be provided to a station that has joined specifying itself as the "dock" station type.
 
 #### JSON Data
 ```json
 {
-   "message_version"      : "0" ,
-   "message_timestamp"    : "2014-09-15 14:08:59",
-   "secure_tone_pattern": "[d, d, d, d, d, d, d, d, d]",
-   "return_guidance_pattern": "[dd, dd, dd, dd, dd, dd]"
+   "message_version"        : "0" ,
+   "message_timestamp"      : "2014-09-15 14:08:59",
+   "secure_tone_pattern"    : "[d, d, d, d, d, d, d, d, d]",
+   "return_guidance_pattern": "[dd, dd, dd, dd, dd, dd]",
+   "team_name"              : "some name"
 }
 ```
 
