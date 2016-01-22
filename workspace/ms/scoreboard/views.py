@@ -63,45 +63,7 @@ class ScoreboardStatus(View):
             pi__station_type=PiStation.LAUNCH_STATION_TYPE
         )
 
-        # PDL:
-        # score = 0
-        # find all PiEvent.START_CHALLENGE_MSG_TYPE events and note timestamps
-        # if any found then
-        #     score = 1
-        #     start_time = timestamp of 1st event
-        # end if
-        #
-        # time_to_exit = false
-        # num_failed_attempts = 0
-        #
-        # while not time_to_exit
-        #     if there are more START_CHALLENGE events that we haven't looked at yet then
-        #         get timestamp t of next START_CHALLENGE event
-        #         get timestamp u of following START_CHALLENGE event or TODO (final design challenge has concluded event) event if it exists; o/w timestamp u of last event
-        #
-        #         if there are four events within t..u range with status SUCCESS_STATUS or FAIL_STATUS then
-        #             score = 2 * num SUCCESS events + 1 * num FAIL events
-        #             time_to_exit = true
-        #             end_time = timestamp of final SUCCESS_STATUS or FAIL_STATUS event
-        #         else if there is an event within t..u range with TODO (final design challenge has concluded event) then
-        #             score = 2 * num SUCCESS events + 1 * num FAIL events
-        #             time_to_exit = true
-        #             end_time = timestamp of TODO (final design challenge has concluded event) event
-        #         else
-        #             # phone probably died and need to start over, or challenge
-        #             # still in-progress
-        #             pass
-        #         end if
-        #     else
-        #         # challenge still in-progress
-        #         time_to_exit = true
-        #         end_time = current time
-        #     end if
-        # end while
-        #
-        # duration_s = end_time - start_time
-
-
+        # TODO - Pull from issue Detailed Design
 
 
 
@@ -127,56 +89,7 @@ class ScoreboardStatus(View):
             pi__station_type=PiStation.DOCK_STATION_TYPE
         )
 
-        # Assumptions:
-        #     * One SUCCESS/FAIL event will be posted after the user scans the Secure QR code
-        #     * A FAIL event is posted when each of three challenge attempts fails
-        #     * The SUCCESS/FAIL events provide the actual docking time for the attempt (disregarding the simulation run time)
-        #     * The 2x velocity-dropped-to-zero penalty is already accounted for in the actual docking time in the FAIL messages
-        # PDL:
-        # score = 0
-        # find all PiEvent.START_CHALLENGE_MSG_TYPE events and note timestamps
-        # if any found then
-        #     score = 1
-        #     start_time = timestamp of 1st event
-        # end if
-        #
-        # time_to_exit = false
-        # num_failed_attempts = 0
-        #
-        # while not time_to_exit
-        #     if there are more START_CHALLENGE events that we haven't looked at yet then
-        #         get timestamp t of next START_CHALLENGE event
-        #         get timestamp u of following START_CHALLENGE event or TODO (final design challenge has concluded event) event if it exists; o/w timestamp u of last event
-        #
-        #         if there is an event within t..u range with status SUCCESS_STATUS then
-        #             score = 9
-        #             time_to_exit = true
-        #             end_time = timestamp of SUCCESS_STATUS event + total actual docking time for all attempts
-        #         else if there is an event within t..u range with status FAIL_STATUS then
-        #             increment num_failed_attempts
-        #
-        #             if num_failed_attempts > 3 then
-        #                 score = 5
-        #                 time_to_exit = true
-        #                 end_time = timestamp of FAIL_STATUS event + total actual docking time for all attempts
-        #             end if
-        #         else if there is an event within t..u range with TODO (final design challenge has concluded event) then
-        #             score = 5
-        #             time_to_exit = true
-        #             end_time = timestamp of TODO (final design challenge has concluded event) event + total actual docking time for all attempts
-        #         else
-        #             # phone probably died and need to start over, or challenge
-        #             # still in-progress
-        #             pass
-        #         end if
-        #     else
-        #         # challenge still in-progress
-        #         time_to_exit = true
-        #         end_time = current time
-        #     end if
-        # end while
-        #
-        # duration_s = end_time - start_time
+        # TODO - Pull from issue Detailed Design
 
         # TODO Delete
         score = 0
@@ -196,55 +109,7 @@ class ScoreboardStatus(View):
             pi__station_type=PiStation.SECURE_STATION_TYPE
         )
 
-        # Assumptions:
-        #     * One SUCCESS/FAIL event will be posted after the user scans the Secure QR code
-        #     * A FAIL event is posted when each of three challenge attempts fails
-        #     * A FAIL event is _not_ posted for each incorrect response within an attempt
-        # PDL:
-        # score = 0
-        # find all PiEvent.START_CHALLENGE_MSG_TYPE events and note timestamps
-        # if any found then
-        #     score = 1
-        #     start_time = timestamp of 1st event
-        # end if
-        #
-        # time_to_exit = false
-        # num_failed_attempts = 0
-        #
-        # while not time_to_exit
-        #     if there are more START_CHALLENGE events that we haven't looked at yet then
-        #         get timestamp t of next START_CHALLENGE event
-        #         get timestamp u of following START_CHALLENGE event or TODO (final design challenge has concluded event) event if it exists; o/w timestamp u of last event
-        #
-        #         if there is an event within t..u range with status SUCCESS_STATUS then
-        #             score = 9
-        #             time_to_exit = true
-        #             end_time = timestamp of SUCCESS_STATUS event
-        #         else if there is an event within t..u range with status FAIL_STATUS then
-        #             increment num_failed_attempts
-        #
-        #             if num_failed_attempts > 3 then
-        #                 score = 5
-        #                 time_to_exit = true
-        #                 end_time = timestamp of FAIL_STATUS event
-        #             end if
-        #         else if there is an event within t..u range with TODO (final design challenge has concluded event) then
-        #             score = 5
-        #             time_to_exit = true
-        #             end_time = timestamp of TODO (final design challenge has concluded event) event
-        #         else
-        #             # phone probably died and need to start over, or challenge
-        #             # still in-progress
-        #             pass
-        #         end if
-        #     else
-        #         # challenge still in-progress
-        #         time_to_exit = true
-        #         end_time = current time
-        #     end if
-        # end while
-        #
-        # duration_s = end_time - start_time
+        # TODO - Pull from issue Detailed Design
 
         # TODO Delete
         score = 0
@@ -264,7 +129,7 @@ class ScoreboardStatus(View):
             pi__station_type=PiStation.RETURN_STATION_TYPE
         )
 
-        # TODO - same logic as Secure
+        # TODO - Pull from issue Detailed Design
 
         # TODO Delete
         score = 0
@@ -346,62 +211,6 @@ class ScoreboardStatus(View):
 
 
     @staticmethod
-    def _recomputeLaunchScore(teamName):
-        logging.debug('Entered Scores._recomputeLaunchScore({})'.format(teamName))
-
-        events = PiEvent.objects.all().filter(team__name=teamName)
-        # TODO filter by current challenge?
-        # TODO compute score
-        # TODO compute duration
-        # TODO update score and duration for team's challenge in Team table
-
-        logging.debug('Exiting Scores._recomputeLaunchScore')
-
-
-    @staticmethod
-    def _recomputeDockScore(teamName):
-        logging.debug('Entered Scores._recomputeDockScore({})'.format(teamName))
-
-        # TODO
-
-        logging.debug('Exiting Scores._recomputeDockScore')
-
-
-    @staticmethod
-    def _recomputeSecureScore(teamName):
-        logging.debug('Entered Scores._recomputeSecureScore({})'.format(teamName))
-
-        # TODO
-
-        logging.debug('Exiting Scores._recomputeSecureScore')
-
-
-    @staticmethod
-    def _recomputeReturnScore(teamName):
-        logging.debug('Entered Scores._recomputeReturnScore({})'.format(teamName))
-
-        # TODO
-
-        logging.debug('Exiting Scores._recomputeReturnScore')
-
-
-    @staticmethod
-    def _recomputeScores():
-        logging.debug('Entered Scores._recomputeScores')
-
-        if True: # TODO if recomputation necessary (i.e. challenge not over):
-            teams = Team.objects.all()
-
-            for t in teams:
-                Scores._recomputeLaunchScore(t.name)
-                Scores._recomputeDockScore(t.name)
-                Scores._recomputeSecureScore(t.name)
-                Scores._recomputeReturnScore(t.name)
-
-        logging.debug('Exiting Scores._recomputeScores')
-
-
-    @staticmethod
     def _formatSeconds(seconds):
         """ Convert seconds to mm:ss
         
@@ -411,3 +220,4 @@ class ScoreboardStatus(View):
                 string containing mm:ss
         """
         return "{:02d}:{:02d}".format(int(seconds/60), seconds%60)
+
