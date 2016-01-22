@@ -70,17 +70,18 @@ class Team(models.Model):
     pass_code        = models.CharField(max_length=PASS_CODE_FIELD_LENGTH, blank=True)
     reg_code         = models.CharField(max_length=REG_CODE_FIELD_LENGTH, blank=True)
     registered       = models.ForeignKey("piservice.PiEvent", null=True, related_name="teams", default="")  # give name as string to avoid cyclic import dependency
-    
-    # Score/time fields for the different competitions
-    rank              = models.IntegerField(default=0)
-    launch_score      = models.IntegerField(default=0)
-    launch_duration_s = models.IntegerField(default=0)
-    dock_score        = models.IntegerField(default=0)
-    dock_duration_s   = models.IntegerField(default=0)
-    secure_score      = models.IntegerField(default=0)
-    secure_duration_s = models.IntegerField(default=0)
-    return_score      = models.IntegerField(default=0)
-    return_duration_s = models.IntegerField(default=0)
+
+    # TODO Disabling for now; enable if needed for performance, o/w delete.    
+    ## Score/time fields for the different competitions
+    #rank              = models.IntegerField(default=0) # TODO Delete rank; not needed
+    #launch_score      = models.IntegerField(default=0)
+    #launch_duration_s = models.IntegerField(default=0)
+    #dock_score        = models.IntegerField(default=0)
+    #dock_duration_s   = models.IntegerField(default=0)
+    #secure_score      = models.IntegerField(default=0)
+    #secure_duration_s = models.IntegerField(default=0)
+    #return_score      = models.IntegerField(default=0)
+    #return_duration_s = models.IntegerField(default=0)
 
     # TODO:  Add more fields here as needed
     

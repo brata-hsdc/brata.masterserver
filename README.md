@@ -19,12 +19,36 @@ there are four Django apps:
 * `teamcentral` - provides status info to competitors through a mobile device interface
 
 ## Installation
+
+### Install and Set Up Raspbian
+
+Download Raspbian Jessie Lite released 2015-11-21 from https://www.raspberrypi.org/downloads/raspbian/.
+
+Unzip the zip file to get the raw SD card image. Write the raw image file to the SD card:
+
+```sh
+$ sudo dd if=2015-11-21-raspbian-jessie-lite.img of=/dev/sdX bs=4M
+$ sudo sync
+```
+
+Eject SD card, insert into device, and power up.
+
+Log-in when prompted.
+
+
+TODO - config
+TODO - raspi-config to expand SD card
+
+
+### Update Repositories
+
 ```sh
 # sudo apt-get update
 # sudo apt-get upgrade
 ```
 
 ### Install Python
+
 N/A Python already installed and upgraded
 Ah crud need to reinstall python from source with --enabled-shared? This error came from mod_wsgi install.  Suggests there will be major performance and memory hit if not done.
 
