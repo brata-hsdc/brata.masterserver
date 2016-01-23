@@ -125,6 +125,10 @@ class PiEvent(models.Model):
     START_CHALLENGE_2015_MSG_TYPE = 15
     SUBMIT_2015_MSG_TYPE          = 16
     DOCK_MSG_TYPE                 = 17
+    LATCH_MSG_TYPE                = 18
+    OPEN_MSG_TYPE                 = 19
+    SECURE_MSG_TYPE               = 20
+    RETURN_MSG_TYPE               = 21
 
     TYPE_CHOICES = (
                     (UNKNOWN_TYPE,                  "Unknown"),
@@ -144,7 +148,11 @@ class PiEvent(models.Model):
                     (AT_WAYPOINT_2015_MSG_TYPE,     "At Waypoint (2015)"),
                     (START_CHALLENGE_2015_MSG_TYPE, "Start Challenge (2015)"),
                     (SUBMIT_2015_MSG_TYPE,          "Submit (2015)"),
-                    (DOCK_MSG_TYPE,                  "Dock"),
+                    (DOCK_MSG_TYPE,                 "Dock"),
+                    (LATCH_MSG_TYPE,                "Latch"),
+                    (OPEN_MSG_TYPE,                 "Open"),
+                    (SECURE_MSG_TYPE,               "Secure"),
+                    (RETURN_MSG_TYPE,               "Return"),
                    )
     
     MSG_TYPES_2015 = (REGISTER_2015_MSG_TYPE,
