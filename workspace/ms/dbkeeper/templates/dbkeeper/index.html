@@ -6,24 +6,28 @@
 {% block main %}
 From here you can perform the following operations:<br/>
 <br/>
-<a href="add/org/"><button>Add Organization</button><br/></a>
-<a href="add/user/"><button>Add User</button><br/></a>
-<a href="add/team/"><button>Add Team</button><br/></a>
-<br/>
-<a href="add/launchparams/"><button>Add Launch Parameters</button><br/></a>
-<a href="add/dockparams/"><button>Add Dock Parameters</button><br/></a>
-<a href="add/secureparams/"><button>Add Secure Parameters</button><br/></a>
-<a href="add/returnparams/"><button>Add Return Parameters</button><br/></a>
-<br/>
-<a href="checkin/team/"><button>Check In Team</button><br/></a>
-<br/>
-<a href="station_status/"><button>Monitor Station Status</button><br/></a>
-<br/>
-<a href="/admin/dbkeeper/"><button><b>dbkeeper</b> Admin Interface</button><br/></a>
-<a href="/admin/dbkeeper/organization/"><button><b>Organization Table</b> Admin Interface</button><br/></a>
-<a href="/admin/dbkeeper/team/"><button><b>Team Table</b> Admin Interface</button><br/></a>
-<a href="/admin/dbkeeper/setting/"><button><b>Setting Table</b> Admin Interface</button><br/></a>
-<a href="/admin/dbkeeper/msuser/"><button><b>User Table</b> Admin Interface</button><br/></a>
-<br/>
-<a href="/admin/piservice/"><button><b>piservice</b> Admin Interface</button><br/></a>
+<table class="buttonTable">
+  <tr><td><a href="add/org/"><button>Add Organization</button></a></td><td></td></tr>
+  <tr><td><a href="add/user/"><button>Add User</button><br/></a></td><td></td></tr>
+  <tr><td><a href="add/team/"><button>Add Team</button><br/></a></td><td></td></tr>
+  <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr><td><a href="add/launchparams/"><button>Add Launch Parameters</button></a></td><td>Enter parameters for the Launch challenge</td></tr>
+  <tr><td><a href="add/dockparams/"><button>Add Dock Parameters</button></a></td><td>Enter parameters for the Dock challenge</td></tr>
+  <tr><td><a href="add/secureparams/"><button>Add Secure Parameters</button></a></td><td>Enter parameters for the Secure challenge</td></tr>
+  <tr><td><a href="add/returnparams/"><button>Add Return Parameters</button></a></td><td>Enter parameters for the Return challenge</td></tr>
+  <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr><td><a href="checkin/team/"><button>Check In Team</button><br/></a></td><td></td></tr>
+  <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr><td><a href="station_status/"><button>Monitor Station Status</button><br/></a></td><td></td></tr>
+  <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr><td><a href="/admin/dbkeeper/"><button><b>dbkeeper</b> Admin Interface</button><br/></a></td><td></td></tr>
+  <tr><td><a href="/admin/dbkeeper/organization/"><button style="margin-left:3em"><b>Organization Table</b> Admin Interface</button><br/></a></td><td></td></tr>
+  <tr><td><a href="/admin/dbkeeper/team/"><button style="margin-left:3em"><b>Team Table</b> Admin Interface</button><br/></a></td><td></td></tr>
+  <tr><td><a href="/admin/dbkeeper/setting/"><button style="margin-left:3em"><b>Setting Table</b> Admin Interface</button><br/></a></td><td></td></tr>
+  <tr><td><a href="/admin/dbkeeper/msuser/"><button style="margin-left:3em"><b>User Table</b> Admin Interface</button><br/></a></td><td></td></tr>
+  <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  <tr><td><a href="/admin/piservice/"><button><b>piservice</b> Admin Interface</button><br/></a></td><td></td></tr>
+  <tr><td><a href="/admin/piservice/pievent/"><button style="margin-left:3em"><b>PiEvent Table</b> Admin Interface</button><br/></a></td><td></td></tr>
+  <tr><td><a href="/admin/piservice/pistation/"><button style="margin-left:3em"><b>PiStation Table</b> Admin Interface</button><br/></a></td><td></td></tr>
+</table>
 {% endblock %}
