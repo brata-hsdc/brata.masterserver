@@ -151,15 +151,15 @@ class Setting(models.Model):
     
     @staticmethod
     def get(name, default=None):
-        """ Return the value of the Setting with name=name.
-            Return default if Setting not found.  Return
-            None if no default value is specified.
+        """ Return the value of the Setting with name=name, or
+            return default if Setting not found, or
+            return None if no default value is specified.
         """
         try:
             return Setting.objects.get(name=name).value
         except ObjectDoesNotExist:
             return default
         
-    def __unicode(self):
+    def __unicode__(self):
         return self.name
     

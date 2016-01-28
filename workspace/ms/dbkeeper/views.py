@@ -2,10 +2,13 @@ from django.shortcuts import render, HttpResponseRedirect
 from django.views.generic import View
 from django.contrib.auth.models import User
 
-from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm
+from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm,\
+                   AddLaunchParamsForm, AddDockParamsForm, AddSecureParamsForm, AddReturnParamsForm
 from .models import Organization, MSUser, Team, Setting
 from piservice.models import PiEvent
 from .team_code import TeamPassCode
+
+import json
 
 # Create your views here.
 def tryAgain(request, msg=None, url=None, buttonText=None,
@@ -248,3 +251,116 @@ class CheckInTeam(View):
         
         # Form was not valid, so let the user update fields and resubmit
         return render(request, "dbkeeper/check_in.html", self.context)
+
+#----------------------------------------------------------------------------
+class AddLaunchParams(View):
+    context = {
+               "form":   None,
+               "entity": "LaunchParams",
+               "submit": "Add",
+              }
+    
+    def get(self, request):
+        """ Display the Add form with the AddLaunchParams fields """
+        self.context["form"] = AddLaunchParamsForm()
+        return render(request, "dbkeeper/add.html", self.context)
+    
+    def post(self, request):
+        self.context["form"] = AddLaunchParamsForm(request.POST)
+        form = self.context["form"]
+        if form.is_valid():
+            value = json.dumps(form.cleaned_data)
+            try:
+                setting = Setting.objects.get(name="LAUNCH_PARAMS")
+                setting.value = value
+            except Setting.DoesNotExist:
+                setting = Setting(name="LAUNCH_PARAMS", value=value, description="Competition parameters for the Launch challenge")
+            setting.save()
+            return HttpResponseRedirect("/dbkeeper/")
+
+        return render(request, "dbkeeper/add.html", self.context)
+
+#----------------------------------------------------------------------------
+class AddDockParams(View):
+    context = {
+               "form":   None,
+               "entity": "DockParams",
+               "submit": "Add",
+              }
+    
+    def get(self, request):
+        """ Display the Add form with the AddDockParams fields """
+        self.context["form"] = AddDockParamsForm()
+        return render(request, "dbkeeper/add.html", self.context)
+    
+    def post(self, request):
+        self.context["form"] = AddDockParamsForm(request.POST)
+        form = self.context["form"]
+        if form.is_valid():
+            value = json.dumps(form.cleaned_data)
+            try:
+                setting = Setting.objects.get(name="DOCK_PARAMS")
+                setting.value = value
+            except Setting.DoesNotExist:
+                setting = Setting(name="DOCK_PARAMS", value=value, description="Competition parameters for the Dock challenge")
+            setting.save()
+            return HttpResponseRedirect("/dbkeeper/")
+
+        return render(request, "dbkeeper/add.html", self.context)
+
+#----------------------------------------------------------------------------
+class AddSecureParams(View):
+    context = {
+               "form":   None,
+               "entity": "SecureParams",
+               "submit": "Add",
+              }
+    
+    def get(self, request):
+        """ Display the Add form with the AddSecureParams fields """
+        self.context["form"] = AddSecureParamsForm()
+        return render(request, "dbkeeper/add.html", self.context)
+    
+    def post(self, request):
+        self.context["form"] = AddSecureParamsForm(request.POST)
+        form = self.context["form"]
+        if form.is_valid():
+            value = json.dumps(form.cleaned_data)
+            try:
+                setting = Setting.objects.get(name="SECURE_PARAMS")
+                setting.value = value
+            except Setting.DoesNotExist:
+                setting = Setting(name="SECURE_PARAMS", value=value, description="Competition parameters for the Secure challenge")
+            setting.save()
+            return HttpResponseRedirect("/dbkeeper/")
+
+        return render(request, "dbkeeper/add.html", self.context)
+
+#----------------------------------------------------------------------------
+class AddReturnParams(View):
+    context = {
+               "form":   None,
+               "entity": "ReturnParams",
+               "submit": "Add",
+              }
+    
+    def get(self, request):
+        """ Display the Add form with the AddReturnParams fields """
+        self.context["form"] = AddReturnParamsForm()
+        return render(request, "dbkeeper/add.html", self.context)
+    
+    def post(self, request):
+        self.context["form"] = AddReturnParamsForm(request.POST)
+        form = self.context["form"]
+        if form.is_valid():
+            value = json.dumps(form.cleaned_data)
+            try:
+                setting = Setting.objects.get(name="RETURN_PARAMS")
+                setting.value = value
+            except Setting.DoesNotExist:
+                setting = Setting(name="RETURN_PARAMS", value=value, description="Competition parameters for the Return challenge")
+            setting.save()
+            return HttpResponseRedirect("/dbkeeper/")
+
+        return render(request, "dbkeeper/add.html", self.context)
+

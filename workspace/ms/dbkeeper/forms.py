@@ -36,3 +36,34 @@ class CheckInTeamForm(forms.Form):
     teamCode3 = forms.ChoiceField(label="", choices=[(b,a) for a,b in TeamPassCode.LETTER_LIST], required=False)
     teamCode4 = forms.ChoiceField(label="", choices=[(b,a) for a,b in TeamPassCode.NUMBER_LIST], required=False)
 #     teamCode = forms.CharField(label="Code", required=False)
+
+#----------------------------------------------------------------------------
+class AddLaunchParamsForm(forms.Form):
+    pass
+
+#----------------------------------------------------------------------------
+class AddDockParamsForm(forms.Form):
+    # TODO:  How many tapes will we have?
+    tapeLen1 = forms.FloatField(label="Tape 1 Length (m)", initial="0.0", required=False)
+    tapeLen2 = forms.FloatField(label="Tape 2 Length (m)", initial="0.0", required=False)
+    tapeLen3 = forms.FloatField(label="Tape 3 Length (m)", initial="0.0", required=False)
+    tapeLen4 = forms.FloatField(label="Tape 4 Length (m)", initial="0.0", required=False)
+    tapeLen5 = forms.FloatField(label="Tape 5 Length (m)", initial="0.0", required=False)
+    tapeLen6 = forms.FloatField(label="Tape 6 Length (m)", initial="0.0", required=False)
+    
+    aftAccel     = forms.FloatField(label="Aft (rear) engine acceleration (m/s^2)", initial="0.15")
+    foreAccel    = forms.FloatField(label="Fore (front) engine acceleration (m/s^2)", initial="0.09")
+    fuelRate     = forms.FloatField(label="Fuel consumption rate (kg/s)", initial="0.7")
+    fuelQuantity = forms.FloatField(label="Fuel quantity (kg)", initial="20.0")
+    minDockVel   = forms.FloatField(label="Min dock velocity (m/s)", initial="0.01")
+    maxDockVel   = forms.FloatField(label="Max dock velocity (m/s)", initial="0.1")
+    initialVel   = forms.FloatField(label="Initial velocity (m/s)", initial="0.0")
+    simTime      = forms.IntegerField(label="Simulation run time (s)", initial="45")
+
+#----------------------------------------------------------------------------
+class AddSecureParamsForm(forms.Form):
+    pass
+
+#----------------------------------------------------------------------------
+class AddReturnParamsForm(forms.Form):
+    pass

@@ -27,6 +27,10 @@ urlpatterns = [
     url(r'^add/organization/$', views.AddOrganization.as_view(), name="AddOrganization"),
     url(r'^add/user/$', views.AddUser.as_view(), name="AddUser"),
     url(r'^add/team/$', views.AddTeam.as_view(), name="AddTeam"),
+    url(r'^add/launchparams/$', views.AddLaunchParams.as_view(), name="AddLaunchParams"),
+    url(r'^add/dockparams/$', views.AddDockParams.as_view(), name="AddDockParams"),
+    url(r'^add/secureparams/$', views.AddSecureParams.as_view(), name="AddSecureParams"),
+    url(r'^add/returnparams/$', views.AddReturnParams.as_view(), name="AddReturnParams"),
     url(r'^checkin/team/$', views.CheckInTeam.as_view(), name="CheckInTeam"),
     ]
 
