@@ -883,13 +883,20 @@ class Latch(JSONHandlerView):
         #TODO
         try:
             submitRequests = PiEvent.objects.filter(type=PiEvent.SUBMIT_MSG_TYPE, team=team, pi=station).order_by('time')
-            attempts = 0
+            attemptCount = 0
+            retry = True
+            wasCorrect = False
             for attempt in submitRequests:
                 submitData, response = self.validateJSONFields(attempt.data, ("is_correct","fail_message",))
                 if submitData is None:
                     return response
-                submitData.is_correct
-                
+                if submitData.is_correct:
+                    retry = False
+                    wasCorrect = True
+                else:
+                    attemptCount = attemptCount + 1
+            if attemptCount > 2:
+                retry = False
         catch:
             message = "No simulation started at this station, please check your QR Code scanned."	
             status = PiEvent.WARNING_STATUS
@@ -903,50 +910,47 @@ class Latch(JSONHandlerView):
             self.jsonResponse["message"] = cipher(message)
             return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
-        
-        if 
-        # Succeeded:  Record the transaction and update the station record
-        message = "Docking latch engaged! Continue to next Challenge!"
-        status = PiEvent.SUCCESS_STATUS
-        data = request.body
-        event = self.addEvent(team=team,
-                              pi=station,
-                              data=data,
-                              status=status,
-                              message=message,
-                             )
-        
-
-	# Send message to the Pi this team is registered with to restart the simulation no matter what
-        url = "{}/reset/31415".format(station.url)
-        headers = { "Content-type": "application/json", "Accept": "application.json" }
-        jsonData = json.dumps({})
-	response = requests.post(url, data=jsonData, headers=headers)
-        if response.status_code != 200:
-            message = "Could not contact simulation server.  Contact a competition official."	
-            status = PiEvent.WARNING_STATUS
-            data = response
+        # Need to make sure these status make it in the log and back to the user regardless of station coms
+        if wasCorrect:
+            # Succeeded:  Record the transaction and update the station record
+            message = "Docking latch engaged! Continue to next Challenge!"
+            status = PiEvent.SUCCESS_STATUS
+            data = request.body
             event = self.addEvent(team=team,
                               pi=station,
                               data=data,
                               status=status,
                               message=message,
                              )
-            self.jsonResponse["message"] = cipher(message)
-            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
-
-        # Determine if retry or done find the latest submit message for this team and station
-        # and then in the data fieled what the value of is_correct is set to
-        events = PiEvent.objects.filter(team=team, pi=station, type=PiEvent.SUBMIT_MSG_TYPE).order_by('time')[:1]
-        if nto events.exists():
-            # we have an issue as there was no submit
-            # TODO
-        retry = False
-        # Got it wrong?
-        message = "TODO"
-        status = PiEvent.FAIL_STATUS
-        # Got it wrong less than 3 times?
-            retry = True
+        if (not retry) and (not wasCorrect):
+            message = "TODO FAIL"
+            status = PiEvent.FAIL_STATUS
+            data = request.body
+            event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=status,
+                              message=message,
+                             )
+        
+	# Send message to the Pi this team is registered with to restart the simulation no matter what
+        url = "{}/reset/31415".format(station.url)
+        headers = { "Content-type": "application/json", "Accept": "application.json" }
+        jsonData = json.dumps({})
+	response = requests.post(url, data=jsonData, headers=headers)
+        if response.status_code != 200:
+            errorMessage = "Could not contact simulation server.  Contact a competition official."	
+            errorStatus = PiEvent.WARNING_STATUS
+            data = response
+            event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=errorStatus,
+                              message=errorMessage,
+                             )
+            if retry:
+                self.jsonResponse["message"] = cipher(errorMessage)
+                return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
         if retry:
             # take it from the top
@@ -959,6 +963,7 @@ class Latch(JSONHandlerView):
             # Get random parameters
             # TODO
             message = "Dock using [TAPE=d] [AFT=d.ddd] [FORE=d.ddd] [FUEL=dd.dd] [F-RATE=dd.dd]"
+
             response = requests.post(url, data=jsonData, headers=headers)
             if response.status_code != 200:
                 message = "Could not contact simulation server.  Contact a competition official."	
