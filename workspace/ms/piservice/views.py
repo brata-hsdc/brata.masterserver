@@ -324,7 +324,7 @@ class Register(JSONHandlerView):
         #if team.reg_code is not None and team.reg_code != "":
         #    # Failed:  Record the transaction and what went wrong
         #    self.addEvent(data=request.body,
-        #                  status=PiEvent.FAIL_STATUS,
+        #                  status=PiEvent.INFO_STATUS,
         #                  message="Device {} already registered to Team {}".format(team.reg_code, team.pass_code),
         #                 )
         #    self.jsonResponse["message"] = "You already have a device registered.  You must Unregister it before Registering another device.".format(team_passcode)
@@ -875,10 +875,47 @@ class Latch(JSONHandlerView):
         if team is None:
             return response
 
+        # Determine if successful based on Submit, no matter if can resent or not they should get credit
+        # for the attempt either way, so log this event even though we may need to log a station com error
+        # in addtion to this later on
+
+        # Get submits from this station for this team
+        #TODO
+        try:
+            submitRequests = PiEvent.objects.filter(type=PiEvent.SUBMIT_MSG_TYPE, team=team, pi=station).order_by('time')
+            attempts = 0
+            for attempt in submitRequests:
+                submitData, response = self.validateJSONFields(attempt.data, ("is_correct","fail_message",))
+                if submitData is None:
+                    return response
+                submitData.is_correct
+                
+        catch:
+            message = "No simulation started at this station, please check your QR Code scanned."	
+            status = PiEvent.WARNING_STATUS
+            data = response
+            event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=status,
+                              message=message,
+                             )
+            self.jsonResponse["message"] = cipher(message)
+            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+        
+        if 
         # Succeeded:  Record the transaction and update the station record
         message = "Docking latch engaged! Continue to next Challenge!"
         status = PiEvent.SUCCESS_STATUS
         data = request.body
+        event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=status,
+                              message=message,
+                             )
+        
 
 	# Send message to the Pi this team is registered with to restart the simulation no matter what
         url = "{}/reset/31415".format(station.url)
@@ -900,8 +937,10 @@ class Latch(JSONHandlerView):
 
         # Determine if retry or done find the latest submit message for this team and station
         # and then in the data fieled what the value of is_correct is set to
-        #events = PiEvent.objects.get(team=team, pi=station, type=PiEvent.SUBMIT_MSG_TYPE)
-        # TODO
+        events = PiEvent.objects.filter(team=team, pi=station, type=PiEvent.SUBMIT_MSG_TYPE).order_by('time')[:1]
+        if nto events.exists():
+            # we have an issue as there was no submit
+            # TODO
         retry = False
         # Got it wrong?
         message = "TODO"
@@ -997,7 +1036,7 @@ class Open(JSONHandlerView):
         data = request.body
         if response.status_code != 200:
             message = "Could not contact station server.  Contact a competition official."	
-            status=PiEvent.FAIL_STATUS
+            status=PiEvent.WARNING_STATUS
             httpStatus = 400
             data = response
             
@@ -1042,11 +1081,11 @@ class Secure(JSONHandlerView):
         
         # TODO:  Add message processing
 
-        team, response = self.getTeamFromRegCode(self, m.reg_code, body)
+        team, response = self.getTeamFromRegCode(self, m.reg_code, request.body)
         if team is None:
            return response
 
-        station, response = self.getStationFromStationId(self, station_id, body)
+        station, response = self.getStationFromStationId(self, station_id, request.body)
         if station is None:
             return response
 
@@ -1060,30 +1099,32 @@ class Secure(JSONHandlerView):
             message = "Correct! Go to the next Challenge!"
         else:
             # failed
+            status=PiEvent.FAIL_STATUS
             if restart:
+                message = "Try again by listening to tones again (optional) and scanning Open QR Code to re-enable photodetector"
+
    	        # Restart since they failed < 3 times 
                 url = "{}/start_challenge".format(station.url)
                 headers = { "Content-type": "application/json", "Accept": "application.json" }
+                # Go back to generating tones they had before by extracting from their previous start_challenge params
+                # TODO
                 data = json.dumps({
                     "message_version": "0",
                     "message_timestamp": "2014-09-15 14:08:59",
                     "secure_tone_pattern": [0, 1, 2, 3, 4, 5, 6, 7, 4],
                    })
-
                 response = requests.post(url, data=data, headers=headers)
                 if response.status_code != 200:
                     message = "Could not contact simulation server.  Contact a competition official."	
-                # Store failure
-                status=PiEvent.FAIL_STATUS
-                message = "Try again by listening to tones again (optional) and scanning Open QR Code to re-enable photodetector"
             else:
-                status=PiEvent.FAIL_STATUS
                 message = "Failed! Go to the next Challenge!"
 
         # Store the right event to the DB
-        event = self.addEvent(data=request.body,
-                              status=PiEvent.SUCCESS_STATUS,
-                              message="Secure msg received from {}".format(m.reg_code),
+        event = self.addEvent(team=team,
+                              pi=station,
+                              data=request.body,
+                              status=PiEvent.status,
+                              message=message,
                               )
  
         # Send response
@@ -1119,11 +1160,11 @@ class ReturnToEarth(JSONHandlerView):
         
         # TODO:  Add message processing
 
-        team, response = getTeamFromRegCode(self, m.reg_code, body)
+        team, response = getTeamFromRegCode(self, m.reg_code, request.body)
         if team is None:
            return response
 
-        station, response = getStationFromStationId(self, station_id, body)
+        station, response = getStationFromStationId(self, station_id, request.body)
         if station is None:
             return response
 
@@ -1192,23 +1233,46 @@ class Submit(JSONHandlerView):
         m,response = self.validateJSONFields(request, ("station_id","is_correct","fail_message","candidate_answer"))
         if m is None:
             return response
+
+        station, response = self.getStationFromStationId(self, m.station_id, request.body)
+        if station is None:
+            return response
+
+        # figure out which team is at that station based on the last transation for that station
+        # TODO
+        if station.
+        team, response = getTeamFromRegCode(self, m.reg_code, request.body)
+        if team is None:
+           return response
         
         # TODO:  Add message processing
         
-        # Succeeded:  Record the transaction and update the station record
-        event = self.addEvent(data=request.body,
-                              status=PiEvent.SUCCESS_STATUS,
-                              message="Submit msg received from {}".format(m.station_id),
-                             )
         # Figure out if the attempt was successful
 	# TODO
-	#wasDocked = True
+        # TODO add error handling in case a boolean can't be coerced form the data provided
+	wasCorrect = m.is_correct
+        # Note the status if successful or failure is not set here because we are having the clock stop
+        # when they scan the final QR code for each event, so these are just info with the data having the is_correct status
+        status=PiEvent.INFO_STATUS
+        if wasCorrect:
+        else:
+            status=PiEvent.INFO_STATUS,
         #message = "Docking latches engaged! Continue to next Challenge!"
 	#if not wasDocked:
 	#    message = "TODO some error message"
 	# Send a success response
         #self.jsonResponse["message"] = "Docking latches engaged! Continue to next Challenge!"
-        self.jsonResponse["challenge_complete"] = "False"
+
+        # Record the transaction and update the station record
+        # Note we store the entire response to make data extraction during last QR scan eaiser
+        event = self.addEvent(team=team,
+                              pi=station,
+                              data=request,
+                              status=PiEvent.INFO_STATUS,
+                              message="Submit msg received from {}".format(m.station_id),
+                             )
+
+        self.jsonResponse["challenge_complete"] = "{}".format(wasCorrect)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
@@ -1307,7 +1371,7 @@ class Register_2015(JSONHandlerView):
         if team is None:
             # Failed:  Record the transaction and what went wrong
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Invalid team_id {}".format(m.team_id),
                          )
             self.jsonResponse["message"] = "You have tried to Register your BRATA device with an invalid team_id: {}".format(m.team_id)
