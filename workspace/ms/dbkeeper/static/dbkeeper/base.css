@@ -103,7 +103,7 @@ tr.submitRow td {
 }*/
 table.buttonTable td {
   height: 100%;
-  padding: 0.5em;
+  padding: 0.1em;
   font-size: 90%;
 }
 table.buttonTable button {
