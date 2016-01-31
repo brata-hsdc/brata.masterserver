@@ -1,0 +1,31 @@
+{
+ "width": 1, 
+ "cmds": [
+  {
+   "button": "Join", 
+   "cmd": "http --json POST :80/piservice/join/ Content-type:application/json Accept:application/json host=\"First RPi Station\" pi_type=\"B+\" station_type=1", 
+   "tooltip": "Sent by a Station to the MS when it is ready to come online"
+  }, 
+  {
+   "button": "Register", 
+   "cmd": "http --json POST :80/piservice/register/auth10/ Content-type:application/json Accept:application/json brata_version=\"02\"", 
+   "tooltip": "Sent by the BRATA to the MS to authenticate and get a reg_code"
+  }, 
+  {
+   "button": "Start Secure", 
+   "cmd": "http --json POST :80/piservice/start_challenge/secure01/ Content-type:application/json Accept:application/json reg_code=\"60e37b2c72c0d737\" message=\"\"", 
+   "tooltip": "Start Challenge"
+  },
+  {
+   "button": "Open Secure", 
+   "cmd": "http --json POST :80/piservice/open/secure01/ Content-type:application/json Accept:application/json reg_code=\"60e37b2c72c0d737\" message=\"\"", 
+   "tooltip": "Open Secure"
+  },
+  {
+   "button": "Secure Secure", 
+   "cmd": "http --json POST :80/piservice/secure/secure01/ Content-type:application/json Accept:application/json reg_code=\"60e37b2c72c0d737\" message=\"\"", 
+   "tooltip": "Secure"
+  }
+ ], 
+ "title": "MS Test Commands for Secure"
+}

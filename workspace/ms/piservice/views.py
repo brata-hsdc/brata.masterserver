@@ -19,6 +19,9 @@ import sys
 sys.path.append(os.path.abspath("/opt/designchallenge2016"))
 from NoCMConfigValues import *
 
+# for regular expression matching
+import re
+
 # Create your views here.
 
 #----------------------------------------------------------------------------
@@ -82,7 +85,7 @@ class JSONHandlerView(View):
         if not self.clientSpeaksJSON(request):
             # Client doesn't accept JSON so send plain text
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Badly formed request",
                          )
             return HttpResponse("Cannot converse in JSON", content_type="text/plain", status=400)
@@ -180,7 +183,7 @@ class JSONHandlerView(View):
         except:
             # Log the message
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Badly formed JSON " + lastError,
                          )
             # Send a fail response
@@ -208,13 +211,141 @@ class JSONHandlerView(View):
         if team is None:
             # Failed:  Record the transaction and what went wrong
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Invalid {} {}".format("team_id" if msg2015 else "reg_code", teamCode),
                          )
             self.jsonResponse["message"] = failureMsg
             resp = HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
         return (team, resp)
-            
+
+    def getTeamFromRegCode(self, reg_code, body):
+        # Get the team name from the reg_code
+        try:
+            team = Team.objects.get(reg_code=reg_code)
+        except ObjectDoesNotExist:
+            team = None
+        
+        if team is None:
+            # Failed:  Record the transaction and what went wrong
+            self.addEvent(data=body,
+                          status=PiEvent.WARNING_STATUS,
+                          message="Failed to retrieve Team using reg_code '{}' from the database".format(reg_code),
+                         )
+            self.jsonResponse["message"] = cipher("Could not find a valid team: {}".format(reg_code))
+            return team, HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+
+        return (team, None)
+
+    def getStationFromStationId(self, station_id, body):
+        # Get the station from the station_id
+        station_id = station_id.lower()
+        try:
+            station = PiStation.objects.get(station_id=station_id)
+        except ObjectDoesNotExist:
+            station = None
+        
+        if station is None:
+            # Failed:  Record the transaction and what went wrong
+            self.addEvent(data=body,
+                          status=PiEvent.WARNING_STATUS,
+                          message="Failed to retrieve Station using station_id '{}' from the database".format(station_id),
+                         )
+            self.jsonResponse["message"] = cipher("Could not find a station_id: {}".format(station_id))
+            return station, HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+
+        return (station, None)
+
+    def getFieldsFromBrataMessage(self, brataMessage, fields):
+        """ Extract message data from a Brata message.
+
+            Example:
+                m = self.getFieldsFromBrataMessage(message, ("field-1", "field-2",))
+                
+                would return (if the message contained just field1 and field2):
+                {
+                  field1:  "value1",
+                  field2:  "value2",
+                }
+                
+                and would be accessible as m.field1, and m.field2.
+                Note the illegal - has been removed from the resulting variable name.
+                Case is left unchanged so if caps in you get caps out.
+        
+            Returns:
+                A tuple containing (Namespace, HttpResponse) where one of the two
+                elements will be None.
+        """
+        try:
+            msgFields = self.Namespace()
+            lastError = "none"
+            message = None
+            for f in fields:
+                # Build regex to find [f=*] returning * as the value for f
+                if isinstance(f, (str, unicode)):
+                    try:
+                        value = re.search("[[]"+f+"=(.+?)[]]", brataMessage).group(1)
+                    except AttributeError:
+                        lastError = f + " not found"
+                        message="Illegal parameter: {}".format(lastError)
+                        raise
+                    fValid = f.replace("-","")
+                    setattr(msgFields, fValid, value)
+            return (msgFields, None)
+        except:
+            # Log the message
+            if lastError == "none":
+                e = sys.exc_info()
+                message = "Exception: {}".format(e)
+
+            self.addEvent(data=message,
+                          status=PiEvent.WARNING_STATUS,
+                          message=message,
+                         )
+            # Send a fail response
+            #self.jsonResponse["message"] = traceback.format_exc()
+            self.jsonResponse["message"] = message # TODO put back cipher(message)
+            resp = HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+            return (None, resp)
+
+    def getStatus(self, team, station):
+        # Get submits from this station for this team
+        try:
+            # sort by time should provide the oldest first
+            # TODO how do we know they didn't need to restart this one because of a dead phone?
+            submitRequests = PiEvent.objects.filter(status=PiEvent.INFO_STATUS, type=PiEvent.SUBMIT_MSG_TYPE, team=team, pi=station).order_by('time')
+            attemptCount = 0
+            retry = True
+            wasCorrect = False
+            for attempt in submitRequests:
+                lastAttemptData = attempt.data
+                submitData = json.loads(attempt.data)
+                if submitData is None:
+                    return response
+                if submitData["is_correct"].lower()=="true":
+                    retry = False
+                    wasCorrect = True
+                else:
+                    attemptCount = attemptCount + 1
+                lastAnswer = submitData["candidate_answer"]
+            if attemptCount > 2:
+                retry = False
+            return wasCorrect, retry, lastAnswer, lastAttemptData, None
+        except:
+            # TODO fix message = "No simulation started at this station, please check your QR Code scanned."	
+            e = sys.exc_info()
+            message = "Exception: {}".format(e)
+            status = PiEvent.WARNING_STATUS
+            data = ""
+            event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=status,
+                              message=message,
+                             )
+            # TODO put back self.jsonResponse["message"] = cipher(message)
+            self.jsonResponse["message"] = message
+            return None, None, None, None, HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+     
 #----------------------------------------------------------------------------
 class Register(JSONHandlerView):
     """ A class-based view to handle a BRATA Register message.
@@ -256,7 +387,7 @@ class Register(JSONHandlerView):
 #         except KeyError,e:
 #             # Send a fail response
 #             self.addEvent(data=request.body,
-#                           status=PiEvent.FAIL_STATUS,
+#                           status=PiEvent.WARNING_STATUS,
 #                           message="Badly formed request",
 #                          )
 #             self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
@@ -272,11 +403,11 @@ class Register(JSONHandlerView):
                 team = Team.objects.get(pass_code=TeamPassCode.unwordify(team_passcode))
             except ObjectDoesNotExist:
                 team = None
-        
+
         if team is None:
             # Failed:  Record the transaction and what went wrong
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Failed to retrieve Team '{}' from the database".format(team_passcode),
                          )
             self.jsonResponse["message"] = "Invalid team_passcode: '{}'".format(team_passcode)
@@ -286,7 +417,7 @@ class Register(JSONHandlerView):
         #if team.reg_code is not None and team.reg_code != "":
         #    # Failed:  Record the transaction and what went wrong
         #    self.addEvent(data=request.body,
-        #                  status=PiEvent.FAIL_STATUS,
+        #                  status=PiEvent.INFO_STATUS,
         #                  message="Device {} already registered to Team {}".format(team.reg_code, team.pass_code),
         #                 )
         #    self.jsonResponse["message"] = "You already have a device registered.  You must Unregister it before Registering another device.".format(team_passcode)
@@ -298,7 +429,7 @@ class Register(JSONHandlerView):
         # Succeeded:  Record the transaction and update the team record
         event = self.addEvent(team=team,
                               data=request.body,
-                              status=PiEvent.SUCCESS_STATUS,
+                              status=PiEvent.INFO_STATUS,
                               message="Team '{}' Registered with brata_version '{}'. Assigned reg_code {}.".format(team.name, "m.brata_version", team.reg_code),
                              )
         
@@ -346,7 +477,7 @@ class Unregister(JSONHandlerView):
         except KeyError,e:
             # Send a fail response
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Badly formed request",
                          )
             self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
@@ -361,7 +492,7 @@ class Unregister(JSONHandlerView):
         except (ObjectDoesNotExist, MultipleObjectsReturned):
             # Failed:  Record the transaction and what went wrong
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Failed to retrieve Team from the database with reg_code {}".format(reg_code),
                          )
             self.jsonResponse["message"] = "Unable to find registered device to unregister."
@@ -371,7 +502,7 @@ class Unregister(JSONHandlerView):
         # Succeeded:  Record the transaction and update the team record
         event = self.addEvent(team=team,
                               data=request.body,
-                              status=PiEvent.SUCCESS_STATUS,
+                              status=PiEvent.INFO_STATUS,
                               message="Team '{}' Unregistered device with reg_code '{}'.".format(team.name, team.reg_code),
                              )
         
@@ -419,14 +550,14 @@ class Join(JSONHandlerView):
         
         # Validate the message format
         try:
-            station_id         = data["station_id"].lower()
-            station_type = data["station_type"].lower()
+            station_id   = data["station_id"].lower()
+            station_type = data["station_type"].lower().capitalize()
             serial_num   = data["station_serial"]
             url          = data["station_url"] if "station_url" in data else ""
         except KeyError:
             # Send a fail response
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Badly formed request",
                           )
             self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
@@ -437,7 +568,7 @@ class Join(JSONHandlerView):
         if not PiStation.allowedHost(senderIP) or not PiStation.allowedSerialNum(serial_num):
             # Send a fail response
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Join request from invalid host ({}) or serial_num ({}).  See MS setting STATION_IPS and STATION_SERIAL_NUMS.".format(senderIP, serial_num),
                          )
             self.jsonResponse["message"] = "Join request from invalid host ({}) or serial_num ({})".format(senderIP, serial_num)
@@ -454,7 +585,7 @@ class Join(JSONHandlerView):
         station.station_id = station_id #station.setStationId()
         station.joined = self.addEvent(pi=station,
                                        data=request.body,
-                                       status=PiEvent.SUCCESS_STATUS,
+                                       status=PiEvent.INFO_STATUS,
                                        message="Station '{}' ({}) sent a Join message".format(station.host, station.station_id),
                                        )
         station.last_activity = timezone.now()
@@ -498,7 +629,7 @@ class Heartbeat(JSONHandlerView):
         if not station or not PiStation.allowedHost(senderIP):
             # Send a fail response
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Heartbeat received from invalid host: {}, station_id {}.  See MS setting STATION_IPS.".format(senderIP, station_id),
                          )
             self.jsonResponse["message"] = "Heartbeat message from unrecognized station: {} at address {}".format(station_id, senderIP)
@@ -506,8 +637,9 @@ class Heartbeat(JSONHandlerView):
         
 #         # Succeeded:  Record the transaction and update the station record
 #         event = self.addEvent(pi=station,
+
 #                               data=request.body,
-#                               status=PiEvent.SUCCESS_STATUS,
+#                               status=PiEvent.INFO_STATUS,
 #                               message="Station '{}' ({}) sent a Heartbeat message".format(station.host, station.station_id),
 #                              )
         
@@ -548,7 +680,7 @@ class Leave(JSONHandlerView):
         except KeyError:
             # Send a fail response
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Badly formed request",
                          )
             self.jsonResponse["message"] = "Badly formed request: {}".format(repr(data))
@@ -562,7 +694,7 @@ class Leave(JSONHandlerView):
             # Could not retrieve a PiStation record using station_id.
             # Send a fail response
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Could not find a valid station: {}".format(station_id),
                          )
             self.jsonResponse["message"] = "Could not find a valid station: {}".format(station_id, repr(data))
@@ -571,7 +703,7 @@ class Leave(JSONHandlerView):
         # Succeeded:  Record the transaction and update the station record
         event = self.addEvent(pi=station,
                               data=request.body,
-                              status=PiEvent.SUCCESS_STATUS,
+                              status=PiEvent.INFO_STATUS,
                               message="Station '{}' sent a Leave message".format(station.host),
                              )
         
@@ -651,58 +783,93 @@ class StartChallenge(JSONHandlerView):
         message="StartChallenge msg received from {}".format(m.reg_code)
 
         # Get the station from the station_id
-        try:
-            station = PiStation.objects.get(station_id=station_id)
-        except ObjectDoesNotExist:
-                station = None
-        
+        station, response = self.getStationFromStationId(station_id, request.body)
         if station is None:
-            # Failed:  Record the transaction and what went wrong
-            self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
-                          message="Failed to retrieve Station using station_id '{}' from the database".format(station_id),
-                         )
-            self.jsonResponse["message"] = cipher("Could not find a valid station: {}".format(station_id))
-            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+            return response
 
-        # For Dock get the team name from the reg_code
-        try:
-            team = Team.objects.get(reg_code=m.reg_code)
-        except ObjectDoesNotExist:
-                team = None
-        
+        team, response = self.getTeamFromRegCode(m.reg_code, request.body)
         if team is None:
-            # Failed:  Record the transaction and what went wrong
-            self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
-                          message="Failed to retrieve Team using reg_code '{}' from the database".format(m.reg_code),
-                         )
-            self.jsonResponse["message"] = cipher("Could not find a valid team: {}".format(m.reg_code))
-            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+            return response
+
+        # assuming all goes well
+        data=request.body
+        # INFO because success is reserved for final event evaluation as SUCCESS or FAIL
+        status=PiEvent.INFO_STATUS
 
 	# Send message to the Pi this team is registered with to start the simulation
         url = "{}/start_challenge".format(station.url)
         headers = { "Content-type": "application/json", "Accept": "application.json" }
-        data = json.dumps({
+        shouldCallStation = True
+
+        if station.station_type == "Launch":
+            # Get set of random parameters
+            # TODO
+            shouldCallStation = False
+            message = "Layout the launch site at [LAT=+dd.ddddd] [LON=-dd.ddddd] [ROT=ddd.d] [SIDE=dd.d] [COLOR=c]"
+        elif station.station_type == "Dock":
+            jsonData = json.dumps({
+                 "message_version": "0",
+                 "message_timestamp": "2014-09-15 14:08:59",
                  "team_name": team.name,
                })
-	response = requests.post(url, data=data, headers=headers)
-        if response.status_code != 200:
-            message = "Could not contact simulation server '{}'.  Contact a competition official.".format(station_id)	
-            # Failed:  Record the transaction and what went wrong
-            self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
-                          message=message,
-                         )
-            self.jsonResponse["message"] = cipher(message)
-            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+            # Get random parameters
+            # TODO
+            message = "Dock using [TAPE=1] [AFT=1.111] [FORE=1.111] [FUEL=11.11] [F-RATE=11.11]"
+            startData = json.dumps({
+                 "AFT": "1.111",
+                 "FORE": "1.111",
+                 "FUEL": "11.11",
+                 "F_RATE": "11.11",
+                 "DIST": "11",
+               })
 
-        message = "Dock using [TAPE=d] [AFT=d.ddd] [FORE=d.ddd] [FUEL=dd.dd] [F-RATE=dd.dd]"
+        elif station.station_type == "Secure":
+            # Get random parameters
+            # TODO
+            jsonData = json.dumps({
+                 "message_version": "0",
+                 "message_timestamp": "2014-09-15 14:08:59",
+                 "secure_tone_pattern": [0, 1, 2, 3, 4, 5, 6, 7, 4],
+                   })
+            startData = jsonData
+            message="Attach the mic cord and determine the 4 Lock Digits, then scan the Open QR Code"
+        elif station.station_type == "Return":
+            # Get parameters for this particular station
+            # TODO
+            jsonData = json.dumps({
+                 "message_version": "0",
+                 "message_timestamp": "2014-09-15 14:08:59",
+                 "return_guidance_pattern": [0, 0, 0, 0, 0, 0],
+                   })
+            startData = jsonData
+            message="Measure return angle, determine guidance computer parameters, then enter them into the guidance computer. Scan Return QR Code when done."
+        else:
+            shouldCallStation = False
+            status = PiEvent.WARNING_STATUS
+            startData = ""
+            message = "Invalid StationID. Contact a competition official."
 
-        # Succeeded:  Record the transaction and update the station record
-        event = self.addEvent(data=request.body,
-                              status=PiEvent.SUCCESS_STATUS,
-                              message="StartChallenge msg received from {}".format(m.reg_code),
+        # Record the transaction status
+        event = self.addEvent(team=team,
+                              pi=station,
+                              data=startData,
+                              status=status,
+                              message=message,
+                             )
+
+	if shouldCallStation:
+            response = requests.post(url, data=jsonData, headers=headers)
+            if response.status_code != 200:
+                message = "Could not contact station. Contact a competition official."	
+                status = PiEvent.WARNING_STATUS
+                data = response
+
+                # Record the transaction status
+                event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=status,
+                              message=message,
                              )
         
         # Send a success response
@@ -735,54 +902,450 @@ class Dock(JSONHandlerView):
         m,response = self.validateJSONFields(request, ("reg_code","message",))
         if m is None:
             return response
+
+        team, response = self.getTeamFromRegCode(m.reg_code, request.body)
+        if team is None:
+            return response
         
-        # TODO:  Add message processing
         # Get the station from the station_id
-        station_id = station_id.lower()
-        try:
-            station = PiStation.objects.get(station_id=station_id)
-        except ObjectDoesNotExist:
-                station = None
-        
+        station, response = self.getStationFromStationId(station_id, request.body) 
         if station is None:
-            # Failed:  Record the transaction and what went wrong
-            self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
-                          message="Failed to retrieve Station using station_id '{}' from the database".format(station_id),
-                         )
+            return response
         
-        # Succeeded:  Record the transaction and update the station record
-        event = self.addEvent(data=request.body,
-                              status=PiEvent.SUCCESS_STATUS,
-                              message="Dock msg received from {}".format(m.reg_code),
+        # setup assuming all goes well
+        message = "Docking Parameters received!"
+        status=PiEvent.INFO_STATUS
+        data=request.body
+
+        # get submitted params from the message
+        messageData, response = self.getFieldsFromBrataMessage(m.message, ("T-AFT", "T-COAST", "T-FORE",))
+        if messageData is None:
+           return response
+
+        t_aft = messageData.TAFT
+        t_coast = messageData.TCOAST
+        t_fore = messageData.TFORE
+
+        # get the initial parameters from the start_challenge event
+        # find the event and get the parameters out of the JSON data
+        try:
+            startRequests = PiEvent.objects.filter(type=PiEvent.START_CHALLENGE_MSG_TYPE, pi=station, team=team).order_by('-time')[:1]
+        except:
+            message = "No start found at this station"
+            # TODO handle error
+        data = json.loads(startRequests[0].data)
+        if data is None:
+            # TODO make error message
+            return response
+
+        a_aft = data["AFT"]
+        a_fore = data["FORE"]
+        dist = data["DIST"]
+        r_fuel = data["F_RATE"]
+        q_fuel = data["FUEL"]
+        
+	# Send message to the Pi this team is registered with to start the simulation
+        url = "{}/post_challenge".format(station.url)
+        headers = { "Content-type": "application/json", "Accept": "application.json" }
+        jsonData = json.dumps({
+                 "t_aft": t_aft,
+                 "t_coast": t_coast,
+                 "t_fore": t_fore,
+                 "a_aft": a_aft,
+                 "a_fore": a_fore,
+                 "r_fuel": r_fuel,
+                 "q_fuel": q_fuel,
+                 "dist": dist,
+                 "v_min": "0.01",
+                 "v_max": "0.1",
+                 "v_init": "0.0",
+                 "t_sim": "45",
+               })
+	response = requests.post(url, data=jsonData, headers=headers)
+        if response.status_code != 200:
+            message = "Could not contact simulation server.  Contact a competition official."	
+            status = PiEvent.WARNING_STATUS
+            data = response
+
+        # If all went well then store what params were assigned to the team
+        data = jsonData
+
+        # Record the transaction and update the station record
+        event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=status,
+                              message=message,
+                             )
+                    
+        # Send a success response
+        self.jsonResponse["message"] = cipher(message)
+
+        return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+#----------------------------------------------------------------------------
+class Latch(JSONHandlerView):
+    """ A class-based view to handle a BRATA Dock message.
+    
+        The client sends a POST message with the following JSON data:
+        {
+            "reg_code":        "current reg_code",
+            "message":         "see ICD"
+        }
+        
+        The MS sends the following response on success:
+        {
+            "message":  "..."
+        }
+    """
+    def __init__(self):
+        super(Latch, self).__init__(PiEvent.LATCH_MSG_TYPE, methods=[self.POST])
+    
+    def post(self, request, station_id, *args, **kwargs):
+        """ Handle the POST message and update the database """
+        super(Latch, self).post(request, *args, **kwargs)
+
+        # Get input parameters from URL and/or POST data
+        m,response = self.validateJSONFields(request, ("reg_code","message",))
+        if m is None:
+            return response
+
+        team, response = self.getTeamFromRegCode(m.reg_code, request.body)
+        if team is None:
+            return response
+        
+        # Get the station from the station_id
+        station, response = self.getStationFromStationId(station_id, request.body)        
+        if station is None:
+            return response
+        
+        wasCorrect, retry, lastAnswer, lastAttemptData, response = self.getStatus(team, station)
+        if wasCorrect is None:
+            return response
+
+        # Need to make sure these status make it in the log and back to the user regardless of station coms
+        # this is what the scoring is based on and needs to include the time for docking including penalty
+        if wasCorrect:
+            # Succeeded:  Record the transaction and update the station record
+            message = "Docking latches engaged! Continue to next Challenge!"
+            status = PiEvent.SUCCESS_STATUS
+        else:
+            # Post failures so scoring can keep track of them
+            status = PiEvent.FAIL_STATUS
+            # figure out if actual docking time requires penalty
+            # TODO change the reported time in data            
+            if retry:
+                # Get random parameters
+                # TODO
+                message = "Dock using [TAPE=1] [AFT=1.111] [FORE=1.111] [FUEL=11.11] [F-RATE=11.11]"
+                startData = json.dumps({
+                     "AFT": "1.111",
+                     "FORE": "1.111",
+                     "FUEL": "11.11",
+                     "F_RATE": "11.11",
+                     "DIST": "11",
+                   })
+                event = PiEvent.addEvent(type=PiEvent.START_CHALLENGE_MSG_TYPE,
+                              team=team,
+                              pi=station,
+                              data=startData,
+                              status=PiEvent.INFO_STATUS,
+                              message=message,
+                             )
+            else:
+                message = "Failed! Go to the next Challenge!"
+
+	jsonTime = json.dumps({
+             "time": lastAnswer,
+           })
+        data = jsonTime
+        
+        event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=status,
+                              message=message,
                              )
         
-        message = "Docking Parameters received!"
+	# Send message to the Pi this team is registered with to restart the simulation no matter what
+        url = "{}/reset/31415".format(station.url)
+        headers = { "Content-type": "application/json", "Accept": "application.json" }
+        jsonData = json.dumps({})
+	response = requests.post(url, data=jsonData, headers=headers)
+        if response.status_code != 200:
+            errorMessage = "Could not contact station. Contact a competition official."	
+            errorStatus = PiEvent.WARNING_STATUS
+            data = response
+            event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=errorStatus,
+                              message=errorMessage,
+                             )
+            if retry:
+                # We need to make the team aware as there is a problem that keeps them from continuing
+                self.jsonResponse["message"] = cipher(errorMessage)
+                return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+        if retry:
+            # take it from the top
+            url = "{}/start_challenge".format(station.url)
+            headers = { "Content-type": "application/json", "Accept": "application.json" }
+	    jsonData = json.dumps({
+                 "message_version": "0",
+                 "message_timestamp": "2014-09-15 14:08:59",
+                 "team_name": team.name,
+               })
+
+            response = requests.post(url, data=jsonData, headers=headers)
+            if response.status_code != 200:
+                message = "Could not contact station. Contact a competition official."	
+                status = PiEvent.WARNING_STATUS
+                data = response
+                event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=status,
+                              message=message,
+                             )
+        
+        # Send a response
+        self.jsonResponse["message"] = cipher(message)
+        return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
+class Open(JSONHandlerView):
+    """ A class-based view to handle a BRATA Dock message.
+    
+        The client sends a POST message with the following JSON data:
+        {
+            "reg_code":        "current reg_code",
+            "message":         "see ICD"
+        }
+        
+        The MS sends the following response on success:
+        {
+            "message":  "..."
+        }
+    """
+    def __init__(self):
+        super(Open, self).__init__(PiEvent.OPEN_MSG_TYPE, methods=[self.POST])
+    
+    def post(self, request, station_id, *args, **kwargs):
+        """ Handle the POST message and update the database """
+        super(Open, self).post(request, *args, **kwargs)
+
+        # Get input parameters from URL and/or POST data
+        m,response = self.validateJSONFields(request, ("reg_code","message",))
+        if m is None:
+            return response
+
+        team, response = self.getTeamFromRegCode(m.reg_code, request.body)
+        if team is None:
+            return response
+        
+        # Get the station from the station_id
+        station, response = self.getStationFromStationId(station_id, request.body)
+        if station is None:
+            return response
+
+        message = "Photodetector enabled: send Lock Digit pulses now!"
+        status=PiEvent.INFO_STATUS
+        httpStatus = 200
+
+        # Get the parameters from the DB
+        # TODO
 
 	# Send message to the Pi this team is registered with to start the simulation
         url = "{}/post_challenge".format(station.url)
         headers = { "Content-type": "application/json", "Accept": "application.json" }
         data = json.dumps({
-                 "t_aft": "8.2",
-                 "t_coast": "1",
-                 "t_fore": "13.1",
-                 "a_aft": "0.15",
-                 "a_fore": "0.09",
-                 "r_fuel": "0.7",
-                 "q_fuel": "20",
-                 "dist": "15.0",
-                 "v_min": "0.01",
-                 "v_max": "0.1",
-                 "v_init": "0.0",
-                 "t_sim": "5",
+                 "message_version": "0",
+                 "message_timestamp": "2014-09-15 14:08:59",
+                 "secure_pulse_pattern": [1, 2, 3, 4],
+                 "secure_max_pulse_width": "100",
+                 "secure_max_gap": "10",
+                 "secure_min_gap": "10",
                })
 	response = requests.post(url, data=data, headers=headers)
-        if response.status_code != 200:
-            message = "Could not contact simulation server.  Contact a competition official."	
-            
-        # Send a success response
-        self.jsonResponse["message"] = message
 
+        data = request.body
+        if response.status_code != 200:
+            message = "Could not contact station server.  Contact a competition official."	
+            status=PiEvent.WARNING_STATUS
+            data = response
+            
+        # Record the transaction and update the station record
+        event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=status,
+                              message=message,
+                             )
+        
+        # Send a success response
+        self.jsonResponse["message"] = cipher(message)
+        return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=httpStatus)
+
+#----------------------------------------------------------------------------
+class Secure(JSONHandlerView):
+    """ A class-based view to handle a BRATA Dock message.
+    
+        The client sends a POST message with the following JSON data:
+        {
+            "reg_code":        "current reg_code",
+            "message":         "see ICD"
+        }
+        
+        The MS sends the following response on success:
+        {
+            "message":  "..."
+        }
+    """
+    def __init__(self):
+        super(Secure, self).__init__(PiEvent.SECURE_MSG_TYPE, methods=[self.POST])
+    
+    def post(self, request, station_id, *args, **kwargs):
+        """ Handle the POST message and update the database """
+        super(Secure, self).post(request, *args, **kwargs)
+
+        # Get input parameters from URL and/or POST data
+        m,response = self.validateJSONFields(request, ("reg_code","message",))
+        if m is None:
+            return response
+        
+        # TODO:  Add message processing
+
+        team, response = self.getTeamFromRegCode(self, m.reg_code, request.body)
+        if team is None:
+           return response
+
+        station, response = self.getStationFromStationId(self, station_id, request.body)
+        if station is None:
+            return response
+
+        # TODO check if passed or, was 3 fails or was < 3 fails
+        passed = False
+        restart = True
+
+        if passed:
+            # Succeeded:  Record the transaction and update the station record
+            status=PiEvent.SUCCESS_STATUS
+            message = "Correct! Go to the next Challenge!"
+        else:
+            # failed
+            status=PiEvent.FAIL_STATUS
+            if restart:
+                message = "Try again by listening to tones again (optional) and scanning Open QR Code to re-enable photodetector"
+
+   	        # Restart since they failed < 3 times 
+                url = "{}/start_challenge".format(station.url)
+                headers = { "Content-type": "application/json", "Accept": "application.json" }
+                # Go back to generating tones they had before by extracting from their previous start_challenge params
+                # TODO
+                data = json.dumps({
+                    "message_version": "0",
+                    "message_timestamp": "2014-09-15 14:08:59",
+                    "secure_tone_pattern": [0, 1, 2, 3, 4, 5, 6, 7, 4],
+                   })
+                response = requests.post(url, data=data, headers=headers)
+                if response.status_code != 200:
+                    message = "Could not contact simulation server.  Contact a competition official."	
+            else:
+                message = "Failed! Go to the next Challenge!"
+
+        # Store the right event to the DB
+        event = self.addEvent(team=team,
+                              pi=station,
+                              data=request.body,
+                              status=PiEvent.status,
+                              message=message,
+                              )
+ 
+        # Send response
+        self.jsonResponse["message"] = cipher(message)
+        return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
+class ReturnToEarth(JSONHandlerView):
+    """ A class-based view to handle a BRATA Dock message.
+    
+        The client sends a POST message with the following JSON data:
+        {
+            "reg_code":        "current reg_code",
+            "message":         "see ICD"
+        }
+        
+        The MS sends the following response on success:
+        {
+            "message":  "..."
+        }
+    """
+    def __init__(self):
+        super(ReturnToEarth, self).__init__(PiEvent.RETURN_MSG_TYPE, methods=[self.POST])
+    
+    def post(self, request, station_id, *args, **kwargs):
+        """ Handle the POST message and update the database """
+        super(ReturnToEarth, self).post(request, *args, **kwargs)
+
+        # Get input parameters from URL and/or POST data
+        m,response = self.validateJSONFields(request, ("reg_code","message",))
+        if m is None:
+            return response
+        
+        # TODO:  Add message processing
+
+        team, response = getTeamFromRegCode(self, m.reg_code, request.body)
+        if team is None:
+           return response
+
+        station, response = getStationFromStationId(self, station_id, request.body)
+        if station is None:
+            return response
+
+        # TODO check if passed or, was 3 fails or was < 3 fails
+        passed = True
+        restart = True
+
+        if passed:
+            # Succeeded:  Record the transaction and update the station record
+            status=PiEvent.SUCCESS_STATUS
+            message = "Correct! You have returned successfully!"
+        else:
+            # failed
+            if restart:
+   	        # Restart since they failed < 3 times 
+                # Store failure no matter what for score keeping
+                status=PiEvent.FAIL_STATUS
+                # This is the message to send assuming restart of the station works
+                message = "Try again! A bit signed but still alive!"
+
+                # Get parameters for this station
+                # TODO do we really send the parameters because it resets automatically
+                url = "{}/start_challenge".format(station.url)
+                headers = { "Content-type": "application/json", "Accept": "application.json" }
+                data = json.dumps({
+                    "message_version": "0",
+                    "message_timestamp": "2014-09-15 14:08:59",
+                    "secure_tone_pattern": [0, 1, 2, 3, 4, 5, 6, 7, 4, 2],
+                   })
+
+                response = requests.post(url, data=data, headers=headers)
+                if response.status_code != 200:
+                    message = "Could not contact station. Contact a competition official."	
+            else:
+                status=PiEvent.FAIL_STATUS
+                message = "Failed! Too bad but all done."
+
+        # Store the event to the DB for score keeping
+        event = self.addEvent(team=team,
+                              pi=station,
+                              data=request.body,
+                              status=status,
+                              message=message,
+                              )
+ 
+        # Send response
+        self.jsonResponse["message"] = cipher(message)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
@@ -810,23 +1373,35 @@ class Submit(JSONHandlerView):
         m,response = self.validateJSONFields(request, ("station_id","is_correct","fail_message","candidate_answer"))
         if m is None:
             return response
-        
-        # TODO:  Add message processing
-        
-        # Succeeded:  Record the transaction and update the station record
-        event = self.addEvent(data=request.body,
-                              status=PiEvent.SUCCESS_STATUS,
+
+        station, response = self.getStationFromStationId(m.station_id, request.body)
+        if station is None:
+            return response
+
+        # figure out which team is at that station based on the last transation for that station
+        # TODO
+        try:
+            startRequests = PiEvent.objects.filter(type=PiEvent.START_CHALLENGE_MSG_TYPE, pi=station).order_by('time')[:1]
+        except:
+            message = "No start found at this station"
+        team = startRequests[0].team        
+
+        # Record the transaction and update the station record
+        # Note we store the entire response to make data extraction during last QR scan eaiser
+        event = self.addEvent(team=team,
+                              pi=station,
+                              data=request.body,
+                              status=PiEvent.INFO_STATUS,
                               message="Submit msg received from {}".format(m.station_id),
                              )
-        # Figure out if the attempt was successful
-	# TODO
-	wasDocked = True
-        message = "Docking latches engaged! Continue to next Challenge!"
-	if not wasDocked:
-	    message = "TODO some error message"
-	# Send a success response
-        self.jsonResponse["message"] = "Docking latches engaged! Continue to next Challenge!"
-        self.jsonResponse["challenge_complete"] = "True"
+        
+        # Figure out what to do next
+        wasCorrect, retry, lastAnswer, lastAttemptData, response = self.getStatus(team, station)
+        if wasCorrect is None:
+            return response
+
+        challegneComplete = wasCorrect or not retry
+        self.jsonResponse["challenge_complete"] = "{}".format(challengeComplete)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
@@ -925,7 +1500,7 @@ class Register_2015(JSONHandlerView):
         if team is None:
             # Failed:  Record the transaction and what went wrong
             self.addEvent(data=request.body,
-                          status=PiEvent.FAIL_STATUS,
+                          status=PiEvent.WARNING_STATUS,
                           message="Invalid team_id {}".format(m.team_id),
                          )
             self.jsonResponse["message"] = "You have tried to Register your BRATA device with an invalid team_id: {}".format(m.team_id)

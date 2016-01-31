@@ -1,0 +1,31 @@
+{
+ "width": 1, 
+ "cmds": [
+  {
+   "button": "Register", 
+   "cmd": "http --json POST :80/piservice/register/auth10/ Content-type:application/json Accept:application/json brata_version=\"02\"", 
+   "tooltip": "Sent by the BRATA to the MS to authenticate and get a reg_code"
+  }, 
+  {
+   "button": "Start Dock", 
+   "cmd": "http --json POST :80/piservice/start_challenge/dock01/ Content-type:application/json Accept:application/json reg_code=\"60e37b2c72c0d737\" message=\"\"", 
+   "tooltip": "Start Challenge"
+  },
+  {
+   "button": "Dock", 
+   "cmd": "http --json POST :80/piservice/dock/dock01/ Content-type:application/json Accept:application/json reg_code=\"60e37b2c72c0d737\" message=\"[T-AFT=111.1] [L-COAST=111.1] [T-FORE=111.1]\"", 
+   "tooltip": "Sent by the BRATA to submit docking paramaters"
+  }, 
+  {
+   "button": "Latch", 
+   "cmd": "http --json POST :80/piservice/latch/dock01/ Content-type:application/json Accept:application/json reg_code=\"60e37b2c72c0d737\" message=\"\"", 
+   "tooltip": "Start Challenge"
+  },
+  {
+   "button": "Join", 
+   "cmd": "http --json POST :80/piservice/join/ Content-type:application/json Accept:application/json host=\"First RPi Station\" pi_type=\"B+\" station_type=1", 
+   "tooltip": "Sent by a Station to the MS when it is ready to come online"
+  }
+ ], 
+ "title": "MS Test Commands for Dock"
+}
