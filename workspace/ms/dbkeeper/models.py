@@ -5,6 +5,8 @@ from django.core.exceptions import ObjectDoesNotExist
 
 from .team_code import TeamPassCode, TeamRegCode
 
+import json
+
 # See the schema diagram and other documentation in the
 # brata.workstation/transitions folder.
 
@@ -159,6 +161,35 @@ class Setting(models.Model):
             return Setting.objects.get(name=name).value
         except ObjectDoesNotExist:
             return default
+    
+    @staticmethod
+    def getLaunchParams(tri=None, vert=None):
+        """ Return the whole data structure, triangle, or 1 vertex.
+        
+        Triangles are indexed 0, 1, 2.
+        Vertices are indexed 0, 1, 2, 3 where 3 is the center.
+        Each vertex is a list [name, lat, lon, angle].
+        The center is a tuple [name, sidelength].  (sidelength is really
+        not associated with the center point, but is stored there for convenience.)
+        
+        Returns:
+            the entire LAUNCH_PARAMS data structure if tri is None
+            an entire triangle list if tri is not None and vert is None
+            a vertex if tri and vert are not None
+            None if LAUNCH_PARAMS is not in the database or cannot be parsed
+        """
+        try:
+            launchParams = Setting.objects.get(name="LAUNCH_PARAMS").value
+            launchParams = json.loads(launchParams)
+        except ObjectDoesNotExist:
+            return None
+        
+        if tri is None:
+            return launchParams
+        elif vert is None:
+            return launchParams[tri]
+        else:
+            return launchParams[tri][vert]
         
     def __unicode__(self):
         return self.name

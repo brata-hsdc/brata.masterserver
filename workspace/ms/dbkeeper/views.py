@@ -262,23 +262,57 @@ class AddLaunchParams(View):
     
     def get(self, request):
         """ Display the Add form with the AddLaunchParams fields """
-        self.context["form"] = AddLaunchParamsForm()
-        return render(request, "dbkeeper/add.html", self.context)
+        try:
+            launchParams = Setting.getLaunchParams()
+            d = {}
+            for tri,color in ((0,"r"), (1,"g"), (2,"b")):
+                for vert in (0, 1, 2):
+                    v = color + "v{}".format(vert)
+                    name,lat,lon,angle = launchParams[tri][vert]
+                    d[v + "name"]  = name
+                    d[v + "lat"]   = lat
+                    d[v + "lon"]   = lon
+                    d[v + "angle"] = angle
+                cname,sidelen = launchParams[tri][3]
+                d[color + "vcname"]  = cname
+                d[color + "sidelen"] = sidelen
+            self.context["form"] = AddLaunchParamsForm(initial=d)
+        except:
+            self.context["form"] = AddLaunchParamsForm()
+        return render(request, "dbkeeper/add_launch_params.html", self.context)
     
     def post(self, request):
         self.context["form"] = AddLaunchParamsForm(request.POST)
         form = self.context["form"]
         if form.is_valid():
-            value = json.dumps(form.cleaned_data)
+            # Create a more structured JSON object
+#             value = json.dumps(form.cleaned_data)
+            d = form.cleaned_data
+            redTri   = ((d["rv0name"], d["rv0lat"], d["rv0lon"], d["rv0angle"]),
+                        (d["rv1name"], d["rv1lat"], d["rv1lon"], d["rv1angle"]),
+                        (d["rv2name"], d["rv2lat"], d["rv2lon"], d["rv2angle"]),
+                        (d["rvcname"], d["rsidelen"]),
+                       )
+            greenTri = ((d["gv0name"], d["gv0lat"], d["gv0lon"], d["gv0angle"]),
+                        (d["gv1name"], d["gv1lat"], d["gv1lon"], d["gv1angle"]),
+                        (d["gv2name"], d["gv2lat"], d["gv2lon"], d["gv2angle"]),
+                        (d["gvcname"], d["gsidelen"]),
+                       )
+            blueTri  = ((d["bv0name"], d["bv0lat"], d["bv0lon"], d["bv0angle"]),
+                        (d["bv1name"], d["bv1lat"], d["bv1lon"], d["bv1angle"]),
+                        (d["bv2name"], d["bv2lat"], d["bv2lon"], d["bv2angle"]),
+                        (d["bvcname"], d["bsidelen"]),
+                       )
+            value = json.dumps((redTri, greenTri, blueTri,))
             try:
                 setting = Setting.objects.get(name="LAUNCH_PARAMS")
                 setting.value = value
             except Setting.DoesNotExist:
                 setting = Setting(name="LAUNCH_PARAMS", value=value, description="Competition parameters for the Launch challenge")
             setting.save()
-            return HttpResponseRedirect("/dbkeeper/")
+            return HttpResponseRedirect("/admin/dbkeeper/setting/")
 
-        return render(request, "dbkeeper/add.html", self.context)
+        return render(request, "dbkeeper/add_launch_params.html", self.context)
 
 #----------------------------------------------------------------------------
 class AddDockParams(View):
@@ -304,7 +338,7 @@ class AddDockParams(View):
             except Setting.DoesNotExist:
                 setting = Setting(name="DOCK_PARAMS", value=value, description="Competition parameters for the Dock challenge")
             setting.save()
-            return HttpResponseRedirect("/dbkeeper/")
+            return HttpResponseRedirect("/admin/dbkeeper/setting/")
 
         return render(request, "dbkeeper/add.html", self.context)
 
@@ -332,7 +366,7 @@ class AddSecureParams(View):
             except Setting.DoesNotExist:
                 setting = Setting(name="SECURE_PARAMS", value=value, description="Competition parameters for the Secure challenge")
             setting.save()
-            return HttpResponseRedirect("/dbkeeper/")
+            return HttpResponseRedirect("/admin/dbkeeper/setting/")
 
         return render(request, "dbkeeper/add.html", self.context)
 
@@ -360,7 +394,7 @@ class AddReturnParams(View):
             except Setting.DoesNotExist:
                 setting = Setting(name="RETURN_PARAMS", value=value, description="Competition parameters for the Return challenge")
             setting.save()
-            return HttpResponseRedirect("/dbkeeper/")
+            return HttpResponseRedirect("/admin/dbkeeper/setting/")
 
         return render(request, "dbkeeper/add.html", self.context)
 
