@@ -31,3 +31,5 @@ obj/
 _ReSharper*/
 [Tt]est[Rr]esult*
 transition/msdb_database_initialization.html
+transition/generated/db_backup/*
+.pydevproject
