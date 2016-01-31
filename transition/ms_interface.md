@@ -268,7 +268,7 @@ station_id  || | the same value provided in the join message
 {
    "message_version"      : "0" ,
    "message_timestamp"    : "2014-09-15 14:08:59",
-   "candidate_answer"     : [31, 41, 59],
+   "candidate_answer"     : "[31, 41, 59]",
    "is_correct"           : "False",
    "fail_message"         : "Incorrect answer provided."
 }
