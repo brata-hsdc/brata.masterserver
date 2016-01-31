@@ -8,7 +8,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dbkeeper', '0007_auto_20151217_0424'),
+#        ('dbkeeper', '0007_auto_20151217_0424'),
         ('dbkeeper', '0008_auto_20151120_2121'),
     ]
 

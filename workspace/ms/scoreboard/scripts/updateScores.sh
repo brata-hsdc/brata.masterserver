@@ -126,8 +126,7 @@ UPDATE_INTERVAL_S=2
       ${PSQL} -U ${PGUSER} ${PGDB} << END_OF_FILE
 
          UPDATE ${TEAM_TABLE}
-         SET rank              = ${moeRank},
-             launch_duration_s = ${moeLaunchDuration_s},
+         SET launch_duration_s = ${moeLaunchDuration_s},
              launch_score      = ${moeLaunchScore},
              dock_duration_s   = ${moeDockDuration_s},
              dock_score        = ${moeDockScore},
@@ -138,8 +137,7 @@ UPDATE_INTERVAL_S=2
          WHERE name = 'Moe';
 
          UPDATE ${TEAM_TABLE}
-         SET rank              = ${larryRank},
-             launch_duration_s = ${larryLaunchDuration_s},
+         SET launch_duration_s = ${larryLaunchDuration_s},
              launch_score      = ${larryLaunchScore},
              dock_duration_s   = ${larryDockDuration_s},
              dock_score        = ${larryDockScore},
@@ -150,8 +148,7 @@ UPDATE_INTERVAL_S=2
          WHERE name = 'Larry';
 
          UPDATE ${TEAM_TABLE}
-         SET rank              = ${curlyRank},
-             launch_duration_s = ${curlyLaunchDuration_s},
+         SET launch_duration_s = ${curlyLaunchDuration_s},
              launch_score      = ${curlyLaunchScore},
              dock_duration_s   = ${curlyDockDuration_s},
              dock_score        = ${curlyDockScore},
@@ -161,7 +158,7 @@ UPDATE_INTERVAL_S=2
              return_score      = ${curlyReturnScore}
          WHERE name = 'Curly';
 
-         SELECT id, name, rank, launch_duration_s, launch_score, dock_duration_s, dock_score, secure_duration_s, secure_score, return_duration_s, return_score
+         SELECT id, name, launch_duration_s, launch_score, dock_duration_s, dock_score, secure_duration_s, secure_score, return_duration_s, return_score
          FROM ${TEAM_TABLE};
 
 END_OF_FILE

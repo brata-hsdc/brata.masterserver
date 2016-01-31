@@ -8,14 +8,15 @@ from piservice.models import PiEvent, PiStation
 
 #-------------------------------------------------------------------------------
 def index(request):
-    """ Display the scoreboard page. Updating is driven by the page making REST requests.
+    """ Display the scoreboard page. Updating is driven by the page making
+        REST requests.
     """
     logging.debug('Entered scoreboard.views.index')
 
     refreshInterval = 5000 # TODO Setting.get("SCOREBOARD_STATUS_REFRESH_INTERVAL_MS", default="5000")
 
     context = {
-       "PAGE_REFRESH_INTERVAL": refreshInterval
+        "PAGE_REFRESH_INTERVAL": refreshInterval
     }
 
     result = render(request, "scoreboard/index.html", context)
@@ -26,6 +27,8 @@ def index(request):
 
 #-------------------------------------------------------------------------------
 class ScoreboardStatus(View):
+
+    #---------------------------------------------------------------------------
     """ A class-based view to handle a Station Status Ajax request.
     
         The client sends a GET message with the following JSON data:
@@ -79,6 +82,7 @@ class ScoreboardStatus(View):
         return (score, duration_s)
 
 
+    #---------------------------------------------------------------------------
     @staticmethod
     def _recomputeDockScore(teamName):
         logging.debug('Entered ScoreboardStatus._recomputeDockScore({})'.format(teamName))
@@ -99,6 +103,7 @@ class ScoreboardStatus(View):
         return (score, duration_s)
 
 
+    #---------------------------------------------------------------------------
     @staticmethod
     def _recomputeSecureScore(teamName):
         logging.debug('Entered ScoreboardStatus._recomputeSecureScore({})'.format(teamName))
@@ -119,6 +124,7 @@ class ScoreboardStatus(View):
         return (score, duration_s)
 
 
+    #---------------------------------------------------------------------------
     @staticmethod
     def _recomputeReturnScore(teamName):
         logging.debug('Entered ScoreboardStatus._recomputeReturnScore({})'.format(teamName))
@@ -139,9 +145,10 @@ class ScoreboardStatus(View):
         return (score, duration_s)
 
 
+    #---------------------------------------------------------------------------
     @staticmethod
     def _recomputeTeamScore(teamName):
-        logging.debug('Entered ScoreboardStatus._recomputeScores')
+        logging.debug('Entered ScoreboardStatus._recomputeTeamScore')
 
         (launch_score, launch_duration_s) = ScoreboardStatus._recomputeLaunchScore(teamName)
         (dock_score,   dock_duration_s)   = ScoreboardStatus._recomputeDockScore(teamName)
@@ -164,10 +171,11 @@ class ScoreboardStatus(View):
             total_duration_s=total_duration_s
         )
 
-        logging.debug('Exiting ScoreboardStatus._recomputeScores')
+        logging.debug('Exiting ScoreboardStatus._recomputeTeamScore')
         return result
 
 
+    #---------------------------------------------------------------------------
     """ A REST request to get scores from the database for the leaderboard """
     def get(self, request):
         """ Retrieve score information from the database and return it """
@@ -185,9 +193,9 @@ class ScoreboardStatus(View):
             s = ScoreboardStatus._recomputeTeamScore(t.name)
 
             team = {
-                "team_icon"      : "TODO", 
+                "team_icon"      : "TODO (team_icon)",
                 "team_name"      : t.name,
-                "team_id"        : "TODO",
+                "team_id"        : "TODO (team_id)",
                 "organization"   : t.organization.name,
                 "is_registered"  : t.registered,
                 "launch_score"   : s['launch_score'],
@@ -210,6 +218,7 @@ class ScoreboardStatus(View):
         return result
 
 
+    #---------------------------------------------------------------------------
     @staticmethod
     def _formatSeconds(seconds):
         """ Convert seconds to mm:ss

@@ -1,7 +1,7 @@
 {% extends "scoreboard/base.html" %}
 
 {% block title  %}Main Page{% endblock %}
-{% block header %}Leader Board{% endblock %}
+{% block header %}High School Design Challenge 2016{% endblock %}
 
 {% block extra_javascript %}
   <script src="/static/scoreboard/jquery-2.1.4.js"></script>
@@ -10,6 +10,7 @@
 {% block body_start %}
   <script type="text/javascript">
     function handleScoreboardStatus(data) {
+
        // Handle the data returned from the Ajax call
        var tableBody = "";
        data.sort(function(a,b){ return a.id - b.id; });
@@ -19,26 +20,6 @@
 
        $.each(data, function(index, value) {
           if (value.total_score < prevScore) { rank++; }
-
-/* TODO absorb below
-          tableBody = tableBody + "<tr id=\"" + rank + "\">"
-                    + "<td>" + rank + "</td>"
-                    + "<td>" + value.team_icon + "</td>" // TODO
-                    + "<td>" + value.team_name + "</td>"
-                    + "<td>" + value.team_id + "</td>"
-                    + "<td>" + value.organization + "</td>" // TODO
-                    + "<td>" + value.is_registered + "</td>" // TODO
-                    + "<td>" + value.launch_score + " (" + value.launch_duration + ")</td>"
-                    + "<td>" + value.dock_score + " (" + value.dock_duration + ")</td>"
-                    + "<td>" + value.secure_score + " (" + value.secure_duration + ")</td>"
-                    + "<td>" + value.return_score + " (" + value.return_duration + ")</td>"
-                    + "<td>" + value.total_score + "</td>"
-                    + "<td>" + value.total_duration + "(TODO user-friendly e.g. mm:ss)</td>"
-                    + "</tr>";
-       });
-
-       $('#stationTable table > tbody:first').html(tableBody);
-*/
 
           var numRows = $("tbody").find("tr").length;
 
@@ -62,8 +43,8 @@
              }
           }
 
-          rowId = "team-" + value.name;
-          newRow = "<tr id='" + rowId + "'>"
+          var rowId = "team-" + value.name;
+          var newRow = "<tr id='" + rowId + "'>"
                  + "<td>" + "TODO rank" + "</td>"
                  + "<td>" + value.icon + "</td>" // TODO
                  + "<td>" + value.name + "</td>"
@@ -80,8 +61,7 @@
           $('tbody').append(newRow);
        });
 
-/* TODO
-
+/*
        // Reorder the table to sort by descending rank
        var numRows = $("tbody").find("tr").length;
        var top = 26;
@@ -99,7 +79,9 @@
 
           top += elem.outerHeight();
        }
+*/
 
+/*
        $.each(order_arr, function(idx, val) {
           var el = $('tbody tr#user-' + val);
 
@@ -124,6 +106,7 @@
     }
 
     $(document).ready(onReady);
+
   </script>
 {% endblock %}{# body_start #}
 

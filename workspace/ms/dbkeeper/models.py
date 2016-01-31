@@ -89,7 +89,7 @@ class Team(models.Model):
     #@property
     #def total_score(self):
     #    return self.launch_score + self.dock_score + self.secure_score + self.return_score
-    #
+
     #@property
     #def total_duration_s(self):
     #    # total duration of competition in seconds
