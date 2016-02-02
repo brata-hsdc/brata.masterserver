@@ -316,6 +316,10 @@ class JSONHandlerView(View):
             attemptCount = 0
             retry = True
             wasCorrect = False
+            # need to initialize attempt data in case they scan latch without
+            # an attempt actually completing
+            lastAnswer = 0
+            lastAttemptData = ""
             for attempt in submitRequests:
                 lastAttemptData = attempt.data
                 submitData = json.loads(attempt.data)
@@ -814,12 +818,12 @@ class StartChallenge(JSONHandlerView):
                })
             # Get random parameters
             # TODO
-            message = "Dock using [TAPE=1] [AFT=1.111] [FORE=1.111] [FUEL=11.11] [F-RATE=11.11]"
+            message = "Dock using [TAPE=1] [AFT=0.900] [FORE=0.900] [FUEL=10.00] [F-RATE=09.00]"
             startData = json.dumps({
-                 "AFT": "1.111",
-                 "FORE": "1.111",
-                 "FUEL": "11.11",
-                 "F_RATE": "11.11",
+                 "AFT": "0.900",
+                 "FORE": "0.900",
+                 "FUEL": "10.00",
+                 "F_RATE": "09.00",
                  "DIST": "11",
                })
 
@@ -1031,17 +1035,15 @@ class Latch(JSONHandlerView):
         else:
             # Post failures so scoring can keep track of them
             status = PiEvent.FAIL_STATUS
-            # figure out if actual docking time requires penalty
-            # TODO change the reported time in data            
             if retry:
                 # Get random parameters
                 # TODO
-                message = "Dock using [TAPE=1] [AFT=1.111] [FORE=1.111] [FUEL=11.11] [F-RATE=11.11]"
+                message = "Dock using [TAPE=1] [AFT=0.900] [FORE=0.900] [FUEL=10.00] [F-RATE=09.00]"
                 startData = json.dumps({
-                     "AFT": "1.111",
-                     "FORE": "1.111",
-                     "FUEL": "11.11",
-                     "F_RATE": "11.11",
+                     "AFT": "0.900",
+                     "FORE": "0.900",
+                     "FUEL": "10.00",
+                     "F_RATE": "09.00",
                      "DIST": "11",
                    })
                 event = PiEvent.addEvent(type=PiEvent.START_CHALLENGE_MSG_TYPE,
@@ -1054,6 +1056,8 @@ class Latch(JSONHandlerView):
             else:
                 message = "Failed! Go to the next Challenge!"
 
+        # figure out if actual docking time requires penalty
+        # TODO change the reported time in data            
 	jsonTime = json.dumps({
              "time": lastAnswer,
            })
@@ -1400,7 +1404,7 @@ class Submit(JSONHandlerView):
         if wasCorrect is None:
             return response
 
-        challegneComplete = wasCorrect or not retry
+        challengeComplete = wasCorrect or not retry
         self.jsonResponse["challenge_complete"] = "{}".format(challengeComplete)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
