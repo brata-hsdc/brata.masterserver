@@ -1,0 +1,141 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}Add {{ entity|title }}{% endblock %}
+{% block header %}Add {{ entity|title }}{% endblock %}
+
+{% block main %}
+<form action="/dbkeeper/add/{{ entity|lower }}/" method="post">
+    {% csrf_token %}
+    {# Include the hidden fields #}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    {# Include the visible fields #}
+    <h3>Red Triangle</h3>
+    <table class="fieldWrapper">
+      <tr>
+        <th>&nbsp;</th><th>Name</th><th>Lat</th><th>Lon</th><th>Angle</th>
+      </tr>
+      <tr>
+        <td>Vertex 1</td>
+        <td>{{ form.rv0name }} <span style="color: red">{{ form.rv0name.errors }}</td>
+        <td>{{ form.rv0lat }} <span style="color: red">{{ form.rv0lat.errors }}</td>
+        <td>{{ form.rv0lon }} <span style="color: red">{{ form.rv0lon.errors }}</td>
+        <td>{{ form.rv0angle }} <span style="color: red">{{ form.rv0angle.errors }}</td>
+      </tr>
+      <tr>
+        <td>Vertex 2</td>
+        <td>{{ form.rv1name }} <span style="color: red">{{ form.rv1name.errors }}</td>
+        <td>{{ form.rv1lat }} <span style="color: red">{{ form.rv1lat.errors }}</td>
+        <td>{{ form.rv1lon }} <span style="color: red">{{ form.rv1lon.errors }}</td>
+        <td>{{ form.rv1angle }} <span style="color: red">{{ form.rv1angle.errors }}</td>
+      </tr>
+      <tr>
+        <td>Vertex 3</td>
+        <td>{{ form.rv2name }} <span style="color: red">{{ form.rv2name.errors }}</td>
+        <td>{{ form.rv2lat }} <span style="color: red">{{ form.rv2lat.errors }}</td>
+        <td>{{ form.rv2lon }} <span style="color: red">{{ form.rv2lon.errors }}</td>
+        <td>{{ form.rv2angle }} <span style="color: red">{{ form.rv2angle.errors }}</td>
+      </tr>
+      <tr>
+        <td>Center Name</td>
+        <td>{{ form.rvcname }} <span style="color: red">{{ form.rvcname.errors }}</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>Side Length</td>
+        <td>{{ form.rsidelen }} <span style="color: red">{{ form.rsidelen.errors }}</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
+    <h3>Green Triangle</h3>
+    <table class="fieldWrapper">
+      <tr>
+        <th>&nbsp;</th><th>Name</th><th>Lat</th><th>Lon</th><th>Angle</th>
+      </tr>
+      <tr>
+        <td>Vertex 1</td>
+        <td>{{ form.gv0name }} <span style="color: red">{{ form.gv0name.errors }}</td>
+        <td>{{ form.gv0lat }} <span style="color: red">{{ form.gv0lat.errors }}</td>
+        <td>{{ form.gv0lon }} <span style="color: red">{{ form.gv0lon.errors }}</td>
+        <td>{{ form.gv0angle }} <span style="color: red">{{ form.gv0angle.errors }}</td>
+      </tr>
+      <tr>
+        <td>Vertex 2</td>
+        <td>{{ form.gv1name }} <span style="color: red">{{ form.gv1name.errors }}</td>
+        <td>{{ form.gv1lat }} <span style="color: red">{{ form.gv1lat.errors }}</td>
+        <td>{{ form.gv1lon }} <span style="color: red">{{ form.gv1lon.errors }}</td>
+        <td>{{ form.gv1angle }} <span style="color: red">{{ form.gv1angle.errors }}</td>
+      </tr>
+      <tr>
+        <td>Vertex 3</td>
+        <td>{{ form.gv2name }} <span style="color: red">{{ form.gv2name.errors }}</td>
+        <td>{{ form.gv2lat }} <span style="color: red">{{ form.gv2lat.errors }}</td>
+        <td>{{ form.gv2lon }} <span style="color: red">{{ form.gv2lon.errors }}</td>
+        <td>{{ form.gv2angle }} <span style="color: red">{{ form.gv2angle.errors }}</td>
+      </tr>
+      <tr>
+        <td>Center Name</td>
+        <td>{{ form.gvcname }} <span style="color: red">{{ form.gvcname.errors }}</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>Side Length</td>
+        <td>{{ form.gsidelen }} <span style="color: red">{{ form.gsidelen.errors }}</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+    </table>
+    <h3>Blue Triangle</h3>
+    <table class="fieldWrapper">
+      <tr>
+        <th>&nbsp;</th><th>Name</th><th>Lat</th><th>Lon</th><th>Angle</th>
+      </tr>
+      <tr>
+        <td>Vertex 1</td>
+        <td>{{ form.bv0name }} <span style="color: red">{{ form.bv0name.errors }}</span></td>
+        <td>{{ form.bv0lat }} <span style="color: red">{{ form.bv0lat.errors }}</span></td>
+        <td>{{ form.bv0lon }} <span style="color: red">{{ form.bv0lon.errors }}</span></td>
+        <td>{{ form.bv0angle }} <span style="color: red">{{ form.bv0angle.errors }}</span></td>
+      </tr>
+      <tr>
+        <td>Vertex 2</td>
+        <td>{{ form.bv1name }} <span style="color: red">{{ form.bv1name.errors }}</span></td>
+        <td>{{ form.bv1lat }} <span style="color: red">{{ form.bv1lat.errors }}</span></td>
+        <td>{{ form.bv1lon }} <span style="color: red">{{ form.bv1lon.errors }}</span></td>
+        <td>{{ form.bv1angle }} <span style="color: red">{{ form.bv1angle.errors }}</span></td>
+      </tr>
+      <tr>
+        <td>Vertex 3</td>
+        <td>{{ form.bv2name }} <span style="color: red">{{ form.bv2name.errors }}</span></td>
+        <td>{{ form.bv2lat }} <span style="color: red">{{ form.bv2lat.errors }}</span></td>
+        <td>{{ form.bv2lon }} <span style="color: red">{{ form.bv2lon.errors }}</span></td>
+        <td>{{ form.bv2angle }} <span style="color: red">{{ form.bv2angle.errors }}</span></td>
+      </tr>
+      <tr>
+        <td>Center Name</td>
+        <td>{{ form.bvcname }} <span style="color: red">{{ form.bvcname.errors }}</span></td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr>
+        <td>Side Length</td>
+        <td>{{ form.bsidelen }} <span style="color: red">{{ form.bsidelen.errors }}</span></td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+        <td>&nbsp;</td>
+      </tr>
+      <tr class="submitRow">
+          <td colspan="5"><input type="submit" value="{{ submit }}" /></td>
+      </tr>
+    </table>
+</form>
+{% endblock %}

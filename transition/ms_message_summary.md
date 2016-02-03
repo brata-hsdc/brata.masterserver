@@ -63,13 +63,15 @@ The URL format follows this pattern:  http://*ms-host-or-ip*/*msg_type*/*params*
 
 Message         | Type | URL                                           | Params Sent | Params Received
 ----------------|------|-----------------------------------------------|-------------|----------------
-Join            | POST | <b>http://</b><i>ms</i><b>/join/</b>          | station_type, serial_num | station_id
+Join            | POST | <b>http://</b><i>ms</i><b>/join/</b>          | station_type, serial_num, station_url | station_id
 Heartbeat       | GET  | <b>http://</b><i>ms</i><b>/heartbeat/</b>     | station_id               | time
 Submit          | POST | <b>http://</b><i>ms</i><b>/submit/</b>        | station_id, *multiple*   | *multiple*
 Leave           | POST | <b>http://</b><i>ms</i><b>/leave/</b>         | station_id               | message
 Time Expired    | POST | <b>http://</b><i>ms</i><b>/time_expired/</b>  | station_id, timestamp    | 
 
 *serial_num* will be a unique identifier containing the processor serial number from the RPi.
+
+*station_url* is the base URL the MS can use to send messages to the RPi.
 
 The **Join** message may be sent multiple times, but subsequent **Join**s before a **Leave** will be ignored.
 
