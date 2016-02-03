@@ -60,16 +60,21 @@ class ScoreboardStatus(View):
     def _recomputeLaunchScore(teamName):
         logging.debug('Entered ScoreboardStatus._recomputeLaunchScore({})'.format(teamName))
 
+        score = 0
+
+        # find all PiEvent.START_CHALLENGE_MSG_TYPE events and note timestamps
         events = PiEvent.objects.filter(
             team__name=teamName
         ).filter(
             pi__station_type=PiStation.LAUNCH_STATION_TYPE
+        ).filter(
+            type=PiEvent.START_CHALLENGE_MSG_TYPE
         )
 
-        # TODO - Pull from issue Detailed Design
+        # TODO note timestamps
 
 
-
+        #-------------------
         # TODO Delete
         #for e in events:
         #    logging.debug('{} [type={}, team={}, pi={}] {}'.format(e.time, e.type, e.team, e.pi, e.status))
@@ -77,6 +82,45 @@ class ScoreboardStatus(View):
         # TODO Delete
         score = 0
         duration_s = 0
+        #-------------------
+
+        # TODO
+        # PDL:
+        # if any found then
+        #     score = 1
+        #     start_time = timestamp of 1st event
+        # end if
+        #
+        # time_to_exit = false
+        # num_failed_attempts = 0
+        #
+        # while not time_to_exit
+        #     if there are more START_CHALLENGE events that we haven't looked at yet then
+        #         get timestamp t of next START_CHALLENGE event
+        #         get timestamp u of following START_CHALLENGE event or TODO (final design challenge has concluded event) event if it exists; o/w timestamp u of last event
+        #
+        #         if there are four events within t..u range with status SUCCESS_STATUS or FAIL_STATUS then
+        #             score = 2 * num SUCCESS events + 1 * num FAIL events
+        #             time_to_exit = true
+        #             end_time = timestamp of final SUCCESS_STATUS or FAIL_STATUS event
+        #         else if there is an event within t..u range with TODO (final design challenge has concluded event) then
+        #             score = 2 * num SUCCESS events + 1 * num FAIL events
+        #             time_to_exit = true
+        #             end_time = timestamp of TODO (final design challenge has concluded event) event
+        #         else
+        #             # phone probably died and need to start over, or challenge
+        #             # still in-progress
+        #             pass
+        #         end if
+        #     else
+        #         # challenge still in-progress
+        #         time_to_exit = true
+        #         end_time = current time
+        #     end if
+        # end while
+        #
+        # duration_s = end_time - start_time
+
 
         logging.debug('Exiting ScoreboardStatus._recomputeLaunchScore')
         return (score, duration_s)
