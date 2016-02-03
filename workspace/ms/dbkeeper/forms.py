@@ -1,6 +1,8 @@
 """ms.dbkeeper Form definitions """
 from django import forms
 
+import operator
+
 from .models import Organization, Team
 from .team_code import TeamPassCode
 
@@ -95,22 +97,98 @@ class AddLaunchParamsForm(forms.Form):
 
 #----------------------------------------------------------------------------
 class AddDockParamsForm(forms.Form):
-    # TODO:  How many tapes will we have?
-    tapeLen1 = forms.FloatField(label="Tape 1 Length (m)", initial="0.0", required=False)
-    tapeLen2 = forms.FloatField(label="Tape 2 Length (m)", initial="0.0", required=False)
-    tapeLen3 = forms.FloatField(label="Tape 3 Length (m)", initial="0.0", required=False)
-    tapeLen4 = forms.FloatField(label="Tape 4 Length (m)", initial="0.0", required=False)
-    tapeLen5 = forms.FloatField(label="Tape 5 Length (m)", initial="0.0", required=False)
-    tapeLen6 = forms.FloatField(label="Tape 6 Length (m)", initial="0.0", required=False)
+    """ This is a dynamic form so it is structured differently from the
+        static forms.
+    """
+    def __init__(self, *args, **kwargs):
+        super(AddDockParamsForm, self).__init__(*args, **kwargs)
+        #self.setFixedFields()
+        
+    def setFixedFields(self):
+        self.fields["minDockVel"]  = forms.FloatField(label="Min dock velocity (m/s)", initial="0.01")
+        self.fields["maxDockVel"]  = forms.FloatField(label="Max dock velocity (m/s)", initial="0.1")
+        self.fields["initDockVel"] = forms.FloatField(label="Initial velocity (m/s)", initial="0.0")
+        self.fields["simTime"]     = forms.IntegerField(label="Simulation run time (s)", initial="45")
+        
+        self.fields["numRows"] = forms.IntegerField(label="Number of tapes", initial=0, widget=forms.HiddenInput())
+        
+    def setFields(self, numRows=0):
+        for n in range(0, numRows):
+            ns = str(n)
+            self.fields["tapeId_" + ns]       = forms.IntegerField(label="Tape ID", required=False)
+            self.fields["tapeLen_" + ns]      = forms.FloatField(label="Tape Length (m)", required=False)
+            self.fields["aftAccel_" + ns]     = forms.FloatField(label="Aft (rear) engine acceleration (m/s^2)", required=False)
+            self.fields["foreAccel_" + ns]    = forms.FloatField(label="Fore (front) engine acceleration (m/s^2)", required=False)
+            self.fields["fuelRate_" + ns]     = forms.FloatField(label="Fuel consumption rate (kg/s)", required=False)
+            self.fields["fuelQuantity_" + ns] = forms.FloatField(label="Fuel quantity (kg)", required=False)
+        
+    def setData(self, dockParams):
+        """ Add the data values that will be used to initialize the form fields """
+        self.data["numRows"]     = len(dockParams["sets"])
+        self.data["minDockVel"]  = dockParams["min_dock"]
+        self.data["maxDockVel"]  = dockParams["max_dock"]
+        self.data["initDockVel"] = dockParams["init_vel"]
+        self.data["simTime"]     = dockParams["sim_time"]
+        
+        for n,s in enumerate(dockParams["sets"]):
+            ns = str(n)
+            self.data["tapeId_" + ns]       = s["tape_id"]
+            self.data["tapeLen_" + ns]      = s["tape_len"]
+            self.data["aftAccel_" + ns]     = s["a_aft"]
+            self.data["foreAccel_" + ns]    = s["a_fore"]
+            self.data["fuelRate_" + ns]     = s["f_rate"]
+            self.data["fuelQuantity_" + ns] = s["f_qty"]
+
+        self.data["sets"] = dockParams["sets"]
+
+        self.is_bound = True
+        return self.data
+
+    def validate(self, post):
+        """ Validate the contents of the form """
+        for name,field in self.fields.items():
+            try:
+                if name in post:
+                    field.clean(post[name])
+            except forms.ValidationError, e:
+                self.errors[name] = e.messages    
     
-    aftAccel     = forms.FloatField(label="Aft (rear) engine acceleration (m/s^2)", initial="0.15")
-    foreAccel    = forms.FloatField(label="Fore (front) engine acceleration (m/s^2)", initial="0.09")
-    fuelRate     = forms.FloatField(label="Fuel consumption rate (kg/s)", initial="0.7")
-    fuelQuantity = forms.FloatField(label="Fuel quantity (kg)", initial="20.0")
-    minDockVel   = forms.FloatField(label="Min dock velocity (m/s)", initial="0.01")
-    maxDockVel   = forms.FloatField(label="Max dock velocity (m/s)", initial="0.1")
-    initialVel   = forms.FloatField(label="Initial velocity (m/s)", initial="0.0")
-    simTime      = forms.IntegerField(label="Simulation run time (s)", initial="45")
+    def buildStructure(self, data):
+        """ Put the data fields into the structure specified in models.getDockParams() """
+        s = { "min_dock": float(data["minDockVel"]),
+              "max_dock": float(data["maxDockVel"]),
+              "init_vel": float(data["initDockVel"]),
+              "sim_time": int(data["simTime"]),
+              "sets": [],
+            }
+        
+        n = 0
+        nRows = int(data["numRows"])
+        while len(s["sets"]) < nRows and n < 100: # stop searching for more than 100 rows
+            if "tapeId_{}".format(n) in data:
+                set = { "tape_id":  data["tapeId_{}".format(n)],
+                        "tape_len": data["tapeLen_{}".format(n)],
+                        "a_aft":    data["aftAccel_{}".format(n)],
+                        "a_fore":   data["foreAccel_{}".format(n)],
+                        "f_rate":   data["fuelRate_{}".format(n)],
+                        "f_qty":    data["fuelQuantity_{}".format(n)],
+                      }
+                # If all the values in the set are None, row was deleted from form
+                if not self.listIsAllNone(set.values()):
+                    # cast values to their proper types
+                    set["tape_id"]  = int(set["tape_id"])
+                    set["tape_len"] = float(set["tape_len"])
+                    set["a_aft"]    = float(set["a_aft"])
+                    set["a_fore"]   = float(set["a_fore"])
+                    set["f_rate"]   = float(set["f_rate"])
+                    set["f_qty"]    = float(set["f_qty"])
+                    s["sets"].append(set)
+            n += 1
+        return s
+    
+    def listIsAllNone(self, lst):
+        """ Return True if every element of the list is None """
+        return reduce(operator.__and__, [n is None for n in lst])
 
 #----------------------------------------------------------------------------
 class AddSecureParamsForm(forms.Form):

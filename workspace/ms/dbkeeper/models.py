@@ -166,11 +166,20 @@ class Setting(models.Model):
     def getLaunchParams(tri=None, vert=None):
         """ Return the whole data structure, triangle, or 1 vertex.
         
-        Triangles are indexed 0, 1, 2.
-        Vertices are indexed 0, 1, 2, 3 where 3 is the center.
-        Each vertex is a list [name, lat, lon, angle].
-        The center is a tuple [name, sidelength].  (sidelength is really
-        not associated with the center point, but is stored there for convenience.)
+        The structure is as follows:
+        [triangle0, triangle1, triangle2]
+        
+        where trianglen is:
+        [vertex0, vertex1, vertex2, vertex3]
+        
+        where vertex0..2 are:
+        [name, lat, lon, angle]
+        
+        and vertex3 (the center and triangle side length) is:
+        [name, sidelength]
+        
+        (sidelength is really not associated with the center
+        point, but is stored there for convenience.)
         
         Returns:
             the entire LAUNCH_PARAMS data structure if tri is None
@@ -181,7 +190,7 @@ class Setting(models.Model):
         try:
             launchParams = Setting.objects.get(name="LAUNCH_PARAMS").value
             launchParams = json.loads(launchParams)
-        except ObjectDoesNotExist:
+        except (ObjectDoesNotExist, ValueError, TypeError):
             return None
         
         if tri is None:
@@ -190,7 +199,63 @@ class Setting(models.Model):
             return launchParams[tri]
         else:
             return launchParams[tri][vert]
+    
+    @staticmethod
+    def getDockParams():
+        """ Return the entire DOCK_PARAMS data structure.
         
+        The structure is as follows:
+        { "min_dock": <float>,
+          "max_dock": <float>,
+          "init_vel": <float>,
+          "sim_time": int,
+          "sets": [set0, set1, ..., setn-1] }
+        
+        where each seti is:
+        { "a_aft": <float>,
+          "a_fore": <float>,
+          "f_rate": <float>,
+          "f_qty": <float> }
+        """
+        try:
+            dockParams = Setting.objects.get(name="DOCK_PARAMS").value
+            dockParams = json.loads(dockParams)
+        except (ObjectDoesNotExist, ValueError, TypeError):
+            return None
+        return dockParams
+    
+    @staticmethod
+    def getReturnParams(station=None, value=None):
+        """ Return the whole data structure, a station, or a value.
+        
+        Stations are indexed 0-5.
+        Values are indexed 0-6.  Value 0 is the Station ID. 1-6 are the numbers.
+        
+        The structure is as follows:
+        [station0, station1, ..., station5]
+        
+        where stationn is:
+        [stationID, value1, value2, ..., value6]
+        
+        Returns:
+            the entire RETURN_PARAMS data structure if station is None
+            the data for a station if station is not None and value is None
+            an individual data value if station and value are not None
+        """
+        try:
+            returnParams = Setting.objects.get(name="RETURN_PARAMS").value
+            returnParams = json.loads(returnParams)
+        except (ObjectDoesNotExist, ValueError, TypeError):
+            return None
+        
+        if station is None:
+            return returnParams
+        elif value is None:
+            return returnParams[station]
+        else:
+            return returnParams[station][value]
+        
+    
     def __unicode__(self):
         return self.name
     

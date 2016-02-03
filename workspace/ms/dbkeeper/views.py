@@ -277,8 +277,11 @@ class AddLaunchParams(View):
                 d[color + "vcname"]  = cname
                 d[color + "sidelen"] = sidelen
             self.context["form"] = AddLaunchParamsForm(initial=d)
+            raise ValueError #DEBUG
         except:
             self.context["form"] = AddLaunchParamsForm()
+            form = self.context["form"]
+            raise ValueError #DEBUG
         return render(request, "dbkeeper/add_launch_params.html", self.context)
     
     def post(self, request):
@@ -324,14 +327,37 @@ class AddDockParams(View):
     
     def get(self, request):
         """ Display the Add form with the AddDockParams fields """
-        self.context["form"] = AddDockParamsForm()
-        return render(request, "dbkeeper/add.html", self.context)
+#         self.context["form"] = AddDockParamsForm()
+#         self.context["data"] = { "sets": [
+#                                           {"tape_id":"1", "tape_len":1, "a_aft":1, "a_fore":1, "f_rate":1, "f_qty":1},
+#                                           {"tape_id":"2", "tape_len":2, "a_aft":2, "a_fore":2, "f_rate":2, "f_qty":2},
+#                                           {"tape_id":"3", "tape_len":3, "a_aft":3, "a_fore":3, "f_rate":3, "f_qty":3},
+#                                          ] }
+#         return render(request, "dbkeeper/add_dock_params.html", self.context)
+        form = AddDockParamsForm()
+        form.setFixedFields()
+        try:
+            dockParams = Setting.getDockParams()
+            form.setFields(len(dockParams["sets"]))
+#             form.setData(dockParams)
+            self.context["data"] = form.setData(dockParams)
+        except:
+            raise
+            self.context["data"] = { "numRows": 0 }
+        self.context["form"] = form
+        return render(request, "dbkeeper/add_dock_params.html", self.context)
     
     def post(self, request):
-        self.context["form"] = AddDockParamsForm(request.POST)
-        form = self.context["form"]
+        form = AddDockParamsForm()
+        form.setFixedFields()
+        form.setFields(int(request.POST["numRows"]))
+        form.data = request.POST
+        form.is_bound = True
+        form.validate(request.POST)  # is_valid will call this
         if form.is_valid():
-            value = json.dumps(form.cleaned_data)
+#             value = json.dumps(form.cleaned_data)
+            value = form.buildStructure(form.cleaned_data)
+            value = json.dumps(value)
             try:
                 setting = Setting.objects.get(name="DOCK_PARAMS")
                 setting.value = value
@@ -339,8 +365,11 @@ class AddDockParams(View):
                 setting = Setting(name="DOCK_PARAMS", value=value, description="Competition parameters for the Dock challenge")
             setting.save()
             return HttpResponseRedirect("/admin/dbkeeper/setting/")
+        else:
+            err = form.errors
 
-        return render(request, "dbkeeper/add.html", self.context)
+        self.context["form"] = form
+        return render(request, "dbkeeper/add_dock_params.html", self.context)
 
 #----------------------------------------------------------------------------
 class AddSecureParams(View):
@@ -379,22 +408,46 @@ class AddReturnParams(View):
               }
     
     def get(self, request):
-        """ Display the Add form with the AddReturnParams fields """
-        self.context["form"] = AddReturnParamsForm()
-        return render(request, "dbkeeper/add.html", self.context)
+        """ Display the add_return_params form.
+        
+        If RETURN_PARAMS already exists in the database, the form
+        is populated with the current values.
+        """
+#         self.context["form"] = AddReturnParamsForm()
+#         return render(request, "dbkeeper/add_return_params.html", self.context)
+        try:
+            returnParams = Setting.getReturnParams()
+            d = {}
+            for station in range(0, 6):
+                fields = ["st{}{}".format(station, valname) for valname in ("id", "v0", "v1", "v2", "v3", "v4", "v5")]
+                values = returnParams[station]
+                
+                for f,v in zip(fields, values):
+                    d[f] = v 
+
+            self.context["form"] = AddReturnParamsForm(initial=d)
+        except:
+            self.context["form"] = AddReturnParamsForm()
+        return render(request, "dbkeeper/add_return_params.html", self.context)
     
     def post(self, request):
         self.context["form"] = AddReturnParamsForm(request.POST)
         form = self.context["form"]
         if form.is_valid():
-            value = json.dumps(form.cleaned_data)
+            d = form.cleaned_data
+            values = []
+            for station in range(0, 6):
+                fields = ["st{}{}".format(station, valname) for valname in ("id", "v0", "v1", "v2", "v3", "v4", "v5")]
+                values.append([d[f] for f in fields])
+            
+            values = json.dumps(values)
             try:
                 setting = Setting.objects.get(name="RETURN_PARAMS")
-                setting.value = value
+                setting.value = values
             except Setting.DoesNotExist:
                 setting = Setting(name="RETURN_PARAMS", value=value, description="Competition parameters for the Return challenge")
             setting.save()
             return HttpResponseRedirect("/admin/dbkeeper/setting/")
 
-        return render(request, "dbkeeper/add.html", self.context)
+        return render(request, "dbkeeper/add_return_params.html", self.context)
 
