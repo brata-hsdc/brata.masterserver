@@ -12,8 +12,10 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import site_logging
 # The following is a hack to keep our passwords from accidentally being checked in
 import sys
+import site_logging
 sys.path.append(os.path.abspath("/opt/designchallenge2016"))
 from NoCMConfigValues import *
 
