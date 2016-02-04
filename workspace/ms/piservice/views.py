@@ -1219,26 +1219,26 @@ class Secure(JSONHandlerView):
         
         # TODO:  Add message processing
 
-        team, response = self.getTeamFromRegCode(self, m.reg_code, request.body)
+        team, response = self.getTeamFromRegCode(m.reg_code, request.body)
         if team is None:
            return response
 
-        station, response = self.getStationFromStationId(self, station_id, request.body)
+        station, response = self.getStationFromStationId(station_id, request.body)
         if station is None:
             return response
 
-        # TODO check if passed or, was 3 fails or was < 3 fails
-        passed = False
-        restart = True
+        wasCorrect, retry, lastAnswer, lastAttemptData, response = self.getStatus(team, station)
+        if wasCorrect is None:
+            return response
 
-        if passed:
+        if wasCorrect:
             # Succeeded:  Record the transaction and update the station record
             status=PiEvent.SUCCESS_STATUS
             message = "Correct! Go to the next Challenge!"
         else:
             # failed
             status=PiEvent.FAIL_STATUS
-            if restart:
+            if retry:
                 message = "Try again by listening to tones again (optional) and scanning Open QR Code to re-enable photodetector"
 
    	        # Restart since they failed < 3 times 
@@ -1261,7 +1261,7 @@ class Secure(JSONHandlerView):
         event = self.addEvent(team=team,
                               pi=station,
                               data=request.body,
-                              status=PiEvent.status,
+                              status=status,
                               message=message,
                               )
  
@@ -1295,47 +1295,32 @@ class ReturnToEarth(JSONHandlerView):
         m,response = self.validateJSONFields(request, ("reg_code","message",))
         if m is None:
             return response
-        
-        # TODO:  Add message processing
 
-        team, response = getTeamFromRegCode(self, m.reg_code, request.body)
+        team, response = self.getTeamFromRegCode(self, m.reg_code, request.body)
         if team is None:
            return response
 
-        station, response = getStationFromStationId(self, station_id, request.body)
+        station, response = self.getStationFromStationId(self, station_id, request.body)
         if station is None:
             return response
 
         # TODO check if passed or, was 3 fails or was < 3 fails
-        passed = True
-        restart = True
+        wasCorrect, retry, lastAnswer, lastAttemptData, response = self.getStatus(team, station)
+        if wasCorrect is None:
+            return response
 
-        if passed:
+        if wasCorrect:
             # Succeeded:  Record the transaction and update the station record
             status=PiEvent.SUCCESS_STATUS
             message = "Correct! You have returned successfully!"
         else:
             # failed
-            if restart:
+            if retry:
    	        # Restart since they failed < 3 times 
                 # Store failure no matter what for score keeping
                 status=PiEvent.FAIL_STATUS
                 # This is the message to send assuming restart of the station works
                 message = "Try again! A bit signed but still alive!"
-
-                # Get parameters for this station
-                # TODO do we really send the parameters because it resets automatically
-                url = "{}/start_challenge".format(station.url)
-                headers = { "Content-type": "application/json", "Accept": "application.json" }
-                data = json.dumps({
-                    "message_version": "0",
-                    "message_timestamp": "2014-09-15 14:08:59",
-                    "secure_tone_pattern": [0, 1, 2, 3, 4, 5, 6, 7, 4, 2],
-                   })
-
-                response = requests.post(url, data=data, headers=headers)
-                if response.status_code != 200:
-                    message = "Could not contact station. Contact a competition official."	
             else:
                 status=PiEvent.FAIL_STATUS
                 message = "Failed! Too bad but all done."
@@ -1347,7 +1332,41 @@ class ReturnToEarth(JSONHandlerView):
                               status=status,
                               message=message,
                               )
- 
+
+        headers = { "Content-type": "application/json", "Accept": "application.json" }
+
+        if retry:
+            # Get parameters for this particular station
+            # TODO
+            jsonData = json.dumps({
+                 "message_version": "0",
+                 "message_timestamp": "2014-09-15 14:08:59",
+                 "return_guidance_pattern": [0, 0, 0, 0, 0, 0],
+                   })
+            message="Measure return angle, determine guidance computer parameters, then enter them into the guidance computer. Scan Return QR Code when done."
+        else: 
+          # Send message to the Pi this team is registered with to restart the simulation no matter what
+          url = "{}/reset/31415".format(station.url)
+          jsonData = json.dumps({})
+
+        # Either way we call the pi
+	response = requests.post(url, data=jsonData, headers=headers)
+        if response.status_code != 200:
+            errorMessage = "Could not contact station. Contact a competition official."	
+            errorStatus = PiEvent.WARNING_STATUS
+            data = response
+            event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=errorStatus,
+                              message=errorMessage,
+                             )
+            if retry:
+                # We need to make the team aware as there is a problem that keeps them from continuing
+                self.jsonResponse["message"] = cipher(errorMessage)
+                return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+
         # Send response
         self.jsonResponse["message"] = cipher(message)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)

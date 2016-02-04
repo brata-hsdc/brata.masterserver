@@ -1,0 +1,24 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}Test Links {{ entity|title }}{% endblock %}
+{% block header %}Test Links {{ entity|title }}{% endblock %}
+
+{% block main %}
+    {# Include the visible fields #}
+    <table class="fieldWrapper" border="1">
+       <tr>
+          <td style="text-align: left;">Organization</td>
+          <td style="text-align: left;">Team Name</td>
+          <td style="text-align: left;">Registration</td>
+       </tr>
+       {% for team in table %}
+       <tr>
+          <td style="text-align: left;">{{ team.organization }}</td>
+          <td style="text-align: left;">{{ team.name }}</td>
+          <td style="text-align: left;">
+           <a href="http://192.168.4.37/dbkeeper/regtest_team/{{team.pass_code}}/">Reg QRs</a></td>
+       </tr>
+       {% endfor %}
+    </table>
+</form>
+{% endblock %}

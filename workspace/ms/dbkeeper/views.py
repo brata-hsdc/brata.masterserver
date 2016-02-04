@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.views.generic import View
 from django.contrib.auth.models import User
+from django.template import RequestContext
 
 from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm
 from .models import Organization, MSUser, Team, Setting
@@ -36,6 +37,31 @@ def index(request):
 def test(request):
     """ Display the QR Code test page. """
     return render(request, "dbkeeper/test.html")
+
+#----------------------------------------------------------------------------
+class regtest(View):
+    """ Display the QR Code test page. """
+    #queryset = Team.objects.all()
+    #table = RegTable(queryset)
+    #return render_to_response("dbkeeper/regtest.html", {"table": table}, context_instance=RequestContext(request))
+    context = {
+               "table":   None,
+              }
+    
+    def get(self, request):
+        self.context["table"] = Team.objects.all().order_by("organization","name")
+        return render(request, "dbkeeper/regtest.html", self.context)
+
+#----------------------------------------------------------------------------
+class regtest_team(View):
+    """ Display the QR Code test page. """
+    context = {
+               "pass_code":   None,
+              }
+    
+    def get(self, request, pass_code):
+        self.context["pass_code"] = pass_code
+        return render(request, "dbkeeper/regtest_team.html", self.context)
 
 #----------------------------------------------------------------------------
 def station_status(request):
