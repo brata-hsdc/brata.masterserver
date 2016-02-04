@@ -311,7 +311,8 @@ class JSONHandlerView(View):
         # Get submits from this station for this team
         try:
             # sort by time should provide the oldest first
-            # TODO how do we know they didn't need to restart this one because of a dead phone?
+            # How do we know they didn't need to restart this one because of a dead phone?
+            # Doesn't matter because they still only get a total of 3 chances
             submitRequests = PiEvent.objects.filter(status=PiEvent.INFO_STATUS, type=PiEvent.SUBMIT_MSG_TYPE, team=team, pi=station).order_by('time')
             attemptCount = 0
             retry = True
@@ -347,7 +348,7 @@ class JSONHandlerView(View):
                               message=message,
                              )
             # TODO put back self.jsonResponse["message"] = cipher(message)
-            self.jsonResponse["message"] = message
+            self.jsonResponse["message"] = cipher(message)
             return None, None, None, None, HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
      
 #----------------------------------------------------------------------------
@@ -1304,7 +1305,6 @@ class ReturnToEarth(JSONHandlerView):
         if station is None:
             return response
 
-        # TODO check if passed or, was 3 fails or was < 3 fails
         wasCorrect, retry, lastAnswer, lastAttemptData, response = self.getStatus(team, station)
         if wasCorrect is None:
             return response
@@ -1333,8 +1333,7 @@ class ReturnToEarth(JSONHandlerView):
                               message=message,
                               )
 
-        headers = { "Content-type": "application/json", "Accept": "application.json" }
-
+        url = "{}/start_challenge".format(station.url)
         if retry:
             # Get parameters for this particular station
             # TODO
@@ -1350,6 +1349,7 @@ class ReturnToEarth(JSONHandlerView):
           jsonData = json.dumps({})
 
         # Either way we call the pi
+        headers = { "Content-type": "application/json", "Accept": "application.json" }
 	response = requests.post(url, data=jsonData, headers=headers)
         if response.status_code != 200:
             errorMessage = "Could not contact station. Contact a competition official."	
@@ -1365,7 +1365,6 @@ class ReturnToEarth(JSONHandlerView):
                 # We need to make the team aware as there is a problem that keeps them from continuing
                 self.jsonResponse["message"] = cipher(errorMessage)
                 return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
-
 
         # Send response
         self.jsonResponse["message"] = cipher(message)
