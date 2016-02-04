@@ -225,11 +225,6 @@ class ScoreboardStatus(View):
         """ Retrieve score information from the database and return it """
         logging.debug('Entered ScoreboardStatus.get')
 
-        # TODO move this out of here; should this be run via cron somehow? We don't
-        # want the scoreboard web page driving scoring computation--just display
-        # precomputed scores.
-        Scores._recomputeScores()
-
         teams = Team.objects.all()
         teamList = []
 
