@@ -19,12 +19,36 @@ there are four Django apps:
 * `teamcentral` - provides status info to competitors through a mobile device interface
 
 ## Installation
+
+### Install and Set Up Raspbian
+
+Download Raspbian Jessie Lite released 2015-11-21 from https://www.raspberrypi.org/downloads/raspbian/.
+
+Unzip the zip file to get the raw SD card image. Write the raw image file to the SD card:
+
+```sh
+$ sudo dd if=2015-11-21-raspbian-jessie-lite.img of=/dev/sdX bs=4M
+$ sudo sync
+```
+
+Eject SD card, insert into device, and power up.
+
+Log-in when prompted.
+
+
+TODO - config
+TODO - raspi-config to expand SD card
+
+
+### Update Repositories
+
 ```sh
 # sudo apt-get update
 # sudo apt-get upgrade
 ```
 
 ### Install Python
+
 N/A Python already installed and upgraded
 Ah crud need to reinstall python from source with --enabled-shared? This error came from mod_wsgi install.  Suggests there will be major performance and memory hit if not done.
 
@@ -107,8 +131,8 @@ Allow from all
 </Directory>
 ```
 
-### install the ms Django project
-First change the default password from the source to match the one you set above for the pi postgress user.
+### Install the ms Django project
+First change the default password from the source to match the one you set above for the pi postgres user.
 ```sh
 # cd brata.masterserver/workspace/ms/ms
 # nano settings.py
@@ -120,12 +144,34 @@ Then:
 # python manage.py migrate
 ```
 
+**Note:** (JIA 12/17/2015) I had to make the following edits. FYI this was for a Debian Jessie VM running on a laptop:
+
+   # Edit /opt/.../workspace/ms/ms/settings.py and set HOST to localhost in order to get migrate to run successfully. 
+   # Edit /etc/apache2/envvars to change APACHE_RUN_USER and APACHE_RUN_GROUP from www-data to the development user; restart apache2.
+   # In the /etc/apache2/sites-enabled/000-default.conf, added after "Allow from all", then restarted Apache:
+   # In the /etc/apache2/sites-enabled/000-default.conf, I currently hard-coded the following just for scorekeeper; don't know what Jaron has planned for a more robust solution though Ellery did mention the installation script copying all statics to a central location, so settings.py might need a STATIC_ROOT set:
+
+      Alias /static/ /opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/static/
+      <Directory /opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/static>
+        Require all granted
+      </Directory>
+
+```
+Require all granted
+```
+
+**Note:** (JIA 1/6/2016) I had to make the following edits. FYI this was for a Debian Jessie VM running on a laptop:
+
+   # Edit /etc/postgresql/9.4/main/pg_hba.conf to change "peer" to "md5" on the local/all/all line.
+
 ## Test
 
 Do the following to test whether everything got set up correctly:
 
-```
-```
+In a Web browser, navigate to the following URLs:
+
+   * http://localhost/admin
+   * http://localhost/dbkeeper
 
 ---
 ---

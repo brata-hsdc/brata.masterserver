@@ -1,0 +1,140 @@
+{% extends "scoreboard/base.html" %}
+
+{% block title  %}Main Page{% endblock %}
+{% block header %}High School Design Challenge 2016{% endblock %}
+
+{% block extra_javascript %}
+  <script src="/static/scoreboard/jquery-2.1.4.js"></script>
+{% endblock %}
+
+{% block body_start %}
+  <script type="text/javascript">
+    function handleScoreboardStatus(data) {
+
+       // Handle the data returned from the Ajax call
+       var tableBody = "";
+       data.sort(function(a,b){ return a.id - b.id; });
+
+       var rank = 0;
+       var prevScore = 9999999999;
+
+       $.each(data, function(index, value) {
+          if (value.total_score < prevScore) { rank++; }
+
+          var numRows = $("tbody").find("tr").length;
+
+          for (var i = 1; i <= numRows; ++i) {
+             var id = $("tbody").find("tr:nth-child(" + i + ")").attr('id');
+
+             if(id == ('team-' + value.name)) {
+                var elem = $("tbody").find("tr:nth-child(" + i + ")");
+                elem.find("td:nth-child( 1)").html(value.rank)
+                elem.find("td:nth-child( 2)").html(value.icon) // TODO
+                elem.find("td:nth-child( 3)").html(value.name)
+                elem.find("td:nth-child( 4)").html(value.organization) // TODO
+                elem.find("td:nth-child( 5)").html(value.is_registered) // TODO
+                elem.find("td:nth-child( 6)").html(value.launch_score + " (" + value.launch_duration + ")")
+                elem.find("td:nth-child( 7)").html(value.dock_score + " (" + value.dock_duration + ")")
+                elem.find("td:nth-child( 8)").html(value.secure_score + " (" + value.secure_duration + ")")
+                elem.find("td:nth-child( 9)").html(value.return_score + " (" + value.return_duration + ")")
+                elem.find("td:nth-child(10)").html(value.total_score)
+                elem.find("td:nth-child(11)").html(value.total_duration)
+                return true;
+             }
+          }
+
+          var rowId = "team-" + value.name;
+          var newRow = "<tr id='" + rowId + "'>"
+                 + "<td>" + "TODO rank" + "</td>"
+                 + "<td>" + value.icon + "</td>" // TODO
+                 + "<td>" + value.name + "</td>"
+                 + "<td>" + value.organization + "</td>" // TODO
+                 + "<td>" + value.is_registered + "</td>" // TODO
+                 + "<td>" + value.launch_score + " (" + value.launch_duration + ")</td>"
+                 + "<td>" + value.dock_score + " (" + value.dock_duration + ")</td>"
+                 + "<td>" + value.secure_score + " (" + value.secure_duration + ")</td>"
+                 + "<td>" + value.return_score + " (" + value.return_duration + ")</td>"
+                 + "<td>" + value.total_score + "</td>"
+                 + "<td>" + value.total_duration + "</td>"
+                 + "</tr>";
+
+          $('tbody').append(newRow);
+       });
+
+/*
+       // Reorder the table to sort by descending rank
+       var numRows = $("tbody").find("tr").length;
+       var top = 26;
+
+       for (var i = 1; i <= numRows; ++i) {
+          var elem = $("tbody").find("tr:nth-child(" + i + ")");
+          var id = elem.attr('id');
+          var rank = elem.find("td:nth-child( 1)").html();
+//          console.log("top=["+top+"] rank=["+rank+"] prod=["+(top*rank)+"]");
+
+          elem.animate({
+             position: 'absolute',
+             top: 0 + 'px'
+          }, 400);
+
+          top += elem.outerHeight();
+       }
+*/
+
+/*
+       $.each(order_arr, function(idx, val) {
+          var el = $('tbody tr#user-' + val);
+
+          el.animate({
+             position: 'absolute',
+             top: top + 'px'
+          }, 400);
+          top += el.outerHeight();
+       });
+*/
+
+       // Now that we've completed the request, schedule the next one
+       setTimeout(getScoreboardStatus, {{ PAGE_REFRESH_INTERVAL }});
+    }
+
+    function getScoreboardStatus() {
+       $.getJSON('/scoreboard/scoreboard_status/', handleScoreboardStatus);
+    }
+
+    function onReady(event) {
+       getScoreboardStatus();
+    }
+
+    $(document).ready(onReady);
+
+  </script>
+{% endblock %}{# body_start #}
+
+{% block main %}
+  <div id="stationTable">
+    <table class="table table-striped table-hover ">
+      <thead>
+        <tr>
+           <th>Position</th>
+           <th>Team Icon/Avatar (TBD)</th>
+           <th>Team Name</th>
+           <th>Team Code</th>
+           <th>Organization (TBD)</th>
+           <th>Registered (TBD)</th>
+           <th>Launch</th>
+           <th>Dock</th>
+           <th>Secure</th>
+           <th>Return to Earth</th>
+           <th>Total Score</th>
+           <th>Total Duration (TBD)</th>
+        </tr>
+      </thead>
+
+      <tbody/>
+    </table>
+  </div>
+{% endblock %}{# main #}
+
+{% block page_footer %}
+   <div id="timestamp" />
+{% endblock %}{ # page_footer # }
