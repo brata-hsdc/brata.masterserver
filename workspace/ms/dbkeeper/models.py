@@ -244,6 +244,37 @@ class Setting(models.Model):
         return dockParams
     
     @staticmethod
+    def getSecureParams(set=None):
+        """ Return the whole data structure, or an individual set of values.
+        
+        Sets are indexed starting at 0.
+        
+        The structure is as follows:
+        [set0, set1, ..., setn]
+        
+        where setn is:
+        {
+           freqs:  [value0, value1, ..., value8],
+           values: [value0, value1, value2, value3]
+        }
+        
+        Returns:
+            the entire SECURE_PARAMS data structure if set is None
+            a single set, if set is an integer value
+        """
+        # 9 ints + 4 ints
+        try:
+            secureParams = Setting.objects.get(name="SECURE_PARAMS").value
+            secureParams = json.loads(secureParams)
+        except (ObjectDoesNotExist, ValueError, TypeError):
+            return None
+        
+        if set is None:
+            return secureParams
+        else:
+            return secureParams[set]
+        
+    @staticmethod
     def getReturnParams(station=None, value=None):
         """ Return the whole data structure, a station, or a value.
         

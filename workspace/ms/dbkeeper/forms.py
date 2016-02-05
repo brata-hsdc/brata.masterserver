@@ -192,7 +192,109 @@ class AddDockParamsForm(forms.Form):
 
 #----------------------------------------------------------------------------
 class AddSecureParamsForm(forms.Form):
-    pass
+    """ This is a dynamic form so it is structured differently from the
+        static forms.
+    """
+    def __init__(self, *args, **kwargs):
+        super(AddSecureParamsForm, self).__init__(*args, **kwargs)
+        #self.setFixedFields()
+        
+    def setFields(self, numRows=0):
+        self.fields["numRows"] = forms.IntegerField(label="Number of sets", initial=0, widget=forms.HiddenInput())
+        for n in range(0, numRows):
+            ns = str(n)
+            self.fields["f0_" + ns] = forms.IntegerField(label="Freq0", required=False)
+            self.fields["f1_" + ns] = forms.IntegerField(label="Freq1", required=False)
+            self.fields["f2_" + ns] = forms.IntegerField(label="Freq2", required=False)
+            self.fields["f3_" + ns] = forms.IntegerField(label="Freq3", required=False)
+            self.fields["f4_" + ns] = forms.IntegerField(label="Freq4", required=False)
+            self.fields["f5_" + ns] = forms.IntegerField(label="Freq5", required=False)
+            self.fields["f6_" + ns] = forms.IntegerField(label="Freq6", required=False)
+            self.fields["f7_" + ns] = forms.IntegerField(label="Freq7", required=False)
+            self.fields["f8_" + ns] = forms.IntegerField(label="Freq8", required=False)
+            self.fields["v0_" + ns] = forms.IntegerField(label="Value0", required=False)
+            self.fields["v1_" + ns] = forms.IntegerField(label="Value1", required=False)
+            self.fields["v2_" + ns] = forms.IntegerField(label="Value2", required=False)
+            self.fields["v3_" + ns] = forms.IntegerField(label="Value3", required=False)
+        
+    def setData(self, secureParams):
+        """ Add the data values that will be used to initialize the form fields """
+        self.data["numRows"] = len(secureParams)
+        for n,s in enumerate(secureParams):
+            ns = str(n)
+            self.fields["f0_" + ns] = s["f0"]
+            self.fields["f1_" + ns] = s["f1"]
+            self.fields["f2_" + ns] = s["f2"]
+            self.fields["f3_" + ns] = s["f3"]
+            self.fields["f4_" + ns] = s["f4"]
+            self.fields["f5_" + ns] = s["f5"]
+            self.fields["f6_" + ns] = s["f6"]
+            self.fields["f7_" + ns] = s["f7"]
+            self.fields["f8_" + ns] = s["f8"]
+            self.fields["v0_" + ns] = s["v0"]
+            self.fields["v1_" + ns] = s["v1"]
+            self.fields["v2_" + ns] = s["v2"]
+            self.fields["v3_" + ns] = s["v3"]
+
+        self.data["sets"] = secureParams
+
+        self.is_bound = True
+        return self.data
+
+    def validate(self, post):
+        """ Validate the contents of the form """
+        for name,field in self.fields.items():
+            try:
+                if name in post:
+                    field.clean(post[name])
+            except forms.ValidationError, e:
+                self.errors[name] = e.messages    
+    
+    def buildStructure(self, data):
+        """ Put the data fields into the structure specified in models.getDockParams() """
+        n = 0
+        nRows = int(data["numRows"])
+        s = data["sets"]
+        while len(s) < nRows and n < 100: # stop searching for more than 100 rows
+            if "f0_{}".format(n) in data:
+                grp = { "f0": data["f0_{}".format(n)],
+                        "f1": data["f1_{}".format(n)],
+                        "f2": data["f2_{}".format(n)],
+                        "f3": data["f3_{}".format(n)],
+                        "f4": data["f4_{}".format(n)],
+                        "f5": data["f5_{}".format(n)],
+                        "f6": data["f6_{}".format(n)],
+                        "f7": data["f7_{}".format(n)],
+                        "f8": data["f8_{}".format(n)],
+                        "v0": data["v0_{}".format(n)],
+                        "v1": data["v1_{}".format(n)],
+                        "v2": data["v2_{}".format(n)],
+                        "v3": data["v3_{}".format(n)],
+                      }
+                # If all the values in the set are None, row was deleted from form
+                if not self.listIsAllNone(set.values()):
+                    # cast values to their proper types
+                    grp["f0"] = int(grp["f0"])
+                    grp["f1"] = int(grp["f1"])
+                    grp["f2"] = int(grp["f2"])
+                    grp["f3"] = int(grp["f3"])
+                    grp["f4"] = int(grp["f4"])
+                    grp["f5"] = int(grp["f5"])
+                    grp["f6"] = int(grp["f6"])
+                    grp["f7"] = int(grp["f7"])
+                    grp["f8"] = int(grp["f8"])
+                    grp["v0"] = int(grp["v0"])
+                    grp["v1"] = int(grp["v1"])
+                    grp["v2"] = int(grp["v2"])
+                    grp["v3"] = int(grp["v3"])
+                    s["sets"].append(grp)
+            n += 1
+        return s
+    
+    def listIsAllNone(self, lst):
+        """ Return True if every element of the list is None """
+        return reduce(operator.__and__, [n is None for n in lst])
+
 
 #----------------------------------------------------------------------------
 class AddReturnParamsForm(forms.Form):
