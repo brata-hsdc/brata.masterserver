@@ -257,7 +257,7 @@ class AddLaunchParams(View):
     context = {
                "form":   None,
                "entity": "LaunchParams",
-               "submit": "Add",
+               "submit": "Done",
               }
     
     def get(self, request):
@@ -322,7 +322,7 @@ class AddDockParams(View):
     context = {
                "form":   None,
                "entity": "DockParams",
-               "submit": "Add",
+               "submit": "Done",
               }
     
     def get(self, request):
@@ -342,7 +342,6 @@ class AddDockParams(View):
 #             form.setData(dockParams)
             self.context["data"] = form.setData(dockParams)
         except:
-            raise
             self.context["data"] = { "numRows": 0 }
         self.context["form"] = form
         return render(request, "dbkeeper/add_dock_params.html", self.context)
@@ -353,7 +352,7 @@ class AddDockParams(View):
         form.setFields(int(request.POST["numRows"]))
         form.data = request.POST
         form.is_bound = True
-        form.validate(request.POST)  # is_valid will call this
+        form.validate(request.POST)
         if form.is_valid():
 #             value = json.dumps(form.cleaned_data)
             value = form.buildStructure(form.cleaned_data)
@@ -365,8 +364,8 @@ class AddDockParams(View):
                 setting = Setting(name="DOCK_PARAMS", value=value, description="Competition parameters for the Dock challenge")
             setting.save()
             return HttpResponseRedirect("/admin/dbkeeper/setting/")
-        else:
-            err = form.errors
+#         else:
+#             err = form.errors
 
         self.context["form"] = form
         return render(request, "dbkeeper/add_dock_params.html", self.context)
@@ -376,19 +375,31 @@ class AddSecureParams(View):
     context = {
                "form":   None,
                "entity": "SecureParams",
-               "submit": "Add",
+               "submit": "Done",
               }
     
     def get(self, request):
         """ Display the Add form with the AddSecureParams fields """
-        self.context["form"] = AddSecureParamsForm()
-        return render(request, "dbkeeper/add.html", self.context)
+        form = AddSecureParamsForm()
+        #form.setFixedFields()
+        try:
+            secureParams = Setting.getSecureParams()
+            form.setFields(len(secureParams["sets"]))
+        except:
+            self.context["data"] = { "numRows": 0 }
+        self.context["form"] = form
+        return render(request, "dbkeeper/add_secure_params.html", self.context)
     
     def post(self, request):
-        self.context["form"] = AddSecureParamsForm(request.POST)
-        form = self.context["form"]
+        form = AddSecureParamsForm(request.POST)
+        #form.setFixedFields()
+        form.setFields(int(request.POST["numRows"]))
+        form.data = request.POST
+        form.is_bound = True
+        form.validate(request.POST)
         if form.is_valid():
-            value = json.dumps(form.cleaned_data)
+            value = form.buildStructure(form.cleaned_data)
+            value = json.dumps(value)
             try:
                 setting = Setting.objects.get(name="SECURE_PARAMS")
                 setting.value = value
@@ -396,15 +407,18 @@ class AddSecureParams(View):
                 setting = Setting(name="SECURE_PARAMS", value=value, description="Competition parameters for the Secure challenge")
             setting.save()
             return HttpResponseRedirect("/admin/dbkeeper/setting/")
+#         else:
+#             err = form.errors
 
-        return render(request, "dbkeeper/add.html", self.context)
+        self.context["form"] = form
+        return render(request, "dbkeeper/add_secure_params.html", self.context)
 
 #----------------------------------------------------------------------------
 class AddReturnParams(View):
     context = {
                "form":   None,
                "entity": "ReturnParams",
-               "submit": "Add",
+               "submit": "Done",
               }
     
     def get(self, request):
