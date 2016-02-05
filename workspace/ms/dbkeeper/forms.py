@@ -189,6 +189,24 @@ class AddDockParamsForm(forms.Form):
     def listIsAllNone(self, lst):
         """ Return True if every element of the list is None """
         return reduce(operator.__and__, [n is None for n in lst])
+    
+    def tones(self, lockDigits):
+        """ Given the 4 lock digits, generate the 9 tone values.
+        
+        Returns:
+            a list of 9 integers representing the tones
+        """
+        tones = [0]*9  # a list of 9 zeroes
+        tones[0] = lockDigits[0]
+        tones[1] = lockDigits[1]
+        tones[2] = 7 - (tones[0] + tones[1]) % 7
+        tones[3] = lockDigits[2]
+        tones[4] = lockDigits[3]
+        tones[5] = 7 - (tones[3] + tones[4]) % 7
+        tones[6] = 7 - (tones[0] + tones[3]) % 7
+        tones[7] = 7 - (tones[1] + tones[4]) % 7
+        tones[8] = 7 - (tones[2] + tones[5]) % 7
+        return tones
 
 #----------------------------------------------------------------------------
 class AddSecureParamsForm(forms.Form):
