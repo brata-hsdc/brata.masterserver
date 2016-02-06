@@ -1,0 +1,97 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}Add {{ entity|title }}{% endblock %}
+{% block header %}Add {{ entity|title }}{% endblock %}
+
+{% block main %}
+<form action="/dbkeeper/add/{{ entity|lower }}/" method="post">
+    {% csrf_token %}
+    {# Include the hidden fields #}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    {# Include the visible fields #}
+    <table class="fieldWrapper" style="width: 80%">
+      <colgroup>
+        <col span="1" />
+        <col span="1" style="width: 10%" />
+        <col span="1" style="width: 7%" />
+        <col span="1" style="width: 7%" />
+        <col span="1" style="width: 7%" />
+        <col span="1" style="width: 7%" />
+        <col span="1" style="width: 7%" />
+        <col span="1" style="width: 7%" />
+      </colgroup>
+      <thead>
+      <tr>
+        <th>&nbsp;</th><th>Station ID</th><th style="width: 5em">Value 1</th><th>Value 2</th><th>Value 3</th><th>Value 4</th><th>Value 5</th><th>Value 6</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>Station 1</td>
+        <td>{{ form.st0id }} <span style="color: red">{{ form.st0id.errors }}</td>
+        <td>{{ form.st0v0 }} <span style="color: red">{{ form.st0v0.errors }}</td>
+        <td>{{ form.st0v1 }} <span style="color: red">{{ form.st0v1.errors }}</td>
+        <td>{{ form.st0v2 }} <span style="color: red">{{ form.st0v2.errors }}</td>
+        <td>{{ form.st0v3 }} <span style="color: red">{{ form.st0v3.errors }}</td>
+        <td>{{ form.st0v4 }} <span style="color: red">{{ form.st0v4.errors }}</td>
+        <td>{{ form.st0v5 }} <span style="color: red">{{ form.st0v5.errors }}</td>
+      </tr>
+      <tr>
+        <td>Station 2</td>
+        <td>{{ form.st1id }} <span style="color: red">{{ form.st1id.errors }}</td>
+        <td>{{ form.st1v0 }} <span style="color: red">{{ form.st1v0.errors }}</td>
+        <td>{{ form.st1v1 }} <span style="color: red">{{ form.st1v1.errors }}</td>
+        <td>{{ form.st1v2 }} <span style="color: red">{{ form.st1v2.errors }}</td>
+        <td>{{ form.st1v3 }} <span style="color: red">{{ form.st1v3.errors }}</td>
+        <td>{{ form.st1v4 }} <span style="color: red">{{ form.st1v4.errors }}</td>
+        <td>{{ form.st1v5 }} <span style="color: red">{{ form.st1v5.errors }}</td>
+      </tr>
+      <tr>
+        <td>Station 3</td>
+        <td>{{ form.st2id }} <span style="color: red">{{ form.st2id.errors }}</td>
+        <td>{{ form.st2v0 }} <span style="color: red">{{ form.st2v0.errors }}</td>
+        <td>{{ form.st2v1 }} <span style="color: red">{{ form.st2v1.errors }}</td>
+        <td>{{ form.st2v2 }} <span style="color: red">{{ form.st2v2.errors }}</td>
+        <td>{{ form.st2v3 }} <span style="color: red">{{ form.st2v3.errors }}</td>
+        <td>{{ form.st2v4 }} <span style="color: red">{{ form.st2v4.errors }}</td>
+        <td>{{ form.st2v5 }} <span style="color: red">{{ form.st2v5.errors }}</td>
+      </tr>
+      <tr>
+        <td>Station 4</td>
+        <td>{{ form.st3id }} <span style="color: red">{{ form.st3id.errors }}</td>
+        <td>{{ form.st3v0 }} <span style="color: red">{{ form.st3v0.errors }}</td>
+        <td>{{ form.st3v1 }} <span style="color: red">{{ form.st3v1.errors }}</td>
+        <td>{{ form.st3v2 }} <span style="color: red">{{ form.st3v2.errors }}</td>
+        <td>{{ form.st3v3 }} <span style="color: red">{{ form.st3v3.errors }}</td>
+        <td>{{ form.st3v4 }} <span style="color: red">{{ form.st3v4.errors }}</td>
+        <td>{{ form.st3v5 }} <span style="color: red">{{ form.st3v5.errors }}</td>
+      </tr>
+      <tr>
+        <td>Station 5</td>
+        <td>{{ form.st4id }} <span style="color: red">{{ form.st4id.errors }}</td>
+        <td>{{ form.st4v0 }} <span style="color: red">{{ form.st4v0.errors }}</td>
+        <td>{{ form.st4v1 }} <span style="color: red">{{ form.st4v1.errors }}</td>
+        <td>{{ form.st4v2 }} <span style="color: red">{{ form.st4v2.errors }}</td>
+        <td>{{ form.st4v3 }} <span style="color: red">{{ form.st4v3.errors }}</td>
+        <td>{{ form.st4v4 }} <span style="color: red">{{ form.st4v4.errors }}</td>
+        <td>{{ form.st4v5 }} <span style="color: red">{{ form.st4v5.errors }}</td>
+      </tr>
+      <tr>
+        <td>Station 6</td>
+        <td>{{ form.st5id }} <span style="color: red">{{ form.st5id.errors }}</td>
+        <td>{{ form.st5v0 }} <span style="color: red">{{ form.st5v0.errors }}</td>
+        <td>{{ form.st5v1 }} <span style="color: red">{{ form.st5v1.errors }}</td>
+        <td>{{ form.st5v2 }} <span style="color: red">{{ form.st5v2.errors }}</td>
+        <td>{{ form.st5v3 }} <span style="color: red">{{ form.st5v3.errors }}</td>
+        <td>{{ form.st5v4 }} <span style="color: red">{{ form.st5v4.errors }}</td>
+        <td>{{ form.st5v5 }} <span style="color: red">{{ form.st5v5.errors }}</td>
+      </tr>
+      <tr class="submitRow">
+          <td colspan="7"><input type="submit" value="{{ submit }}" /></td>
+      </tr>
+      </tbody>
+    </table>
+</form>
+{% endblock %}

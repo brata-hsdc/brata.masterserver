@@ -6,6 +6,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from .team_code import TeamPassCode, TeamRegCode
 import django_tables2 as tables
 
+import json
+
 # See the schema diagram and other documentation in the
 # brata.workstation/transitions folder.
 
@@ -69,12 +71,31 @@ class Team(models.Model):
     pass_code        = models.CharField(max_length=PASS_CODE_FIELD_LENGTH, blank=True)
     reg_code         = models.CharField(max_length=REG_CODE_FIELD_LENGTH, blank=True)
     registered       = models.ForeignKey("piservice.PiEvent", null=True, related_name="teams", default="")  # give name as string to avoid cyclic import dependency
-    
-    #    Score fields for the different competitions
-    total_score      = models.IntegerField(default=0)
-    total_duration_s = models.IntegerField(default=0)  # total duration of competition in seconds
+
+    # TODO Disabling for now; enable if needed for performance, o/w delete.    
+    ## Score/time fields for the different competitions
+    #rank              = models.IntegerField(default=0) # TODO Delete rank; not needed
+    #launch_score      = models.IntegerField(default=0)
+    #launch_duration_s = models.IntegerField(default=0)
+    #dock_score        = models.IntegerField(default=0)
+    #dock_duration_s   = models.IntegerField(default=0)
+    #secure_score      = models.IntegerField(default=0)
+    #secure_duration_s = models.IntegerField(default=0)
+    #return_score      = models.IntegerField(default=0)
+    #return_duration_s = models.IntegerField(default=0)
+
     # TODO:  Add more fields here as needed
     
+    # TODO Disabling for now; enable if needed for performance, o/w delete.    
+    #@property
+    #def total_score(self):
+    #    return self.launch_score + self.dock_score + self.secure_score + self.return_score
+
+    #@property
+    #def total_duration_s(self):
+    #    # total duration of competition in seconds
+    #    return self.launch_duration_s + self.dock_duration_s + self.secure_duration_s + self.return_duration_s
+
     @staticmethod
     def makeTeamCode(existingCodes=None):
         """ Create a unique pass_code for the team """
@@ -152,15 +173,140 @@ class Setting(models.Model):
     
     @staticmethod
     def get(name, default=None):
-        """ Return the value of the Setting with name=name.
-            Return default if Setting not found.  Return
-            None if no default value is specified.
+        """ Return the value of the Setting with name=name, or
+            return default if Setting not found, or
+            return None if no default value is specified.
         """
         try:
             return Setting.objects.get(name=name).value
         except ObjectDoesNotExist:
             return default
+    
+    @staticmethod
+    def getLaunchParams(tri=None, vert=None):
+        """ Return the whole data structure, triangle, or 1 vertex.
         
-    def __unicode(self):
+        The structure is as follows:
+        [triangle0, triangle1, triangle2]
+        
+        where trianglen is:
+        [vertex0, vertex1, vertex2, vertex3]
+        
+        where vertex0..2 are:
+        [name, lat, lon, angle]
+        
+        and vertex3 (the center and triangle side length) is:
+        [name, sidelength]
+        
+        (sidelength is really not associated with the center
+        point, but is stored there for convenience.)
+        
+        Returns:
+            the entire LAUNCH_PARAMS data structure if tri is None
+            an entire triangle list if tri is not None and vert is None
+            a vertex if tri and vert are not None
+            None if LAUNCH_PARAMS is not in the database or cannot be parsed
+        """
+        try:
+            launchParams = Setting.objects.get(name="LAUNCH_PARAMS").value
+            launchParams = json.loads(launchParams)
+        except (ObjectDoesNotExist, ValueError, TypeError):
+            return None
+        
+        if tri is None:
+            return launchParams
+        elif vert is None:
+            return launchParams[tri]
+        else:
+            return launchParams[tri][vert]
+    
+    @staticmethod
+    def getDockParams():
+        """ Return the entire DOCK_PARAMS data structure.
+        
+        The structure is as follows:
+        { "min_dock": <float>,
+          "max_dock": <float>,
+          "init_vel": <float>,
+          "sim_time": int,
+          "sets": [set0, set1, ..., setn-1] }
+        
+        where each seti is:
+        { "a_aft": <float>,
+          "a_fore": <float>,
+          "f_rate": <float>,
+          "f_qty": <float> }
+        """
+        try:
+            dockParams = Setting.objects.get(name="DOCK_PARAMS").value
+            dockParams = json.loads(dockParams)
+        except (ObjectDoesNotExist, ValueError, TypeError):
+            return None
+        return dockParams
+    
+    @staticmethod
+    def getSecureParams(set=None):
+        """ Return the whole data structure, or an individual set of values.
+        
+        Sets are indexed starting at 0.
+        
+        The structure is as follows:
+        [set0, set1, ..., setn]
+        
+        where setn is:
+        {
+           freqs:  [value0, value1, ..., value8],
+           values: [value0, value1, value2, value3]
+        }
+        
+        Returns:
+            the entire SECURE_PARAMS data structure if set is None
+            a single set, if set is an integer value
+        """
+        # 9 ints + 4 ints
+        try:
+            secureParams = Setting.objects.get(name="SECURE_PARAMS").value
+            secureParams = json.loads(secureParams)
+        except (ObjectDoesNotExist, ValueError, TypeError):
+            return None
+        
+        if set is None:
+            return secureParams
+        else:
+            return secureParams[set]
+        
+    @staticmethod
+    def getReturnParams(station=None, value=None):
+        """ Return the whole data structure, a station, or a value.
+        
+        Stations are indexed 0-5.
+        Values are indexed 0-6.  Value 0 is the Station ID. 1-6 are the numbers.
+        
+        The structure is as follows:
+        [station0, station1, ..., station5]
+        
+        where stationn is:
+        [stationID, value1, value2, ..., value6]
+        
+        Returns:
+            the entire RETURN_PARAMS data structure if station is None
+            the data for a station if station is not None and value is None
+            an individual data value if station and value are not None
+        """
+        try:
+            returnParams = Setting.objects.get(name="RETURN_PARAMS").value
+            returnParams = json.loads(returnParams)
+        except (ObjectDoesNotExist, ValueError, TypeError):
+            return None
+        
+        if station is None:
+            return returnParams
+        elif value is None:
+            return returnParams[station]
+        else:
+            return returnParams[station][value]
+        
+    
+    def __unicode__(self):
         return self.name
     

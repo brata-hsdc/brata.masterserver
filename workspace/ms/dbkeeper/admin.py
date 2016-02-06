@@ -20,12 +20,9 @@ class TeamAdmin(admin.ModelAdmin):
                                       "organization",
                                       ("pass_code", "reg_code", "registered")],
                           }),
-                 ("Competition Scores", {"fields": ["total_score",
-                                                    "total_duration_s"],
-                                        }),
                 ]
     list_filter = ("organization",)
-    list_display = ("name", "organization", "pass_code", "wordCode", "reg_code", "registered", "total_score", "total_duration_s")
+    list_display = ("name", "organization", "pass_code", "wordCode", "reg_code", "registered")
     ordering = ("name",)
     search_fields = ("name", "pass_code", "reg_code")
     readonly_fields = ("pass_code", "reg_code", "registered")

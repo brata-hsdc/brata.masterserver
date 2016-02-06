@@ -1,0 +1,126 @@
+[
+    {
+        "model": "dbkeeper.Organization",
+        "pk": "1",
+        "fields": {
+            "name": "School1",
+            "type": 1
+        }
+    },
+    {
+        "model": "dbkeeper.Team",
+        "pk": "1",
+        "fields": {
+            "name": "Moe",
+            "organization": 1
+        }
+    },
+    {
+        "model": "dbkeeper.Team",
+        "pk": "2",
+        "fields": {
+            "name": "Larry",
+            "organization": 1
+        }
+    },
+    {
+        "model": "dbkeeper.Team",
+        "pk": "3",
+        "fields": {
+            "name": "Curly",
+            "organization": 1
+        }
+    },
+    {
+        "model": "piservice.PiStation",
+        "pk": "1",
+        "fields": {
+            "host": "newton",
+            "station_type": "Launch",
+            "station_id": "l.newton",
+            "serial_num": "l.newton.1",
+            "url": "http://localhost:9999/newton",
+            "last_activity": "2001-02-03 04:05:06"
+        }
+    },
+    {
+        "model": "piservice.PiStation",
+        "pk": "2",
+        "fields": {
+            "host": "archimedes",
+            "station_type": "Dock",
+            "station_id": "d.archimedes",
+            "serial_num": "d.archimedes.1",
+            "url": "http://localhost:9999/archimedes",
+            "last_activity": "2001-02-03 04:05:06"
+        }
+    },
+    {
+        "model": "piservice.PiStation",
+        "pk": "3",
+        "fields": {
+            "host": "gauss",
+            "station_type": "Secure",
+            "station_id": "s.gauss",
+            "serial_num": "s.gauss.1",
+            "url": "http://localhost:9999/gauss",
+            "last_activity": "2001-02-03 04:05:06"
+        }
+    },
+    {
+        "model": "piservice.PiStation",
+        "pk": "4",
+        "fields": {
+            "host": "euler",
+            "station_type": "Return to Earth",
+            "station_id": "r.euler",
+            "serial_num": "r.euler.1",
+            "url": "http://localhost:9999/euler",
+            "last_activity": "2001-02-03 04:05:06"
+        }
+    },
+    {
+        "model": "piservice.PiEvent",
+        "pk": "1",
+        "fields": {
+            "time"   : "2001-03-01 00:00:01",
+            "type"   : 11,
+            "team"   : "1",
+            "pi"     : "1",
+            "status" : 5
+        }
+    },
+    {
+        "model": "piservice.PiEvent",
+        "pk": "2",
+        "fields": {
+            "time"   : "2001-03-01 00:00:02",
+            "type"   : 11,
+            "team"   : "1",
+            "pi"     : "1",
+            "status" : 5
+        }
+    },
+    {
+        "model": "piservice.PiEvent",
+        "pk": "3",
+        "fields": {
+            "time"   : "2001-03-01 00:00:03",
+            "type"   : 11,
+            "team"   : "1",
+            "pi"     : "1",
+            "status" : 5
+        }
+    },
+    {
+        "model": "piservice.PiEvent",
+        "pk": "4",
+        "fields": {
+            "time"   : "2001-03-01 00:00:10",
+            "type"   : 12,
+            "team"   : "1",
+            "pi"     : "1",
+            "status" : 1
+        }
+    }
+]

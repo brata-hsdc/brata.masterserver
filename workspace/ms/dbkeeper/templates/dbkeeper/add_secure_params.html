@@ -1,0 +1,118 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}Add {{ entity|title }}{% endblock %}
+{% block header %}Add {{ entity|title }}{% endblock %}
+
+{% block extra_javascript %}
+<script src="/static/dbkeeper/jquery-2.1.4.js"></script>
+{% endblock %}
+
+{% block body_start %}
+<script type="text/javascript">
+// TODO:  Need function to add a row of input fields to the table
+function addTableRow() {
+  //tableBody = $('#dynamicTable > tbody').html();
+  nRows = parseInt($('#id_numRows').attr('value'));
+  nStr = nRows.toString();
+  tableBody = '    <tr id="row_{}">'.replace(/{}/g, nStr);
+  tableBody += '     <td>';
+  tableBody += '      <input id="f0_{}" name="f0_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <input id="f1_{}" name="f1_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <input id="f2_{}" name="f2_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <br />';
+  tableBody += '       <input id="f3_{}" name="f3_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <input id="f4_{}" name="f4_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <input id="f5_{}" name="f5_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <br />';
+  tableBody += '       <input id="f6_{}" name="f6_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <input id="f7_{}}" name="f7_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <input id="f8_{}" name="f8_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <br />';
+  tableBody += '       <br />';
+  tableBody += '       <input id="v0_{}" name="v0_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <input id="v1_{}" name="v1_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <input id="v2_{}" name="v2_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <input id="v3_{}" name="v3_{}" step="any" type="number" />'.replace(/{}/g, nStr);
+  tableBody += '       <br />';
+  tableBody += '       <input id="delete_{}" type="button" value="Delete" onclick="delTableRow(\'#row_{}\')" />'.replace(/{}/g, nStr);
+  tableBody += '     </td>';
+  tableBody += '    </tr>';
+  $('#addRow').before(tableBody);
+  nRows++;
+  $('#id_numRows').attr('value', nRows.toString());
+};
+function delTableRow(rowID) {
+  $(rowID).remove();
+};
+</script>
+{% endblock %}
+
+{% block main %}
+<form action="/dbkeeper/add/{{ entity|lower }}/" method="post">
+  {% csrf_token %}
+  {# Include the hidden fields #}
+  {% for hidden in form.hidden_fields %}
+      {{ hidden }}
+  {% endfor %}
+  {# Include the visible fields #}
+  <h4>Challenge Sets  <input type="button" value="Add a Tape" onclick="addTableRow();" /></h4>
+  
+  <table id="dynamicTable" class="fieldWrapper">
+    <thead>
+    <tr>
+      <th>Tape ID</th>
+      <th>Tape Length</th>
+      <th>Aft Accel</th>
+      <th>Fore Accel</th>
+      <th>Fuel Rate</th>
+      <th>Fuel Quantity</th>
+      <th>&nbsp;</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for set in data.sets %}
+    <tr id="row_{{ forloop.counter0 }}">
+      <td>
+        <input id="f0_{{ forloop.counter0 }}" name="f0_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.f0 }}" />
+        <input id="f1_{{ forloop.counter0 }}" name="f1_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.f1 }}" />
+        <input id="f2_{{ forloop.counter0 }}" name="f2_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.f2 }}" />
+        <br />
+        <input id="f3_{{ forloop.counter0 }}" name="f3_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.f3 }}" />
+        <input id="f4_{{ forloop.counter0 }}" name="f4_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.f4 }}" />
+        <input id="f5_{{ forloop.counter0 }}" name="f5_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.f5 }}" />
+        <br />
+        <input id="f6_{{ forloop.counter0 }}" name="f6_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.f6 }}" />
+        <input id="f7_{{ forloop.counter0 }}" name="f7_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.f7 }}" />
+        <input id="f8_{{ forloop.counter0 }}" name="f8_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.f8 }}" />
+        <br />
+        <br />
+        <input id="v0_{{ forloop.counter0 }}" name="v0_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.v0 }}" />
+        <input id="v1_{{ forloop.counter0 }}" name="v1_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.v1 }}" />
+        <input id="v2_{{ forloop.counter0 }}" name="v2_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.v2 }}" />
+        <input id="v3_{{ forloop.counter0 }}" name="v3_{{ forloop.counter0 }}" step="any" type="number" value="{{ set.v3 }}" />
+        <br />
+        <input id="delete_{{ forloop.counter0 }}" type="button" value="Delete" onclick="delTableRow('#row_{{ forloop.counter0 }}')" />
+      </td>
+    </tr>
+    {% endfor %}
+     
+    <tr id="addRow">
+    <td colspan="7"></td>
+      <!--
+      <td style="text-align: center">{{ form.tapeId }} <span style="color: red">{{ set.tapeId.errors }}</span></td>
+      <td style="text-align: center">{{ form.tapeLen }} <span style="color: red">{{ set.tapeLen.errors }}</span></td>
+      <td style="text-align: center">{{ form.aftAccel }} <span style="color: red">{{ set.aftAccel.errors }}</span></td>
+      <td style="text-align: center">{{ form.foreAccel }} <span style="color: red">{{ set.foreAccel.errors }}</span></td>
+      <td style="text-align: center">{{ form.fuelRate }} <span style="color: red">{{ set.fuelRate.errors }}</span></td>
+      <td style="text-align: center">{{ form.fuelQuantity }} <span style="color: red">{{ set.fuelQuantity.errors }}</span></td>
+      <td><input type="button" value="Add" onclick="addTableRow();"/></td>
+      -->
+    </tr>
+    
+    <tr class="submitRow">
+      <td colspan="7"><input type="submit" value="Done" /></td>
+    </tr>
+    </tbody>
+  </table>
+</form>
+{% endblock %}
