@@ -7,6 +7,7 @@ from .team_code import TeamPassCode, TeamRegCode
 import django_tables2 as tables
 
 import json
+import random
 
 # See the schema diagram and other documentation in the
 # brata.workstation/transitions folder.
@@ -245,36 +246,50 @@ class Setting(models.Model):
         return dockParams
     
     @staticmethod
-    def getSecureParams(set=None):
-        """ Return the whole data structure, or an individual set of values.
+    def getSecureParams():
+        """ Generate a random problem that includes one error.
         
-        Sets are indexed starting at 0.
+        Creates 4 random lock digits.  Computes the 9 tone values.
+        Injects an error of +1 or -1 into one of the digits at random.
         
-        The structure is as follows:
-        [set0, set1, ..., setn]
+        The digits are layed out as follows (as in the Design Spec):
         
-        where setn is:
-        {
-           freqs:  [value0, value1, ..., value8],
-           values: [value0, value1, value2, value3]
-        }
+        a  b  c          0  1  2
+        d  e  f   --->   3  4  5
+        g  h  i          6  7  8
+        
+        where [a, b, d, e] are the 4 lock digits and the other values
+        are the check digits.
         
         Returns:
-            the entire SECURE_PARAMS data structure if set is None
-            a single set, if set is an integer value
+            (lockDigits, tones) - a tuple containing list of 4 integers
+                                  and a list of 9 integer tone values.
+                                  All integers will in the range 0-7
+        
+        Note:  This method does not actually access the Setting table
+               (or any other table) but it is here because the other
+               challenge parameter access methods are here.
         """
-        # 9 ints + 4 ints
-        try:
-            secureParams = Setting.objects.get(name="SECURE_PARAMS").value
-            secureParams = json.loads(secureParams)
-        except (ObjectDoesNotExist, ValueError, TypeError):
-            return None
+        random.seed()  # initialize random number generator
+        lockDigits = [random.randint(0,7), random.randint(0,7), random.randint(0,7), random.randint(0,7)]
+        tones = [0]*9  # a list of 9 zeroes
+        tones[0] = lockDigits[0]
+        tones[1] = lockDigits[1]
+        tones[2] = 7 - (tones[0] + tones[1]) % 7
+        tones[3] = lockDigits[2]
+        tones[4] = lockDigits[3]
+        tones[5] = 7 - (tones[3] + tones[4]) % 7
+        tones[6] = 7 - (tones[0] + tones[3]) % 7
+        tones[7] = 7 - (tones[1] + tones[4]) % 7
+        tones[8] = 7 - (tones[2] + tones[5]) % 7
         
-        if set is None:
-            return secureParams
-        else:
-            return secureParams[set]
+        # Throw in a random error
+        errorDigit = random.randint(0,8)
+        change = random.randint(0,1) * 2 - 1  # gives 1 or -1
+        tones[errorDigit] = (tones[errorDigit] + change) % 7
         
+        return (lockDigits, tones)
+
     @staticmethod
     def getReturnParams(station=None, value=None):
         """ Return the whole data structure, a station, or a value.

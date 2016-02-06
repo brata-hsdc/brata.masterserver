@@ -303,11 +303,10 @@ class AddLaunchParams(View):
                 d[color + "vcname"]  = cname
                 d[color + "sidelen"] = sidelen
             self.context["form"] = AddLaunchParamsForm(initial=d)
-            raise ValueError #DEBUG
         except:
             self.context["form"] = AddLaunchParamsForm()
             form = self.context["form"]
-            raise ValueError #DEBUG
+
         return render(request, "dbkeeper/add_launch_params.html", self.context)
     
     def post(self, request):
