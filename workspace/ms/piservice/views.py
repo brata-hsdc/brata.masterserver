@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 import json
 
 from .models import PiEvent, PiStation
-from dbkeeper.models import Team
+from dbkeeper.models import Team, Setting
 from dbkeeper.team_code import TeamPassCode
 
 from datetime import timedelta, datetime
@@ -21,6 +21,8 @@ from NoCMConfigValues import *
 
 # for regular expression matching
 import re
+
+import random
 
 # Create your views here.
 
@@ -818,14 +820,24 @@ class StartChallenge(JSONHandlerView):
                  "team_name": team.name,
                })
             # Get random parameters
-            # TODO
-            message = "Dock using [TAPE=1] [AFT=0.900] [FORE=0.900] [FUEL=10.00] [F-RATE=09.00]"
+            dockParams = Setting.getDockParams()
+            sets = dockParams["sets"]
+            randomSet = random.choice(sets)
+          
+            aft = "{:.3f}".format(randomSet["a_aft"])
+            fore = "{:.3f}".format(randomSet["a_fore"])
+            fuel = "{0:05.2f}".format(randomSet["f_qty"])
+            rate = "{0:05.2f}".format(randomSet["f_rate"])
+            tape = "{}".format(randomSet["tape_id"])
+            dist = "{}".format(randomSet["tape_len"])
+
+            message = "Dock using [TAPE={}] [AFT={}] [FORE={}] [FUEL={}] [F-RATE={}]".format(tape, aft, fore, fuel, rate)
             startData = json.dumps({
-                 "AFT": "0.900",
-                 "FORE": "0.900",
-                 "FUEL": "10.00",
-                 "F_RATE": "09.00",
-                 "DIST": "11",
+                 "AFT": aft,
+                 "FORE": fore,
+                 "FUEL": fuel,
+                 "F_RATE": rate,
+                 "DIST": dist,
                })
 
         elif station.station_type == "Secure":
@@ -948,6 +960,12 @@ class Dock(JSONHandlerView):
         dist = data["DIST"]
         r_fuel = data["F_RATE"]
         q_fuel = data["FUEL"]
+
+        dockParams = Setting.getDockParams()
+        min_dock = "{:.2f}".format(dockParams["min_dock"])
+        max_dock = "{:.1f}".format(dockParams["max_dock"])
+        init_vel = "{:.1f}".format(dockParams["init_vel"])
+        sim_time = "{0:0>2}".format(dockParams["sim_time"])
         
 	# Send message to the Pi this team is registered with to start the simulation
         url = "{}/post_challenge".format(station.url)
@@ -961,10 +979,10 @@ class Dock(JSONHandlerView):
                  "r_fuel": r_fuel,
                  "q_fuel": q_fuel,
                  "dist": dist,
-                 "v_min": "0.01",
-                 "v_max": "0.1",
-                 "v_init": "0.0",
-                 "t_sim": "45",
+                 "v_min": min_dock,
+                 "v_max": max_dock,
+                 "v_init": init_vel,
+                 "t_sim": sim_time,
                })
 	response = requests.post(url, data=jsonData, headers=headers)
         if response.status_code != 200:
@@ -1038,14 +1056,24 @@ class Latch(JSONHandlerView):
             status = PiEvent.FAIL_STATUS
             if retry:
                 # Get random parameters
-                # TODO
-                message = "Dock using [TAPE=1] [AFT=0.900] [FORE=0.900] [FUEL=10.00] [F-RATE=09.00]"
+                dockParams = Setting.getDockParams()
+                sets = dockParams["sets"]
+                randomSet = random.choice(sets)
+          
+                aft = "{:.3f}".format(randomSet["a_aft"])
+                fore = "{:.3f}".format(randomSet["a_fore"])
+                fuel = "{0:0>2.2f}".format(randomSet["f_qty"])
+                rate = "{0:0>2.3f}".format(randomSet["f_rate"])
+                tape = "{0:0>2}".format(randomSet["tape_id"])
+                dist = "{0:0>2}".format(randomSet["tape_len"])
+
+                message = "Dock using [TAPE={}] [AFT={}] [FORE={}] [FUEL={}] [F-RATE={}]".format(tape, aft, fore, fuel, rate)
                 startData = json.dumps({
-                     "AFT": "0.900",
-                     "FORE": "0.900",
-                     "FUEL": "10.00",
-                     "F_RATE": "09.00",
-                     "DIST": "11",
+                     "AFT": aft,
+                     "FORE": fore,
+                     "FUEL": fuel,
+                     "F_RATE": rate,
+                     "DIST": dist,
                    })
                 event = PiEvent.addEvent(type=PiEvent.START_CHALLENGE_MSG_TYPE,
                               team=team,
