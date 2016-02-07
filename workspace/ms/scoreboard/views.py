@@ -1,5 +1,8 @@
+from django.db.models import Q
 from django.shortcuts import render, HttpResponse
 from django.views.generic import View
+from django.utils.timezone import utc
+from datetime import datetime, timedelta
 import json
 import logging
 from dbkeeper.models import Organization, Team
@@ -13,7 +16,7 @@ def index(request):
     """
     logging.debug('Entered scoreboard.views.index')
 
-    refreshInterval = 5000 # TODO Setting.get("SCOREBOARD_STATUS_REFRESH_INTERVAL_MS", default="5000")
+    refreshInterval = 20000 # TODO Setting.get("SCOREBOARD_STATUS_REFRESH_INTERVAL_MS", default="5000")
 
     context = {
         "PAGE_REFRESH_INTERVAL": refreshInterval
@@ -60,67 +63,108 @@ class ScoreboardStatus(View):
     def _recomputeLaunchScore(teamName):
         logging.debug('Entered ScoreboardStatus._recomputeLaunchScore({})'.format(teamName))
 
+        now = datetime.utcnow().replace(tzinfo=utc)
         score = 0
+        start_time = now
 
         # find all PiEvent.START_CHALLENGE_MSG_TYPE events and note timestamps
-        events = PiEvent.objects.filter(
+        teamEvents = PiEvent.objects.filter(
             team__name=teamName
         ).filter(
             pi__station_type=PiStation.LAUNCH_STATION_TYPE
-        ).filter(
+        ).order_by('time')
+
+        startChallengeEvents = teamEvents.filter(
             type=PiEvent.START_CHALLENGE_MSG_TYPE
-        )
+        ).order_by('time')
 
-        # TODO note timestamps
+        if startChallengeEvents.count() > 0:
+            score = 1
+            start_time = startChallengeEvents[0].time
 
+        time_to_exit = False
+        num_failed_attempts = 0
+        i = 0
 
-        #-------------------
-        # TODO Delete
-        #for e in events:
-        #    logging.debug('{} [type={}, team={}, pi={}] {}'.format(e.time, e.type, e.team, e.pi, e.status))
+        while not time_to_exit:
+            attemptNum = i + 1
+            logging.debug('Not yet time to exit; processing attempt {} of {} for team {}'.format(attemptNum, startChallengeEvents.count(), teamName))
 
-        # TODO Delete
-        score = 0
-        duration_s = 0
-        #-------------------
+            if i < startChallengeEvents.count():
+                logging.debug('Examining more START_CHALLENGE events')
+                # need to get range t..u of events for this attempt only
 
-        # TODO
-        # PDL:
-        # if any found then
-        #     score = 1
-        #     start_time = timestamp of 1st event
-        # end if
-        #
-        # time_to_exit = false
-        # num_failed_attempts = 0
-        #
-        # while not time_to_exit
-        #     if there are more START_CHALLENGE events that we haven't looked at yet then
-        #         get timestamp t of next START_CHALLENGE event
-        #         get timestamp u of following START_CHALLENGE event or TODO (final design challenge has concluded event) event if it exists; o/w timestamp u of last event
-        #
-        #         if there are four events within t..u range with status SUCCESS_STATUS or FAIL_STATUS then
-        #             score = 2 * num SUCCESS events + 1 * num FAIL events
-        #             time_to_exit = true
-        #             end_time = timestamp of final SUCCESS_STATUS or FAIL_STATUS event
-        #         else if there is an event within t..u range with TODO (final design challenge has concluded event) then
-        #             score = 2 * num SUCCESS events + 1 * num FAIL events
-        #             time_to_exit = true
-        #             end_time = timestamp of TODO (final design challenge has concluded event) event
-        #         else
-        #             # phone probably died and need to start over, or challenge
-        #             # still in-progress
-        #             pass
-        #         end if
-        #     else
-        #         # challenge still in-progress
-        #         time_to_exit = true
-        #         end_time = current time
-        #     end if
-        # end while
-        #
-        # duration_s = end_time - start_time
+                t = startChallengeEvents[i].time # timestamp of next START_CHALLENGE event
 
+                if attemptNum < startChallengeEvents.count():
+                    logging.debug('More attempts for team follow')
+                    u = startChallengeEvents[attemptNum].time # timestamp of following event
+                else:
+                    logging.debug('No more attempts for team or event concluded')
+                    gameOverEvents = PiEvent.objects.filter(
+                        type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
+                    ).order_by('time')
+
+                    if gameOverEvents.count() > 0:
+                        logging.debug('Detected game over - event concluded')
+                        u = gameOverEvents[0].time
+                    else:
+                        logging.debug('No more attempts for team')
+                        u = teamEvents.reverse()[0].time # get last event timestamp
+
+                logging.debug('Processing events for Team "{}" attempt #{} from {}..{}'.format(teamName, attemptNum, t, u))
+
+                # get events within t..u range with status SUCCESS_STATUS or FAIL_STATUS
+                submitEvents = teamEvents.filter(
+                    type=PiEvent.SUBMIT_MSG_TYPE
+                ).filter(
+                    (Q(status=PiEvent.SUCCESS_STATUS) | Q(status=PiEvent.FAIL_STATUS)),
+                    Q(time__gte=t),
+                    Q(time__lte=u)
+                )
+
+                num_success_events = submitEvents.filter(
+                    status=PiEvent.SUCCESS_STATUS
+                ).count()
+
+                num_fail_events = submitEvents.filter(
+                    status=PiEvent.FAIL_STATUS
+                ).count()
+
+                cur_attempt_score = (2 * num_success_events) + (1 * num_fail_events)
+
+                if submitEvents.count() < 4:
+                    logging.debug('Getting events within t..u range with EVENT_CONCLUDED_MSG_TYPE')
+
+                    events = teamEvents.filter(
+                        type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
+                    ).filter(
+                        Q(time__gte=t),
+                        Q(time__lte=u)
+                    )
+
+                    if events.count() > 0:
+                        score = cur_attempt_score
+                        time_to_exit = true
+                        end_time = events[0].time
+                    else:
+                        logging.debug('Phone probably died and need to start over, or challenge still in-progress')
+                        pass
+                else:
+                    if submitEvents.count() > 4:
+                        logging.error('More than four SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attemptNum, teamName, t, u))
+
+                    score = cur_attempt_score
+                    time_to_exit = true
+                    end_time = submitEvents.reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
+
+                ++i
+            else:
+                logging.debug('Challenge still in-progress')
+                time_to_exit = True
+                end_time = now
+
+        duration_s = (end_time - start_time).total_seconds()
 
         logging.debug('Exiting ScoreboardStatus._recomputeLaunchScore')
         return (score, duration_s)
@@ -253,6 +297,27 @@ class ScoreboardStatus(View):
 
         result = HttpResponse(json.dumps(teamList), content_type="application/json", status=200)
 
+        #-------------------
+        # TODO Delete
+        #for e in submitEvents:
+        #    logging.debug('3: {} {} [type={}, team={}, pi={}] {}'.format(e.time, e.message, e.type, e.team, e.pi, e.status))
+        #for e in events:
+        #    logging.debug('{} [type={}, team={}, pi={}] {}'.format(e.time, e.type, e.team, e.pi, e.status))
+        #for e in events:
+        #    logging.debug('1: {} [type={}, team={}, pi={}] {}'.format(e.time, e.type, e.team, e.pi, e.status))
+        #logging.debug('2: {} vs. {}'.format(now, start_time))
+        # timestamps in e.time for e in events
+        #for e in events:
+        #    logging.debug('{} {} [type={}, team={}, pi={}] {}'.format(e.time, e.message, e.type, e.team, e.pi, e.status))
+        # for e in events:
+        #     logging.debug('{} {} [type={}, team={}, pi={}] {}'.format(e.time, e.message, e.type, e.team, e.pi, e.status))
+        # logging.debug('[count={}]'.format(events.count()))
+        #
+        # TODO Delete
+        #score = 0
+        #duration_s = 0
+        #-------------------
+
         logging.debug('Exiting ScoreboardStatus.get')
         return result
 
@@ -267,5 +332,5 @@ class ScoreboardStatus(View):
             Returns:
                 string containing mm:ss
         """
-        return "{:02d}:{:02d}".format(int(seconds/60), seconds%60)
+        return "{:02d}:{:02d}".format(int(seconds/60), int(seconds)%60)
 

@@ -129,6 +129,7 @@ class PiEvent(models.Model):
     OPEN_MSG_TYPE                 = 19
     SECURE_MSG_TYPE               = 20
     RETURN_MSG_TYPE               = 21
+    EVENT_CONCLUDED_MSG_TYPE      = 22
 
     TYPE_CHOICES = (
                     (UNKNOWN_TYPE,                  "Unknown"),
@@ -153,6 +154,7 @@ class PiEvent(models.Model):
                     (OPEN_MSG_TYPE,                 "Open"),
                     (SECURE_MSG_TYPE,               "Secure"),
                     (RETURN_MSG_TYPE,               "Return"),
+                    (EVENT_CONCLUDED_MSG_TYPE,      "Event Concluded"),
                    )
     
     MSG_TYPES_2015 = (REGISTER_2015_MSG_TYPE,
