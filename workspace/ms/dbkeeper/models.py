@@ -4,7 +4,6 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
 from .team_code import TeamPassCode, TeamRegCode
-import django_tables2 as tables
 
 import json
 import random

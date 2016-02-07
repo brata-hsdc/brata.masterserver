@@ -1,0 +1,80 @@
+{% extends "dbkeeper/student_test_base.html" %}
+
+{% block title  %}{{ entity|title }}{% endblock %}
+{% block header %}{{ entity|title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+html, body {
+  height: 100%;
+}
+#map {
+  width: 80%;
+  height: 80%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+#quiz {
+  margin-left: 10em;
+  margin-right: 10em;
+  text-align: center;
+  font-size: 24px;
+}
+.answer_button {
+  font-size: 24px;
+}
+@media only screen and (min-device-width : 768px) {
+
+}
+</style>
+{% endblock %}
+
+{% block main %}
+  <div id="quiz">
+    <p>Which marker is at latitude, longitude:<br />
+    {{ lat }}&nbsp;&nbsp;{{ lon }}</p>
+    <button class="answer_button" onclick="alert('{{ answer.0 }}')">Red</button>
+    <button class="answer_button" onclick="alert('{{ answer.1 }}')">Green</button>
+    <button class="answer_button" onclick="alert('{{ answer.2 }}')">Blue</button>
+    <button class="answer_button" onclick="alert('{{ answer.3 }}')">Yellow</button>
+    <br />
+    <br />
+  </div>
+    <div id="map">
+    There should be a map here
+    </div>
+    <script type="text/javascript">
+    function initMap() {
+      //var myLatLng = {lat: 27.951710, lng: -80.675075};
+      var icons = [
+      "http://maps.google.com/mapfiles/ms/icons/red-dot.png",
+      "http://maps.google.com/mapfiles/ms/icons/green-dot.png",
+      "http://maps.google.com/mapfiles/ms/icons/blue-dot.png",
+      "http://maps.google.com/mapfiles/ms/icons/yellow-dot.png"
+      ];
+      {% autoescape off %}
+      var points = eval('(' + {{ points }} + ')');
+      {% endautoescape %}
+    
+      // Create a map object and specify the DOM element for display.
+      var map = new google.maps.Map(document.getElementById('map'), {
+        center: {lng: points[0].x, lat: points[0].y},
+        scrollwheel: false,
+        zoom: 21,
+        mapTypeId: google.maps.MapTypeId.SATELLITE,
+        tilt: 0 // straight down (nadir) view
+      });
+    
+      for (var i=0; i < 4; i++) {
+        var marker = new google.maps.Marker({
+          map: map,
+          position: {lng: points[i].x, lat: points[i].y},
+          icon: icons[i]
+          //title: 'Hello World!'
+        });
+      }
+    }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVYxtmHIM2jyKE3UuB8unZNKScpWgw9NA&callback=initMap" async defer></script>
+{% endblock %}
