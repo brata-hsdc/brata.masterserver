@@ -149,7 +149,7 @@ class ScoreboardStatus(View):
                         end_time = events[0].time
                     else:
                         logging.debug('Phone probably died and need to start over, or challenge still in-progress')
-                        pass
+
                 else:
                     if submitEvents.count() > 4:
                         logging.error('More than four SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attemptNum, teamName, t, u))
@@ -158,15 +158,15 @@ class ScoreboardStatus(View):
                     time_to_exit = true
                     end_time = submitEvents.reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
 
-                ++i
+                i += 1
             else:
-                logging.debug('Challenge still in-progress')
+                logging.debug('Challenge complete; time to exit')
                 time_to_exit = True
                 end_time = now
 
         duration_s = (end_time - start_time).total_seconds()
 
-        logging.debug('Exiting ScoreboardStatus._recomputeLaunchScore')
+        logging.debug('Exiting ScoreboardStatus._recomputeLaunchScore: score={}, duration={} s'.format(score, duration_s))
         return (score, duration_s)
 
 
