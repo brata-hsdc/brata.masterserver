@@ -1,6 +1,7 @@
 from django.shortcuts import render, HttpResponseRedirect
 from django.views.generic import View
 from django.contrib.auth.models import User
+from django.template import RequestContext
 
 from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm,\
                    AddLaunchParamsForm, AddDockParamsForm, AddSecureParamsForm, AddReturnParamsForm
@@ -9,6 +10,7 @@ from piservice.models import PiEvent
 from .team_code import TeamPassCode
 
 import json
+import random
 
 # Create your views here.
 def tryAgain(request, msg=None, url=None, buttonText=None,
@@ -39,6 +41,73 @@ def index(request):
 def test(request):
     """ Display the QR Code test page. """
     return render(request, "dbkeeper/test.html")
+
+#----------------------------------------------------------------------------
+class regtest(View):
+    """ Display the QR Code test page. """
+    #queryset = Team.objects.all()
+    #table = RegTable(queryset)
+    #return render_to_response("dbkeeper/regtest.html", {"table": table}, context_instance=RequestContext(request))
+    context = {
+               "table":   None,
+              }
+    
+    def get(self, request):
+        teams = Team.objects.all().order_by("organization","name")
+        #self.context["table"] = teams
+        
+        # Join the teams with the launch test points for each school
+        launchTestPoints = json.loads(Setting.objects.get(name="LAUNCH_TEST_DATA").value)
+        table = []    
+        for team in teams:
+            entry = {}
+            entry["organization"] = team.organization.name  # school name
+            entry["name"] = team.name  # team name
+            entry["pass_code"] = team.pass_code
+            entry["points"] = launchTestPoints[team.organization.name]
+            table.append(entry)
+        self.context["table"] = table
+        
+        # Get the URL of the DOCK_TEST_HOST
+        self.context["dock_test_host"] = Setting.objects.get(name="DOCK_TEST_HOST").value
+        return render(request, "dbkeeper/regtest.html", self.context)
+
+#----------------------------------------------------------------------------
+class regtest_team(View):
+    """ Display the QR Code test page. """
+    context = {
+               "pass_code":   None,
+              }
+    
+    def get(self, request, pass_code):
+        self.context["pass_code"] = pass_code
+        return render(request, "dbkeeper/regtest_team.html", self.context)
+
+#----------------------------------------------------------------------------
+class NavTestTeam(View):
+    """ Display a map test page with markers. """
+    context = {
+               "entity":    "Launch Test",
+               "pass_code": None,
+               "no_sidebarLeft": True,
+               "no_mainRight": True,
+              }
+    
+    def get(self, request, pass_code, lat1, lon1, lat2, lon2, lat3, lon3, lat4, lon4):
+        self.context["pass_code"] = pass_code
+        # send the points to the template as an array of GeoJSON objects
+        pt0 = '{{ "x": {}, "y": {} }}'.format(lon1, lat1)  # red
+        pt1 = '{{ "x": {}, "y": {} }}'.format(lon2, lat2)  # green
+        pt2 = '{{ "x": {}, "y": {} }}'.format(lon3, lat3)  # blue
+        pt3 = '{{ "x": {}, "y": {} }}'.format(lon4, lat4)  # yellow
+        self.context["points"] = "'[" + ", ".join([pt0, pt1, pt2, pt3]) + "]'";
+        random.seed();
+        n = random.randint(0,3)
+        self.context["lat"] = (lat1, lat2, lat3, lat4)[n]
+        self.context["lon"] = (lon1, lon2, lon3, lon4)[n]
+        self.context["answer"] = ["Incorrect"] * 4
+        self.context["answer"][n] = "Correct"
+        return render(request, "dbkeeper/navtest_team.html", self.context)
 
 #----------------------------------------------------------------------------
 def station_status(request):

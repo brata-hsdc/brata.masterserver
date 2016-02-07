@@ -1,0 +1,31 @@
+{% extends "dbkeeper/student_test_base.html" %}
+
+{% block title  %}Test Links {{ entity|title }}{% endblock %}
+{% block header %}Test Links {{ entity|title }}{% endblock %}
+
+{% block main %}
+    {# Include the visible fields #}
+    <table class="fieldWrapper" border="1">
+       <tr>
+          <th>School</th>
+          <th>Team</th>
+          <th>Registration</th>
+          <th>Launch Test</th>
+          <th>Dock Test</th>
+       </tr>
+       <tbody>
+         {% for team in table %}
+         <tr>
+            <td style="text-align: left;">{{ team.organization }}</td>
+            <td style="text-align: left;">{{ team.name }}</td>
+            <td style="text-align: left;">
+             <a href="../regtest_team/{{team.pass_code}}/">Reg QRs</a></td>
+            <td style="text-align: left;">
+             <a href="../navtest_team/{{team.pass_code}}/{{team.points.0.0}}/{{team.points.0.1}}/{{team.points.1.0}}/{{team.points.1.1}}/{{team.points.2.0}}/{{team.points.2.1}}/{{team.points.3.0}}/{{team.points.3.1}}/">Map Points</a></td>
+            <td><a href="{{ dock_test_host }}/dock">Dock Sim Evaluator</a></td>
+         </tr>
+         {% endfor %}
+       </tbody>
+    </table>
+
+{% endblock %}
