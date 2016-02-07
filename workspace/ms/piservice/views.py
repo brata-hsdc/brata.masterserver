@@ -982,6 +982,7 @@ class Dock(JSONHandlerView):
         self.jsonResponse["message"] = cipher(message)
 
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
 #----------------------------------------------------------------------------
 class Latch(JSONHandlerView):
     """ A class-based view to handle a BRATA Dock message.
