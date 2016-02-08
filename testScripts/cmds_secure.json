@@ -13,17 +13,17 @@
   }, 
   {
    "button": "Start Secure", 
-   "cmd": "http --json POST :80/piservice/start_challenge/secure01/ Content-type:application/json Accept:application/json reg_code=\"60e37b2c72c0d737\" message=\"\"", 
+   "cmd": "http --json POST :80/piservice/start_challenge/secure01/ Content-type:application/json Accept:application/json reg_code=\"0b95f281f733d0d6\" message=\"\"", 
    "tooltip": "Start Challenge"
   },
   {
    "button": "Open Secure", 
-   "cmd": "http --json POST :80/piservice/open/secure01/ Content-type:application/json Accept:application/json reg_code=\"60e37b2c72c0d737\" message=\"\"", 
+   "cmd": "http --json POST :80/piservice/open/secure01/ Content-type:application/json Accept:application/json reg_code=\"0b95f281f733d0d6\" message=\"\"", 
    "tooltip": "Open Secure"
   },
   {
    "button": "Secure Secure", 
-   "cmd": "http --json POST :80/piservice/secure/secure01/ Content-type:application/json Accept:application/json reg_code=\"60e37b2c72c0d737\" message=\"\"", 
+   "cmd": "http --json POST :80/piservice/secure/secure01/ Content-type:application/json Accept:application/json reg_code=\"0b95f281f733d0d6\" message=\"\"", 
    "tooltip": "Secure"
   }
  ], 

@@ -6,7 +6,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 import json
 
 from .models import PiEvent, PiStation
-from dbkeeper.models import Team
+from dbkeeper.models import Team, Setting
 from dbkeeper.team_code import TeamPassCode
 
 from datetime import timedelta, datetime
@@ -21,6 +21,8 @@ from NoCMConfigValues import *
 
 # for regular expression matching
 import re
+
+import random
 
 # Create your views here.
 
@@ -311,11 +313,16 @@ class JSONHandlerView(View):
         # Get submits from this station for this team
         try:
             # sort by time should provide the oldest first
-            # TODO how do we know they didn't need to restart this one because of a dead phone?
+            # How do we know they didn't need to restart this one because of a dead phone?
+            # Doesn't matter because they still only get a total of 3 chances
             submitRequests = PiEvent.objects.filter(status=PiEvent.INFO_STATUS, type=PiEvent.SUBMIT_MSG_TYPE, team=team, pi=station).order_by('time')
             attemptCount = 0
             retry = True
             wasCorrect = False
+            # need to initialize attempt data in case they scan latch without
+            # an attempt actually completing
+            lastAnswer = 0
+            lastAttemptData = ""
             for attempt in submitRequests:
                 lastAttemptData = attempt.data
                 submitData = json.loads(attempt.data)
@@ -343,7 +350,7 @@ class JSONHandlerView(View):
                               message=message,
                              )
             # TODO put back self.jsonResponse["message"] = cipher(message)
-            self.jsonResponse["message"] = message
+            self.jsonResponse["message"] = cipher(message)
             return None, None, None, None, HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
      
 #----------------------------------------------------------------------------
@@ -813,14 +820,24 @@ class StartChallenge(JSONHandlerView):
                  "team_name": team.name,
                })
             # Get random parameters
-            # TODO
-            message = "Dock using [TAPE=1] [AFT=1.111] [FORE=1.111] [FUEL=11.11] [F-RATE=11.11]"
+            dockParams = Setting.getDockParams()
+            sets = dockParams["sets"]
+            randomSet = random.choice(sets)
+          
+            aft = "{:.3f}".format(randomSet["a_aft"])
+            fore = "{:.3f}".format(randomSet["a_fore"])
+            fuel = "{0:05.2f}".format(randomSet["f_qty"])
+            rate = "{0:05.2f}".format(randomSet["f_rate"])
+            tape = "{}".format(randomSet["tape_id"])
+            dist = "{}".format(randomSet["tape_len"])
+
+            message = "Dock using [TAPE={}] [AFT={}] [FORE={}] [FUEL={}] [F-RATE={}]".format(tape, aft, fore, fuel, rate)
             startData = json.dumps({
-                 "AFT": "1.111",
-                 "FORE": "1.111",
-                 "FUEL": "11.11",
-                 "F_RATE": "11.11",
-                 "DIST": "11",
+                 "AFT": aft,
+                 "FORE": fore,
+                 "FUEL": fuel,
+                 "F_RATE": rate,
+                 "DIST": dist,
                })
 
         elif station.station_type == "Secure":
@@ -943,6 +960,12 @@ class Dock(JSONHandlerView):
         dist = data["DIST"]
         r_fuel = data["F_RATE"]
         q_fuel = data["FUEL"]
+
+        dockParams = Setting.getDockParams()
+        min_dock = "{:.2f}".format(dockParams["min_dock"])
+        max_dock = "{:.1f}".format(dockParams["max_dock"])
+        init_vel = "{:.1f}".format(dockParams["init_vel"])
+        sim_time = "{0:0>2}".format(dockParams["sim_time"])
         
 	# Send message to the Pi this team is registered with to start the simulation
         url = "{}/post_challenge".format(station.url)
@@ -956,10 +979,10 @@ class Dock(JSONHandlerView):
                  "r_fuel": r_fuel,
                  "q_fuel": q_fuel,
                  "dist": dist,
-                 "v_min": "0.01",
-                 "v_max": "0.1",
-                 "v_init": "0.0",
-                 "t_sim": "45",
+                 "v_min": min_dock,
+                 "v_max": max_dock,
+                 "v_init": init_vel,
+                 "t_sim": sim_time,
                })
 	response = requests.post(url, data=jsonData, headers=headers)
         if response.status_code != 200:
@@ -982,6 +1005,7 @@ class Dock(JSONHandlerView):
         self.jsonResponse["message"] = cipher(message)
 
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
 #----------------------------------------------------------------------------
 class Latch(JSONHandlerView):
     """ A class-based view to handle a BRATA Dock message.
@@ -1031,18 +1055,26 @@ class Latch(JSONHandlerView):
         else:
             # Post failures so scoring can keep track of them
             status = PiEvent.FAIL_STATUS
-            # figure out if actual docking time requires penalty
-            # TODO change the reported time in data            
             if retry:
                 # Get random parameters
-                # TODO
-                message = "Dock using [TAPE=1] [AFT=1.111] [FORE=1.111] [FUEL=11.11] [F-RATE=11.11]"
+                dockParams = Setting.getDockParams()
+                sets = dockParams["sets"]
+                randomSet = random.choice(sets)
+          
+                aft = "{:.3f}".format(randomSet["a_aft"])
+                fore = "{:.3f}".format(randomSet["a_fore"])
+                fuel = "{0:0>2.2f}".format(randomSet["f_qty"])
+                rate = "{0:0>2.3f}".format(randomSet["f_rate"])
+                tape = "{0:0>2}".format(randomSet["tape_id"])
+                dist = "{0:0>2}".format(randomSet["tape_len"])
+
+                message = "Dock using [TAPE={}] [AFT={}] [FORE={}] [FUEL={}] [F-RATE={}]".format(tape, aft, fore, fuel, rate)
                 startData = json.dumps({
-                     "AFT": "1.111",
-                     "FORE": "1.111",
-                     "FUEL": "11.11",
-                     "F_RATE": "11.11",
-                     "DIST": "11",
+                     "AFT": aft,
+                     "FORE": fore,
+                     "FUEL": fuel,
+                     "F_RATE": rate,
+                     "DIST": dist,
                    })
                 event = PiEvent.addEvent(type=PiEvent.START_CHALLENGE_MSG_TYPE,
                               team=team,
@@ -1054,6 +1086,8 @@ class Latch(JSONHandlerView):
             else:
                 message = "Failed! Go to the next Challenge!"
 
+        # figure out if actual docking time requires penalty
+        # TODO change the reported time in data            
 	jsonTime = json.dumps({
              "time": lastAnswer,
            })
@@ -1215,26 +1249,26 @@ class Secure(JSONHandlerView):
         
         # TODO:  Add message processing
 
-        team, response = self.getTeamFromRegCode(self, m.reg_code, request.body)
+        team, response = self.getTeamFromRegCode(m.reg_code, request.body)
         if team is None:
            return response
 
-        station, response = self.getStationFromStationId(self, station_id, request.body)
+        station, response = self.getStationFromStationId(station_id, request.body)
         if station is None:
             return response
 
-        # TODO check if passed or, was 3 fails or was < 3 fails
-        passed = False
-        restart = True
+        wasCorrect, retry, lastAnswer, lastAttemptData, response = self.getStatus(team, station)
+        if wasCorrect is None:
+            return response
 
-        if passed:
+        if wasCorrect:
             # Succeeded:  Record the transaction and update the station record
             status=PiEvent.SUCCESS_STATUS
             message = "Correct! Go to the next Challenge!"
         else:
             # failed
             status=PiEvent.FAIL_STATUS
-            if restart:
+            if retry:
                 message = "Try again by listening to tones again (optional) and scanning Open QR Code to re-enable photodetector"
 
    	        # Restart since they failed < 3 times 
@@ -1257,7 +1291,7 @@ class Secure(JSONHandlerView):
         event = self.addEvent(team=team,
                               pi=station,
                               data=request.body,
-                              status=PiEvent.status,
+                              status=status,
                               message=message,
                               )
  
@@ -1291,47 +1325,31 @@ class ReturnToEarth(JSONHandlerView):
         m,response = self.validateJSONFields(request, ("reg_code","message",))
         if m is None:
             return response
-        
-        # TODO:  Add message processing
 
-        team, response = getTeamFromRegCode(self, m.reg_code, request.body)
+        team, response = self.getTeamFromRegCode(self, m.reg_code, request.body)
         if team is None:
            return response
 
-        station, response = getStationFromStationId(self, station_id, request.body)
+        station, response = self.getStationFromStationId(self, station_id, request.body)
         if station is None:
             return response
 
-        # TODO check if passed or, was 3 fails or was < 3 fails
-        passed = True
-        restart = True
+        wasCorrect, retry, lastAnswer, lastAttemptData, response = self.getStatus(team, station)
+        if wasCorrect is None:
+            return response
 
-        if passed:
+        if wasCorrect:
             # Succeeded:  Record the transaction and update the station record
             status=PiEvent.SUCCESS_STATUS
             message = "Correct! You have returned successfully!"
         else:
             # failed
-            if restart:
+            if retry:
    	        # Restart since they failed < 3 times 
                 # Store failure no matter what for score keeping
                 status=PiEvent.FAIL_STATUS
                 # This is the message to send assuming restart of the station works
                 message = "Try again! A bit signed but still alive!"
-
-                # Get parameters for this station
-                # TODO do we really send the parameters because it resets automatically
-                url = "{}/start_challenge".format(station.url)
-                headers = { "Content-type": "application/json", "Accept": "application.json" }
-                data = json.dumps({
-                    "message_version": "0",
-                    "message_timestamp": "2014-09-15 14:08:59",
-                    "secure_tone_pattern": [0, 1, 2, 3, 4, 5, 6, 7, 4, 2],
-                   })
-
-                response = requests.post(url, data=data, headers=headers)
-                if response.status_code != 200:
-                    message = "Could not contact station. Contact a competition official."	
             else:
                 status=PiEvent.FAIL_STATUS
                 message = "Failed! Too bad but all done."
@@ -1343,7 +1361,40 @@ class ReturnToEarth(JSONHandlerView):
                               status=status,
                               message=message,
                               )
- 
+
+        url = "{}/start_challenge".format(station.url)
+        if retry:
+            # Get parameters for this particular station
+            # TODO
+            jsonData = json.dumps({
+                 "message_version": "0",
+                 "message_timestamp": "2014-09-15 14:08:59",
+                 "return_guidance_pattern": [0, 0, 0, 0, 0, 0],
+                   })
+            message="Measure return angle, determine guidance computer parameters, then enter them into the guidance computer. Scan Return QR Code when done."
+        else: 
+          # Send message to the Pi this team is registered with to restart the simulation no matter what
+          url = "{}/reset/31415".format(station.url)
+          jsonData = json.dumps({})
+
+        # Either way we call the pi
+        headers = { "Content-type": "application/json", "Accept": "application.json" }
+	response = requests.post(url, data=jsonData, headers=headers)
+        if response.status_code != 200:
+            errorMessage = "Could not contact station. Contact a competition official."	
+            errorStatus = PiEvent.WARNING_STATUS
+            data = response
+            event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=errorStatus,
+                              message=errorMessage,
+                             )
+            if retry:
+                # We need to make the team aware as there is a problem that keeps them from continuing
+                self.jsonResponse["message"] = cipher(errorMessage)
+                return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
         # Send response
         self.jsonResponse["message"] = cipher(message)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
@@ -1400,7 +1451,7 @@ class Submit(JSONHandlerView):
         if wasCorrect is None:
             return response
 
-        challegneComplete = wasCorrect or not retry
+        challengeComplete = wasCorrect or not retry
         self.jsonResponse["challenge_complete"] = "{}".format(challengeComplete)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 

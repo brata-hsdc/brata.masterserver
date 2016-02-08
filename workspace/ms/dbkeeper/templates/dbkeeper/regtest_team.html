@@ -1,0 +1,18 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}Register Team {{ entity|title }}{% endblock %}
+{% block header %}Register Team {{ entity|title }}{% endblock %}
+
+{% block main %}
+<table>
+<tr>
+<td>Registration</td>
+<td>Unregister (Note you need to unregister after registering if you want to register again using the same pass code)</td>
+</tr>
+<tr>
+<td><img src="http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F97.102.189.170%3A80%2Fpiservice%2Fregister%2F{{pass_code}}/"></td>
+<td><img src="http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F97.102.189.170%3A80%2Fpiservice%2Funregister"></td>
+</tr>
+</table>
+{% endblock %}
+

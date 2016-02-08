@@ -13,12 +13,12 @@
   }, 
   {
    "button": "Start Return", 
-   "cmd": "http --json POST :80/piservice/start_challenge/return06/ Content-type:application/json Accept:application/json reg_code=\"60e37b2c72c0d737\" message=\"\"", 
+   "cmd": "http --json POST :80/piservice/start_challenge/return06/ Content-type:application/json Accept:application/json reg_code=\"0b95f281f733d0d6\" message=\"\"", 
    "tooltip": "Start Challenge"
   },
   {
    "button": "Scan Return", 
-   "cmd": "http --json POST :80/piservice/return/return06/ Content-type:application/json Accept:application/json reg_code=\"60e37b2c72c0d737\" message=\"\"", 
+   "cmd": "http --json POST :80/piservice/return/return06/ Content-type:application/json Accept:application/json reg_code=\"0b95f281f733d0d6\" message=\"\"", 
    "tooltip": "Check if got it right"
   }
  ], 

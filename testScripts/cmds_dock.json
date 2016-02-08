@@ -12,8 +12,13 @@
    "tooltip": "Start Challenge"
   },
   {
-   "button": "Dock", 
+   "button": "Dock Fail", 
    "cmd": "http --json POST :80/piservice/dock/dock01/ Content-type:application/json Accept:application/json reg_code=\"0b95f281f733d0d6\" message=\"[T-AFT=111.1] [T-COAST=111.1] [T-FORE=111.1]\"", 
+   "tooltip": "Sent by the BRATA to submit docking paramaters"
+  }, 
+  {
+   "button": "Dock Success", 
+   "cmd": "http --json POST :80/piservice/dock/dock01/ Content-type:application/json Accept:application/json reg_code=\"0b95f281f733d0d6\" message=\"[T-AFT=000.5] [T-COAST=019.0] [T-FORE=000.4]\"", 
    "tooltip": "Sent by the BRATA to submit docking paramaters"
   }, 
   {
