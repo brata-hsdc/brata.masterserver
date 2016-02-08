@@ -35,3 +35,4 @@ _ReSharper*/
 transition/msdb_database_initialization.html
 transition/generated/db_backup/*
 .pydevproject
+workspace/ms/data/*
