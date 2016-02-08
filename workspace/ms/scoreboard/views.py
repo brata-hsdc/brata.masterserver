@@ -7,6 +7,7 @@ import json
 import logging
 from dbkeeper.models import Organization, Team
 from piservice.models import PiEvent, PiStation
+from gnome._gnome import score_init
 
 
 #-------------------------------------------------------------------------------
@@ -62,7 +63,7 @@ class ScoreboardStatus(View):
     #---------------------------------------------------------------------------
     @staticmethod
     def _getEvents(team_name,
-                   event_type,
+                   station_type,
                    now):
         logging.debug('Entered ScoreboardStatus._getEvents({})'.format(team_name))
 
@@ -89,403 +90,159 @@ class ScoreboardStatus(View):
 
     #---------------------------------------------------------------------------
     @staticmethod
-    def _recomputeLaunchScore(team_name,
-                              station_type,
-                              max_submit_events,
-                              now):
-        logging.debug('Entered ScoreboardStatus._recomputeLaunchScore({})'.format(team_name))
+    def _getNextEventTimestamp(attempt_num,
+                               start_challenge_events,
+                               team_events):
+        if attempt_num < start_challenge_events.count():
+            logging.debug('More attempts for team follow')
+            result = start_challenge_events[attempt_num].time # timestamp of following event
+        else:
+            logging.debug('No more attempts for team or event concluded')
+            game_over_events = PiEvent.objects.filter(
+                type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
+            ).order_by('time')
 
-#--- BEGIN COMMON
-        (team_events, start_challenge_events, score, start_time) = _getEvents(team_name, station_type, now)
-
-        time_to_exit = False
-        num_failed_attempts = 0 # TODO unused
-        i = 0
-
-        while not time_to_exit:
-            attemptNum = i + 1
-            logging.debug('Not yet time to exit; processing attempt {} of {} for team {}'.format(attemptNum, start_challenge_events.count(), team_name))
-
-            if i < start_challenge_events.count():
-                logging.debug('Examining more START_CHALLENGE events')
-                # need to get range t..u of events for this attempt only
-
-                t = start_challenge_events[i].time # timestamp of next START_CHALLENGE event
-
-                if attemptNum < start_challenge_events.count():
-                    logging.debug('More attempts for team follow')
-                    u = start_challenge_events[attemptNum].time # timestamp of following event
-                else:
-                    logging.debug('No more attempts for team or event concluded')
-                    game_over_events = PiEvent.objects.filter(
-                        type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
-                    ).order_by('time')
-
-                    if game_over_events.count() > 0:
-                        logging.debug('Detected game over - event concluded')
-                        u = game_over_events[0].time
-                    else:
-                        logging.debug('No more attempts for team')
-                        u = team_events.reverse()[0].time # get last event timestamp
-
-                logging.debug('Processing events for Team "{}" attempt #{} from {}..{}'.format(team_name, attemptNum, t, u))
-
-                # get events within t..u range with status SUCCESS_STATUS or FAIL_STATUS
-                submit_events = team_events.filter(
-                    type=PiEvent.SUBMIT_MSG_TYPE
-                ).filter(
-                    (Q(status=PiEvent.SUCCESS_STATUS) | Q(status=PiEvent.FAIL_STATUS)),
-                    Q(time__gte=t),
-                    Q(time__lte=u)
-                )
-
-                success_events = submit_events.filter(
-                    status=PiEvent.SUCCESS_STATUS
-                )
-
-                fail_events = submit_events.filter(
-                    status=PiEvent.FAIL_STATUS
-                )
-
-                num_success_events = success_events.count()
-                num_fail_events = fail_events.count()
-#--- END COMMON
-
-                cur_attempt_score = (2 * num_success_events) + (1 * num_fail_events)
-
-#--- BEGIN COMMON
-                if submit_events.count() < max_submit_events:
-                    logging.debug('Getting events within t..u range with EVENT_CONCLUDED_MSG_TYPE')
-
-                    events = team_events.filter(
-                        type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
-                    ).filter(
-                        Q(time__gte=t),
-                        Q(time__lte=u)
-                    )
-
-                    if events.count() > 0:
-                        score = cur_attempt_score
-                        time_to_exit = true
-#--- END COMMON
-                        end_time = events[0].time
-#--- BEGIN COMMON
-                    else:
-                        logging.debug('Phone probably died and need to start over, or challenge still in-progress')
-#--- END COMMON
-
-                else:
-                    if submit_events.count() > max_submit_events:
-                        logging.error('More than four SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attemptNum, team_name, t, u))
-
-                    score = cur_attempt_score
-                    time_to_exit = true
-                    end_time = submit_events.reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
-
-#--- BEGIN COMMON
-                i += 1
+            if game_over_events.count() > 0:
+                logging.debug('Detected game over - event concluded')
+                result = game_over_events[0].time
             else:
-                logging.debug('Challenge complete; time to exit')
-                time_to_exit = True
-                end_time = now
+                logging.debug('No more attempts for team')
+                result = team_events.reverse()[0].time # get last event timestamp
 
-        duration_s = (end_time - start_time).total_seconds()
-#--- END COMMON
+        return result
 
-        logging.debug('Exiting ScoreboardStatus._recomputeLaunchScore: score={}, duration={} s'.format(score, duration_s))
-        return (score, duration_s)
+    #---------------------------------------------------------------------------
+    @staticmethod
+    def _computeLaunch(team_name,
+                       attempt_num,
+                       max_submit_events,
+                       params,
+                       now):
+        logging.debug('Entered ScoreboardStatus._computeLaunch({})'.format(team_name))
+
+        if params['submit_events'].count() > max_submit_events:
+            logging.error('More than four SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+
+        params['score'] = params['cur_attempt_score']
+        params['time_to_exit'] = True
+        params['end_time'] = params['submit_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
+
+        logging.debug('Exiting ScoreboardStatus._computeLaunch')
 
 
     #---------------------------------------------------------------------------
     @staticmethod
-    def _recomputeDockScore(team_name,
-                            station_type,
-                            max_submit_events,
-                            now):
-        logging.debug('Entered ScoreboardStatus._recomputeDockScore({})'.format(team_name))
+    def _computeDock(team_name,
+                     attempt_num,
+                     max_submit_events,
+                     params,
+                     now):
+        logging.debug('Entered ScoreboardStatus._computeDock({})'.format(team_name))
 
-#--- TODO BEGIN COMMON
-        (team_events, start_challenge_events, score, start_time) = _getEvents(team_name, station_type, now)
-
-        time_to_exit = False
-        num_failed_attempts = 0
-        i = 0
-#--- TODO END COMMON
-
+        """
 #--- TODO BEGIN DOCK
-        current_run_time = 0
-#--- TODO END DOCK
-
-#--- TODO BEGIN COMMON
-        while not time_to_exit:
-            attemptNum = i + 1
-            logging.debug('Not yet time to exit; processing attempt {} of {} for team {}'.format(attemptNum, start_challenge_events.count(), team_name))
-
-            if i < start_challenge_events.count():
-                logging.debug('Examining more START_CHALLENGE events')
-                # need to get range t..u of events for this attempt only
-
-                t = start_challenge_events[i].time # timestamp of next START_CHALLENGE event
-
-                if attemptNum < start_challenge_events.count():
-                    logging.debug('More attempts for team follow')
-                    u = start_challenge_events[attemptNum].time # timestamp of following event
-                else:
-                    logging.debug('No more attempts for team or event concluded')
-                    game_over_events = PiEvent.objects.filter(
-                        type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
-                    ).order_by('time')
-
-                    if game_over_events.count() > 0:
-                        logging.debug('Detected game over - event concluded')
-                        u = game_over_events[0].time
-                    else:
-                        logging.debug('No more attempts for team')
-                        u = team_events.reverse()[0].time # get last event timestamp
-
-                logging.debug('Processing events for Team "{}" attempt #{} from {}..{}'.format(team_name, attemptNum, t, u))
-
-                # get events within t..u range with status SUCCESS_STATUS or FAIL_STATUS
-                submit_events = team_events.filter(
-                    type=PiEvent.SUBMIT_MSG_TYPE
-                ).filter(
-                    (Q(status=PiEvent.SUCCESS_STATUS) | Q(status=PiEvent.FAIL_STATUS)),
-                    Q(time__gte=t),
-                    Q(time__lte=u)
-                )
-
-                success_events = submit_events.filter(
-                    status=PiEvent.SUCCESS_STATUS
-                )
-
-                fail_events = submit_events.filter(
-                    status=PiEvent.FAIL_STATUS
-                )
-
-                num_success_events = success_events.count()
-                num_fail_events = fail_events.count()
-#--- TODO END COMMON
-
-                cur_attempt_score = 5
-
-#--- BEGIN COMMON
-                if submit_events.count() < max_submit_events:
-                    logging.debug('Getting events within t..u range with EVENT_CONCLUDED_MSG_TYPE')
-
-                    events = team_events.filter(
-                        type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
-                    ).filter(
-                        Q(time__gte=t),
-                        Q(time__lte=u)
-                    )
-
-                    if events.count() > 0:
-                        score = cur_attempt_score
-                        time_to_exit = true
-#--- TODO END COMMON
-#--- TODO BEGIN DOCK
+TODO2:
         # TODO
         #             dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
         #             attempt_run_time = timestamp of LATCH/SUBMIT event + (total actual docking time * dnf_scale)
-        #             end_time = current_run_time + attempt_run_time
+        #             params['end_time'] = params['current_run_time'] + attempt_run_time
+        params['docking_time_s'] = todo
 #--- TODO END DOCK
 #--- BEGIN COMMON
-                    else:
-                        logging.debug('Phone probably died and need to start over, or challenge still in-progress')
 
-                elif num_success_events > 0:
-                    if submit_events.count() > max_submit_events:
-                        logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attemptNum, team_name, t, u))
+TODO4:
+                if num_success_events > 0:
+                    if params['submit_events'].count() > max_submit_events:
+                        logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
 
-                    score = 9
-                    time_to_exit = true
+                    params['score'] = 9
+                    params['time_to_exit'] = True
 #--- TODO END COMMON
 #--- TODO BEGIN DOCK
         # TODO
         #                 dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
         #                 attempt_run_time = timestamp of LATCH/SUBMIT event + (total actual docking time * dnf_scale)
-        #                 end_time = current_run_time + attempt_run_time
+        #                 params['end_time'] = params['current_run_time'] + attempt_run_time
         #             else
         #                 dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
         #                 attempt_run_time = timestamp of LATCH/SUBMIT event + (total actual docking time * dnf_scale)
-        #                 current_run_time += attempt_run_time
+        #                 params['current_run_time'] += attempt_run_time
 #--- TODO END DOCK
 
 #--- TODO BEGIN COMMON
                 elif num_fail_events > 0:
-                    if submit_events.count() > max_submit_events:
-                        logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attemptNum, team_name, t, u))
+                    if params['submit_events'].count() > max_submit_events:
+                        logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
 
-                    num_failed_attempts += 1
+                    params['num_failed_attempts'] += 1
 
-                    if num_failed_attempts > 3:
-                        score = 5
-                        time_to_exit = true
+                    if params['num_failed_attempts'] > 3:
+                        params['score'] = 5
+                        params['time_to_exit'] = True
 #--- TODO END COMMON
 #--- TODO BEGIN DOCK
         # TODO
         #             dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
         #             attempt_run_time = timestamp of LATCH/SUBMIT event + (total actual docking time * dnf_scale)
-        #             end_time = current_run_time + attempt_run_time
+        #             params['end_time'] = params['current_run_time'] + attempt_run_time
 #--- TODO END DOCK
 
 #--- TODO BEGIN COMMON
                 else:
                     log.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
-                i += 1
-            else:
-                logging.debug('Challenge complete; time to exit')
-                time_to_exit = True
 #--- TODO END COMMON
 #--- TODO BEGIN DOCK
+TODO3:
         #         TODO - Do we have a Submit message to work with here?
         #         dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
         #         attempt_run_time = now + (total actual docking time * dnf_scale)
-        #         end_time = current_run_time + attempt_run_time
+        #         params['end_time'] = params['current_run_time'] + attempt_run_time
+        params['docking_time_s'] = todo
 #--- TODO END DOCK
 
 #--- BEGIN COMMON
-
-        duration_s = (end_time - start_time).total_seconds()
 #--- END COMMON
+        """
 
-        logging.debug('Exiting ScoreboardStatus._recomputeDockScore: score={}, duration={} s'.format(score, duration_s))
-        return (score, duration_s)
+        logging.debug('Exiting ScoreboardStatus._computeDock')
 
 
     #---------------------------------------------------------------------------
     @staticmethod
-    def _recomputeSecureOrReturnScore(team_name,
-                                      station_type,
-                                      max_submit_events,
-                                      now):
-        logging.debug('Entered ScoreboardStatus._recomputeSecureOrReturnScore({}, {})'.format(team_name, station_type))
+    def _computeSecureOrReturn(team_name,
+                               attempt_num,
+                               max_submit_events,
+                               params,
+                               now):
+        logging.debug('Entered ScoreboardStatus._computeSecureOrReturn({})'.format(team_name))
 
-#--- BEGIN COMMON
-        (team_events, start_challenge_events, score, start_time) = _getEvents(team_name, station_type, now)
+        num_success_events = params['success_events'].count()
+        num_fail_events = params['fail_events'].count()
 
-        time_to_exit = False
-        num_failed_attempts = 0
-        i = 0
-#--- END COMMON
+        if num_success_events > 0:
+            if params['submit_events'].count() > max_submit_events:
+                logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
 
-#--- BEGIN COMMON
-        while not time_to_exit:
-            attemptNum = i + 1
-            logging.debug('Not yet time to exit; processing attempt {} of {} for team {}'.format(attemptNum, start_challenge_events.count(), team_name))
+            params['score'] = 9
+            params['time_to_exit'] = True
+            params['end_time'] = params['success_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS
 
-            if i < start_challenge_events.count():
-                logging.debug('Examining more START_CHALLENGE events')
-                # need to get range t..u of events for this attempt only
+        elif num_fail_events > 0:
+            if params['submit_events'].count() > max_submit_events:
+                logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
 
-                t = start_challenge_events[i].time # timestamp of next START_CHALLENGE event
+            params['num_failed_attempts'] += 1
 
-                if attemptNum < start_challenge_events.count():
-                    logging.debug('More attempts for team follow')
-                    u = start_challenge_events[attemptNum].time # timestamp of following event
-                else:
-                    logging.debug('No more attempts for team or event concluded')
-                    game_over_events = PiEvent.objects.filter(
-                        type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
-                    ).order_by('time')
+            if params['num_failed_attempts'] > 3:
+                params['score'] = 5
+                params['time_to_exit'] = True
+                params['end_time'] = params['fail_events'].reverse()[0].time # timestamp of final FAIL_STATUS
 
-                    if game_over_events.count() > 0:
-                        logging.debug('Detected game over - event concluded')
-                        u = game_over_events[0].time
-                    else:
-                        logging.debug('No more attempts for team')
-                        u = team_events.reverse()[0].time # get last event timestamp
+        else:
+            log.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
-                logging.debug('Processing events for Team "{}" attempt #{} from {}..{}'.format(team_name, attemptNum, t, u))
-
-                # get events within t..u range with status SUCCESS_STATUS or FAIL_STATUS
-                submit_events = team_events.filter(
-                    type=PiEvent.SUBMIT_MSG_TYPE
-                ).filter(
-                    (Q(status=PiEvent.SUCCESS_STATUS) | Q(status=PiEvent.FAIL_STATUS)),
-                    Q(time__gte=t),
-                    Q(time__lte=u)
-                )
-
-                success_events = submit_events.filter(
-                    status=PiEvent.SUCCESS_STATUS
-                )
-
-                fail_events = submit_events.filter(
-                    status=PiEvent.FAIL_STATUS
-                )
-
-                num_success_events = success_events.count()
-                num_fail_events = fail_events.count()
-#--- END COMMON
-
-                cur_attempt_score = 5
-
-#--- BEGIN COMMON
-                if submit_events.count() < max_submit_events:
-                    logging.debug('Getting events within t..u range with EVENT_CONCLUDED_MSG_TYPE')
-
-                    events = team_events.filter(
-                        type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
-                    ).filter(
-                        Q(time__gte=t),
-                        Q(time__lte=u)
-                    )
-
-                    if events.count() > 0:
-                        score = cur_attempt_score
-                        time_to_exit = true
-#--- END COMMON
-#--- BEGIN SECURE OR RETURN
-                        end_time = events[0].time
-#--- END SECURE OR RETURN
-#--- BEGIN COMMON
-                    else:
-                        logging.debug('Phone probably died and need to start over, or challenge still in-progress')
-
-#--- END COMMON
-
-#---BEGIN SECURE OR RETURN
-                elif num_success_events > 0:
-                    if submit_events.count() > max_submit_events:
-                        logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attemptNum, team_name, t, u))
-
-                    score = 9
-                    time_to_exit = true
-                    end_time = success_events.reverse()[0].time # timestamp of final SUCCESS_STATUS
-
-                elif num_fail_events > 0:
-                    if submit_events.count() > max_submit_events:
-                        logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attemptNum, team_name, t, u))
-
-                    num_failed_attempts += 1
-
-                    if num_failed_attempts > 3:
-                        score = 5
-                        time_to_exit = true
-                        end_time = fail_events.reverse()[0].time # timestamp of final FAIL_STATUS
-
-                else:
-                    log.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
-#---END SECURE OR RETURN
-
-#--- BEGIN COMMON
-                i += 1
-            else:
-                logging.debug('Challenge complete; time to exit')
-                time_to_exit = True
-#--- END COMMON
-#--- BEGIN SECURE OR RETURN
-                end_time = now
-#--- END SECURE OR RETURN
-#--- BEGIN COMMON
-
-        duration_s = (end_time - start_time).total_seconds()
-#--- END COMMON
-
-        logging.debug('Exiting ScoreboardStatus._recomputeSecureOrReturnScore')
-        return (score, duration_s)
+        logging.debug('Exiting ScoreboardStatus._computeSecureOrReturn')
 
 
     #---------------------------------------------------------------------------
@@ -494,13 +251,95 @@ class ScoreboardStatus(View):
                         team_name,
                         station_type,
                         max_submit_events,
+                        calc_current_attempt_score,
                         now):
         logging.debug('Entered ScoreboardStatus._recomputeScore({})'.format(team_name))
 
-        (score, duration_s) = algorithm(team_name, station_type, max_submit_events, now)
+        (team_events, start_challenge_events, score, start_time) = ScoreboardStatus._getEvents(team_name, station_type, now)
+
+        params = {}
+        params['score'] = score
+        params['time_to_exit'] = False
+        params['num_failed_attempts'] = 0;
+        params['current_run_time'] = 0
+        params['docking_time_s'] = 0
+        i = 0
+
+        while not params['time_to_exit']:
+            attempt_num = i + 1
+            logging.debug('Not yet time to exit; processing attempt {} of {} for team {}'.format(attempt_num, start_challenge_events.count(), team_name))
+
+            if i < start_challenge_events.count():
+                logging.debug('Examining more START_CHALLENGE events')
+                # need to get range t..u of events for this attempt only
+
+                params['t'] = start_challenge_events[i].time # timestamp of next START_CHALLENGE event
+                params['u'] = ScoreboardStatus._getNextEventTimestamp(attempt_num, start_challenge_events, team_events)
+
+                logging.debug('Processing events for Team "{}" attempt #{} from {}..{}'.format(team_name, attempt_num, params['t'], params['u']))
+
+                # get events within t..u range with status SUCCESS_STATUS or FAIL_STATUS
+                params['submit_events'] = team_events.filter(
+                    type=PiEvent.SUBMIT_MSG_TYPE
+                ).filter(
+                    (Q(status=PiEvent.SUCCESS_STATUS) | Q(status=PiEvent.FAIL_STATUS)),
+                    Q(time__gte=params['t']),
+                    Q(time__lte=params['u'])
+                )
+
+                params['success_events'] = params['submit_events'].filter(
+                    status=PiEvent.SUCCESS_STATUS
+                )
+
+                params['fail_events'] = params['submit_events'].filter(
+                    status=PiEvent.FAIL_STATUS
+                )
+
+                num_success_events = params['success_events'].count()
+                num_fail_events = params['fail_events'].count()
+
+                params['cur_attempt_score'] = 5
+
+                if calc_current_attempt_score:
+                    params['cur_attempt_score'] = (2 * num_success_events) + (1 * num_fail_events)
+
+                if params['submit_events'].count() < max_submit_events:
+                    logging.debug('Getting events within t..u range with EVENT_CONCLUDED_MSG_TYPE')
+
+                    events = team_events.filter(
+                        type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
+                    ).filter(
+                        Q(time__gte=params['t']),
+                        Q(time__lte=params['u'])
+                    )
+
+                    if events.count() > 0:
+                        params['score'] = params['cur_attempt_score']
+                        params['time_to_exit'] = True
+                        params['end_time'] = events[0].time
+                    else:
+                        logging.debug('Phone probably died and need to start over, or challenge still in-progress')
+                else:
+                    algorithm(team_name,
+                              attempt_num,
+                              max_submit_events,
+                              params,
+                              now)
+
+                i += 1
+            else:
+                logging.debug('Challenge complete; time to exit')
+                params['time_to_exit'] = True
+                params['end_time'] = now
+
+        """
+        TODO
+        params['docking_time_s'] = _computeDockingTime(todo)
+        """
+        duration_s = (params['end_time'] - start_time).total_seconds() + params['docking_time_s']
 
         logging.debug('Exiting ScoreboardStatus._recomputeScore()')
-        return (score, duration_s)
+        return (params['score'], duration_s)
 
     #---------------------------------------------------------------------------
     @staticmethod
@@ -509,25 +348,29 @@ class ScoreboardStatus(View):
 
         now = datetime.utcnow().replace(tzinfo=utc)
 
-        (launch_score, launch_duration_s) = ScoreboardStatus._recomputeScore(_recomputeLaunchScore,
+        (launch_score, launch_duration_s) = ScoreboardStatus._recomputeScore(ScoreboardStatus._computeLaunch,
                                                                              team_name,
                                                                              PiStation.LAUNCH_STATION_TYPE,
                                                                              4,
+                                                                             True,
                                                                              now)
-        (dock_score,   dock_duration_s)   = ScoreboardStatus._recomputeScore(_recomputeDockScore,
+        (dock_score,   dock_duration_s)   = ScoreboardStatus._recomputeScore(ScoreboardStatus._computeDock,
                                                                              team_name,
                                                                              PiStation.DOCK_STATION_TYPE,
                                                                              1,
+                                                                             False,
                                                                              now)
-        (secure_score, secure_duration_s) = ScoreboardStatus._recomputeScore(_recomputeSecureOrReturnScore,
+        (secure_score, secure_duration_s) = ScoreboardStatus._recomputeScore(ScoreboardStatus._computeSecureOrReturn,
                                                                              team_name,
                                                                              PiStation.SECURE_STATION_TYPE,
                                                                              1,
+                                                                             False,
                                                                              now)
-        (return_score, return_duration_s) = ScoreboardStatus._recomputeScore(_recomputeSecureOrReturnScore,
+        (return_score, return_duration_s) = ScoreboardStatus._recomputeScore(ScoreboardStatus._computeSecureOrReturn,
                                                                              team_name,
                                                                              PiStation.RETURN_STATION_TYPE,
                                                                              1,
+                                                                             False,
                                                                              now)
 
         total_score = launch_score + dock_score + secure_score + return_score
