@@ -1,16 +1,20 @@
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect, HttpResponse
 from django.views.generic import View
 from django.contrib.auth.models import User
 from django.template import RequestContext
 
 from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm,\
-                   AddLaunchParamsForm, AddDockParamsForm, AddSecureParamsForm, AddReturnParamsForm
+                   AddLaunchParamsForm, AddDockParamsForm, AddSecureParamsForm, AddReturnParamsForm,\
+                   LoadSettingsForm
 from .models import Organization, MSUser, Team, Setting
 from piservice.models import PiEvent
 from .team_code import TeamPassCode
 
 import json
 import random
+import csv
+from datetime import date as Date
+from cStringIO import StringIO
 
 # Create your views here.
 def tryAgain(request, msg=None, url=None, buttonText=None,
@@ -533,3 +537,56 @@ class AddReturnParams(View):
 
         return render(request, "dbkeeper/add_return_params.html", self.context)
 
+#----------------------------------------------------------------------------
+def SaveSettings(request):
+    """ Display the save_settings page. """
+    return render(request, "dbkeeper/save_settings.html")
+
+#----------------------------------------------------------------------------
+def SaveSettingsConfirmed(request):
+    """ Send back the CSV file """
+    # Create a response object to send back the data
+    response = HttpResponse(content_type="tex/plain")
+    
+    # Write the CSV into the response
+    fieldNames = ["name", "value", "description"]
+    writer = csv.DictWriter(response, fieldnames=fieldNames)
+    writer.writeheader()
+    for s in Setting.objects.values(*fieldNames).order_by("name"):
+        writer.writerow(s)
+    
+    response["Content-Disposition"] = "attachment; filename=Settings_{}.csv".format(str(Date.today()))
+    return response
+
+#----------------------------------------------------------------------------
+class LoadSettings(View):
+    context = {
+               "form":   None,
+               "entity": "Load Settings from CSV",
+               "submit": "Upload CSV",
+              }
+
+    def get(self, request):
+        """ Display the form """
+        self.context["form"] = LoadSettingsForm()
+        return render(request, "dbkeeper/load_settings.html", self.context)
+    
+    def post(self, request):
+        form = LoadSettingsForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Read the CSV file
+            reader = csv.DictReader(StringIO(request.FILES["loadFile"].read()))
+            
+            for r in reader:
+                try:
+                    setting = Setting.objects.get(name=r["name"])
+                    setting.value = r["value"]
+                    setting.description = r["description"]
+                except Setting.DoesNotExist:
+                    setting = Setting(name=r["name"], value=r["value"], description=r["description"])
+                setting.save()
+            
+            return HttpResponseRedirect("/admin/dbkeeper/setting/")
+        
+        self.context["form"] = form
+        return render(request, "dbkeeper/load_settings.html", self.context)

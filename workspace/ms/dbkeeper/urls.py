@@ -36,6 +36,9 @@ urlpatterns = [
     url(r'^add/secureparams/$', views.AddSecureParams.as_view(), name="AddSecureParams"),
     url(r'^add/returnparams/$', views.AddReturnParams.as_view(), name="AddReturnParams"),
     url(r'^checkin/team/$', views.CheckInTeam.as_view(), name="CheckInTeam"),
+    url(r'^save/settings/$', views.SaveSettings, name="SaveSettings"),
+    url(r'^save/settings/confirmed/$', views.SaveSettingsConfirmed, name="SaveSettingsConfirmed"),  # save Setting table to CSV file
+    url(r'^load/settings/$', views.LoadSettings.as_view(), name="LoadSettings"),  # load Setting table from CSV file
     ]
 
 # Test commands:
