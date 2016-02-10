@@ -35,3 +35,6 @@ _ReSharper*/
 transition/msdb_database_initialization.html
 transition/generated/db_backup/*
 .pydevproject
+
+# ignore output of nohup service
+nohup.out
