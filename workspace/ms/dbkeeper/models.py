@@ -4,7 +4,6 @@ from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 
 from .team_code import TeamPassCode, TeamRegCode
-import django_tables2 as tables
 
 import json
 import random
@@ -250,10 +249,12 @@ class Setting(models.Model):
         """ Generate a random problem that includes one error.
         
         Creates 4 random lock digits.  Computes the 9 tone values.
-        Injects an error of +1 or -1 into one of the digits at random.
+        Injects errors as specified by the Settings SECURE_NUM_INDUCED_ERRORS
+        and SECURE_ERROR_DISTRIBUTION.
         
-        The digits are layed out as follows (as in the Design Spec):
+        The digits are laid out as follows (as in the Design Spec):
         
+         value            index
         a  b  c          0  1  2
         d  e  f   --->   3  4  5
         g  h  i          6  7  8
@@ -261,17 +262,19 @@ class Setting(models.Model):
         where [a, b, d, e] are the 4 lock digits and the other values
         are the check digits.
         
-        Returns:
+        Returns:  ([a, b, d, e], [a', b', c, d', e', f, g, h, i])
             (lockDigits, tones) - a tuple containing list of 4 integers
                                   and a list of 9 integer tone values.
-                                  All integers will in the range 0-7
-        
-        Note:  This method does not actually access the Setting table
-               (or any other table) but it is here because the other
-               challenge parameter access methods are here.
+                                  Some of the tone values may have been
+                                  modified by an error value.
+                                  All integers will be in the range 0-7.
+                                  
         """
+        # Choose 4 lock digits
         random.seed()  # initialize random number generator
         lockDigits = [random.randint(0,7), random.randint(0,7), random.randint(0,7), random.randint(0,7)]
+
+        # Generate the error correcting tone sequence for the lock digits
         tones = [0]*9  # a list of 9 zeroes
         tones[0] = lockDigits[0]
         tones[1] = lockDigits[1]
@@ -283,10 +286,21 @@ class Setting(models.Model):
         tones[7] = 7 - (tones[1] + tones[4]) % 7
         tones[8] = 7 - (tones[2] + tones[5]) % 7
         
-        # Throw in a random error
-        errorDigit = random.randint(0,8)
-        change = random.randint(0,1) * 2 - 1  # gives 1 or -1
-        tones[errorDigit] = (tones[errorDigit] + change) % 7
+        # Try to retrieve error injection values from the Setting table
+        try:
+            errorValues = json.loads(Setting.objects.get(name="SECURE_ERROR_DISTRIBUTION").value)
+            numErrors   = int(Setting.objects.get(name="SECURE_NUM_INDUCED_ERRORS").value)
+        except (ObjectDoesNotExist, ValueError, TypeError):
+            return None
+        
+        # Throw in numErrors random errors
+        unused = range(0,9)  # create a list of indices that could be zapped
+        while numErrors:
+            errorDigit = random.choice(unused)  # choose one of the intact tone values to mess up
+            change = random.choice(errorValues)  # choose an amount to perturb it by
+            tones[errorDigit] = (tones[errorDigit] + change) % 7  # add the corruption
+            unused.remove(errorDigit)  # don't choose the same one twice
+            numErrors -= 1
         
         return (lockDigits, tones)
 

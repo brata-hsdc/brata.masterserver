@@ -1,15 +1,20 @@
-from django.shortcuts import render, HttpResponseRedirect
+from django.shortcuts import render, HttpResponseRedirect, HttpResponse
 from django.views.generic import View
 from django.contrib.auth.models import User
 from django.template import RequestContext
 
 from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm,\
-                   AddLaunchParamsForm, AddDockParamsForm, AddSecureParamsForm, AddReturnParamsForm
+                   AddLaunchParamsForm, AddDockParamsForm, AddSecureParamsForm, AddReturnParamsForm,\
+                   LoadSettingsForm
 from .models import Organization, MSUser, Team, Setting
 from piservice.models import PiEvent
 from .team_code import TeamPassCode
 
 import json
+import random
+import csv
+from datetime import date as Date
+from cStringIO import StringIO
 
 # Create your views here.
 def tryAgain(request, msg=None, url=None, buttonText=None,
@@ -52,7 +57,23 @@ class regtest(View):
               }
     
     def get(self, request):
-        self.context["table"] = Team.objects.all().order_by("organization","name")
+        teams = Team.objects.all().order_by("organization","name")
+        #self.context["table"] = teams
+        
+        # Join the teams with the launch test points for each school
+        launchTestPoints = json.loads(Setting.objects.get(name="LAUNCH_TEST_DATA").value)
+        table = []    
+        for team in teams:
+            entry = {}
+            entry["organization"] = team.organization.name  # school name
+            entry["name"] = team.name  # team name
+            entry["pass_code"] = team.pass_code
+            entry["points"] = launchTestPoints[team.organization.name]
+            table.append(entry)
+        self.context["table"] = table
+        
+        # Get the URL of the DOCK_TEST_HOST
+        self.context["dock_test_host"] = Setting.objects.get(name="DOCK_TEST_HOST").value
         return render(request, "dbkeeper/regtest.html", self.context)
 
 #----------------------------------------------------------------------------
@@ -65,6 +86,37 @@ class regtest_team(View):
     def get(self, request, pass_code):
         self.context["pass_code"] = pass_code
         return render(request, "dbkeeper/regtest_team.html", self.context)
+
+#----------------------------------------------------------------------------
+class NavTestTeam(View):
+    """ Display a map test page with markers. """
+    context = {
+               "entity":    "Launch Test",
+               "pass_code": None,
+               "no_sidebarLeft": True,
+               "no_mainRight": True,
+              }
+    
+    def get(self, request, pass_code, lat1, lon1, lat2, lon2, lat3, lon3, lat4, lon4, school_name):
+        self.context["pass_code"] = pass_code
+        # send the points to the template as an array of GeoJSON objects
+        pt0 = '{{ "x": {}, "y": {} }}'.format(lon1, lat1)  # red
+        pt1 = '{{ "x": {}, "y": {} }}'.format(lon2, lat2)  # green
+        pt2 = '{{ "x": {}, "y": {} }}'.format(lon3, lat3)  # blue
+        pt3 = '{{ "x": {}, "y": {} }}'.format(lon4, lat4)  # yellow
+        pt4 = '{{ "x": {}, "y": {} }}'.format(sum([float(x) for x in [lon1, lon2, lon3, lon4]])/4.0,  # centroid
+                                              sum([float(y) for y in [lat1, lat2, lat3, lat4]])/4.0)
+        self.context["points"] = "'[" + ", ".join([pt0, pt1, pt2, pt3, pt4]) + "]'";
+        
+        # Choose on of the points at random for the team to identify
+        random.seed();
+        n = random.randint(0,3)
+        self.context["lat"] = (lat1, lat2, lat3, lat4)[n]
+        self.context["lon"] = (lon1, lon2, lon3, lon4)[n]
+        self.context["answer"] = ["Incorrect"] * 4
+        self.context["answer"][n] = "Correct!"
+        self.context["entity"] += " for " + school_name
+        return render(request, "dbkeeper/navtest_team.html", self.context)
 
 #----------------------------------------------------------------------------
 def station_status(request):
@@ -490,3 +542,56 @@ class AddReturnParams(View):
 
         return render(request, "dbkeeper/add_return_params.html", self.context)
 
+#----------------------------------------------------------------------------
+def SaveSettings(request):
+    """ Display the save_settings page. """
+    return render(request, "dbkeeper/save_settings.html")
+
+#----------------------------------------------------------------------------
+def SaveSettingsConfirmed(request):
+    """ Send back the CSV file """
+    # Create a response object to send back the data
+    response = HttpResponse(content_type="tex/plain")
+    
+    # Write the CSV into the response
+    fieldNames = ["name", "value", "description"]
+    writer = csv.DictWriter(response, fieldnames=fieldNames)
+    writer.writeheader()
+    for s in Setting.objects.values(*fieldNames).order_by("name"):
+        writer.writerow(s)
+    
+    response["Content-Disposition"] = "attachment; filename=Settings_{}.csv".format(str(Date.today()))
+    return response
+
+#----------------------------------------------------------------------------
+class LoadSettings(View):
+    context = {
+               "form":   None,
+               "entity": "Load Settings from CSV",
+               "submit": "Upload CSV",
+              }
+
+    def get(self, request):
+        """ Display the form """
+        self.context["form"] = LoadSettingsForm()
+        return render(request, "dbkeeper/load_settings.html", self.context)
+    
+    def post(self, request):
+        form = LoadSettingsForm(request.POST, request.FILES)
+        if form.is_valid():
+            # Read the CSV file
+            reader = csv.DictReader(StringIO(request.FILES["loadFile"].read()))
+            
+            for r in reader:
+                try:
+                    setting = Setting.objects.get(name=r["name"])
+                    setting.value = r["value"]
+                    setting.description = r["description"]
+                except Setting.DoesNotExist:
+                    setting = Setting(name=r["name"], value=r["value"], description=r["description"])
+                setting.save()
+            
+            return HttpResponseRedirect("/admin/dbkeeper/setting/")
+        
+        self.context["form"] = form
+        return render(request, "dbkeeper/load_settings.html", self.context)

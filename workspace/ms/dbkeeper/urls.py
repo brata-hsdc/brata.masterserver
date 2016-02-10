@@ -23,7 +23,9 @@ urlpatterns = [
     url(r'^index.html$', views.index, name="index"),
     url(r'^test.html$', views.test, name="test"),
     url(r'^remotetest/$', views.regtest.as_view(), name="regtest"),
+    url(r'^test/$', views.regtest.as_view(), name="regtest"), # this is the student test main page (we should remove or rename test.html)
     url(r'^regtest_team/(?P<pass_code>[^/]+)/$', views.regtest_team.as_view(), name="regtest_team"),
+    url(r'^navtest_team/(?P<pass_code>[^/]+)/(?P<lat1>[0-9.-]+)/(?P<lon1>[0-9.-]+)/(?P<lat2>[0-9.-]+)/(?P<lon2>[0-9.-]+)/(?P<lat3>[0-9.-]+)/(?P<lon3>[0-9.-]+)/(?P<lat4>[0-9.-]+)/(?P<lon4>[0-9.-]+)/(?P<school_name>[^/]*)/$', views.NavTestTeam.as_view(), name="navtest_team"),
     url(r'^station_status/$', views.station_status, name="station_status_page"),
     url(r'^add/org/$', views.AddOrganization.as_view(), name="AddOrg"),
     url(r'^add/organization/$', views.AddOrganization.as_view(), name="AddOrganization"),
@@ -34,6 +36,9 @@ urlpatterns = [
     url(r'^add/secureparams/$', views.AddSecureParams.as_view(), name="AddSecureParams"),
     url(r'^add/returnparams/$', views.AddReturnParams.as_view(), name="AddReturnParams"),
     url(r'^checkin/team/$', views.CheckInTeam.as_view(), name="CheckInTeam"),
+    url(r'^save/settings/$', views.SaveSettings, name="SaveSettings"),
+    url(r'^save/settings/confirmed/$', views.SaveSettingsConfirmed, name="SaveSettingsConfirmed"),  # save Setting table to CSV file
+    url(r'^load/settings/$', views.LoadSettings.as_view(), name="LoadSettings"),  # load Setting table from CSV file
     ]
 
 # Test commands:

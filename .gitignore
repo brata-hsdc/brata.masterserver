@@ -38,3 +38,5 @@ transition/generated/db_backup/*
 
 # ignore output of nohup service
 nohup.out
+
+workspace/ms/data/*

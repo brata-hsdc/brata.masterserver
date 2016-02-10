@@ -26,5 +26,6 @@ urlpatterns = [
     url(r'^serve_pi/', include(piservice_urls)),  # appetizing alias for piservice
     url(r'^m/', include(piservice_urls)),  # alias for 2015 backward compatibility
     url(r'^dbkeeper/', include(dbkeeper_urls)),
+    url(r'^hsdc/', include(dbkeeper_urls)), # alias for dbkeeper for student test pages
     url(r'^scoreboard/', include(scoreboard_urls)),
 ]

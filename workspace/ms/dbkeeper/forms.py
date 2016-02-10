@@ -7,6 +7,17 @@ from .models import Organization, Team
 from .team_code import TeamPassCode
 
 #----------------------------------------------------------------------------
+class FilteredFileField(forms.FileField):
+    """ A file input field for uploading files, that filters on extension """
+    widget = None
+    attrs = {}
+    def __init__(self, *args, **kwargs):
+        self.attrs = kwargs.pop("attrs", {})
+        self.attrs["accept"] = kwargs.pop("accept", None)
+        self.widget = forms.ClearableFileInput(attrs=self.attrs)
+        super(FilteredFileField, self).__init__(*args, **kwargs)
+
+#----------------------------------------------------------------------------
 class AddOrganizationForm(forms.Form):
     name = forms.CharField(label="Organization Name")
     type = forms.ChoiceField(label="Organization Type", choices=Organization.TYPE_CHOICES, initial=Organization.UNKNOWN_TYPE, required=False)
@@ -251,7 +262,7 @@ class AddSecureParamsForm(forms.Form):
                 self.errors[name] = e.messages    
     
     def buildStructure(self, data):
-        """ Put the data fields into the structure specified in models.getDockParams() """
+        """ Put the data fields into the structure specified in models.getSecureParams() """
         n = 0
         nRows = int(data["numRows"])
         s = data["sets"]
@@ -352,3 +363,10 @@ class AddReturnParamsForm(forms.Form):
     st5v4 = forms.IntegerField(initial="0")
     st5v5 = forms.IntegerField(initial="0")
     
+# #----------------------------------------------------------------------------
+# class SaveSettingsForm(forms.Form):
+#     saveFile = forms.FileField(label="Save to File", accept=".csv", max_length=250)
+#     
+#----------------------------------------------------------------------------
+class LoadSettingsForm(forms.Form):
+    loadFile = FilteredFileField(label="Load from File", accept=".csv", max_length=250)
