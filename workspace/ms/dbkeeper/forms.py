@@ -262,7 +262,7 @@ class AddSecureParamsForm(forms.Form):
                 self.errors[name] = e.messages    
     
     def buildStructure(self, data):
-        """ Put the data fields into the structure specified in models.getDockParams() """
+        """ Put the data fields into the structure specified in models.getSecureParams() """
         n = 0
         nRows = int(data["numRows"])
         s = data["sets"]
