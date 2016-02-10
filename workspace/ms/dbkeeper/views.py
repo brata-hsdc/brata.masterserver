@@ -93,20 +93,25 @@ class NavTestTeam(View):
                "no_mainRight": True,
               }
     
-    def get(self, request, pass_code, lat1, lon1, lat2, lon2, lat3, lon3, lat4, lon4):
+    def get(self, request, pass_code, lat1, lon1, lat2, lon2, lat3, lon3, lat4, lon4, school_name):
         self.context["pass_code"] = pass_code
         # send the points to the template as an array of GeoJSON objects
         pt0 = '{{ "x": {}, "y": {} }}'.format(lon1, lat1)  # red
         pt1 = '{{ "x": {}, "y": {} }}'.format(lon2, lat2)  # green
         pt2 = '{{ "x": {}, "y": {} }}'.format(lon3, lat3)  # blue
         pt3 = '{{ "x": {}, "y": {} }}'.format(lon4, lat4)  # yellow
-        self.context["points"] = "'[" + ", ".join([pt0, pt1, pt2, pt3]) + "]'";
+        pt4 = '{{ "x": {}, "y": {} }}'.format(sum([float(x) for x in [lon1, lon2, lon3, lon4]])/4.0,  # centroid
+                                              sum([float(y) for y in [lat1, lat2, lat3, lat4]])/4.0)
+        self.context["points"] = "'[" + ", ".join([pt0, pt1, pt2, pt3, pt4]) + "]'";
+        
+        # Choose on of the points at random for the team to identify
         random.seed();
         n = random.randint(0,3)
         self.context["lat"] = (lat1, lat2, lat3, lat4)[n]
         self.context["lon"] = (lon1, lon2, lon3, lon4)[n]
         self.context["answer"] = ["Incorrect"] * 4
-        self.context["answer"][n] = "Correct"
+        self.context["answer"][n] = "Correct!"
+        self.context["entity"] += " for " + school_name
         return render(request, "dbkeeper/navtest_team.html", self.context)
 
 #----------------------------------------------------------------------------
