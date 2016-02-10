@@ -39,6 +39,9 @@ urlpatterns = [
     url(r'^save/settings/$', views.SaveSettings, name="SaveSettings"),
     url(r'^save/settings/confirmed/$', views.SaveSettingsConfirmed, name="SaveSettingsConfirmed"),  # save Setting table to CSV file
     url(r'^load/settings/$', views.LoadSettings.as_view(), name="LoadSettings"),  # load Setting table from CSV file
+    url(r'^competition/start/$', views.CompetitionStart.as_view(), name="CompetitionStart"),  # clear the PiEvent table and/or insert a Competition Start event 
+    url(r'^competition/end/$', views.CompetitionEnd.as_view(), name="CompetitionEnd"),  # insert a Competition End event 
+    url(r'^add/logmsg/$', views.LogMessage.as_view(), name="LogMessage"),  # insert a LOG_MESSAGE_MSG_TYPE event to mark something
     ]
 
 # Test commands:

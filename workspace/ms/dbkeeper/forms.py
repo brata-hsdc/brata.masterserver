@@ -370,3 +370,20 @@ class AddReturnParamsForm(forms.Form):
 #----------------------------------------------------------------------------
 class LoadSettingsForm(forms.Form):
     loadFile = FilteredFileField(label="Load from File", accept=".csv", max_length=250)
+
+#----------------------------------------------------------------------------
+class CompetitionStartForm(forms.Form):
+    deleteEvents = forms.BooleanField(label="Delete All Events except those checked below", required=False, initial=False)
+    deleteStationJoins = forms.BooleanField(label="Delete Station JOIN and LEAVE Events", required=False, initial=False)
+    deleteTeamRegistrations = forms.BooleanField(label="Delete Team Registration Events", required=False, initial=False)
+    deleteStationStatus = forms.BooleanField(label="Delete Station Status Message Events", required=False, initial=True)
+
+#----------------------------------------------------------------------------
+class CompetitionEndForm(forms.Form):
+    pass
+
+#----------------------------------------------------------------------------
+class LogMessageForm(forms.Form):
+    pass
+
+    

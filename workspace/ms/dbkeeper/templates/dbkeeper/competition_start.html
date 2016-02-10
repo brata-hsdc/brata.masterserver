@@ -1,0 +1,48 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}{{ entity|title }}{% endblock %}
+{% block header %}{{ entity|title }}{% endblock %}
+
+{% block extra_javascript %}
+<script src="/static/dbkeeper/jquery-2.1.4.js"></script>
+<script type="text/javascript">
+function toggleCheckboxes() {
+  var enableCheckbox = $('#id_deleteEvents');//.checked;
+  $("#id_deleteStationJoins").disabled = enableCheckbox;
+  $("#id_deleteTeamRegistrations").disabled = enableCheckbox;
+  $("#id_deleteStationStatus").disabled = enableCheckbox;
+};
+
+$(document).ready(
+    function (event) {
+        $("#id_deleteEvents").change(
+            function (event) {
+                toggleCheckboxes();
+            } );
+    } );
+
+</script>
+{% endblock %}
+
+{% block main %}
+<form action="/dbkeeper/competition/start/" method="post">
+    {% csrf_token %}
+    {# Include the hidden fields #}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    {# Include the visible fields #}
+    <table class="fieldWrapper">
+       {% for field in form.visible_fields %}
+       <tr>
+          <td style="text-align: right;">{{ field.label_tag }}</td>
+          <td style="text-align: left;">{{ field }}</td>
+          <td style="text-align: left; color: red;">{{ field.errors }}</td>
+       </tr>
+       {% endfor %}
+       <tr class="submitRow">
+          <td colspan="3"><b><input type="submit" value="{{ submit }}" /></b></td>
+       </tr>
+    </table>
+</form>
+{% endblock %}

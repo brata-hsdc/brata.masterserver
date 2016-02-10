@@ -1,7 +1,7 @@
 {% extends "dbkeeper/base.html" %}
 
-{% block title  %}Populate Database{% endblock %}
-{% block header %}Populate Database{% endblock %}
+{% block title  %}Master Server Maintenance{% endblock %}
+{% block header %}Master Server Maintenance{% endblock %}
 
 {% block main %}
 From here you can perform the following operations:<br/>
@@ -11,26 +11,35 @@ From here you can perform the following operations:<br/>
   <tr><td><a href="add/user/"><button>Add User</button><br/></a></td><td></td></tr>
   <tr><td><a href="add/team/"><button>Add Team</button><br/></a></td><td></td></tr>
   <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  
   <tr><td><a href="add/launchparams/"><button>Add Launch Parameters</button></a></td><td>Enter parameters for the Launch challenge</td></tr>
   <tr><td><a href="add/dockparams/"><button>Add Dock Parameters</button></a></td><td>Enter parameters for the Dock challenge</td></tr>
   <tr><td><a href="add/secureparams/"><button>Add Secure Parameters</button></a></td><td>Enter parameters for the Secure challenge</td></tr>
   <tr><td><a href="add/returnparams/"><button>Add Return Parameters</button></a></td><td>Enter parameters for the Return challenge</td></tr>
   <tr><td><a href="save/settings/"><button>Save Settings to CSV</button></a></td><td>Save the content of the Setting table to a CSV file</td></tr>
   <tr><td><a href="load/settings/"><button>Load Settings from CSV</button></a></td><td>Load the content of the Setting table from a CSV file</td></tr>
-  
   <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  
   <tr><td><a href="checkin/team/"><button>Check In Team</button><br/></a></td><td></td></tr>
   <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  
   <tr><td><a href="station_status/"><button>Monitor Station Status</button><br/></a></td><td></td></tr>
   <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  
   <tr><td><a href="/admin/dbkeeper/"><button><b>dbkeeper</b> Admin Interface</button><br/></a></td><td></td></tr>
   <tr><td><a href="/admin/dbkeeper/organization/"><button style="margin-left:3em"><b>Organization Table</b> Admin Interface</button><br/></a></td><td></td></tr>
   <tr><td><a href="/admin/dbkeeper/team/"><button style="margin-left:3em"><b>Team Table</b> Admin Interface</button><br/></a></td><td></td></tr>
   <tr><td><a href="/admin/dbkeeper/setting/"><button style="margin-left:3em"><b>Setting Table</b> Admin Interface</button><br/></a></td><td></td></tr>
   <tr><td><a href="/admin/dbkeeper/msuser/"><button style="margin-left:3em"><b>User Table</b> Admin Interface</button><br/></a></td><td></td></tr>
   <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  
   <tr><td><a href="/admin/piservice/"><button><b>piservice</b> Admin Interface</button><br/></a></td><td></td></tr>
   <tr><td><a href="/admin/piservice/pievent/"><button style="margin-left:3em"><b>PiEvent Table</b> Admin Interface</button><br/></a></td><td></td></tr>
   <tr><td><a href="/admin/piservice/pistation/"><button style="margin-left:3em"><b>PiStation Table</b> Admin Interface</button><br/></a></td><td></td></tr>
+  <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+  
+  <tr><td><a href="competition/start/"><button><b>Start the Competition</b></button></a></td></tr>
+  <tr><td><a href="competition/end/"><button><b>End the Competition</b></button></a></td></tr>
+  <tr><td><a href="add/logmsg/"><button><b>Insert a Log Message</b></button></a></td></tr>
 </table>
 {% endblock %}
