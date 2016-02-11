@@ -49,7 +49,8 @@ TODO - raspi-config to expand SD card
 
 ### Install Python
 
-N/A Python already installed and upgraded
+N/A Python already installed and upgraded.
+
 Ah crud need to reinstall python from source with --enabled-shared? This error came from mod_wsgi install.  Suggests there will be major performance and memory hit if not done.
 
 ### Install the Apache Web Server
@@ -80,6 +81,15 @@ TODO do we need to create a virtual environment first?
 ### Install Django
 ```sh
 # sudo pip install Django
+```
+
+### Install pytz
+`pytz` makes it easy to construct a proper *tzinfo* to set the timezone in Django.  This
+allows UTC datetimes to be stored in the database, but displayed in the local timezone.
+The local timezone is set in the Django **settings.py** file.
+
+```sh
+# sudo pip install pytz
 ```
 
 ### Install httpie
