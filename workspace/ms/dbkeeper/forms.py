@@ -374,9 +374,9 @@ class LoadSettingsForm(forms.Form):
 #----------------------------------------------------------------------------
 class CompetitionStartForm(forms.Form):
     deleteEvents = forms.BooleanField(label="Delete All Events except those checked below", required=False, initial=False)
-    deleteStationJoins = forms.BooleanField(label="Delete Station JOIN and LEAVE Events", required=False, initial=False)
-    deleteTeamRegistrations = forms.BooleanField(label="Delete Team Registration Events", required=False, initial=False)
-    deleteStationStatus = forms.BooleanField(label="Delete Station Status Message Events", required=False, initial=True)
+    preserveStationJoins = forms.BooleanField(label="Preserve Station JOIN and LEAVE Events", required=False, initial=True)
+    preserveTeamRegistrations = forms.BooleanField(label="Preserve Team REGISTER and UNREGISTER Events", required=False, initial=True)
+    preserveStationStatus = forms.BooleanField(label="Preserve STATION_STATUS Message Events", required=False, initial=True)
 
 #----------------------------------------------------------------------------
 class CompetitionEndForm(forms.Form):
@@ -384,6 +384,6 @@ class CompetitionEndForm(forms.Form):
 
 #----------------------------------------------------------------------------
 class LogMessageForm(forms.Form):
-    pass
+    messageText = forms.CharField(label="Message Text", widget=forms.Textarea)
 
     

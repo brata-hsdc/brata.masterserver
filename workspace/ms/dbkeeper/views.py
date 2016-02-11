@@ -619,11 +619,11 @@ class CompetitionStart(View):
                 # on_delete=SET_NULL or something similar
                 querySet = PiEvent.objects.all()
                 
-                if not form.cleaned_data["deleteStationJoins"]:
+                if form.cleaned_data["preserveStationJoins"]:
                     querySet = querySet.exclude(type=PiEvent.JOIN_MSG_TYPE).exclude(type=PiEvent.LEAVE_MSG_TYPE)
-                if not form.cleaned_data["deleteTeamRegistrations"]: 
-                    querySet = querySet.exclude(type=PiEvent.REGISTER_MSG_TYPE)
-                if not form.cleaned_data["deleteStationStatus"]: 
+                if form.cleaned_data["preserveTeamRegistrations"]: 
+                    querySet = querySet.exclude(type=PiEvent.REGISTER_MSG_TYPE).exclude(type=PiEvent.UNREGISTER_MSG_TYPE)
+                if form.cleaned_data["preserveStationStatus"]: 
                     querySet = querySet.exclude(type=PiEvent.STATION_STATUS_MSG_TYPE)
                     
                 # Do the delete
@@ -654,7 +654,13 @@ class CompetitionEnd(View):
     def post(self, request):
         form = CompetitionEndForm(request.POST)
         if form.is_valid():
-            pass
+            PiEvent.addEvent(type=PiEvent.EVENT_CONCLUDED_MSG_TYPE,
+                             status=PiEvent.INFO_STATUS,
+                             message="End of Competition")
+            return HttpResponseRedirect("/dbkeeper/")
+        
+        self.context["form"] = form
+        return render(request, "dbkeeper/competition_end.html", self.context)
         
 #----------------------------------------------------------------------------
 class LogMessage(View):
@@ -672,6 +678,12 @@ class LogMessage(View):
     def post(self, request):
         form = LogMessageForm(request.POST)
         if form.is_valid():
-            pass
+            PiEvent.addEvent(type=PiEvent.LOG_MESSAGE_MSG_TYPE,
+                             status=PiEvent.INFO_STATUS,
+                             message=form.cleaned_data["messageText"])
+            return HttpResponseRedirect("/dbkeeper/")
+        
+        self.context["form"] = form
+        return render(request, "dbkeeper/log_msg.html", self.context)
 
             

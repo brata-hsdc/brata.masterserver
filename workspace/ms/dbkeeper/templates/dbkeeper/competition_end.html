@@ -3,35 +3,16 @@
 {% block title  %}{{ entity|title }}{% endblock %}
 {% block header %}{{ entity|title }}{% endblock %}
 
-{% block extra_javascript %}
-<script src="/static/dbkeeper/jquery-2.1.4.js"></script>
-<script type="text/javascript">
-function toggleCheckboxes(event) {
-  var enableCheckbox = ! $('#id_deleteEvents').is(":checked");
-  $("#id_preserveStationJoins").prop("disabled", enableCheckbox);
-  $("#id_preserveTeamRegistrations").prop("disabled", enableCheckbox);
-  $("#id_preserveStationStatus").prop("disabled", enableCheckbox);
-};
-
-$(document).ready(
-    function (event) {
-        $("#id_deleteEvents").click(toggleCheckboxes);
-        toggleCheckboxes();
-    } );
-
-</script>
-{% endblock %}
-
 {% block main %}
 <div style="max-width: 50em;">
   <h4>Start the Competition</h4>
-  <p>Click the button below to insert an EVENT_STARTED message into the PiEvent table
-  to indicate that the Competition has begun.
+  <p>Click the button below to insert an EVENT_CONCLUDED message into the PiEvent table
+  to indicate that the competition has ended.
   You can have the marker inserted without deleting any PiEvent records, or you can use
   the checkboxes to select certain types of messages to preserve.  The rest will be deleted.
   </p>
 </div>
-<form action="/dbkeeper/competition/start/" method="post">
+<form action="/dbkeeper/competition/end/" method="post">
     {% csrf_token %}
     {# Include the hidden fields #}
     {% for hidden in form.hidden_fields %}
