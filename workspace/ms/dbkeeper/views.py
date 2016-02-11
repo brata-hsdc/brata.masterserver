@@ -5,7 +5,7 @@ from django.template import RequestContext
 
 from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm,\
                    AddLaunchParamsForm, AddDockParamsForm, AddSecureParamsForm, AddReturnParamsForm,\
-                   LoadSettingsForm
+                   LoadSettingsForm, CompetitionStartForm, CompetitionEndForm, LogMessageForm
 from .models import Organization, MSUser, Team, Setting
 from piservice.models import PiEvent
 from .team_code import TeamPassCode
@@ -595,3 +595,95 @@ class LoadSettings(View):
         
         self.context["form"] = form
         return render(request, "dbkeeper/load_settings.html", self.context)
+
+#----------------------------------------------------------------------------
+class CompetitionStart(View):
+    context = {
+               "form":   None,
+               "entity": "Competition Start",
+               "submit": "Let the Games Begin!",
+              }
+
+    def get(self, request):
+        """ Display the form """
+        self.context["form"] = CompetitionStartForm()
+        return render(request, "dbkeeper/competition_start.html", self.context)
+    
+    def post(self, request):
+        form = CompetitionStartForm(request.POST)
+        if form.is_valid():
+            if form.cleaned_data["deleteEvents"]:
+                # Warning:  this will delete all PiEvents, AND
+                # will also delete anything linked to one of these
+                # records through a foreign key unless they have
+                # on_delete=SET_NULL or something similar
+                querySet = PiEvent.objects.all()
+                
+                if form.cleaned_data["preserveStationJoins"]:
+                    querySet = querySet.exclude(type=PiEvent.JOIN_MSG_TYPE).exclude(type=PiEvent.LEAVE_MSG_TYPE)
+                if form.cleaned_data["preserveTeamRegistrations"]: 
+                    querySet = querySet.exclude(type=PiEvent.REGISTER_MSG_TYPE).exclude(type=PiEvent.UNREGISTER_MSG_TYPE)
+                if form.cleaned_data["preserveStationStatus"]: 
+                    querySet = querySet.exclude(type=PiEvent.STATION_STATUS_MSG_TYPE)
+                    
+                # Do the delete
+                querySet.delete()
+                
+            PiEvent.addEvent(type=PiEvent.EVENT_STARTED_MSG_TYPE,
+                             status=PiEvent.INFO_STATUS,
+                             message="Start of Competition")
+            
+            return HttpResponseRedirect("/dbkeeper/")
+        
+        self.context["form"] = form
+        return render(request, "dbkeeper/competition_start.html", self.context)
+
+#----------------------------------------------------------------------------
+class CompetitionEnd(View):
+    context = {
+               "form":   None,
+               "entity": "Competition End",
+               "submit": "The Games are Concluded!",
+              }
+
+    def get(self, request):
+        """ Display the form """
+        self.context["form"] = CompetitionEndForm()
+        return render(request, "dbkeeper/competition_end.html", self.context)
+    
+    def post(self, request):
+        form = CompetitionEndForm(request.POST)
+        if form.is_valid():
+            PiEvent.addEvent(type=PiEvent.EVENT_CONCLUDED_MSG_TYPE,
+                             status=PiEvent.INFO_STATUS,
+                             message="End of Competition")
+            return HttpResponseRedirect("/dbkeeper/")
+        
+        self.context["form"] = form
+        return render(request, "dbkeeper/competition_end.html", self.context)
+        
+#----------------------------------------------------------------------------
+class LogMessage(View):
+    context = {
+               "form":   None,
+               "entity": "Insert Log Message Event",
+               "submit": "Insert Message",
+              }
+
+    def get(self, request):
+        """ Display the form """
+        self.context["form"] = LogMessageForm()
+        return render(request, "dbkeeper/log_msg.html", self.context)
+    
+    def post(self, request):
+        form = LogMessageForm(request.POST)
+        if form.is_valid():
+            PiEvent.addEvent(type=PiEvent.LOG_MESSAGE_MSG_TYPE,
+                             status=PiEvent.INFO_STATUS,
+                             message=form.cleaned_data["messageText"])
+            return HttpResponseRedirect("/dbkeeper/")
+        
+        self.context["form"] = form
+        return render(request, "dbkeeper/log_msg.html", self.context)
+
+            

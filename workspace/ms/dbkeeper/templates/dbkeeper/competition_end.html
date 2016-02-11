@@ -1,0 +1,35 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}{{ entity|title }}{% endblock %}
+{% block header %}{{ entity|title }}{% endblock %}
+
+{% block main %}
+<div style="max-width: 50em;">
+  <h4>Start the Competition</h4>
+  <p>Click the button below to insert an EVENT_CONCLUDED message into the PiEvent table
+  to indicate that the competition has ended.
+  You can have the marker inserted without deleting any PiEvent records, or you can use
+  the checkboxes to select certain types of messages to preserve.  The rest will be deleted.
+  </p>
+</div>
+<form action="/dbkeeper/competition/end/" method="post">
+    {% csrf_token %}
+    {# Include the hidden fields #}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    {# Include the visible fields #}
+    <table class="fieldWrapper">
+       {% for field in form.visible_fields %}
+       <tr>
+          <td style="text-align: right;">{{ field.label_tag }}</td>
+          <td style="text-align: left;">{{ field }}</td>
+          <td style="text-align: left; color: red;">{{ field.errors }}</td>
+       </tr>
+       {% endfor %}
+       <tr class="submitRow">
+          <td colspan="3"><b><input type="submit" value="{{ submit }}" /></b></td>
+       </tr>
+    </table>
+</form>
+{% endblock %}
