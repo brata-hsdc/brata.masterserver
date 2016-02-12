@@ -369,7 +369,8 @@ class AddReturnParamsForm(forms.Form):
 #     
 #----------------------------------------------------------------------------
 class LoadSettingsForm(forms.Form):
-    loadFile = FilteredFileField(label="Load from File", accept=".csv", max_length=250)
+    loadFile = FilteredFileField(label="Load from File", accept=".csv", max_length=250, required=False)
+    updates = forms.CharField(widget=forms.HiddenInput(), label="updates", max_length=1000000, required=False)
 
 #----------------------------------------------------------------------------
 class CompetitionStartForm(forms.Form):
