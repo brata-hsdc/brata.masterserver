@@ -1,4 +1,4 @@
-from django.shortcuts import render, HttpResponseRedirect, HttpResponse
+from django.shortcuts import render, HttpResponseRedirect, HttpResponse, Http404
 from django.views.generic import View
 from django.contrib.auth.models import User
 from django.template import RequestContext
@@ -574,28 +574,79 @@ class LoadSettings(View):
     def get(self, request):
         """ Display the form """
         self.context["form"] = LoadSettingsForm()
+        self.context["upload"] = True
         return render(request, "dbkeeper/load_settings.html", self.context)
     
     def post(self, request):
-        form = LoadSettingsForm(request.POST, request.FILES)
-        if form.is_valid():
-            # Read the CSV file
-            reader = csv.DictReader(StringIO(request.FILES["loadFile"].read()))
-            
-            for r in reader:
-                try:
-                    setting = Setting.objects.get(name=r["name"])
-                    setting.value = r["value"]
-                    setting.description = r["description"]
-                except Setting.DoesNotExist:
-                    setting = Setting(name=r["name"], value=r["value"], description=r["description"])
-                setting.save()
-            
-            return HttpResponseRedirect("/admin/dbkeeper/setting/")
-        
-        self.context["form"] = form
-        return render(request, "dbkeeper/load_settings.html", self.context)
+        if hasattr(request, "FILES") and "loadFile" in request.FILES:
+            form = LoadSettingsForm(request.POST, request.FILES)
+            if form.is_valid():
+                # Read the CSV file
+                csvRecords = list(csv.DictReader(StringIO(request.FILES["loadFile"].read())))
+                csvRecords.sort(key=lambda x: x["name"])
+                
+                settings = self.createChangedItemsList(csvRecords)
 
+                form.is_bound = False  # reset the flag so we can add new data
+                form.fields["updates"].initial = json.dumps(settings) # stash the update values in the form
+                self.context["settings"] = settings
+                self.context["upload"] = False
+                self.context["form"] = form
+                self.context["submit"] = "Update Settings"
+                return render(request, "dbkeeper/load_settings.html", self.context)
+            else:
+                # Form did not validate, try again
+                self.context["form"] = form
+                self.context["upload"] = True
+                return render(request, "dbkeeper/load_settings.html", self.context)
+        else:
+            # Retrieve the changed items list and the checkboxes, and update the table
+            form = LoadSettingsForm(request.POST)
+            if form.is_valid():
+                settings = json.loads(form.cleaned_data["updates"]) # retrieve stashed update values
+                for s in settings:
+                    # Update the table based on the checkboxes
+                    if s["name"] in request.POST and request.POST[s["name"]] == u"on":
+                        try:
+                            setting = Setting.objects.get(name=s["name"])
+                            setting.value = s["value"]
+                            setting.description = s["description"]
+                        except Setting.DoesNotExist:
+                            setting = Setting(name=s["name"], value=s["value"], description=s["description"])
+                        setting.save()
+            
+                return HttpResponseRedirect("/admin/dbkeeper/setting/")
+            else:
+                # Form did not validate, don't know what went wrong
+                return Http404()
+
+    def createChangedItemsList(self, csvRecords):
+        # Get the existing settings from the table
+        qs = Setting.objects.all()
+        values = dict(zip([x.name for x in qs],
+                          [{"name": x.name,
+                            "value": x.value,
+                            "description": x.description,
+                            "disp": "update",
+                           } for x in qs])) # values indexed by name
+        settings = [] # record new variables or existing with updated values
+        for r in csvRecords:
+            if r["name"] not in values:
+                settings.append({"name": r["name"],
+                                 "value": r["value"].strip(),
+                                 "description": r["description"].strip(),
+                                 "disp": "new",
+                                })
+
+            elif r["value"].strip() != values[r["name"]]["value"].strip() or \
+                 r["description"].strip() != values[r["name"]]["description"].strip():
+                settings.append({"name": r["name"],
+                                 "value": r["value"].strip(),
+                                 "description": r["description"].strip(),
+                                 "disp": "update",
+                                })
+        return settings
+        
 #----------------------------------------------------------------------------
 class CompetitionStart(View):
     context = {

@@ -1,24 +1,51 @@
 {% extends "dbkeeper/base.html" %}
 
-{% block title  %}Add {{ entity|title }}{% endblock %}
-{% block header %}Add {{ entity|title }}{% endblock %}
+{% block title  %}{{ entity }}{% endblock %}
+{% block header %}{{ entity }}{% endblock %}
+
+{% block extra_javascript %}
+<script src="/static/dbkeeper/jquery-2.1.4.js"></script>
+{% endblock %}
+
+{% block body_start %}
+<script type="text/javascript">
+function checkAll (ev) {
+   $("input.itemCheck").prop("checked", $("#allCheck").is(":checked"));
+}
+
+$(document).ready(function (event) {
+   $("#allCheck").click(checkAll);
+});
+</script>
+{% endblock %}
 
 {% block main %}
-<p>Load Setting table entries from a CSV file.<br />
-   Existing records will be overwritten if the names match.<br />
+{% if upload %}
+<h4>Upload CSV File</h4>
+<p style="max-width: 50em;">Load Setting table entries from a CSV file.
+   Existing records will be overwritten if the names match.
    To clear out old values, first delete the old records from the
    <a href="/admin/dbkeeper/setting/">Setting Admin</a> page.</p>
-<form action="/dbkeeper/load/settings/" method="post" enctype="multipart/form-data">
+{% else %}
+<h4>Choose Settings and Update</h4>
+<p style="max-width: 50em;">Check the Settings you wish to update.  Extra settings in the Settings
+   table that were not in the CSV will be preserved.  To delete them,
+   go to the <a href="/admin/dbkeeper/setting/">Setting Admin</a> page.</p>
+{% endif %}
+
+<form action="/dbkeeper/load/settings/" method="post" {% if upload %}enctype="multipart/form-data"{% endif %}>
     {% csrf_token %}
     {# Include the hidden fields #}
     {% for hidden in form.hidden_fields %}
         {{ hidden }}
     {% endfor %}
-    {# Include the visible fields #}
+    
+    {# Include this version to get the file upload #}
+    {% if upload %}
     <table class="fieldWrapper">
        {% for field in form.visible_fields %}
        <tr>
-          <td style="text-align: right;">{% if field.field.required %}* {% endif %}{{ field.label_tag }}</td>
+          <td style="text-align: right;">{{ field.label_tag }}</td>
           <td style="text-align: left;">{{ field }}</td>
           <td style="text-align: left; color: red;">{{ field.errors }}</td>
        </tr>
@@ -27,5 +54,40 @@
           <td colspan="3"><input type="submit" value="{{ submit }}" /></td>
        </tr>
     </table>
+    {% endif %}
+
+    {# Include this version to get the record checkboxes #}
+    {% if not upload %}
+    {{ form.updates }}
+    <table class="fieldWrapper">
+      <tr>
+        <th></th>
+        <th style="text-align: center;"><input id="allCheck" name="allCheck" type="checkbox"></input></th>
+        <!-- <th>Apply</th> -->
+        <th>Name</th>
+        <th>Value</th>
+        <th>Description</th>
+      </tr>
+      <!--  <tr>
+        <td></td>
+        <td style="text-align: center;"><input id="allCheck" name="allCheck" type="checkbox"></input></td>
+        <td></td>
+        <td></td>
+        <td></td>
+      </tr> -->
+      {% for s in settings %}
+      <tr>
+        <td style="text-align: right;">{{ s.disp }}</td>
+        <td style="text-align: center;"><input name="{{ s.name }}" type="checkbox" class="itemCheck"></input></td>
+        <td style="text-align: left; margin-right: 1em;">{{ s.name }}</td>
+        <td style="text-align: left;">{{ s.value }}</td>
+        <td style="text-align: left;">{{ s.description }}</td>
+      </tr>
+      {% endfor %}
+      <tr class="submitRow">
+        <td colspan="3"><input type="submit" value="{{ submit }}" /></td>
+      </tr>
+    </table>
+    {% endif %}
 </form>
 {% endblock %}
