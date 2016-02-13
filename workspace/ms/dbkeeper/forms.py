@@ -5,6 +5,7 @@ import operator
 
 from .models import Organization, Team
 from .team_code import TeamPassCode
+from PiEvent.models import PiEvent
 
 #----------------------------------------------------------------------------
 class FilteredFileField(forms.FileField):
@@ -386,5 +387,11 @@ class CompetitionEndForm(forms.Form):
 #----------------------------------------------------------------------------
 class LogMessageForm(forms.Form):
     messageText = forms.CharField(label="Message Text", widget=forms.Textarea)
+
+#----------------------------------------------------------------------------
+class DisplayEventsForm(forms.Form):
+    teams      = forms.ModelMultipleChoiceField(label="Team", queryset=Team.objects.all().order_by("name"))
+    challenges = forms.MultipleChoiceField(label="Challenges", required=False, choices=("Register", "Launch", "Dock", "Secure", "Return"), widget=forms.CheckboxSelectMultiple())
+    eventTypes = forms.MultipleChoiceField(label="Events", choices=PiEvent.TYPE_CHOICES, initial=PiEvent.UNKNOWN_TYPE, required=False)
 
     

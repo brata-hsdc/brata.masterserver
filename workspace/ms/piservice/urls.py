@@ -42,6 +42,7 @@ urlpatterns = [
     
     # Ajax requests
     url(r'^station_status/$', views.StationStatus.as_view(), name="station_status"),
+    url(r'^events/$', views.GetEvents.as_view(), name="get_events"),  # generate JSON to create a timeline
     
     # Backward compatible 2015 message formats
     url(r'^brata-v00/register$', views.Register_2015.as_view(), name="register_2015"),

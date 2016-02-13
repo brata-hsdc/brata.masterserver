@@ -5,7 +5,8 @@ from django.template import RequestContext
 
 from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm,\
                    AddLaunchParamsForm, AddDockParamsForm, AddSecureParamsForm, AddReturnParamsForm,\
-                   LoadSettingsForm, CompetitionStartForm, CompetitionEndForm, LogMessageForm
+                   LoadSettingsForm, CompetitionStartForm, CompetitionEndForm, LogMessageForm,\
+                   DisplayEventsForm
 from .models import Organization, MSUser, Team, Setting
 from piservice.models import PiEvent
 from .team_code import TeamPassCode
@@ -737,4 +738,51 @@ class LogMessage(View):
         self.context["form"] = form
         return render(request, "dbkeeper/log_msg.html", self.context)
 
+        
+#----------------------------------------------------------------------------
+class DisplayEventsForm(View):
+    def get(self, request):
+        """ Display the form """
+        return render(request, "dbkeeper/event_timeline.html", { "form": DisplayEventsForm() })
+    
+    def post(self, request):
+        """ Process the form data """
+        form = DisplayEventsForm(request.POST)
+        if form.is_valid():
+            # get the values
+            teams      = form["teams"]
+            challenges = form["challenges"]
+            eventTypes = form["eventTypes"]
+
+            # Get the matching event records            
+            qs = PiEvent.objects.filter(team__in=teams).filter(type__in=eventTypes).filter(pi__station_type__in=challenges)
             
+            # Turn them into JSON for TimelineJS
+            typeNames = dict(TYPE_CHOICES)
+            slides = []
+            for ev in qs:
+                sl = {}
+                time = ev.time
+                sl["start_date"] = self.date(time)
+                sl["text"] = { "headline": "{} {}".format(ev.team.name, typeNames[ev.type]), "text": ev.message }
+                slides.append(sl)
+            js = json.dumps(slides)
+            return render(request, "dbkeeper/event/timeline.html", { "timeline_json": js })
+        else:
+            return render(request, "dbkeeper/event_timeline.html", { "form": form })
+    
+    def date(self, dt):
+        """ Return a date object in TimelineJS format.
+        
+            dt is a datetime object
+        """
+        d = { "year"        : dt.year,
+              "month"       : dt.month, 
+              "day"         : dt.day,
+              "hour"        : dt.hour,
+              "minute"      : dt.minute,
+              "second"      : dt.second,
+              "millisecond" : dt.microsecond/1000,
+#               "display_date": "",
+            }
+        return d

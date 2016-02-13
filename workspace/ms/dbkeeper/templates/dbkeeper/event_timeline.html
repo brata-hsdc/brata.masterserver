@@ -1,0 +1,79 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}{{ entity|title }}{% endblock %}
+{% block header %}{{ entity|title }}{% endblock %}
+
+{% block extra_css %}
+<link title="timeline-styles" rel="stylesheet" href="/static/dbkeeper/timeline.css" />
+<style>
+html, body {
+  height: 100%;
+}
+#map {
+  width: 80%;
+  height: 80%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+#quiz {
+  margin-left: 10em;
+  margin-right: 10em;
+  text-align: center;
+  font-size: 24px;
+}
+.answer_button {
+  font-size: 24px;
+}
+@media only screen and (min-device-width : 768px) {
+
+}
+</style>
+{% endblock %}
+
+{% block extra_javascript %}
+<script src="/static/dbkeeper/timeline.js"></script>
+{% endblock %}
+
+{% if timeline_json %}
+{% block main %}
+  <div id="timeline_embed">
+    There should be a timeline here
+  </div>
+  <script type="text/javascript">
+    // The TL.Timeline constructor takes at least two arguments:
+    // the id of the Timeline container (no '#'), and
+    // the URL to your JSON data file or Google spreadsheet.
+    // the id must refer to an element "above" this code,
+    // and the element must have CSS styling to give it width and height
+    // optionally, a third argument with configuration options can be passed.
+    // See below for more about options.
+    timeline = new TL.Timeline('timeline-embed', {{ timeline_json }});
+//    timeline = new TL.Timeline('timeline-embed', {{ timeline_url }});
+  </script>
+{% endblock %}
+{% else %}
+  <form action="/dbkeeper/load/settings/" method="post" {% if upload %}enctype="multipart/form-data"{% endif %}>
+    {% csrf_token %}
+    {# Include the hidden fields #}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    
+    {# Include this version to get the file upload #}
+    {% if upload %}
+    <table class="fieldWrapper">
+       {% for field in form.visible_fields %}
+       <tr>
+          <td style="text-align: right;">{{ field.label_tag }}</td>
+          <td style="text-align: left;">{{ field }}</td>
+          <td style="text-align: left; color: red;">{{ field.errors }}</td>
+       </tr>
+       {% endfor %}
+       <tr class="submitRow">
+          <td colspan="3"><input type="submit" value="{{ submit }}" /></td>
+       </tr>
+    </table>
+  </form>
+    {% endif %}
+{% endif %}

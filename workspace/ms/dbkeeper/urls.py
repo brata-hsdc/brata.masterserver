@@ -42,6 +42,7 @@ urlpatterns = [
     url(r'^competition/start/$', views.CompetitionStart.as_view(), name="CompetitionStart"),  # clear the PiEvent table and/or insert a Competition Start event 
     url(r'^competition/end/$', views.CompetitionEnd.as_view(), name="CompetitionEnd"),  # insert a Competition End event 
     url(r'^add/logmsg/$', views.LogMessage.as_view(), name="LogMessage"),  # insert a LOG_MESSAGE_MSG_TYPE event to mark something
+    url(r'^timeline/$', views.DisplayEvents.as_view(), name="display_events")
     ]
 
 # Test commands:
