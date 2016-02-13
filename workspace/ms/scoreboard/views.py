@@ -5,9 +5,12 @@ from django.utils.timezone import utc
 from datetime import datetime, timedelta
 import json
 import logging
+import os
 from dbkeeper.models import Organization, Team
+from PIL import Image, ImageDraw, ImageFont
 from piservice.models import PiEvent, PiStation
 from gnome._gnome import score_init
+from random import randint
 
 
 #-------------------------------------------------------------------------------
@@ -406,7 +409,7 @@ TODO3:
             s = ScoreboardStatus._recomputeTeamScore(t.name)
 
             team = {
-                "team_icon"      : "TODO (team_icon)",
+                "team_icon"      : "/scoreboard/team_icon/" + t.name + "/",
                 "team_name"      : t.name,
                 "team_id"        : "TODO (team_id)",
                 "organization"   : t.organization.name,
@@ -464,3 +467,81 @@ TODO3:
         """
         return "{:02d}:{:02d}".format(int(seconds/60), int(seconds)%60)
 
+
+#-------------------------------------------------------------------------------
+class TeamIcon(View):
+
+    #---------------------------------------------------------------------------
+    """ A class-based view to handle a Team Icon Ajax request.
+    
+        The client sends a GET message with the following JSON data:
+        {
+        }
+        
+        The MS sends the following response on success:
+        [
+            # TODO...
+            {
+                "host": "Second RPi Station",
+                "station_id": "2:ab45",
+                "joined": "2015-09-17 03:36:58",
+                "type": "Unknown"
+            },
+            {
+                "host": "First RPi Station",
+                "station_id": "1:03cc",
+                "joined": "",
+                "type": "Unknown"
+            }
+        ]
+    """
+    def __init__(self):
+        logging.debug('Entered TeamIcon.__init__')
+
+
+    #---------------------------------------------------------------------------
+    """ TODO A REST request to get scores from the database for the leaderboard """
+    def get(self, request, team_name):
+        """ TODO Retrieve score information from the database and return it """
+        logging.debug('Entered TeamIcon.get(' + team_name + ')')
+
+        team_initial = team_name[0]
+        text = team_initial.upper()
+
+        colors = [
+            {'polygon': (0xbc, 0xd2, 0xc8), 'text': (0x00, 0x00, 0x00)},
+            {'polygon': (0xf6, 0xf4, 0xf1), 'text': (0x00, 0x00, 0x00)},
+            {'polygon': (0xd9, 0xa0, 0x95), 'text': (0x00, 0x00, 0x00)},
+            {'polygon': (0xa3, 0x61, 0x67), 'text': (0x00, 0x00, 0x00)},
+            {'polygon': (0x48, 0x44, 0x52), 'text': (0xf8, 0xf2, 0xda)},
+            {'polygon': (0xf8, 0xf2, 0xda), 'text': (0x00, 0x00, 0x00)},
+            {'polygon': (0xc7, 0xaf, 0xbd), 'text': (0x00, 0x00, 0x00)},
+            {'polygon': (0xdd, 0xec, 0xef), 'text': (0x00, 0x00, 0x00)},
+        ]
+
+        color = colors[randint(0, len(colors)-1)]
+
+        img_width = 32
+        img_height = 32
+
+        font_size = 24
+
+        img = Image.new("RGBA", (img_width, img_height), (255, 0, 0, 0))
+        draw = ImageDraw.Draw(img)
+
+        fonts_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static/scoreboard/fonts')
+        font = ImageFont.truetype(os.path.join(fonts_path, 'EnchantedPrairieDog.TTF'), font_size)
+        (text_width, text_height) = draw.textsize(text, font=font)
+
+        x = (img_width - text_width) / 2
+        y = 0
+
+        draw.ellipse((0, 0, img_width-1, img_height-1), fill=color['polygon'])
+
+        draw.text((x, y), text, font=font, fill=color['text'])
+
+        result = HttpResponse(content_type="image/png", status=200)
+        img.save(result, "PNG")
+
+        logging.debug('Exiting TeamIcon.get')
+        return result
