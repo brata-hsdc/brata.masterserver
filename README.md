@@ -40,11 +40,14 @@ TODO - config
 TODO - raspi-config to expand SD card
 
 
-### Update Repositories
+### Update Repositories and in case remote QRCode generation goes down add QRCode generation support
 
 ```sh
 # sudo apt-get update
 # sudo apt-get upgrade
+# sudo apt-get install libtiff4-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.5-dev tk8.5-dev python-tk
+# sudo pip install pillow
+# sudo pip install qrcode
 ```
 
 ### Install Python
