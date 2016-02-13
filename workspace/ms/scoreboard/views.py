@@ -6,10 +6,9 @@ from datetime import datetime, timedelta
 import json
 import logging
 import os
-from dbkeeper.models import Organization, Team
+from dbkeeper.models import Organization, Team, Setting
 from PIL import Image, ImageDraw, ImageFont
 from piservice.models import PiEvent, PiStation
-from gnome._gnome import score_init
 from random import randint
 
 
@@ -135,12 +134,92 @@ class ScoreboardStatus(View):
 
     #---------------------------------------------------------------------------
     @staticmethod
+    def _getSetting(key,
+                    ridiculous_default):
+        result = Setting.get(key, ridiculous_default)
+
+        if result == ridiculous_default:
+            logging.error("No {} key found in the Settings table. Proceeding with value {}".format(key, ridiculous_default))
+
+        return result
+
+
+    #---------------------------------------------------------------------------
+    @staticmethod
+    def _getDataField(submit_message,
+                      json_field_name):
+        result = 0 # TODO get value in embedded JSON string in data field of SUBMIT message
+
+        return result
+
+
+    #---------------------------------------------------------------------------
+    @staticmethod
+    def _computeRunningTimeDelta(submit_message):
+        dock_sim_playback_time_s = _getSetting('DOCK_SIM_PLAYBACK_TIME_S', -6000)
+        dnf_time_penalty_factor = _getSetting('DNF_TIME_PENALTY_FACTOR', -8000)
+        actual_time_s = _getDataField(submit_message, 'candidate_answer')
+        fail_message = _getDataField(submit_message, 'fail_message')
+
+        dnf_adjustment_needed = (fail_message == "OUTCOME_DNF")
+        factor = 1.0
+        
+        if dnf_adjustment_needed:
+            factor = dnf_time_penalty_factor
+        
+        running_time_s = actual_time_s * factor
+
+        if actual_time_s > dock_sim_playback_time_s: # simulation time is less than actual time
+            # discount time spent watching the simulation
+            running_time_s -= dock_sim_playback_time_s
+        # else do nothing - no simulation time to discount because simulation time and actual time are the same
+
+        return running_time_s - actual_time_s
+
+
+    #---------------------------------------------------------------------------
+    @staticmethod
     def _computeDock(team_name,
                      attempt_num,
                      max_submit_events,
                      params,
                      now):
         logging.debug('Entered ScoreboardStatus._computeDock({})'.format(team_name))
+
+        num_success_events = params['success_events'].count()
+        num_fail_events = params['fail_events'].count()
+
+        if num_success_events > 0:
+            if params['submit_events'].count() > max_submit_events:
+                logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+
+            submit_message = params['submit_events'][attempt_num - 1]
+            params['total_run_time_delta_s'] += ScoreboardStatus._computeRunningTimeDelta(submit_message)
+
+            latch_event_timestamp = 0 # TODO timestamp of final LATCH event
+
+            params['score'] = 9
+            params['time_to_exit'] = True
+            params['end_time'] = latch_event_timestamp + params['total_run_time_delta_s']
+
+        elif num_fail_events > 0:
+            if params['submit_events'].count() > max_submit_events:
+                logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+
+            params['num_failed_attempts'] += 1
+
+            submit_message = params['submit_events'][attempt_num - 1]
+            params['total_run_time_delta_s'] += ScoreboardStatus._computeRunningTimeDelta(submit_message)
+
+            if params['num_failed_attempts'] > 3:
+                latch_event_timestamp = 0 # TODO timestamp of final LATCH event
+
+                params['score'] = 5
+                params['time_to_exit'] = True
+                params['end_time'] = latch_event_timestamp + params['total_run_time_delta_s']
+
+        else:
+            log.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
         """
 #--- TODO BEGIN DOCK
@@ -263,9 +342,10 @@ TODO3:
         params = {}
         params['score'] = score
         params['time_to_exit'] = False
-        params['num_failed_attempts'] = 0;
+        params['num_failed_attempts'] = 0
         params['current_run_time'] = 0
         params['docking_time_s'] = 0
+        params['total_run_time_delta_s'] = 0.0
         i = 0
 
         while not params['time_to_exit']:
@@ -430,7 +510,6 @@ TODO3:
             team = {
                 "team_icon"       : "/scoreboard/team_icon/" + t.name + "/",
                 "team_name"       : t.name,
-                "team_id"         : "TODO (team_id)",
                 "organization"    : t.organization.name,
                 "registered_icon" : registered_icon,
                 "registered_color": registered_color,
