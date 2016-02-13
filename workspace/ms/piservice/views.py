@@ -23,6 +23,10 @@ from NoCMConfigValues import *
 import re
 
 import random
+#from jpype import * 
+import qrcode
+import qrcode.image.svg
+import io
 
 # Create your views here.
 
@@ -432,10 +436,13 @@ class Register(JSONHandlerView):
             
         # Create a unique registration code for this Team's registration
         team.reg_code = Team.generateRegCode()
-        
+
+        dataToStore = json.loads(request.body)  # POST data (in JSON format)
+        dataToStore["REMOTE_ADDR"] = request.META["REMOTE_ADDR"]  # IP address of sender
+
         # Succeeded:  Record the transaction and update the team record
         event = self.addEvent(team=team,
-                              data=request.body,
+                              data=json.dumps(dataToStore),
                               status=PiEvent.INFO_STATUS,
                               message="Team '{}' Registered with brata_version '{}'. Assigned reg_code {}.".format(team.name, "m.brata_version", team.reg_code),
                              )
@@ -524,6 +531,73 @@ class Unregister(JSONHandlerView):
         
         # Send a success response
         self.jsonResponse["message"] = "You have unregistered your BRATA device.  You may re-register it or register a different BRATA device."
+        return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
+class Reset(JSONHandlerView):
+    """ A class-based view to handle a BRATA Reset message.
+    
+        The client sends a POST message with the following JSON data:
+        {
+            "message":  "",
+            "reg_code":  ""
+        }
+        and the end of the url is the team_passcode
+        
+        The MS sends the following response on success:
+        {
+            "reg_code":  "",
+            "message":   "All team data for '<team_name>' was reset."
+        }
+    """
+    def __init__(self):
+        """ Initialize the base class with the type of message we will handle
+            and the HTTP methods that we will accept.
+        """
+        super(Reset, self).__init__(PiEvent.RESET_MSG_TYPE, methods=[self.POST])
+    
+    def post(self, request, team_passcode, *args, **kwargs):
+        """ Handle the Registration POST message and update the database """
+        super(Reset, self).post(request, *args, **kwargs)
+
+        # Retrieve the Team record using the team_passcode from the Register request
+        try:
+            team = Team.objects.get(pass_code=team_passcode)
+        except ObjectDoesNotExist:
+            try:
+                team = Team.objects.get(pass_code=TeamPassCode.unwordify(team_passcode))
+            except ObjectDoesNotExist:
+                team = None
+
+        if team is None:
+            # Failed:  Record the transaction and what went wrong
+            self.addEvent(data=request.body,
+                          status=PiEvent.WARNING_STATUS,
+                          message="Failed to retrieve Team '{}' from the database".format(team_passcode),
+                         )
+            self.jsonResponse["message"] = "Invalid team_passcode: '{}'".format(team_passcode)
+            return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
+
+        # Find allthe db records for the team and delete them
+        try:
+            teamRecords = PiEvent.objects.filter(team=team)
+            teamRecords.exclude(type=PiEvent.ADDTEAM_TYPE).exclude(type=PiEvent.REGISTER_MSG_TYPE)
+            teamRecords.delete()
+        except:
+            # If nothing found then just nothing to do
+            pass        
+
+        # Succeeded:  Record the transaction and update the team record
+        event = self.addEvent(team=team,
+                              data=request.body,
+                              status=PiEvent.INFO_STATUS,
+                              message="Team '{}' Reset by ip '{}'".format(team.name, request.META["REMOTE_ADDR"]),
+                             )
+        
+        # Send a success response
+        self.jsonResponse["reg_code"] = team.reg_code
+        message = "All team data for '{}' was reset except registration.".format(team.name)
+        self.jsonResponse["message"] = cipher(message)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
@@ -945,15 +1019,6 @@ class Dock(JSONHandlerView):
 
         # get the initial parameters from the start_challenge event
         # find the event and get the parameters out of the JSON data
-        try:
-            startRequests = PiEvent.objects.filter(type=PiEvent.START_CHALLENGE_MSG_TYPE, pi=station, team=team).order_by('-time')[:1]
-        except:
-            message = "No start found at this station"
-            # TODO handle error
-        data = json.loads(startRequests[0].data)
-        if data is None:
-            # TODO make error message
-            return response
 
         a_aft = data["AFT"]
         a_fore = data["FORE"]
@@ -1694,3 +1759,29 @@ class Submit_2015(JSONHandlerView):
         # Send a success response
         self.jsonResponse["message"] = "Your results for the challenge at station {} have been submitted".format(station_id)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
+class QRCode(JSONHandlerView):
+    def get(self, request, *args, **kwargs):
+        """ Handle a GET message """
+        # note this tries to figure out the data automagiclaly
+        # so provide a URL and will set the qrcode type to URL if just text you get text
+        strToEncode = request.GET.get('chl', '')
+        # version 1 is the smallest possible goes up to 40
+        # default error correct is L for up to 7% errors, it is what we used before so no reason to go higher
+        # NOTE we tried for fun error correct up one level to M DO NOT DO IT!  It will kill the Pi.
+        # per the spec need to leave a border of at least 4 units
+        # size we used 350 in the past but seems to be taking long as well
+        qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=5, border=4, image_factory=qrcode.image.svg.SvgImage)
+        qr.add_data(strToEncode)
+        #qr.make(fit=True)
+        #image = qr.make_image()
+        #response = HttpResponse(content_type="image/png")
+        #image.save(response, "PNG")
+        # TODO seems it would be more efficient to make this SVG
+        image = qr.make(fit=True)
+        #image = qr.make(strToEncode, image_factory=qrcode.image.svg.SvgImage)
+        response = HttpResponse(content_type="image/svg+xml")
+        response['Content-Disposition'] = 'out.svg'
+        response.write(image)
+        return response

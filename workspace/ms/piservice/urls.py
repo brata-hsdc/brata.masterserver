@@ -26,6 +26,7 @@ urlpatterns = [
     # BRATA messages
     url(r'^register/(?P<team_passcode>[a-z]+[0-9]+)/$', views.Register.as_view(), name="register"),
     url(r'^unregister/$', views.Unregister.as_view(), name="unregister"),
+    url(r'^reset/(?P<team_passcode>[a-z]+[0-9]+)/$', views.Reset.as_view(), name="reset"),
     url(r'^at_waypoint/(?P<lat>[0-9.-]+)/(?P<lon>[0-9.-]+)/$', views.AtWaypoint.as_view(), name="at_waypoint"),
     url(r'^start_challenge/(?P<station_id>[^/]+)/$', views.StartChallenge.as_view(), name="start_challenge"),
     url(r'^dock/(?P<station_id>[^/]+)/$', views.Dock.as_view(), name="dock"),
@@ -48,6 +49,9 @@ urlpatterns = [
     url(r'^brata-v00/atWaypoint/(?P<waypointId>[^/#?]+)$', views.AtWaypoint_2015.as_view(), name="at_waypoint_2015"),
     url(r'^brata-v00/start_challenge/(?P<station_id>[^/#?]+)$', views.StartChallenge_2015.as_view(), name="start_challenge_2015"),
     url(r'^brata-v00/submit/(?P<station_id>[^/#?]+)$', views.Submit_2015.as_view(), name="submit_2015"), # this one needs a little work
+
+    # Backward compatible 2015 message formats
+    url(r'^qrcode$', views.QRCode.as_view(), name="qrcode"),
 ]
 
 # Test commands:
