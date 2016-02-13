@@ -16,6 +16,10 @@ import site_logging
 # The following is a hack to keep our passwords from accidentally being checked in
 import sys
 import site_logging
+import django.utils.timezone
+import datetime
+import pytz
+
 sys.path.append(os.path.abspath("/opt/designchallenge2016"))
 from NoCMConfigValues import *
 
@@ -115,6 +119,9 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
+
+# Set the local timezone.  Datetimes will be displayed in this timezone.
+django.utils.timezone.activate(pytz.timezone("US/Eastern"))
 
 
 # Static files (CSS, JavaScript, Images)

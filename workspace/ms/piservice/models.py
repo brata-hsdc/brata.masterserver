@@ -130,7 +130,9 @@ class PiEvent(models.Model):
     SECURE_MSG_TYPE               = 20
     RETURN_MSG_TYPE               = 21
     EVENT_CONCLUDED_MSG_TYPE      = 22
-    RESET_MSG_TYPE      = 23
+    EVENT_STARTED_MSG_TYPE        = 23
+    LOG_MESSAGE_MSG_TYPE          = 24
+    RESET_MSG_TYPE                = 25
 
     TYPE_CHOICES = (
                     (UNKNOWN_TYPE,                  "Unknown"),
@@ -156,6 +158,8 @@ class PiEvent(models.Model):
                     (SECURE_MSG_TYPE,               "Secure"),
                     (RETURN_MSG_TYPE,               "Return"),
                     (EVENT_CONCLUDED_MSG_TYPE,      "Event Concluded"),
+                    (EVENT_STARTED_MSG_TYPE,        "Event Started"),
+                    (LOG_MESSAGE_MSG_TYPE,          "Log Message"),
                     (RESET_MSG_TYPE,                "Reset Team"),
                    )
     

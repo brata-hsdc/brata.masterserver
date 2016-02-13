@@ -369,4 +369,22 @@ class AddReturnParamsForm(forms.Form):
 #     
 #----------------------------------------------------------------------------
 class LoadSettingsForm(forms.Form):
-    loadFile = FilteredFileField(label="Load from File", accept=".csv", max_length=250)
+    loadFile = FilteredFileField(label="Load from File", accept=".csv", max_length=250, required=False)
+    updates = forms.CharField(widget=forms.HiddenInput(), label="updates", max_length=1000000, required=False)
+
+#----------------------------------------------------------------------------
+class CompetitionStartForm(forms.Form):
+    deleteEvents = forms.BooleanField(label="Delete All Events except those checked below", required=False, initial=False)
+    preserveStationJoins = forms.BooleanField(label="Preserve Station JOIN and LEAVE Events", required=False, initial=True)
+    preserveTeamRegistrations = forms.BooleanField(label="Preserve Team REGISTER and UNREGISTER Events", required=False, initial=True)
+    preserveStationStatus = forms.BooleanField(label="Preserve STATION_STATUS Message Events", required=False, initial=True)
+
+#----------------------------------------------------------------------------
+class CompetitionEndForm(forms.Form):
+    pass
+
+#----------------------------------------------------------------------------
+class LogMessageForm(forms.Form):
+    messageText = forms.CharField(label="Message Text", widget=forms.Textarea)
+
+    

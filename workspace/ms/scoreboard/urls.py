@@ -24,6 +24,7 @@ urlpatterns = [
 
     # Ajax requests
     url(r'^scoreboard_status/$', views.ScoreboardStatus.as_view(), name="scoreboard_status"),
+    url(r'^team_icon/(?P<team_name>.+)/$', views.TeamIcon.as_view(), name="team_icon"),
 ]
 
 # Test commands:
@@ -31,3 +32,5 @@ urlpatterns = [
 # http://localhost:8000/
 # http://localhost:8000/index.html
 # http://localhost:8000/scoreboard
+# http://localhost:8000/scoreboard/scoreboard_status/
+# http://localhost:8000/scoreboard/images/...
