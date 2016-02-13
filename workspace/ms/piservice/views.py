@@ -916,13 +916,15 @@ class StartChallenge(JSONHandlerView):
 
         elif station.station_type == "Secure":
             # Get random parameters
-            # TODO
+            lock, tone = Setting.getSecureParams()
             jsonData = json.dumps({
                  "message_version": "0",
                  "message_timestamp": "2014-09-15 14:08:59",
-                 "secure_tone_pattern": [0, 1, 2, 3, 4, 5, 6, 7, 4],
+                 "secure_tone_pattern": tone,
                    })
-            startData = jsonData
+            startData = json.dumps({
+                 "lock": lock,
+                 "tone": tone,})
             message="Attach the mic cord and determine the 4 Lock Digits, then scan the Open QR Code"
         elif station.station_type == "Return":
             # Get parameters for this particular station
@@ -1251,8 +1253,19 @@ class Open(JSONHandlerView):
         status=PiEvent.INFO_STATUS
         httpStatus = 200
 
-        # Get the parameters from the DB
-        # TODO
+        # get the initial parameters from the start_challenge event
+        # find the event and get the parameters out of the JSON data
+        try:
+            startRequests = PiEvent.objects.filter(type=PiEvent.START_CHALLENGE_MSG_TYPE, pi=station, team=team).order_by('-time')[:1]
+        except:
+            message = "No start found at this station"
+            # TODO handle error
+        data = json.loads(startRequests[0].data)
+        if data is None:
+            # TODO make error message
+            return response
+
+        lock = data["lock"]
 
 	# Send message to the Pi this team is registered with to start the simulation
         url = "{}/post_challenge".format(station.url)
@@ -1260,7 +1273,7 @@ class Open(JSONHandlerView):
         data = json.dumps({
                  "message_version": "0",
                  "message_timestamp": "2014-09-15 14:08:59",
-                 "secure_pulse_pattern": [1, 2, 3, 4],
+                 "secure_pulse_pattern": lock,
                  "secure_max_pulse_width": "100",
                  "secure_max_gap": "10",
                  "secure_min_gap": "10",
@@ -1359,6 +1372,23 @@ class Secure(JSONHandlerView):
                               status=status,
                               message=message,
                               )
+        if not retry:
+          # Send message to the Pi this team is registered with to restart the simulation
+          # if it doesn't though we don't care the next start should fix it
+          url = "{}/reset/31415".format(station.url)
+          headers = { "Content-type": "application/json", "Accept": "application.json" }
+          jsonData = json.dumps({})
+	  response = requests.post(url, data=jsonData, headers=headers)
+          if response.status_code != 200:
+            errorMessage = "Could not contact station. Contact a competition official."	
+            errorStatus = PiEvent.WARNING_STATUS
+            data = response
+            event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=errorStatus,
+                              message=errorMessage,
+                             )
  
         # Send response
         self.jsonResponse["message"] = cipher(message)
