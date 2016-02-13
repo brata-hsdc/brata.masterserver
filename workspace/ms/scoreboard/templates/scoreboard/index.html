@@ -9,58 +9,89 @@
 
 {% block body_start %}
   <script type="text/javascript">
+    var VERBOSE = true;
+
+    function logE(message) {
+       VERBOSE && console.error(message);
+    }
+
+    function logW(message) {
+       VERBOSE && console.warn(message);
+    }
+
+    function logI(message) {
+       VERBOSE && console.info(message);
+    }
+
+    function logD(message) {
+       VERBOSE && console.log('[DEBUG] ' + message);
+    }
+
+    function logT(message) {
+       VERBOSE && console.log('[TRACE] ' + message);
+    }
+
+    function processData(index, value) {
+       logT('Entered ' + arguments.callee.name + '(' + index + ', ' + value.team_name + ')');
+
+       var numRows = $("tbody").find("tr").length;
+       logD('numRows=' + numRows);
+
+       for (var i = 1; i <= numRows; ++i) {
+          logD('   loop ' + i + ' of ' + numRows);
+
+          var id = $("tbody").find("tr:nth-child(" + i + ")").attr('id');
+
+          if(id == ('team-' + value.team_name)) {
+             var elem = $("tbody").find("tr:nth-child(" + i + ")");
+             elem.find("td:nth-child( 1)").html(value.rank)
+             elem.find("td:nth-child( 2)").html('<img src=\"' + value.team_icon + '" />')
+             elem.find("td:nth-child( 3)").html(value.team_name + " (" + value.organization + ")")
+             elem.find("td:nth-child( 4)").html("(TODO)")
+             elem.find("td:nth-child( 5)").html(value.is_registered) // TODO
+             elem.find("td:nth-child( 6)").html(value.launch_score + " (" + value.launch_duration + ")")
+             elem.find("td:nth-child( 7)").html(value.dock_score + " (" + value.dock_duration + ")")
+             elem.find("td:nth-child( 8)").html(value.secure_score + " (" + value.secure_duration + ")")
+             elem.find("td:nth-child( 9)").html(value.return_score + " (" + value.return_duration + ")")
+             elem.find("td:nth-child(10)").html(value.total_score)
+             elem.find("td:nth-child(11)").html(value.total_duration)
+             return true;
+          }
+       }
+
+       logD('Adding new row for index ' + index);
+
+       var rowId = "team-" + value.team_name;
+       var newRow = "<tr id='" + rowId + "'>"
+              + "<td>" + "TODO rank" + "</td>"
+              + "<td><img src=\"" + value.team_icon + "\" /></td>"
+              + "<td>" + value.team_name + " (" + value.organization + ")</td>"
+              + "<td>" + "(TODO)" + "</td>"
+              + "<td>" + value.is_registered + "</td>" // TODO
+              + "<td>" + value.launch_score + " (" + value.launch_duration + ")</td>"
+              + "<td>" + value.dock_score + " (" + value.dock_duration + ")</td>"
+              + "<td>" + value.secure_score + " (" + value.secure_duration + ")</td>"
+              + "<td>" + value.return_score + " (" + value.return_duration + ")</td>"
+              + "<td>" + value.total_score + "</td>"
+              + "<td>" + value.total_duration + "</td>"
+              + "</tr>";
+
+       $('tbody').append(newRow);
+
+       logT('Exiting ' + arguments.callee.name + '(' + index + ', ' + value.team_name + ')');
+    }
+
     function handleScoreboardStatus(data) {
+       logT('Entered ' + arguments.callee.name + '(' + data.length + ')');
 
        // Handle the data returned from the Ajax call
        var tableBody = "";
        data.sort(function(a,b){ return a.id - b.id; });
 
-       var rank = 0;
-       var prevScore = 9999999999;
+       $.each(data, processData);
 
-       $.each(data, function(index, value) {
-          if (value.total_score < prevScore) { rank++; }
 
-          var numRows = $("tbody").find("tr").length;
-
-          for (var i = 1; i <= numRows; ++i) {
-             var id = $("tbody").find("tr:nth-child(" + i + ")").attr('id');
-
-             if(id == ('team-' + value.name)) {
-                var elem = $("tbody").find("tr:nth-child(" + i + ")");
-                elem.find("td:nth-child( 1)").html(value.rank)
-                elem.find("td:nth-child( 2)").html(value.icon) // TODO
-                elem.find("td:nth-child( 3)").html(value.name)
-                elem.find("td:nth-child( 4)").html(value.organization) // TODO
-                elem.find("td:nth-child( 5)").html(value.is_registered) // TODO
-                elem.find("td:nth-child( 6)").html(value.launch_score + " (" + value.launch_duration + ")")
-                elem.find("td:nth-child( 7)").html(value.dock_score + " (" + value.dock_duration + ")")
-                elem.find("td:nth-child( 8)").html(value.secure_score + " (" + value.secure_duration + ")")
-                elem.find("td:nth-child( 9)").html(value.return_score + " (" + value.return_duration + ")")
-                elem.find("td:nth-child(10)").html(value.total_score)
-                elem.find("td:nth-child(11)").html(value.total_duration)
-                return true;
-             }
-          }
-
-          var rowId = "team-" + value.name;
-          var newRow = "<tr id='" + rowId + "'>"
-                 + "<td>" + "TODO rank" + "</td>"
-                 + "<td>" + value.icon + "</td>" // TODO
-                 + "<td>" + value.name + "</td>"
-                 + "<td>" + value.organization + "</td>" // TODO
-                 + "<td>" + value.is_registered + "</td>" // TODO
-                 + "<td>" + value.launch_score + " (" + value.launch_duration + ")</td>"
-                 + "<td>" + value.dock_score + " (" + value.dock_duration + ")</td>"
-                 + "<td>" + value.secure_score + " (" + value.secure_duration + ")</td>"
-                 + "<td>" + value.return_score + " (" + value.return_duration + ")</td>"
-                 + "<td>" + value.total_score + "</td>"
-                 + "<td>" + value.total_duration + "</td>"
-                 + "</tr>";
-
-          $('tbody').append(newRow);
-       });
-
+// TODO...
 /*
        // Reorder the table to sort by descending rank
        var numRows = $("tbody").find("tr").length;
@@ -70,7 +101,7 @@
           var elem = $("tbody").find("tr:nth-child(" + i + ")");
           var id = elem.attr('id');
           var rank = elem.find("td:nth-child( 1)").html();
-//          console.log("top=["+top+"] rank=["+rank+"] prod=["+(top*rank)+"]");
+//          logD("top=["+top+"] rank=["+rank+"] prod=["+(top*rank)+"]");
 
           elem.animate({
              position: 'absolute',
@@ -116,10 +147,9 @@
       <thead>
         <tr>
            <th>Position</th>
-           <th>Team Icon/Avatar (TBD)</th>
+           <th></th>
            <th>Team Name</th>
            <th>Team Code</th>
-           <th>Organization (TBD)</th>
            <th>Registered (TBD)</th>
            <th>Launch</th>
            <th>Dock</th>
