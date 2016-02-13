@@ -20,7 +20,7 @@ def index(request):
     """
     logging.debug('Entered scoreboard.views.index')
 
-    refreshInterval = 20000 # TODO Setting.get("SCOREBOARD_STATUS_REFRESH_INTERVAL_MS", default="5000")
+    refreshInterval = 5000 # TODO Setting.get("SCOREBOARD_STATUS_REFRESH_INTERVAL_MS", default="5000")
 
     context = {
         "PAGE_REFRESH_INTERVAL": refreshInterval
@@ -415,6 +415,18 @@ TODO3:
                 registered_icon = "phone"
                 registered_color = "#00ff40"
 
+            launch_score = s['launch_score']
+            dock_score = s['dock_score']
+            secure_score = s['secure_score']
+            return_score = s['return_score']
+            total_score = launch_score + dock_score + secure_score + return_score
+
+            launch_duration_s = s['launch_duration_s']
+            dock_duration_s = s['dock_duration_s']
+            secure_duration_s = s['secure_duration_s']
+            return_duration_s = s['return_duration_s']
+            total_duration_s = launch_duration_s + dock_duration_s + secure_duration_s + return_duration_s
+
             team = {
                 "team_icon"       : "/scoreboard/team_icon/" + t.name + "/",
                 "team_name"       : t.name,
@@ -422,16 +434,16 @@ TODO3:
                 "organization"    : t.organization.name,
                 "registered_icon" : registered_icon,
                 "registered_color": registered_color,
-                "launch_score"    : s['launch_score'],
-                "launch_duration" : ScoreboardStatus._formatSeconds(s['launch_duration_s']),
-                "dock_score"      : s['dock_score'],
-                "dock_duration"   : ScoreboardStatus._formatSeconds(s['dock_duration_s']),
-                "secure_score"    : s['secure_score'],
-                "secure_duration" : ScoreboardStatus._formatSeconds(s['secure_duration_s']),
-                "return_score"    : s['return_score'],
-                "return_duration" : ScoreboardStatus._formatSeconds(s['return_duration_s']),
-                "total_score"     : 0, #TODO t.total_score,
-                "total_duration"  : 0, #TODO ScoreboardStatus._formatSeconds(t.total_duration_s),
+                "launch_score"    : launch_score,
+                "launch_duration" : ScoreboardStatus._formatSeconds(launch_duration_s),
+                "dock_score"      : dock_score,
+                "dock_duration"   : ScoreboardStatus._formatSeconds(dock_duration_s),
+                "secure_score"    : secure_score,
+                "secure_duration" : ScoreboardStatus._formatSeconds(secure_duration_s),
+                "return_score"    : return_score,
+                "return_duration" : ScoreboardStatus._formatSeconds(return_duration_s),
+                "total_score"     : total_score,
+                "total_duration"  : ScoreboardStatus._formatSeconds(total_duration_s),
             }
 
             teamList.append(team)
