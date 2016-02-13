@@ -47,8 +47,8 @@
              elem.find("td:nth-child( 1)").html(value.rank)
              elem.find("td:nth-child( 2)").html('<img src=\"' + value.team_icon + '" />')
              elem.find("td:nth-child( 3)").html(value.team_name + " (" + value.organization + ")")
-             elem.find("td:nth-child( 4)").html("(TODO)")
-             elem.find("td:nth-child( 5)").html(value.is_registered) // TODO
+             elem.find("td:nth-child( 4)").html("(TODO: Remove?)")
+             elem.find("td:nth-child( 5)").html('<div class="glyphicon glyphicon-' + value.registered_icon + '" style="color:' + value.registered_color + '" />')
              elem.find("td:nth-child( 6)").html(value.launch_score + " (" + value.launch_duration + ")")
              elem.find("td:nth-child( 7)").html(value.dock_score + " (" + value.dock_duration + ")")
              elem.find("td:nth-child( 8)").html(value.secure_score + " (" + value.secure_duration + ")")
@@ -66,8 +66,8 @@
               + "<td>" + "TODO rank" + "</td>"
               + "<td><img src=\"" + value.team_icon + "\" /></td>"
               + "<td>" + value.team_name + " (" + value.organization + ")</td>"
-              + "<td>" + "(TODO)" + "</td>"
-              + "<td>" + value.is_registered + "</td>" // TODO
+              + "<td>" + "(TODO: Remove?)" + "</td>"
+              + '<td><div class="glyphicon glyphicon-' + value.registered_icon + '" style="color:' + value.registered_color + '" /></td>' // TODO Link to glyphicons in footer
               + "<td>" + value.launch_score + " (" + value.launch_duration + ")</td>"
               + "<td>" + value.dock_score + " (" + value.dock_duration + ")</td>"
               + "<td>" + value.secure_score + " (" + value.secure_duration + ")</td>"
@@ -150,13 +150,13 @@
            <th></th>
            <th>Team Name</th>
            <th>Team Code</th>
-           <th>Registered (TBD)</th>
+           <th></th>
            <th>Launch</th>
            <th>Dock</th>
            <th>Secure</th>
-           <th>Return to Earth</th>
+           <th>RTE</th>
            <th>Total Score</th>
-           <th>Total Duration (TBD)</th>
+           <th>Total Duration</th>
         </tr>
       </thead>
 
