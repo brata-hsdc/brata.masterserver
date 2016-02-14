@@ -19,10 +19,10 @@ def index(request):
     """
     logging.debug('Entered scoreboard.views.index')
 
-    refreshInterval = 5000 # TODO Setting.get("SCOREBOARD_STATUS_REFRESH_INTERVAL_MS", default="5000")
+    refreshInterval_ms = ScoreboardStatus.getSetting('SCOREBOARD_STATUS_REFRESH_INTERVAL_MS', 5000)
 
     context = {
-        "PAGE_REFRESH_INTERVAL": refreshInterval
+        "PAGE_REFRESH_INTERVAL": refreshInterval_ms
     }
 
     result = render(request, "scoreboard/index.html", context)
@@ -60,6 +60,18 @@ class ScoreboardStatus(View):
     """
     def __init__(self):
         logging.debug('Entered ScoreboardStatus.__init__')
+
+
+    #---------------------------------------------------------------------------
+    @staticmethod
+    def getSetting(key,
+                   ridiculous_default):
+        result = Setting.get(key, ridiculous_default)
+
+        if result == ridiculous_default:
+            logging.warning("No {} key found in the Settings table. Proceeding with value {}".format(key, ridiculous_default))
+
+        return result
 
 
     #---------------------------------------------------------------------------
@@ -134,21 +146,11 @@ class ScoreboardStatus(View):
 
     #---------------------------------------------------------------------------
     @staticmethod
-    def _getSetting(key,
-                    ridiculous_default):
-        result = Setting.get(key, ridiculous_default)
-
-        if result == ridiculous_default:
-            logging.error("No {} key found in the Settings table. Proceeding with value {}".format(key, ridiculous_default))
-
-        return result
-
-
-    #---------------------------------------------------------------------------
-    @staticmethod
     def _getDataField(submit_message,
                       json_field_name):
-        result = 0 # TODO get value in embedded JSON string in data field of SUBMIT message
+
+        data = json.loads(submit_message.data)
+        result = data[json_field_name]
 
         return result
 
@@ -156,25 +158,21 @@ class ScoreboardStatus(View):
     #---------------------------------------------------------------------------
     @staticmethod
     def _computeRunningTimeDelta(submit_message):
-        dock_sim_playback_time_s = _getSetting('DOCK_SIM_PLAYBACK_TIME_S', -6000)
-        dnf_time_penalty_factor = _getSetting('DNF_TIME_PENALTY_FACTOR', -8000)
+        dock_sim_playback_time_s = ScoreboardStatus.getSetting('DOCK_SIM_PLAYBACK_TIME_S', -6000)
+        dnf_time_penalty_factor = ScoreboardStatus.getSetting('DNF_TIME_PENALTY_FACTOR', -8000)
         actual_time_s = _getDataField(submit_message, 'candidate_answer')
         fail_message = _getDataField(submit_message, 'fail_message')
 
-        dnf_adjustment_needed = (fail_message == "OUTCOME_DNF")
-        factor = 1.0
-        
-        if dnf_adjustment_needed:
-            factor = dnf_time_penalty_factor
-        
-        running_time_s = actual_time_s * factor
+        # Time charged for the actual docking flight maneuver
+        if fail_message == "OUTCOME_DNF":
+            flying_time_s = actual_time_s * dnf_time_penalty_factor
+        else:
+            flying_time_s = actual_time_s
 
-        if actual_time_s > dock_sim_playback_time_s: # simulation time is less than actual time
-            # discount time spent watching the simulation
-            running_time_s -= dock_sim_playback_time_s
-        # else do nothing - no simulation time to discount because simulation time and actual time are the same
+        # Time watching the animation
+        watching_time_s = min(flying_time_s, dock_sim_playback_time_s)
 
-        return running_time_s - actual_time_s
+        return flying_time_s - watching_time_s
 
 
     #---------------------------------------------------------------------------
@@ -219,7 +217,7 @@ class ScoreboardStatus(View):
                 params['end_time'] = latch_event_timestamp + params['total_run_time_delta_s']
 
         else:
-            log.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
+            logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
         """
 #--- TODO BEGIN DOCK
@@ -271,7 +269,7 @@ TODO4:
 
 #--- TODO BEGIN COMMON
                 else:
-                    log.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
+                    logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
 #--- TODO END COMMON
 #--- TODO BEGIN DOCK
@@ -322,7 +320,7 @@ TODO3:
                 params['end_time'] = params['fail_events'].reverse()[0].time # timestamp of final FAIL_STATUS
 
         else:
-            log.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
+            logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
         logging.debug('Exiting ScoreboardStatus._computeSecureOrReturn')
 
@@ -623,21 +621,23 @@ class TeamIcon(View):
         img_width = 32
         img_height = 32
 
-        font_size = 24
-
         img = Image.new("RGBA", (img_width, img_height), (255, 0, 0, 0))
         draw = ImageDraw.Draw(img)
 
-        fonts_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static/scoreboard/fonts')
-        font = ImageFont.truetype(os.path.join(fonts_path, 'EnchantedPrairieDog.TTF'), font_size)
-        (text_width, text_height) = draw.textsize(text, font=font)
-
-        x = (img_width - text_width) / 2
-        y = 0
-
         draw.ellipse((0, 0, img_width-1, img_height-1), fill=color['polygon'])
 
-        draw.text((x, y), text, font=font, fill=color['text'])
+        try:
+            font_size = 24
+
+            fonts_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static/scoreboard/fonts')
+            font = ImageFont.truetype(os.path.join(fonts_path, 'EnchantedPrairieDog.TTF'), font_size)
+            (text_width, text_height) = draw.textsize(text, font=font)
+
+            x = (img_width - text_width) / 2
+            y = 0
+            draw.text((x, y), text, font=font, fill=color['text'])
+        except Exception, e:
+            logging.warning('Error drawing text on image: {}'.format(e))
 
         result = HttpResponse(content_type="image/png", status=200)
         img.save(result, "PNG")
