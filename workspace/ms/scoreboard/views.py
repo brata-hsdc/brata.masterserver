@@ -187,14 +187,18 @@ class ScoreboardStatus(View):
         num_success_events = params['success_events'].count()
         num_fail_events = params['fail_events'].count()
 
+        if params['latch_events'].count() > 0:
+            latch_event_timestamp = params['latch_events'].reverse()[0].time # timestamp of final LATCH
+        else:
+            # team hasn't scanned the LATCH QR code yet 
+            latch_event_timestamp = now
+
         if num_success_events > 0:
             if params['submit_events'].count() > max_submit_events:
                 logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
 
             submit_message = params['submit_events'][attempt_num - 1]
             params['total_run_time_delta_s'] += ScoreboardStatus._computeRunningTimeDelta(submit_message)
-
-            latch_event_timestamp = 0 # TODO timestamp of final LATCH event
 
             params['score'] = 9
             params['time_to_exit'] = True
@@ -210,8 +214,6 @@ class ScoreboardStatus(View):
             params['total_run_time_delta_s'] += ScoreboardStatus._computeRunningTimeDelta(submit_message)
 
             if params['num_failed_attempts'] > 3:
-                latch_event_timestamp = 0 # TODO timestamp of final LATCH event
-
                 params['score'] = 5
                 params['time_to_exit'] = True
                 params['end_time'] = latch_event_timestamp + params['total_run_time_delta_s']
@@ -344,6 +346,10 @@ TODO3:
         params['current_run_time'] = 0
         params['docking_time_s'] = 0
         params['total_run_time_delta_s'] = 0.0
+        params['latch_events'] = team_events.filter(
+            type=PiEvent.LATCH_MSG_TYPE
+        ).order_by('time')
+
         i = 0
 
         while not params['time_to_exit']:
