@@ -7,9 +7,9 @@ prerequisites, and then you need to perform the following bootstrap process.
 
 1. **Python 2.7** installed
 2. **PostgreSQL** installed
-3. `brata.masterserver/ms project` installed (copied to *`[put folder here]`*)
+3. `brata.masterserver` installed in /opt/designcallenge2016)
 4. Your computer has a user account with username "pi"
-
+5. cd to /opt/designchallenge2016/brata.master/ms
 ## Names you can configure
 
 This document uses the following identifiers and values in its examples.
@@ -27,7 +27,8 @@ msdb       | Master Server database name
 
 Use the `psql` command line utility that comes with PostgreSQL.  You can
 also accomplish the same thing through the `pgadmin` GUI, but it is harder
-to explain here.
+to explain here. DO NOT use raspberry as shown below use the password agreed
+to by the team.
 
 ```
 # psql -U postgres
@@ -118,7 +119,7 @@ example uses a file called `initial_content.sql`, but there will probably
 be multiple of these files:  some for testing, and some for actual deployment.
 
 ```
-# psql -U pi msdb < initial_content.sql
+# sudo -u psql postgres -d msdb < db_backup.sql
 ```
 
 `initial_content.sql` would be a file created using the `pg_dump` command
@@ -192,14 +193,14 @@ database and start over.
 ## 1.  Delete the existing database
 
 ```sh
-# psql -U postgres -c "DROP DATABASE msdb;"
+# sudo -u postgres psql -c "DROP DATABASE msdb;"
 ```
 
 ## 2.  Create a new database
 
 ```sh
-# psql -U postgres -c "CREATE DATABASE msdb;"
-# psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE msdb TO pi;"
+# sudo -u postgres psql -c "CREATE DATABASE msdb;"
+# sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE msdb TO pi;"
 ```
 
 ## 3.  Run the Django migrations on the new database
@@ -209,11 +210,12 @@ This will create the tables.
 ```sh
 # python manage.py migrate
 ```
+Sometimes this will not work either. See the waht to do if the migrations are broken section.
 
 ## 4.  Restore the database contents
 
 ```sh
-# psql -U pi -d msdb < db_backup.sql
+# sudo -u postgres psql -d msdb < db_backup.sql
 ```
 
 ## 5.  (Re-)Create a superuser
@@ -276,6 +278,12 @@ Migrations for 'piservice':
     - Add field pi to pievent
     - Add field team to pievent
 
+If that doesn't work you may need to flush first, then makemigrations and then migrate
+```sh
+# python manage.py sqlflush
+# python manage.py flush
+```
+
 # python manage.py migrate
 Operations to perform:
   Synchronize unmigrated apps: staticfiles, messages
@@ -299,3 +307,5 @@ Running migrations:
   Applying piservice.0001_initial... OK
   Applying sessions.0001_initial... OK
 ```
+
+Then go back and create the super user using the instructions above.

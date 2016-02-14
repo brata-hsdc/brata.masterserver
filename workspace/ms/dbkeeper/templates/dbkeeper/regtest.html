@@ -10,8 +10,9 @@
           <th>School</th>
           <th>Team</th>
           <th>Registration</th>
-          <th>Launch Test</th>
+          <!--<th>Launch Test</th>-->
           <th>Dock Test</th>
+          <!--<td style="text-align: left;">Dock Test</td>-->
        </tr>
        <tbody>
          {% for team in table %}
@@ -20,9 +21,12 @@
             <td style="text-align: left;">{{ team.name }}</td>
             <td style="text-align: left;">
              <a href="../regtest_team/{{team.pass_code}}/">Reg QRs</a></td>
-            <td style="text-align: left;">
+            <!--<td style="text-align: left;">
              <a href="../navtest_team/{{team.pass_code}}/{{team.points.0.0}}/{{team.points.0.1}}/{{team.points.1.0}}/{{team.points.1.1}}/{{team.points.2.0}}/{{team.points.2.1}}/{{team.points.3.0}}/{{team.points.3.1}}/{{team.organization}}/">Map Points</a></td>
-            <td><a href="{{ dock_test_host }}/dock">Dock Sim Evaluator</a></td>
+            -->
+          <td><a href="{{ dock_test_host }}/dock">Dock Sim Evaluator</a></td>
+          <!--<td style="text-align: left;">
+           <a href="../docktest_team/{{team.pass_code}}/">Dock QRs</a></td>-->
          </tr>
          {% endfor %}
        </tbody>

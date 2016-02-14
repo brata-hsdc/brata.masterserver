@@ -9,7 +9,7 @@ import os
 from dbkeeper.models import Organization, Team
 from PIL import Image, ImageDraw, ImageFont
 from piservice.models import PiEvent, PiStation
-from gnome._gnome import score_init
+#from gnome._gnome import score_init
 from random import randint
 
 
