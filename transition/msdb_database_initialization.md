@@ -119,7 +119,7 @@ example uses a file called `initial_content.sql`, but there will probably
 be multiple of these files:  some for testing, and some for actual deployment.
 
 ```
-# sudo -U psql postgres -d msdb < db_backup.sql
+# sudo -u psql postgres -d msdb < db_backup.sql
 ```
 
 `initial_content.sql` would be a file created using the `pg_dump` command
@@ -193,14 +193,14 @@ database and start over.
 ## 1.  Delete the existing database
 
 ```sh
-# sudo -U postgres psql -c "DROP DATABASE msdb;"
+# sudo -u postgres psql -c "DROP DATABASE msdb;"
 ```
 
 ## 2.  Create a new database
 
 ```sh
-# sudo -U postgres psql -c "CREATE DATABASE msdb;"
-# sudo -U postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE msdb TO pi;"
+# sudo -u postgres psql -c "CREATE DATABASE msdb;"
+# sudo -u postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE msdb TO pi;"
 ```
 
 ## 3.  Run the Django migrations on the new database
@@ -215,7 +215,7 @@ Sometimes this will not work either. See the waht to do if the migrations are br
 ## 4.  Restore the database contents
 
 ```sh
-# sudo -U postgres psql -d msdb < db_backup.sql
+# sudo -u postgres psql -d msdb < db_backup.sql
 ```
 
 ## 5.  (Re-)Create a superuser
