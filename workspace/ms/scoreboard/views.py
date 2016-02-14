@@ -12,6 +12,7 @@ from piservice.models import PiEvent, PiStation
 from random import randint
 
 
+# TODO Update doc comments throughout file
 #-------------------------------------------------------------------------------
 def index(request):
     """ Display the scoreboard page. Updating is driven by the page making
@@ -221,72 +222,6 @@ class ScoreboardStatus(View):
         else:
             logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
-        """
-#--- TODO BEGIN DOCK
-TODO2:
-        # TODO
-        #             dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
-        #             attempt_run_time = timestamp of LATCH/SUBMIT event + (total actual docking time * dnf_scale)
-        #             params['end_time'] = params['current_run_time'] + attempt_run_time
-        params['docking_time_s'] = todo
-#--- TODO END DOCK
-#--- BEGIN COMMON
-
-TODO4:
-                if num_success_events > 0:
-                    if params['submit_events'].count() > max_submit_events:
-                        logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
-
-                    params['score'] = 9
-                    params['time_to_exit'] = True
-#--- TODO END COMMON
-#--- TODO BEGIN DOCK
-        # TODO
-        #                 dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
-        #                 attempt_run_time = timestamp of LATCH/SUBMIT event + (total actual docking time * dnf_scale)
-        #                 params['end_time'] = params['current_run_time'] + attempt_run_time
-        #             else
-        #                 dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
-        #                 attempt_run_time = timestamp of LATCH/SUBMIT event + (total actual docking time * dnf_scale)
-        #                 params['current_run_time'] += attempt_run_time
-#--- TODO END DOCK
-
-#--- TODO BEGIN COMMON
-                elif num_fail_events > 0:
-                    if params['submit_events'].count() > max_submit_events:
-                        logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
-
-                    params['num_failed_attempts'] += 1
-
-                    if params['num_failed_attempts'] > 3:
-                        params['score'] = 5
-                        params['time_to_exit'] = True
-#--- TODO END COMMON
-#--- TODO BEGIN DOCK
-        # TODO
-        #             dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
-        #             attempt_run_time = timestamp of LATCH/SUBMIT event + (total actual docking time * dnf_scale)
-        #             params['end_time'] = params['current_run_time'] + attempt_run_time
-#--- TODO END DOCK
-
-#--- TODO BEGIN COMMON
-                else:
-                    logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
-
-#--- TODO END COMMON
-#--- TODO BEGIN DOCK
-TODO3:
-        #         TODO - Do we have a Submit message to work with here?
-        #         dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
-        #         attempt_run_time = now + (total actual docking time * dnf_scale)
-        #         params['end_time'] = params['current_run_time'] + attempt_run_time
-        params['docking_time_s'] = todo
-#--- TODO END DOCK
-
-#--- BEGIN COMMON
-#--- END COMMON
-        """
-
         logging.debug('Exiting ScoreboardStatus._computeDock')
 
 
@@ -419,10 +354,6 @@ TODO3:
                 params['time_to_exit'] = True
                 params['end_time'] = now
 
-        """
-        TODO
-        params['docking_time_s'] = _computeDockingTime(todo)
-        """
         duration_s = (params['end_time'] - start_time).total_seconds() + params['docking_time_s']
 
         logging.debug('Exiting ScoreboardStatus._recomputeScore()')
@@ -532,27 +463,6 @@ TODO3:
             teamList.append(team)
 
         result = HttpResponse(json.dumps(teamList), content_type="application/json", status=200)
-
-        #-------------------
-        # TODO Delete
-        #for e in submitEvents:
-        #    logging.debug('3: {} {} [type={}, team={}, pi={}] {}'.format(e.time, e.message, e.type, e.team, e.pi, e.status))
-        #for e in events:
-        #    logging.debug('{} [type={}, team={}, pi={}] {}'.format(e.time, e.type, e.team, e.pi, e.status))
-        #for e in events:
-        #    logging.debug('1: {} [type={}, team={}, pi={}] {}'.format(e.time, e.type, e.team, e.pi, e.status))
-        #logging.debug('2: {} vs. {}'.format(now, start_time))
-        # timestamps in e.time for e in events
-        #for e in events:
-        #    logging.debug('{} {} [type={}, team={}, pi={}] {}'.format(e.time, e.message, e.type, e.team, e.pi, e.status))
-        # for e in events:
-        #     logging.debug('{} {} [type={}, team={}, pi={}] {}'.format(e.time, e.message, e.type, e.team, e.pi, e.status))
-        # logging.debug('[count={}]'.format(events.count()))
-        #
-        # TODO Delete
-        #score = 0
-        #duration_s = 0
-        #-------------------
 
         logging.debug('Exiting ScoreboardStatus.get')
         return result
