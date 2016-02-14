@@ -450,7 +450,7 @@ class Register(JSONHandlerView):
 #         self.jsonResponse["message"] = "DEBUG"
 #         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
     
-        team.registered = event  # not checking for multiple registrations, so multiple is ok
+        team.registered = event.id  # not checking for multiple registrations, so multiple is ok
         team.save()
         
         # Send a success response
@@ -526,7 +526,7 @@ class Unregister(JSONHandlerView):
 #         self.jsonResponse["message"] = "DEBUG"
 #         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=400)
     
-        team.registered = event  # store the Unregister event in the registered field
+        team.registered = 0  # store the Unregister event in the registered field
         team.save()
         
         # Send a success response
@@ -1662,7 +1662,7 @@ class Register_2015(JSONHandlerView):
                               message="Team '{}' Registered with brata_version 'v00'. Assigned reg_code {} (not used).".format(team.name, team.reg_code),
                              )
         
-        team.registered = event  # not checking for multiple registrations, so multiple is ok
+        team.registered = event.id  # not checking for multiple registrations, so multiple is ok
         team.save()
         
         # Send a success response
