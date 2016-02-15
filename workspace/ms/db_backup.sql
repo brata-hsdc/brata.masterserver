@@ -862,7 +862,7 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 36, true);
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$24000$wMwuFrNw7Ie2$yLLVEL3e+kPDbMR3GfPxRHk0LbyX69pGL9Nr7zOLLbU=	2016-02-14 13:35:33.908361+00	t	pi			pi@nowhere.com	t	t	2016-02-13 19:47:35.067929+00
+1	pbkdf2_sha256$24000$wMwuFrNw7Ie2$yLLVEL3e+kPDbMR3GfPxRHk0LbyX69pGL9Nr7zOLLbU=	2016-02-15 05:10:26.769118+00	t	pi			pi@nowhere.com	t	t	2016-02-13 19:47:35.067929+00
 \.
 
 
@@ -963,15 +963,15 @@ COPY dbkeeper_setting (id, name, value, description) FROM stdin;
 1	1_READ_ME	Master Server Setting Table Contents	The Master Server operation is configured through a variety of values stored in the Setting table.  The values are captured here in case the Setting table needs to be reconstructed.  This file is created by saving the Setting table to a CSV file and importing it into Excel.
 2	DOCK_PARAMS	{"min_dock": 0.01, "sim_time": 45, "max_dock": 0.1, "init_vel": 0.0, "sets": [{"a_fore": 0.09, "f_rate": 0.7, "tape_id": 1, "tape_len": 10.0, "a_aft": 0.15, "f_qty": 20.0}, {"a_fore": 0.1, "f_rate": 0.8, "tape_id": 2, "tape_len": 12.0, "a_aft": 0.16, "f_qty": 21.0}]}	Competition parameters for the Dock challenge
 3	DOCK_SIM_PLAYBACK_TIME_S	45	The maximum replay time, in seconds, for the Dock simulation
-4	DOCK_TEST_HOST	http://192.168.4.37:8080	URL of the host that runs the FlightService Dock test server that is accessible by the students
 5	LAUNCH_PARAMS	[[["red_v1", "1.2", "1", "1"], ["red_v2", "2", "2", "2"], ["red_v3", "3", "3", "3"], ["red_c", "4"]], [["green_v1", "11", "11", "11"], ["green_v2", "22", "22", "22"], ["green_v3", "33", "33", "33"], ["green_c", "44"]], [["blue_v1", "111", "111", "111"], ["blue_v2", "222", "222", "222"], ["blue_v3", "333", "333", "333"], ["blue_c", "444"]]]	Competition parameters for the Launch challenge
-7	RETURN_PARAMS	[["Station 1", 1, 0, 0, 0, 0, 0], ["Station 2", 999, 2, 0, 0, 0, 0], ["Station 3", 0, 0, 3, 0, 0, 0], ["Station 4", 0, 0, 0, 4, 0, 0], ["Station 5", 0, 0, 0, 0, 5, 0], ["Station 6", 0, 0, 0, 0, 0, 6]]	Competition parameters for the Return challenge
 8	SECURE_ERROR_DISTRIBUTION	[ 1, -1 ]	A list represented as a JSON array that contains error deltas that will be chosen at random and added to tone values to introduce errors in the data.  Construct the list to represent the distribution of errors that you desire.  For example, [ 1, 1, -1, -1, 2 ] would result in 40% of the errors deviating from the correct value by 1, 40% by -1, and 20% by 2.
 9	SECURE_NUM_INDUCED_ERRORS	1	The number of errors injected into the Secure tone sequence.  Using the current 3x3 arrangement of values, 1 is the maximum number of induced errors guaranteed to be recoverable.
 10	STATION_IPS	127.0.0.1\r\n192.168.1.1\r\n192.168.4.39\r\n192.168.4.65\r\n192.168.4.59\r\n192.168.1.104	IP address of competition stations.
 11	STATION_SERIAL_NUMS	1234567\r\nabcdefg\r\n1234\r\n0000000072da1490\r\n000000001183fe50\r\n00000000c131aba0\r\n000000003cafb6a9	List of station serial numbers
 12	STATION_STATUS_REFRESH_INTERVAL_MS	5000	
 6	LAUNCH_TEST_DATA	{ "Melbourne": [[28.090004, -80.619985], [28.089966, -80.619876], [28.089892, -80.619948], [28.089896, -80.619816]], "Bayside": [[27.95171, -80.675075], [27.951812, -80.675102], [27.951757, -80.674973], [27.951652, -80.674997]], "Titusville": [[28.591602, -80.805232], [28.591508, -80.805202], [28.591613, -80.805368], [28.591481, -80.805332]], "Palm Bay": [[28.047726, -80.616002], [28.047797, -80.616034], [28.047747, -80.616102], [28.04778, -80.615947]], "Holy Trinity": [[28.201382, -80.667228], [28.201463, -80.667337], [28.201378, -80.667379], [28.20132, -80.6673]], "Edgewood": [[28.201382, -80.667228], [28.201463, -80.667337], [28.201378, -80.667379], [28.20132, -80.6673]], "HarrisTesters": [[28.201382, -80.667228], [28.201463, -80.667337], [28.201378, -80.667379], [28.20132, -80.6673]]   }	School test data points for student testing
+4	DOCK_TEST_HOST	http://97.102.189.170:8080	URL of the host that runs the FlightService Dock test server that is accessible by the students
+7	RETURN_PARAMS	{"return01":[1, 0, 0, 0, 0, 0], "return02":[0, 2, 0, 0, 0, 0], "return03":[0, 0, 3, 0, 0, 0], "return04":[0, 0, 0, 4, 0, 0], "return05":[0, 0, 0, 0, 5, 0], "return06":[0, 0, 0, 0, 0, 6], "Palm Bay":[0, 0, 0, 0, 0, 6], "Melbourne":[0, 0, 0, 0, 0, 6], "Titusville":[0, 0, 0, 0, 0, 6], "Bayside":[0, 0, 0, 0, 0, 6], "Holly Trinity":[0, 0, 0, 0, 0, 6], "Edgewood":[0, 0, 0, 0, 0, 6], "HarrisTesters":[0, 0, 0, 0, 0, 6]}	Competition parameters for the Return challenge
 \.
 
 
@@ -1017,7 +1017,7 @@ COPY dbkeeper_team (id, name, pass_code, reg_code, registered, organization_id) 
 34	Team 3	xkg10		0	7
 35	Team 4	nwl01		0	7
 14	Gentoomen	jsw04		0	1
-6	Test4	bkl09	55c7d041fff322de	38	8
+6	Test4	bkl09	d15b800d5abde460	60	8
 \.
 
 
@@ -1047,6 +1047,11 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 12	2016-02-14 20:11:02.359523+00	43	2016-02-14 14:44:29.651674+00:00: Docking Parameters received!	3		12	1
 13	2016-02-14 20:11:03.116685+00	44	2016-02-14 14:45:32.821632+00:00: Submit msg received from dock02	3		12	1
 14	2016-02-14 20:11:03.257332+00	45	2016-02-14 14:46:17.148683+00:00: Docking latches engaged! Continue to next Challenge!	3		12	1
+15	2016-02-15 03:39:35.43035+00	4	DOCK_TEST_HOST	2	Changed value.	10	1
+16	2016-02-15 03:54:42.962639+00	7	RETURN_PARAMS	2	Changed value.	10	1
+17	2016-02-15 05:14:50.823317+00	7	RETURN_PARAMS	2	Changed value.	10	1
+18	2016-02-15 11:30:01.365811+00	65	2016-02-15 11:27:48.067684+00:00: Team 'Team42' Reset by ip '172.56.37.138'	3		12	1
+19	2016-02-15 11:30:01.977219+00	66	2016-02-15 11:29:15.422959+00:00: Team 'Test4' Reset by ip '172.56.37.138'	3		12	1
 \.
 
 
@@ -1054,7 +1059,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pi
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 14, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 19, true);
 
 
 --
@@ -1121,6 +1126,7 @@ COPY django_session (session_key, session_data, expire_date) FROM stdin;
 waob97rib8ss9bd2qojjmdq4ow58g3i5	Mjg2MWE5MGJlMmI1NGE2MzE5OGVkMjk0NWZlOWEwODAwNzMzZmZkZTp7Il9hdXRoX3VzZXJfaGFzaCI6ImI4ZDYzNTc3MTBhOWFiNjFjZjY5NGI5MDA5MjlmYzAwOGFhMWUwZGYiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2016-02-27 19:49:11.860088+00
 ncdk1i85lhwjchhpkfo9jgi2821q5c1f	Mjg2MWE5MGJlMmI1NGE2MzE5OGVkMjk0NWZlOWEwODAwNzMzZmZkZTp7Il9hdXRoX3VzZXJfaGFzaCI6ImI4ZDYzNTc3MTBhOWFiNjFjZjY5NGI5MDA5MjlmYzAwOGFhMWUwZGYiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2016-02-28 01:13:17.723134+00
 lggy1xw44l4evksteca9x3fgfncx65ij	Mjg2MWE5MGJlMmI1NGE2MzE5OGVkMjk0NWZlOWEwODAwNzMzZmZkZTp7Il9hdXRoX3VzZXJfaGFzaCI6ImI4ZDYzNTc3MTBhOWFiNjFjZjY5NGI5MDA5MjlmYzAwOGFhMWUwZGYiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2016-02-28 13:35:33.955097+00
+j2rhl1e07ndhzepm8lbx2kbm5brrnzoy	Mjg2MWE5MGJlMmI1NGE2MzE5OGVkMjk0NWZlOWEwODAwNzMzZmZkZTp7Il9hdXRoX3VzZXJfaGFzaCI6ImI4ZDYzNTc3MTBhOWFiNjFjZjY5NGI5MDA5MjlmYzAwOGFhMWUwZGYiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2016-02-29 05:10:28.282946+00
 \.
 
 
@@ -1130,7 +1136,6 @@ lggy1xw44l4evksteca9x3fgfncx65ij	Mjg2MWE5MGJlMmI1NGE2MzE5OGVkMjk0NWZlOWEwODAwNzM
 
 COPY piservice_pievent (id, "time", type, status, data, message, pi_id, team_id) FROM stdin;
 1	2016-02-13 18:47:44.075221+00	3	1	\N	Organization 'HarrisTesters' added	\N	\N
-2	2016-02-13 18:48:22.477005+00	5	1	\N	Team 'Team42' added	\N	1
 \.
 
 
@@ -1138,7 +1143,7 @@ COPY piservice_pievent (id, "time", type, status, data, message, pi_id, team_id)
 -- Name: piservice_pievent_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pi
 --
 
-SELECT pg_catalog.setval('piservice_pievent_id_seq', 45, true);
+SELECT pg_catalog.setval('piservice_pievent_id_seq', 66, true);
 
 
 --
