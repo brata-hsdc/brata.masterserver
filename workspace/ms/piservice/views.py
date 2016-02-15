@@ -945,7 +945,6 @@ class StartChallenge(JSONHandlerView):
         if m is None:
             return response
         
-        # TODO:  Add message processing
         message="StartChallenge msg received from {}".format(m.reg_code)
 
         # Get the station from the station_id
@@ -970,6 +969,7 @@ class StartChallenge(JSONHandlerView):
         if station.station_type == "Launch":
             # Get set of random parameters
             # TODO
+            # Randomly select a triangle from the next group of triangles by color
             shouldCallStation = False
             message = "Layout the launch site at [LAT=+dd.ddddd] [LON=-dd.ddddd] [ROT=ddd.d] [SIDE=dd.d] [COLOR=c]"
         elif station.station_type == "Dock":
@@ -1013,19 +1013,25 @@ class StartChallenge(JSONHandlerView):
             message="Attach the mic cord and determine the 4 Lock Digits, then scan the Open QR Code"
         elif station.station_type == "Return":
             # Get parameters for this particular station
-            # TODO
-            jsonData = json.dumps({
+            params = Setting.getReturnParams(station_id=station.station_id)
+            if params is None:
+              jsonData = json.dumps({
                  "message_version": "0",
                  "message_timestamp": "2014-09-15 14:08:59",
-                 "return_guidance_pattern": [0, 0, 0, 0, 0, 0],
+                 "return_guidance_pattern": [params[0], params[1], params[2], params[3], params[4], params[5]],
                    })
-            startData = jsonData
-            message="Measure return angle, determine guidance computer parameters, then enter them into the guidance computer. Scan Return QR Code when done."
+              startData = jsonData
+              message="Measure return angle, determine guidance computer parameters, then enter them into the guidance computer. Scan Return QR Code when done."
+            else:
+              status = PiEvent.WARNING_STATUS
+              startData = ""
+              message="Invalid StationID {}. Contact a competition official.".format(station.station_id)
+
         else:
             shouldCallStation = False
             status = PiEvent.WARNING_STATUS
             startData = ""
-            message = "Invalid StationID. Contact a competition official."
+            message="Invalid StationID {}. Contact a competition official.".format(station.station_id)
 
         # Record the transaction status
         event = self.addEvent(team=team,
@@ -1554,13 +1560,27 @@ class ReturnToEarth(JSONHandlerView):
         url = "{}/start_challenge".format(station.url)
         if retry:
             # Get parameters for this particular station
-            # TODO
-            jsonData = json.dumps({
+            params = Setting.getReturnParams(station_id=station.station_id)
+            if params is None:
+              jsonData = json.dumps({
                  "message_version": "0",
                  "message_timestamp": "2014-09-15 14:08:59",
-                 "return_guidance_pattern": [0, 0, 0, 0, 0, 0],
+                 "return_guidance_pattern": [params[0], params[1], params[2], params[3], params[4], params[5]],
                    })
-            message="Measure return angle, determine guidance computer parameters, then enter them into the guidance computer. Scan Return QR Code when done."
+              startData = jsonData
+              message="Measure return angle, determine guidance computer parameters, then enter them into the guidance computer. Scan Return QR Code when done."
+            else:
+              status = PiEvent.WARNING_STATUS
+              message="Invalid StationID {}. Contact a competition official.".format(station.station_id)
+              data = response
+              event = self.addEvent(team=team,
+                              pi=station,
+                              data=data,
+                              status=status,
+                              message=message,
+                             )
+              self.jsonResponse["message"] = cipher(message)
+              return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
         else: 
           # Send message to the Pi this team is registered with to restart the simulation no matter what
           url = "{}/reset/31415".format(station.url)

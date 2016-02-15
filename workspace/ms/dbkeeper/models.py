@@ -305,17 +305,17 @@ class Setting(models.Model):
         return (lockDigits, tones)
 
     @staticmethod
-    def getReturnParams(station=None, value=None):
+    def getReturnParams(station_id=None, value=None):
         """ Return the whole data structure, a station, or a value.
         
-        Stations are indexed 0-5.
-        Values are indexed 0-6.  Value 0 is the Station ID. 1-6 are the numbers.
+        Stations are indexed by the station_id.
+        Values are indexed 0-5.
         
         The structure is as follows:
         [station0, station1, ..., station5]
         
         where stationn is:
-        [stationID, value1, value2, ..., value6]
+        [value1, value2, ..., value6]
         
         Returns:
             the entire RETURN_PARAMS data structure if station is None
@@ -327,13 +327,15 @@ class Setting(models.Model):
             returnParams = json.loads(returnParams)
         except (ObjectDoesNotExist, ValueError, TypeError):
             return None
-        
-        if station is None:
+        try:
+          if station is None:
             return returnParams
-        elif value is None:
-            return returnParams[station]
-        else:
+          elif value is None:
+            return returnParams[station_id]
+          else:
             return returnParams[station][value]
+        except (ObjectDoesNotExist, ValueError, TypeError):
+            return None
         
     
     def __unicode__(self):
