@@ -1,0 +1,30 @@
+
+{% extends "dbkeeper/student_test_base.html" %}
+
+{% block title  %}Test Links {{ entity|title }}{% endblock %}
+{% block header %}Test Links {{ entity|title }}{% endblock %}
+
+{% block main %}
+    {% csrf_token %}
+    {# Include the visible fields #}
+<form action="/piservice/libraryTest/{{ entity|lower }}/" method="post">
+    {# Include the hidden fields #}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    {# Include the visible fields #}
+    <table class="fieldWrapper">
+       {% for field in form.visible_fields %}
+       <tr>
+          <td style="text-align: right;">{% if field.field.required %}* {% endif %}{{ field.label_tag }}</td>
+          <td style="text-align: left;">{{ field }}</td>
+          <td style="text-align: left; color: red;">{{ field.errors }}</td>
+       </tr>
+       {% endfor %}
+       <tr class="submitRow">
+          <!--<td colspan="3"><input type="submit" value="{{ submit }}" /></td>-->
+          <td colspan="3"><input type="submit" value="View QR Codes" /></td>
+       </tr>
+    </table>
+</form>
+{% endblock %}

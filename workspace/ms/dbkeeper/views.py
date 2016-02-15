@@ -42,11 +42,6 @@ def index(request):
     return render(request, "dbkeeper/index.html")
 
 #----------------------------------------------------------------------------
-def test(request):
-    """ Display the QR Code test page. """
-    return render(request, "dbkeeper/test.html")
-
-#----------------------------------------------------------------------------
 class regtest(View):
     """ Display the QR Code test page. """
     #queryset = Team.objects.all()

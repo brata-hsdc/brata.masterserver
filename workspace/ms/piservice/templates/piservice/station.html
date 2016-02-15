@@ -1,0 +1,28 @@
+
+{% extends "piservice/library_test_base.html" %}
+
+{% block title  %}Test QR Codes {{ entity|title }}{% endblock %}
+{% block header %}Test QR Codes {{ entity|title }}{% endblock %}
+
+{% block main %}
+    {# Include the visible fields #}
+    <a href="..">Back</a>
+    <table class="fieldWrapper" border="1">
+       <tr>
+    <th align="center">Station</th>
+         {% for url in url_table %}
+    <th align="center">{{ url.label }}</th>
+         {% endfor %}
+       </tr>
+       <tbody>
+         {% for station in station_table %}
+         <tr>
+            <td style="text-align: left;">{{ station.station_id }}</td>
+            {% for url in url_table %}
+    <td align="center"><img src="{{ url.url }}{{ station.station_id }}%2F"><br>{{ url.label }}</td>
+            {% endfor %}
+         </tr>
+         {% endfor %}
+       </tbody>
+    </table>
+{% endblock %}
