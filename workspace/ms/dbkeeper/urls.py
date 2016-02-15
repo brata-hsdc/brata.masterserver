@@ -21,8 +21,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.index, name="index"),
     url(r'^index.html$', views.index, name="index"),
-    url(r'^test.html$', views.test, name="test"),
-    url(r'^remotetest/$', views.regtest.as_view(), name="regtest"),
+    url(r'^remotetest/$', views.regtest.as_view(), name="regtest"), # thisis the student main test page already advertised
     url(r'^test/$', views.regtest.as_view(), name="regtest"), # this is the student test main page (we should remove or rename test.html)
     url(r'^regtest_team/(?P<pass_code>[^/]+)/$', views.regtest_team.as_view(), name="regtest_team"),
     url(r'^navtest_team/(?P<pass_code>[^/]+)/(?P<lat1>[0-9.-]+)/(?P<lon1>[0-9.-]+)/(?P<lat2>[0-9.-]+)/(?P<lon2>[0-9.-]+)/(?P<lat3>[0-9.-]+)/(?P<lon3>[0-9.-]+)/(?P<lat4>[0-9.-]+)/(?P<lon4>[0-9.-]+)/(?P<school_name>[^/]*)/$', views.NavTestTeam.as_view(), name="navtest_team"),

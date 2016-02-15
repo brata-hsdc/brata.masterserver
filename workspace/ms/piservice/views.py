@@ -5,6 +5,7 @@ from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 import json
 
+from .forms import AddLibraryTestForm
 from .models import PiEvent, PiStation
 from dbkeeper.models import Team, Setting
 from dbkeeper.team_code import TeamPassCode
@@ -320,11 +321,12 @@ class JSONHandlerView(View):
             # How do we know they didn't need to restart this one because of a dead phone?
             # Doesn't matter because they still only get a total of 3 chances
             submitRequests = PiEvent.objects.filter(status=PiEvent.INFO_STATUS, type=PiEvent.SUBMIT_MSG_TYPE, team=team, pi=station).order_by('time')
+            if not submitRequests.exists():
+                self.jsonResponse["message"] = cipher("No simulation started at this station or simulation not complete.")
+                return None, None, None, None, HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
             attemptCount = 0
             retry = True
             wasCorrect = False
-            # need to initialize attempt data in case they scan latch without
-            # an attempt actually completing
             lastAnswer = 0
             lastAttemptData = ""
             for attempt in submitRequests:
@@ -342,9 +344,9 @@ class JSONHandlerView(View):
                 retry = False
             return wasCorrect, retry, lastAnswer, lastAttemptData, None
         except:
-            # TODO fix message = "No simulation started at this station, please check your QR Code scanned."	
-            e = sys.exc_info()
-            message = "Exception: {}".format(e)
+            message = "No simulation started at this station, please check your QR Code scanned."	
+            #e = sys.exc_info()
+            #message = "Exception: {}".format(e)
             status = PiEvent.WARNING_STATUS
             data = ""
             event = self.addEvent(team=team,
@@ -353,9 +355,92 @@ class JSONHandlerView(View):
                               status=status,
                               message=message,
                              )
-            # TODO put back self.jsonResponse["message"] = cipher(message)
             self.jsonResponse["message"] = cipher(message)
             return None, None, None, None, HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
+class libraryTest(View):
+    """ Display the QR Code test page. """
+    context = {
+               "form": None,
+               "all_stations_table":   None,
+               "station_table":   None,
+               "url_table":   None,
+               "server_ip":   None,
+               "selected_id":   None,
+              }
+
+    def get(self, request):
+        self.context["selected_id"] = None
+        self.context["form"] = AddLibraryTestForm()
+        stations = PiStation.objects.all().order_by("station_id")
+        stable = []
+        for station in stations:
+            entry = {}
+            entry["station_id"] = station.station_id
+            stable.append(entry)
+            self.context["all_station_table"] = stable
+        return render(request, "piservice/libraryTest.html", self.context)
+
+    def post(self, request):
+        serverIP = "97.102.189.170"
+        self.context["server_ip"] = serverIP
+        self.context["selected_id"] = None
+        self.context["form"] = AddLibraryTestForm(request.POST)
+        form = self.context["form"]
+        stations = PiStation.objects.all().order_by("station_id")
+        stable = []
+        for station in stations:
+            entry = {}
+            entry["station_id"] = station.station_id
+            stable.append(entry)
+            self.context["all_station_table"] = stable
+        if form.is_valid():
+            station = form.cleaned_data["station"]
+            #self.context["selected_id"] = id
+            #if PiStation.objects.filter(station_id=id).count() > 0:
+            table = []
+            #    for station in stations:
+            entry = {}
+            entry["station_id"] = station.station_id
+            table.append(entry)
+            self.context["station_table"] = table
+            utable = []
+            entry = {}
+            base = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F"
+            entry["url"] = "{}{}%3A80%2Fpiservice%2Fstart_challenge%2F".format(base, serverIP)
+            entry["label"] = "Arrive"
+            utable.append(entry)
+            if station.station_type == PiStation.DOCK_STATION_TYPE:
+                entry2 = {}
+                entry2["url"] = "{}{}%3A80%2Fpiservice%2Fdock%2F".format(base, serverIP)
+                entry2["label"] = "Dock"
+                utable.append(entry2)
+                entry3 = {}
+                entry3["url"] = "{}{}%3A80%2Fpiservice%2Flatch%2F".format(base, serverIP)
+                entry3["label"] = "Latch"
+                utable.append(entry3)
+                self.context["url_table"] = utable
+                return render(request, "piservice/station.html", self.context)
+            if station.station_type == PiStation.SECURE_STATION_TYPE:
+                entry2 = {}
+                entry2["url"] = "{}{}%3A80%2Fpiservice%2Fopen%2F".format(base, serverIP)
+                entry2["label"] = "Open"
+                utable.append(entry2)
+                entry3 = {}
+                entry3["url"] = "{}{}%3A80%2Fpiservice%2Fsecure%2F".format(base, serverIP)
+                entry3["label"] = "Secure"
+                utable.append(entry3)
+                self.context["url_table"] = utable
+                return render(request, "piservice/station.html", self.context)
+            if station.station_type == PiStation.RETURN_STATION_TYPE:
+                entry2 = {}
+                entry2["url"] = "{}{}%3A80%2Fpiservice%2Freturn%2F".format(base, serverIP)
+                entry2["label"] = "Return"
+                utable.append(entry2)
+                self.context["url_table"] = utable
+                return render(request, "piservice/station.html", self.context)
+        return render(request, "piservice/libraryTest.html", self.context)
      
 #----------------------------------------------------------------------------
 class Register(JSONHandlerView):
@@ -1021,6 +1106,15 @@ class Dock(JSONHandlerView):
 
         # get the initial parameters from the start_challenge event
         # find the event and get the parameters out of the JSON data
+        try:
+            startRequests = PiEvent.objects.filter(type=PiEvent.START_CHALLENGE_MSG_TYPE, pi=station, team=team).order_by('-time')[:1]
+        except:
+            message = "No start found at this station"
+            # TODO handle error
+        data = json.loads(startRequests[0].data)
+        if data is None:
+            # TODO make error message
+            return response
 
         a_aft = data["AFT"]
         a_fore = data["FORE"]

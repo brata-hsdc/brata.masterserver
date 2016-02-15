@@ -862,7 +862,7 @@ SELECT pg_catalog.setval('auth_permission_id_seq', 36, true);
 --
 
 COPY auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
-1	pbkdf2_sha256$24000$wMwuFrNw7Ie2$yLLVEL3e+kPDbMR3GfPxRHk0LbyX69pGL9Nr7zOLLbU=	2016-02-14 01:13:17.663396+00	t	pi			pi@nowhere.com	t	t	2016-02-13 19:47:35.067929+00
+1	pbkdf2_sha256$24000$wMwuFrNw7Ie2$yLLVEL3e+kPDbMR3GfPxRHk0LbyX69pGL9Nr7zOLLbU=	2016-02-14 13:35:33.908361+00	t	pi			pi@nowhere.com	t	t	2016-02-13 19:47:35.067929+00
 \.
 
 
@@ -965,13 +965,13 @@ COPY dbkeeper_setting (id, name, value, description) FROM stdin;
 3	DOCK_SIM_PLAYBACK_TIME_S	45	The maximum replay time, in seconds, for the Dock simulation
 4	DOCK_TEST_HOST	http://192.168.4.37:8080	URL of the host that runs the FlightService Dock test server that is accessible by the students
 5	LAUNCH_PARAMS	[[["red_v1", "1.2", "1", "1"], ["red_v2", "2", "2", "2"], ["red_v3", "3", "3", "3"], ["red_c", "4"]], [["green_v1", "11", "11", "11"], ["green_v2", "22", "22", "22"], ["green_v3", "33", "33", "33"], ["green_c", "44"]], [["blue_v1", "111", "111", "111"], ["blue_v2", "222", "222", "222"], ["blue_v3", "333", "333", "333"], ["blue_c", "444"]]]	Competition parameters for the Launch challenge
-6	LAUNCH_TEST_DATA	{ "Melbourne": [[28.090004, -80.619985], [28.089966, -80.619876], [28.089892, -80.619948], [28.089896, -80.619816]], "Bayside": [[27.95171, -80.675075], [27.951812, -80.675102], [27.951757, -80.674973], [27.951652, -80.674997]], "Titusville": [[28.591602, -80.805232], [28.591508, -80.805202], [28.591613, -80.805368], [28.591481, -80.805332]], "Palm Bay": [[28.047726, -80.616002], [28.047797, -80.616034], [28.047747, -80.616102], [28.04778, -80.615947]], "Holy Trinity": [[28.201382, -80.667228], [28.201463, -80.667337], [28.201378, -80.667379], [28.20132, -80.6673]] }	School test data points for student testing
 7	RETURN_PARAMS	[["Station 1", 1, 0, 0, 0, 0, 0], ["Station 2", 999, 2, 0, 0, 0, 0], ["Station 3", 0, 0, 3, 0, 0, 0], ["Station 4", 0, 0, 0, 4, 0, 0], ["Station 5", 0, 0, 0, 0, 5, 0], ["Station 6", 0, 0, 0, 0, 0, 6]]	Competition parameters for the Return challenge
 8	SECURE_ERROR_DISTRIBUTION	[ 1, -1 ]	A list represented as a JSON array that contains error deltas that will be chosen at random and added to tone values to introduce errors in the data.  Construct the list to represent the distribution of errors that you desire.  For example, [ 1, 1, -1, -1, 2 ] would result in 40% of the errors deviating from the correct value by 1, 40% by -1, and 20% by 2.
 9	SECURE_NUM_INDUCED_ERRORS	1	The number of errors injected into the Secure tone sequence.  Using the current 3x3 arrangement of values, 1 is the maximum number of induced errors guaranteed to be recoverable.
 10	STATION_IPS	127.0.0.1\r\n192.168.1.1\r\n192.168.4.39\r\n192.168.4.65\r\n192.168.4.59\r\n192.168.1.104	IP address of competition stations.
 11	STATION_SERIAL_NUMS	1234567\r\nabcdefg\r\n1234\r\n0000000072da1490\r\n000000001183fe50\r\n00000000c131aba0\r\n000000003cafb6a9	List of station serial numbers
 12	STATION_STATUS_REFRESH_INTERVAL_MS	5000	
+6	LAUNCH_TEST_DATA	{ "Melbourne": [[28.090004, -80.619985], [28.089966, -80.619876], [28.089892, -80.619948], [28.089896, -80.619816]], "Bayside": [[27.95171, -80.675075], [27.951812, -80.675102], [27.951757, -80.674973], [27.951652, -80.674997]], "Titusville": [[28.591602, -80.805232], [28.591508, -80.805202], [28.591613, -80.805368], [28.591481, -80.805332]], "Palm Bay": [[28.047726, -80.616002], [28.047797, -80.616034], [28.047747, -80.616102], [28.04778, -80.615947]], "Holy Trinity": [[28.201382, -80.667228], [28.201463, -80.667337], [28.201378, -80.667379], [28.20132, -80.6673]], "Edgewood": [[28.201382, -80.667228], [28.201463, -80.667337], [28.201378, -80.667379], [28.20132, -80.6673]], "HarrisTesters": [[28.201382, -80.667228], [28.201463, -80.667337], [28.201378, -80.667379], [28.20132, -80.6673]]   }	School test data points for student testing
 \.
 
 
@@ -1017,7 +1017,7 @@ COPY dbkeeper_team (id, name, pass_code, reg_code, registered, organization_id) 
 34	Team 3	xkg10		0	7
 35	Team 4	nwl01		0	7
 14	Gentoomen	jsw04		0	1
-6	Test4	bkl09	36f9deab6dec8529	3	8
+6	Test4	bkl09	55c7d041fff322de	38	8
 \.
 
 
@@ -1036,6 +1036,17 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 1	2016-02-14 01:16:40.10827+00	3	2016-02-13 20:05:49.521865+00:00: Team 'Test4' Registered with brata_version 'm.brata_version'. Assigned reg_code 36f9deab6dec8529.	3		12	1
 2	2016-02-14 01:16:40.178138+00	4	2016-02-13 20:15:22.026017+00:00: Station '192.168.4.39' (dock01) sent a Join message	3		12	1
 3	2016-02-14 01:16:40.212522+00	5	2016-02-13 20:21:23.175663+00:00: Dock using [TAPE=1] [AFT=0.150] [FORE=0.090] [FUEL=20.00] [F-RATE=00.70]	3		12	1
+4	2016-02-14 16:08:33.000557+00	6	LAUNCH_TEST_DATA	2	Changed value.	10	1
+5	2016-02-14 16:11:32.503873+00	6	LAUNCH_TEST_DATA	2	Changed value.	10	1
+6	2016-02-14 17:16:00.251961+00	6	LAUNCH_TEST_DATA	2	Changed value.	10	1
+7	2016-02-14 20:10:44.661019+00	38	2016-02-14 13:39:49.876429+00:00: Team 'Test4' Registered with brata_version 'm.brata_version'. Assigned reg_code 55c7d041fff322de.	3		12	1
+8	2016-02-14 20:10:45.410923+00	39	2016-02-14 13:40:57.802850+00:00: Failed to retrieve Station using station_id 'dock02' from the database	3		12	1
+9	2016-02-14 20:10:45.550979+00	40	2016-02-14 13:44:56.347305+00:00: Station '192.168.1.104' (dock02) sent a Join message	3		12	1
+10	2016-02-14 20:10:45.580089+00	41	2016-02-14 13:45:22.436194+00:00: Dock using [TAPE=1] [AFT=0.150] [FORE=0.090] [FUEL=20.00] [F-RATE=00.70]	3		12	1
+11	2016-02-14 20:10:45.610621+00	42	2016-02-14 14:08:21.280661+00:00: Dock using [TAPE=2] [AFT=0.160] [FORE=0.100] [FUEL=21.00] [F-RATE=00.80]	3		12	1
+12	2016-02-14 20:11:02.359523+00	43	2016-02-14 14:44:29.651674+00:00: Docking Parameters received!	3		12	1
+13	2016-02-14 20:11:03.116685+00	44	2016-02-14 14:45:32.821632+00:00: Submit msg received from dock02	3		12	1
+14	2016-02-14 20:11:03.257332+00	45	2016-02-14 14:46:17.148683+00:00: Docking latches engaged! Continue to next Challenge!	3		12	1
 \.
 
 
@@ -1043,7 +1054,7 @@ COPY django_admin_log (id, action_time, object_id, object_repr, action_flag, cha
 -- Name: django_admin_log_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pi
 --
 
-SELECT pg_catalog.setval('django_admin_log_id_seq', 3, true);
+SELECT pg_catalog.setval('django_admin_log_id_seq', 14, true);
 
 
 --
@@ -1078,20 +1089,20 @@ SELECT pg_catalog.setval('django_content_type_id_seq', 12, true);
 --
 
 COPY django_migrations (id, app, name, applied) FROM stdin;
-1	contenttypes	0001_initial	2016-02-13 18:44:28.024622+00
-2	auth	0001_initial	2016-02-13 18:44:31.211042+00
-3	admin	0001_initial	2016-02-13 18:44:32.266697+00
-4	admin	0002_logentry_remove_auto_add	2016-02-13 18:44:32.978788+00
-5	contenttypes	0002_remove_content_type_name	2016-02-13 18:44:34.998186+00
-6	auth	0002_alter_permission_name_max_length	2016-02-13 18:44:35.866924+00
-7	auth	0003_alter_user_email_max_length	2016-02-13 18:44:37.079215+00
-8	auth	0004_alter_user_username_opts	2016-02-13 18:44:37.751354+00
-9	auth	0005_alter_user_last_login_null	2016-02-13 18:44:38.432958+00
-10	auth	0006_require_contenttypes_0002	2016-02-13 18:44:38.497419+00
-11	auth	0007_alter_validators_add_error_messages	2016-02-13 18:44:39.156259+00
-12	dbkeeper	0001_initial	2016-02-13 18:44:43.470095+00
-13	piservice	0001_initial	2016-02-13 18:44:46.363073+00
-14	sessions	0001_initial	2016-02-13 18:44:46.857201+00
+1	contenttypes	0001_initial	2016-02-14 12:29:21.044637+00
+2	auth	0001_initial	2016-02-14 12:29:35.191372+00
+3	admin	0001_initial	2016-02-14 12:29:35.885571+00
+4	admin	0002_logentry_remove_auto_add	2016-02-14 12:29:36.331184+00
+5	contenttypes	0002_remove_content_type_name	2016-02-14 12:29:37.462187+00
+6	auth	0002_alter_permission_name_max_length	2016-02-14 12:29:39.305878+00
+7	auth	0003_alter_user_email_max_length	2016-02-14 12:29:39.874717+00
+8	auth	0004_alter_user_username_opts	2016-02-14 12:29:40.23819+00
+9	auth	0005_alter_user_last_login_null	2016-02-14 12:29:40.612053+00
+10	auth	0006_require_contenttypes_0002	2016-02-14 12:29:40.672821+00
+11	auth	0007_alter_validators_add_error_messages	2016-02-14 12:29:41.087216+00
+12	dbkeeper	0001_initial	2016-02-14 12:29:45.643708+00
+13	piservice	0001_initial	2016-02-14 12:29:47.021755+00
+14	sessions	0001_initial	2016-02-14 12:29:47.298003+00
 \.
 
 
@@ -1109,6 +1120,7 @@ SELECT pg_catalog.setval('django_migrations_id_seq', 14, true);
 COPY django_session (session_key, session_data, expire_date) FROM stdin;
 waob97rib8ss9bd2qojjmdq4ow58g3i5	Mjg2MWE5MGJlMmI1NGE2MzE5OGVkMjk0NWZlOWEwODAwNzMzZmZkZTp7Il9hdXRoX3VzZXJfaGFzaCI6ImI4ZDYzNTc3MTBhOWFiNjFjZjY5NGI5MDA5MjlmYzAwOGFhMWUwZGYiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2016-02-27 19:49:11.860088+00
 ncdk1i85lhwjchhpkfo9jgi2821q5c1f	Mjg2MWE5MGJlMmI1NGE2MzE5OGVkMjk0NWZlOWEwODAwNzMzZmZkZTp7Il9hdXRoX3VzZXJfaGFzaCI6ImI4ZDYzNTc3MTBhOWFiNjFjZjY5NGI5MDA5MjlmYzAwOGFhMWUwZGYiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2016-02-28 01:13:17.723134+00
+lggy1xw44l4evksteca9x3fgfncx65ij	Mjg2MWE5MGJlMmI1NGE2MzE5OGVkMjk0NWZlOWEwODAwNzMzZmZkZTp7Il9hdXRoX3VzZXJfaGFzaCI6ImI4ZDYzNTc3MTBhOWFiNjFjZjY5NGI5MDA5MjlmYzAwOGFhMWUwZGYiLCJfYXV0aF91c2VyX2JhY2tlbmQiOiJkamFuZ28uY29udHJpYi5hdXRoLmJhY2tlbmRzLk1vZGVsQmFja2VuZCIsIl9hdXRoX3VzZXJfaWQiOiIxIn0=	2016-02-28 13:35:33.955097+00
 \.
 
 
@@ -1126,7 +1138,7 @@ COPY piservice_pievent (id, "time", type, status, data, message, pi_id, team_id)
 -- Name: piservice_pievent_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pi
 --
 
-SELECT pg_catalog.setval('piservice_pievent_id_seq', 37, true);
+SELECT pg_catalog.setval('piservice_pievent_id_seq', 45, true);
 
 
 --
@@ -1135,6 +1147,7 @@ SELECT pg_catalog.setval('piservice_pievent_id_seq', 37, true);
 
 COPY piservice_pistation (id, host, station_type, station_id, serial_num, url, last_activity, joined_id) FROM stdin;
 1	192.168.4.39	Dock	dock01	0000000072da1490	http://192.168.4.39:5000/rpi	2016-02-13 20:15:22.204089+00	\N
+2	192.168.1.104	Dock	dock02	000000003cafb6a9	http://192.168.1.104:5000/rpi	2016-02-14 13:44:56.488369+00	\N
 \.
 
 
@@ -1142,7 +1155,7 @@ COPY piservice_pistation (id, host, station_type, station_id, serial_num, url, l
 -- Name: piservice_pistation_id_seq; Type: SEQUENCE SET; Schema: public; Owner: pi
 --
 
-SELECT pg_catalog.setval('piservice_pistation_id_seq', 1, true);
+SELECT pg_catalog.setval('piservice_pistation_id_seq', 2, true);
 
 
 --
