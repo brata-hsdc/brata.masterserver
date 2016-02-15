@@ -5,7 +5,7 @@ import operator
 
 from .models import Organization, Team
 from .team_code import TeamPassCode
-from PiEvent.models import PiEvent
+from piservice.models import PiEvent, PiStation
 
 #----------------------------------------------------------------------------
 class FilteredFileField(forms.FileField):
@@ -390,8 +390,8 @@ class LogMessageForm(forms.Form):
 
 #----------------------------------------------------------------------------
 class DisplayEventsForm(forms.Form):
-    teams      = forms.ModelMultipleChoiceField(label="Team", queryset=Team.objects.all().order_by("name"))
-    challenges = forms.MultipleChoiceField(label="Challenges", required=False, choices=("Register", "Launch", "Dock", "Secure", "Return"), widget=forms.CheckboxSelectMultiple())
-    eventTypes = forms.MultipleChoiceField(label="Events", choices=PiEvent.TYPE_CHOICES, initial=PiEvent.UNKNOWN_TYPE, required=False)
+    teams      = forms.ModelMultipleChoiceField(label="Team", queryset=Team.objects.all().order_by("name"), required=False)
+    challenges = forms.MultipleChoiceField(label="Challenges", required=False, choices=PiStation.STATION_TYPE_CHOICES, widget=forms.CheckboxSelectMultiple())
+    eventTypes = forms.MultipleChoiceField(label="Events", choices=PiEvent.TYPE_CHOICES, required=False)
 
     

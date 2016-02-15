@@ -2,6 +2,8 @@ from django.shortcuts import render, HttpResponseRedirect, HttpResponse, Http404
 from django.views.generic import View
 from django.contrib.auth.models import User
 from django.template import RequestContext
+from django.utils.safestring import SafeString
+from django.utils import timezone
 
 from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm,\
                    AddLaunchParamsForm, AddDockParamsForm, AddSecureParamsForm, AddReturnParamsForm,\
@@ -740,36 +742,57 @@ class LogMessage(View):
 
         
 #----------------------------------------------------------------------------
-class DisplayEventsForm(View):
+class DisplayEvents(View):
+    """ Display PiEvents as a timeline, with some filtering """
     def get(self, request):
         """ Display the form """
-        return render(request, "dbkeeper/event_timeline.html", { "form": DisplayEventsForm() })
+        return render(request, "dbkeeper/event_timeline.html", { "form": DisplayEventsForm(),
+                                                                 "submit": "Retrieve" })
     
     def post(self, request):
         """ Process the form data """
         form = DisplayEventsForm(request.POST)
         if form.is_valid():
             # get the values
-            teams      = form["teams"]
-            challenges = form["challenges"]
-            eventTypes = form["eventTypes"]
+            teams      = form["teams"].data
+            challenges = form["challenges"].data
+            eventTypes = [int(n) for n in form["eventTypes"].data]
 
             # Get the matching event records            
-            qs = PiEvent.objects.filter(team__in=teams).filter(type__in=eventTypes).filter(pi__station_type__in=challenges)
+            qs = PiEvent.objects.all()
+            if len(teams):
+                qs = qs.filter(team__in=teams)
+            if len(challenges):
+                qs = qs.filter(type__in=eventTypes)
+            if len(eventTypes):
+                qs = qs.filter(pi__station_type__in=challenges)
             
             # Turn them into JSON for TimelineJS
-            typeNames = dict(TYPE_CHOICES)
+            typeNames = dict(PiEvent.TYPE_CHOICES)
             slides = []
             for ev in qs:
-                sl = {}
                 time = ev.time
-                sl["start_date"] = self.date(time)
-                sl["text"] = { "headline": "{} {}".format(ev.team.name, typeNames[ev.type]), "text": ev.message }
+                teamName = "&lt;no team&gt;"
+                if ev.team and ev.team.name not in (None, ""):
+                    teamName = ev.team.name
+                sl = {}
+                # Event params for TimelineJS
+                sl["start_date"] = self.date(time)  # for TimelineJS
+                sl["start"] = self.date(time)  # for Simile Timeline
+                sl["text"] = { "headline": "{} {}".format(typeNames[ev.type], teamName), "text": ev.message }
+                # Event params for Simile Timeline
+                tz = timezone.get_current_timezone()
+                sl["start"] = time.astimezone(tz).ctime()  # for Simile Timeline
+                sl["durationEvent"] = False
+                sl["title"] = "{} {}".format(typeNames[ev.type], teamName)
+                sl["description"] = ev.message
                 slides.append(sl)
-            js = json.dumps(slides)
-            return render(request, "dbkeeper/event/timeline.html", { "timeline_json": js })
+            js = json.dumps({"events": slides, "dateTimeFormat": "Gregorian"})
+
+            return render(request, "dbkeeper/event_timeline.html", { "timeline_json": SafeString(js), "timelinejs": False })
         else:
-            return render(request, "dbkeeper/event_timeline.html", { "form": form })
+            return render(request, "dbkeeper/event_timeline.html", { "form": form,
+                                                                     "submit": "Retrieve" })
     
     def date(self, dt):
         """ Return a date object in TimelineJS format.

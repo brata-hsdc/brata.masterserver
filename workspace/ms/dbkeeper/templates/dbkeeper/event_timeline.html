@@ -1,10 +1,15 @@
 {% extends "dbkeeper/base.html" %}
 
-{% block title  %}{{ entity|title }}{% endblock %}
-{% block header %}{{ entity|title }}{% endblock %}
+{% block title  %}Display Event Timeline{% endblock %}
+{% block header %}Display Event Timeline{% endblock %}
 
 {% block extra_css %}
-<link title="timeline-styles" rel="stylesheet" href="/static/dbkeeper/timeline.css" />
+{% if timelinejs %}
+  <link title="timeline-styles" rel="stylesheet" type="text/css" href="/static/dbkeeper/timeline.css" />
+  <!-- 
+  <link title="timeline-styles" rel="stylesheet" type="text/css" href="//cdn.knightlab.com/libs/timeline3/latest/css/timeline.css" />
+  -->
+{% endif %}
 <style>
 html, body {
   height: 100%;
@@ -32,14 +37,30 @@ html, body {
 {% endblock %}
 
 {% block extra_javascript %}
-<script src="/static/dbkeeper/timeline.js"></script>
+{% if timelinejs %}
+  <script src="/static/dbkeeper/timeline.js"></script>
+  <!-- 
+  <script src="//cdn.knightlab.com/libs/timeline3/latest/js/timeline.js"></script>
+  -->
+{% else %}
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8" />
+  <!--
+  <script src="http://api.simile-widgets.org/timeline/2.3.1/timeline-api.js?bundle=true" type="text/javascript"></script>
+  -->
+  <script src="/static/dbkeeper/simile-timeline/timeline-api.js?bundle=true" type="text/javascript"></script>
+{% endif %}
 {% endblock %}
 
-{% if timeline_json %}
+{% block body_tag %}
+<body onload="onLoad();" onresize="onResize();">
+{% endblock %}
+
 {% block main %}
-  <div id="timeline_embed">
-    There should be a timeline here
+{% if timeline_json %}
+  <div id="timeline-embed" style="width: 100%; height: 600px">
+    <div id="timeline"></div>
   </div>
+  {% if timelinejs %}
   <script type="text/javascript">
     // The TL.Timeline constructor takes at least two arguments:
     // the id of the Timeline container (no '#'), and
@@ -48,32 +69,126 @@ html, body {
     // and the element must have CSS styling to give it width and height
     // optionally, a third argument with configuration options can be passed.
     // See below for more about options.
-    timeline = new TL.Timeline('timeline-embed', {{ timeline_json }});
-//    timeline = new TL.Timeline('timeline-embed', {{ timeline_url }});
+    var additional_options = {
+        "scale_factor": 0.5,
+        "zoom_sequence": [0.25,0.5,1,2,4,8,16,32,64,128],
+        "duration": 700,
+        "timenav_height_percentage": 65
+    };
+    timeline = new TL.Timeline('timeline-embed', {% autoescape off %}{{ timeline_json }}{% endautoescape %}, additional_options);
   </script>
-{% endblock %}
+  <!-- 
+  <script>
+    $(document).ready(function(){
+        var embed = document.getElementById('timeline-embed');
+        embed.style.height = getComputedStyle(document.body).height;
+        window.timeline = new TL.Timeline('timeline-embed', {% autoescape off %}{{ timeline_json }}{% endautoescape %}, { hash_bookmark: false});
+       // window.timeline = new TL.Timeline('timeline-embed', '{{ timeline_json }}', { hash_bookmark: false});
+        window.addEventListener('resize', function() {
+          var embed = document.getElementById('timeline-embed');
+          embed.style.height = getComputedStyle(document.body).height;
+          timeline.updateDisplay();
+        })
+      });
+  </script>
+  -->
+  {% else %} {# simile timeline #}
+  <script type="text/javascript">
+    var tl;
+    function onLoad() {
+        var eventSource1 = new Timeline.DefaultEventSource();
+var js = {"dateTimeFormat": "Gregorian",
+          "events": [{
+                   "description":"Oswald moves to New Orleans, and finds employment at the William B. Riley Coffee Company.",
+                   "end":"Wed May 01 1969 00:00:00 GMT-0600",
+                   "isDuration":true,
+                   "start":"Wed May 01 1963 00:00:00 GMT-0600",
+                   "title":"Oswald moves to New Orleans"}]};
+     var bandInfos = [
+        Timeline.createBandInfo({
+            eventSource:    eventSource1,
+            width:          "70%", 
+            intervalUnit:   Timeline.DateTime.HOUR, 
+            intervalPixels: 100,
+            zoomIndex:      10,
+            zoomSteps:      new Array(
+              {pixelsPerInterval: 280,  unit: Timeline.DateTime.HOUR},
+              {pixelsPerInterval: 140,  unit: Timeline.DateTime.HOUR},
+              {pixelsPerInterval:  70,  unit: Timeline.DateTime.HOUR},
+              {pixelsPerInterval:  35,  unit: Timeline.DateTime.HOUR},
+              {pixelsPerInterval: 400,  unit: Timeline.DateTime.DAY},
+              {pixelsPerInterval: 200,  unit: Timeline.DateTime.DAY},
+              {pixelsPerInterval: 100,  unit: Timeline.DateTime.DAY},
+              {pixelsPerInterval:  50,  unit: Timeline.DateTime.DAY},
+              {pixelsPerInterval: 400,  unit: Timeline.DateTime.MONTH},
+              {pixelsPerInterval: 200,  unit: Timeline.DateTime.MONTH},
+              {pixelsPerInterval: 100,  unit: Timeline.DateTime.MONTH} // DEFAULT zoomIndex
+            )
+        }),
+        Timeline.createBandInfo({
+            overview:       true,
+            eventSource:    eventSource1,
+            width:          "30%", 
+            intervalUnit:   Timeline.DateTime.WEEK, 
+            intervalPixels: 200
+        })
+      ];
+      bandInfos[1].syncWith = 0;
+      bandInfos[1].highlight = true;
+
+      
+      tl = Timeline.create(document.getElementById("timeline-embed"), bandInfos);
+      
+      eventSource1.loadJSON({{ timeline_json }}, ".");
+//      tl.layout();
+    }
+    
+    var resizeTimerID = null;
+    function onResize() {
+        if (resizeTimerID == null) {
+            resizeTimerID = window.setTimeout(function() {
+                resizeTimerID = null;
+                tl.layout();
+            }, 500);
+        }
+    }
+  </script>
+  {% endif %}
+  <noscript>
+  This page uses Javascript to show you a Timeline. Please enable Javascript in your browser to see the full page. Thank you.
+  </noscript>
 {% else %}
-  <form action="/dbkeeper/load/settings/" method="post" {% if upload %}enctype="multipart/form-data"{% endif %}>
+  <form action="/dbkeeper/timeline/" method="post">
     {% csrf_token %}
     {# Include the hidden fields #}
     {% for hidden in form.hidden_fields %}
         {{ hidden }}
     {% endfor %}
     
-    {# Include this version to get the file upload #}
-    {% if upload %}
     <table class="fieldWrapper">
-       {% for field in form.visible_fields %}
        <tr>
-          <td style="text-align: right;">{{ field.label_tag }}</td>
-          <td style="text-align: left;">{{ field }}</td>
-          <td style="text-align: left; color: red;">{{ field.errors }}</td>
+          <td style="text-align: right;">{{ form.teams.label_tag }}</td>
+          <td style="text-align: left;">{{ form.teams }}</td>
+          <td style="text-align: left; color: red;">{{ form.teams.errors }}</td>
        </tr>
-       {% endfor %}
+       <tr>
+          <td style="text-align: right;">{{ form.challenges.label_tag }}</td>
+          <td style="text-align: left;">
+          {% for c in form.challenges %}
+          {{ c.tag }}{{ c.choice_label }}
+          {% endfor %}
+          </td>
+          <td style="text-align: left; color: red;">{{ form.challenges.errors }}</td>
+       </tr>
+       <tr>
+          <td style="text-align: right;">{{ form.eventTypes.label_tag }}</td>
+          <td style="text-align: left;">{{ form.eventTypes }}</td>
+          <td style="text-align: left; color: red;">{{ form.eventTypes.errors }}</td>
+       </tr>
        <tr class="submitRow">
           <td colspan="3"><input type="submit" value="{{ submit }}" /></td>
        </tr>
     </table>
   </form>
-    {% endif %}
 {% endif %}
+{% endblock %}
