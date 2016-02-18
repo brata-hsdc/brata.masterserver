@@ -6,13 +6,13 @@ from datetime import datetime, timedelta
 import json
 import logging
 import os
-from dbkeeper.models import Organization, Team
+from dbkeeper.models import Organization, Team, Setting
 from PIL import Image, ImageDraw, ImageFont
 from piservice.models import PiEvent, PiStation
-#from gnome._gnome import score_init
 from random import randint
 
 
+# TODO Update doc comments throughout file
 #-------------------------------------------------------------------------------
 def index(request):
     """ Display the scoreboard page. Updating is driven by the page making
@@ -20,10 +20,10 @@ def index(request):
     """
     logging.debug('Entered scoreboard.views.index')
 
-    refreshInterval = 5000 # TODO Setting.get("SCOREBOARD_STATUS_REFRESH_INTERVAL_MS", default="5000")
+    refreshInterval_ms = ScoreboardStatus.getSetting('SCOREBOARD_STATUS_REFRESH_INTERVAL_MS', 5000)
 
     context = {
-        "PAGE_REFRESH_INTERVAL": refreshInterval
+        "PAGE_REFRESH_INTERVAL": refreshInterval_ms
     }
 
     result = render(request, "scoreboard/index.html", context)
@@ -61,6 +61,18 @@ class ScoreboardStatus(View):
     """
     def __init__(self):
         logging.debug('Entered ScoreboardStatus.__init__')
+
+
+    #---------------------------------------------------------------------------
+    @staticmethod
+    def getSetting(key,
+                   ridiculous_default):
+        result = Setting.get(key, ridiculous_default)
+
+        if result == ridiculous_default:
+            logging.warning("No {} key found in the Settings table. Proceeding with value {}".format(key, ridiculous_default))
+
+        return result
 
 
     #---------------------------------------------------------------------------
@@ -135,6 +147,37 @@ class ScoreboardStatus(View):
 
     #---------------------------------------------------------------------------
     @staticmethod
+    def _getDataField(submit_message,
+                      json_field_name):
+
+        data = json.loads(submit_message.data)
+        result = data[json_field_name]
+
+        return result
+
+
+    #---------------------------------------------------------------------------
+    @staticmethod
+    def _computeRunningTimeDelta(submit_message):
+        dock_sim_playback_time_s = ScoreboardStatus.getSetting('DOCK_SIM_PLAYBACK_TIME_S', -6000)
+        dnf_time_penalty_factor = ScoreboardStatus.getSetting('DNF_TIME_PENALTY_FACTOR', -8000)
+        actual_time_s = _getDataField(submit_message, 'candidate_answer')
+        fail_message = _getDataField(submit_message, 'fail_message')
+
+        # Time charged for the actual docking flight maneuver
+        if fail_message == "OUTCOME_DNF":
+            flying_time_s = actual_time_s * dnf_time_penalty_factor
+        else:
+            flying_time_s = actual_time_s
+
+        # Time watching the animation
+        watching_time_s = min(flying_time_s, dock_sim_playback_time_s)
+
+        return flying_time_s - watching_time_s
+
+
+    #---------------------------------------------------------------------------
+    @staticmethod
     def _computeDock(team_name,
                      attempt_num,
                      max_submit_events,
@@ -142,71 +185,42 @@ class ScoreboardStatus(View):
                      now):
         logging.debug('Entered ScoreboardStatus._computeDock({})'.format(team_name))
 
-        """
-#--- TODO BEGIN DOCK
-TODO2:
-        # TODO
-        #             dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
-        #             attempt_run_time = timestamp of LATCH/SUBMIT event + (total actual docking time * dnf_scale)
-        #             params['end_time'] = params['current_run_time'] + attempt_run_time
-        params['docking_time_s'] = todo
-#--- TODO END DOCK
-#--- BEGIN COMMON
+        num_success_events = params['success_events'].count()
+        num_fail_events = params['fail_events'].count()
 
-TODO4:
-                if num_success_events > 0:
-                    if params['submit_events'].count() > max_submit_events:
-                        logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+        if params['latch_events'].count() > 0:
+            latch_event_timestamp = params['latch_events'].reverse()[0].time # timestamp of final LATCH
+        else:
+            # team hasn't scanned the LATCH QR code yet 
+            latch_event_timestamp = now
 
-                    params['score'] = 9
-                    params['time_to_exit'] = True
-#--- TODO END COMMON
-#--- TODO BEGIN DOCK
-        # TODO
-        #                 dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
-        #                 attempt_run_time = timestamp of LATCH/SUBMIT event + (total actual docking time * dnf_scale)
-        #                 params['end_time'] = params['current_run_time'] + attempt_run_time
-        #             else
-        #                 dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
-        #                 attempt_run_time = timestamp of LATCH/SUBMIT event + (total actual docking time * dnf_scale)
-        #                 params['current_run_time'] += attempt_run_time
-#--- TODO END DOCK
+        if num_success_events > 0:
+            if params['submit_events'].count() > max_submit_events:
+                logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
 
-#--- TODO BEGIN COMMON
-                elif num_fail_events > 0:
-                    if params['submit_events'].count() > max_submit_events:
-                        logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+            submit_message = params['submit_events'][attempt_num - 1]
+            params['total_run_time_delta_s'] += ScoreboardStatus._computeRunningTimeDelta(submit_message)
 
-                    params['num_failed_attempts'] += 1
+            params['score'] = 9
+            params['time_to_exit'] = True
+            params['end_time'] = latch_event_timestamp + params['total_run_time_delta_s']
 
-                    if params['num_failed_attempts'] > 3:
-                        params['score'] = 5
-                        params['time_to_exit'] = True
-#--- TODO END COMMON
-#--- TODO BEGIN DOCK
-        # TODO
-        #             dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
-        #             attempt_run_time = timestamp of LATCH/SUBMIT event + (total actual docking time * dnf_scale)
-        #             params['end_time'] = params['current_run_time'] + attempt_run_time
-#--- TODO END DOCK
+        elif num_fail_events > 0:
+            if params['submit_events'].count() > max_submit_events:
+                logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
 
-#--- TODO BEGIN COMMON
-                else:
-                    log.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
+            params['num_failed_attempts'] += 1
 
-#--- TODO END COMMON
-#--- TODO BEGIN DOCK
-TODO3:
-        #         TODO - Do we have a Submit message to work with here?
-        #         dnf_scale = 1.0 or value from DB depending on param in SUBMIT message
-        #         attempt_run_time = now + (total actual docking time * dnf_scale)
-        #         params['end_time'] = params['current_run_time'] + attempt_run_time
-        params['docking_time_s'] = todo
-#--- TODO END DOCK
+            submit_message = params['submit_events'][attempt_num - 1]
+            params['total_run_time_delta_s'] += ScoreboardStatus._computeRunningTimeDelta(submit_message)
 
-#--- BEGIN COMMON
-#--- END COMMON
-        """
+            if params['num_failed_attempts'] > 3:
+                params['score'] = 5
+                params['time_to_exit'] = True
+                params['end_time'] = latch_event_timestamp + params['total_run_time_delta_s']
+
+        else:
+            logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
         logging.debug('Exiting ScoreboardStatus._computeDock')
 
@@ -243,7 +257,7 @@ TODO3:
                 params['end_time'] = params['fail_events'].reverse()[0].time # timestamp of final FAIL_STATUS
 
         else:
-            log.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
+            logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
         logging.debug('Exiting ScoreboardStatus._computeSecureOrReturn')
 
@@ -263,9 +277,14 @@ TODO3:
         params = {}
         params['score'] = score
         params['time_to_exit'] = False
-        params['num_failed_attempts'] = 0;
+        params['num_failed_attempts'] = 0
         params['current_run_time'] = 0
         params['docking_time_s'] = 0
+        params['total_run_time_delta_s'] = 0.0
+        params['latch_events'] = team_events.filter(
+            type=PiEvent.LATCH_MSG_TYPE
+        ).order_by('time')
+
         i = 0
 
         while not params['time_to_exit']:
@@ -335,10 +354,6 @@ TODO3:
                 params['time_to_exit'] = True
                 params['end_time'] = now
 
-        """
-        TODO
-        params['docking_time_s'] = _computeDockingTime(todo)
-        """
         duration_s = (params['end_time'] - start_time).total_seconds() + params['docking_time_s']
 
         logging.debug('Exiting ScoreboardStatus._recomputeScore()')
@@ -430,7 +445,6 @@ TODO3:
             team = {
                 "team_icon"       : "/scoreboard/team_icon/" + t.name + "/",
                 "team_name"       : t.name,
-                "team_id"         : "TODO (team_id)",
                 "organization"    : t.organization.name,
                 "registered_icon" : registered_icon,
                 "registered_color": registered_color,
@@ -449,27 +463,6 @@ TODO3:
             teamList.append(team)
 
         result = HttpResponse(json.dumps(teamList), content_type="application/json", status=200)
-
-        #-------------------
-        # TODO Delete
-        #for e in submitEvents:
-        #    logging.debug('3: {} {} [type={}, team={}, pi={}] {}'.format(e.time, e.message, e.type, e.team, e.pi, e.status))
-        #for e in events:
-        #    logging.debug('{} [type={}, team={}, pi={}] {}'.format(e.time, e.type, e.team, e.pi, e.status))
-        #for e in events:
-        #    logging.debug('1: {} [type={}, team={}, pi={}] {}'.format(e.time, e.type, e.team, e.pi, e.status))
-        #logging.debug('2: {} vs. {}'.format(now, start_time))
-        # timestamps in e.time for e in events
-        #for e in events:
-        #    logging.debug('{} {} [type={}, team={}, pi={}] {}'.format(e.time, e.message, e.type, e.team, e.pi, e.status))
-        # for e in events:
-        #     logging.debug('{} {} [type={}, team={}, pi={}] {}'.format(e.time, e.message, e.type, e.team, e.pi, e.status))
-        # logging.debug('[count={}]'.format(events.count()))
-        #
-        # TODO Delete
-        #score = 0
-        #duration_s = 0
-        #-------------------
 
         logging.debug('Exiting ScoreboardStatus.get')
         return result
@@ -544,21 +537,23 @@ class TeamIcon(View):
         img_width = 32
         img_height = 32
 
-        font_size = 24
-
         img = Image.new("RGBA", (img_width, img_height), (255, 0, 0, 0))
         draw = ImageDraw.Draw(img)
 
-        fonts_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static/scoreboard/fonts')
-        font = ImageFont.truetype(os.path.join(fonts_path, 'EnchantedPrairieDog.TTF'), font_size)
-        (text_width, text_height) = draw.textsize(text, font=font)
-
-        x = (img_width - text_width) / 2
-        y = 0
-
         draw.ellipse((0, 0, img_width-1, img_height-1), fill=color['polygon'])
 
-        draw.text((x, y), text, font=font, fill=color['text'])
+        try:
+            font_size = 24
+
+            fonts_path = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static/scoreboard/fonts')
+            font = ImageFont.truetype(os.path.join(fonts_path, 'EnchantedPrairieDog.TTF'), font_size)
+            (text_width, text_height) = draw.textsize(text, font=font)
+
+            x = (img_width - text_width) / 2
+            y = 0
+            draw.text((x, y), text, font=font, fill=color['text'])
+        except Exception, e:
+            logging.warning('Error drawing text on image: {}'.format(e))
 
         result = HttpResponse(content_type="image/png", status=200)
         img.save(result, "PNG")
