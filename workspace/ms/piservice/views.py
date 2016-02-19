@@ -1,6 +1,7 @@
 from django.shortcuts import render, Http404, HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from django.utils import timezone
+from django.utils.http import urlquote
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 import json
@@ -359,8 +360,15 @@ class JSONHandlerView(View):
             return None, None, None, None, HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
-class libraryTest(View):
-    """ Display the QR Code test page. """
+class LibraryTest(View):
+    """ Display the QR Code test page.
+    
+    Lets the user first choose a station and hit submit.
+    Returns a page containing QR codes specific to the run the
+    challenge on the chosen station.
+    """
+    MS_BASE_URL = "http://97.102.189.170:80/piservice"
+    QR_SERVICE_REQUEST_URL = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="
     context = {
                "form": None,
                "all_stations_table":   None,
@@ -371,77 +379,50 @@ class libraryTest(View):
               }
 
     def get(self, request):
-        self.context["selected_id"] = None
+        """ Create and return a blank form. """
         self.context["form"] = AddLibraryTestForm()
-        stations = PiStation.objects.all().order_by("station_id")
-        stable = []
-        for station in stations:
-            entry = {}
-            entry["station_id"] = station.station_id
-            stable.append(entry)
-            self.context["all_station_table"] = stable
         return render(request, "piservice/libraryTest.html", self.context)
 
     def post(self, request):
-        serverIP = "97.102.189.170"
-        self.context["server_ip"] = serverIP
-        self.context["selected_id"] = None
-        self.context["form"] = AddLibraryTestForm(request.POST)
-        form = self.context["form"]
-        stations = PiStation.objects.all().order_by("station_id")
-        stable = []
-        for station in stations:
-            entry = {}
-            entry["station_id"] = station.station_id
-            stable.append(entry)
-            self.context["all_station_table"] = stable
+        """ Create QR codes that can be used to run the requested station.
+        
+        First, construct the URLs that the Brata will need to send to the
+        MS.  Then create requests to the QR service to get the QR code
+        graphic for each URL.  Then insert them into the web page template
+        for display.
+        """
+        form = AddLibraryTestForm(request.POST)
+        self.context["form"] = form
         if form.is_valid():
-            station = form.cleaned_data["station"]
-            #self.context["selected_id"] = id
-            #if PiStation.objects.filter(station_id=id).count() > 0:
-            table = []
-            #    for station in stations:
-            entry = {}
-            entry["station_id"] = station.station_id
-            table.append(entry)
-            self.context["station_table"] = table
-            utable = []
-            entry = {}
-            base = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F"
-            entry["url"] = "{}{}%3A80%2Fpiservice%2Fstart_challenge%2F".format(base, serverIP)
-            entry["label"] = "Arrive"
-            utable.append(entry)
-            if station.station_type == PiStation.DOCK_STATION_TYPE:
-                entry2 = {}
-                entry2["url"] = "{}{}%3A80%2Fpiservice%2Fdock%2F".format(base, serverIP)
-                entry2["label"] = "Dock"
-                utable.append(entry2)
-                entry3 = {}
-                entry3["url"] = "{}{}%3A80%2Fpiservice%2Flatch%2F".format(base, serverIP)
-                entry3["label"] = "Latch"
-                utable.append(entry3)
-                self.context["url_table"] = utable
-                return render(request, "piservice/station.html", self.context)
-            if station.station_type == PiStation.SECURE_STATION_TYPE:
-                entry2 = {}
-                entry2["url"] = "{}{}%3A80%2Fpiservice%2Fopen%2F".format(base, serverIP)
-                entry2["label"] = "Open"
-                utable.append(entry2)
-                entry3 = {}
-                entry3["url"] = "{}{}%3A80%2Fpiservice%2Fsecure%2F".format(base, serverIP)
-                entry3["label"] = "Secure"
-                utable.append(entry3)
-                self.context["url_table"] = utable
-                return render(request, "piservice/station.html", self.context)
-            if station.station_type == PiStation.RETURN_STATION_TYPE:
-                entry2 = {}
-                entry2["url"] = "{}{}%3A80%2Fpiservice%2Freturn%2F".format(base, serverIP)
-                entry2["label"] = "Return"
-                utable.append(entry2)
-                self.context["url_table"] = utable
-                return render(request, "piservice/station.html", self.context)
-        return render(request, "piservice/libraryTest.html", self.context)
-     
+            stations = form.cleaned_data["stations"]
+            
+            # Create a table with one row of URLs for each station.
+            self.context["station_table"] = []
+            for station in stations:
+                stationRow = {"station_id": station.station_id,
+                              "urls": [self.qr("Arrive", "start_challenge", station.station_id)]
+                             }
+                
+                if station.station_type == PiStation.DOCK_STATION_TYPE:
+                    stationRow["urls"].append(self.qr("Dock", "dock", station.station_id))
+                    stationRow["urls"].append(self.qr("Latch", "latch", station.station_id))
+                elif station.station_type == PiStation.SECURE_STATION_TYPE:
+                    stationRow["urls"].append(self.qr("Open", "open", station.station_id))
+                    stationRow["urls"].append(self.qr("Secure", "secure", station.station_id))
+                elif station.station_type == PiStation.RETURN_STATION_TYPE:
+                    stationRow["urls"].append(self.qr("Return", "return", station.station_id))
+                    
+                self.context["station_table"].append(stationRow)
+
+            return render(request, "piservice/station.html", self.context)
+        else:
+            return render(request, "piservice/libraryTest.html", self.context)
+    
+    def qr(self, label, path, stationId):
+        """ Build the QR service request URL """
+        url = self.QR_SERVICE_REQUEST_URL + urlquote("{}/{}/{}/".format(self.MS_BASE_URL, path, stationId))
+        return {"label": label, "url": url }
+    
 #----------------------------------------------------------------------------
 class Register(JSONHandlerView):
     """ A class-based view to handle a BRATA Register message.

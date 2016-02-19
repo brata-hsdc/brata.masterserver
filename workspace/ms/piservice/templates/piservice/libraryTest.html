@@ -6,8 +6,11 @@
 
 {% block main %}
     {% csrf_token %}
+    <p>Use SHIFT + Left Mouse and CTL + Left Mouse to select<br />
+    multiple stations from the Station list.
+    </p>
     {# Include the visible fields #}
-<form action="/piservice/libraryTest/{{ entity|lower }}/" method="post">
+<form action="/piservice/libraryTest/" method="post">
     {# Include the hidden fields #}
     {% for hidden in form.hidden_fields %}
         {{ hidden }}
@@ -16,7 +19,7 @@
     <table class="fieldWrapper">
        {% for field in form.visible_fields %}
        <tr>
-          <td style="text-align: right;">{% if field.field.required %}* {% endif %}{{ field.label_tag }}</td>
+          <td style="text-align: right;">{{ field.label_tag }}</td>
           <td style="text-align: left;">{{ field }}</td>
           <td style="text-align: left; color: red;">{{ field.errors }}</td>
        </tr>

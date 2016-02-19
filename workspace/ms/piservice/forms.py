@@ -7,4 +7,7 @@ from .models import PiStation
 
 #----------------------------------------------------------------------------
 class AddLibraryTestForm(forms.Form):
-    station = forms.ModelChoiceField(label="Station", queryset=PiStation.objects.all().order_by("station_id"), required=True)
+    stations = forms.ModelMultipleChoiceField(label="Station",
+                                      queryset=PiStation.objects.all().order_by("station_id"),
+#                                       widget=forms.MultipleSelectField(),
+                                      required=True)

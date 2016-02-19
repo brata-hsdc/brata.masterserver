@@ -6,23 +6,28 @@
 
 {% block main %}
     {# Include the visible fields #}
-    <a href="..">Back</a>
+    <a href="../libraryTest/">Back</a><br />
+
+    {% for station in station_table %}
     <table class="fieldWrapper" border="1">
-       <tr>
-    <th align="center">Station</th>
-         {% for url in url_table %}
-    <th align="center">{{ url.label }}</th>
-         {% endfor %}
-       </tr>
+      <thead>
+        <tr>
+          <th align="center">Station</th>
+          {% for url in station.urls %}
+          <th align="center">{{ url.label }}</th>
+          {% endfor %}
+        </tr>
+       </thead>
        <tbody>
-         {% for station in station_table %}
          <tr>
             <td style="text-align: left;">{{ station.station_id }}</td>
-            {% for url in url_table %}
-    <td align="center"><img src="{{ url.url }}{{ station.station_id }}%2F"><br>{{ url.label }}</td>
+            {% for url in station.urls %}
+            <td align="center"><img src="{{ url.url }}"><br>{{ url.label }}</td>
             {% endfor %}
          </tr>
-         {% endfor %}
        </tbody>
     </table>
+    <br />
+    <br />
+    {% endfor %}
 {% endblock %}
