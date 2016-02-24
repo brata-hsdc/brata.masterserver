@@ -69,6 +69,36 @@ Ah crud need to reinstall python from source with --enabled-shared? This error c
 # sudo a2enmod wsgi <TBD is this really needed?>
 ```
 
+
+### Install Gunicorn
+
+[*Gunicorn*](http://gunicorn.org/) is a lightweight Python-based web server that can be used in place of the Apache server.
+It should perform better than Apache.  We have observed several-second delays with Apache when handling requests.
+
+```sh
+sudo pip install gunicorn
+```
+
+#### Make Gunicorn run at boot
+TO DO:  add instructions
+
+#### Stop Apache and start Gunicorn
+
+First stop the Apache service if it is running, then
+start Gunicorn and have it listen on the interface specified by <ip addr> (the server's IP address) port 80.
+
+```sh
+sudo service apache2 stop
+cd /opt/designchallenge2016/brata.masterserver/workspace/ms
+sudo gunicorn -b <ip addr>:80 --workers=3 ms.wsgi
+```
+
+#### Serving static files with Gunicorn
+
+Gunicorn can't serve the static files for our Django apps.
+Django can be configured to serve them up, or we can set up [*Nginx*](http://nginx.org/).
+
+
 ### Install PostgreSQL
 ```sh
 sudo apt-get install postgresql-9.1
