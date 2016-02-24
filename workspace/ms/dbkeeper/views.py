@@ -5,7 +5,8 @@ from django.template import RequestContext
 
 from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm,\
                    AddLaunchParamsForm, AddDockParamsForm, AddSecureParamsForm, AddReturnParamsForm,\
-                   LoadSettingsForm, CompetitionStartForm, CompetitionEndForm, LogMessageForm
+                   LoadSettingsForm, CompetitionStartForm, CompetitionEndForm, LogMessageForm,\
+                   ReturnTestForm
 from .models import Organization, MSUser, Team, Setting
 from piservice.models import PiEvent
 from .team_code import TeamPassCode
@@ -13,10 +14,16 @@ from .team_code import TeamPassCode
 import json
 import random
 import csv
+import operator
 from datetime import date as Date
 from cStringIO import StringIO
 
-# Create your views here.
+
+#-------------------------
+# Useful helper functions
+#-------------------------
+
+#----------------------------------------------------------------------------
 def tryAgain(request, msg=None, url=None, buttonText=None,
              title=None):
     """ Helper function that provides a simple "Try Again"
@@ -35,7 +42,22 @@ def tryAgain(request, msg=None, url=None, buttonText=None,
                "button_text": buttonText,
                "title": title}
     return render(request, "dbkeeper/try_again.html", context)
+
+#----------------------------------------------------------------------------
+def schoolNameFromPassCode(pass_code):
+    """ Given a team pass_code, return the school name.
     
+        Returns:  the school name, or None if not found.
+    """
+    try:
+        return Team.objects.get(pass_code=pass_code).organization.name
+    except Team.DoesNotExist:
+        return None
+
+#-------------------------
+# Create your views here.
+#-------------------------
+
 #----------------------------------------------------------------------------
 def index(request):
     """ Display the dbkeeper home page. """
@@ -112,6 +134,62 @@ class NavTestTeam(View):
         self.context["answer"][n] = "Correct!"
         self.context["entity"] += " for " + school_name
         return render(request, "dbkeeper/navtest_team.html", self.context)
+
+#----------------------------------------------------------------------------
+class ReturnTestTeam(View):
+    """ Display a page to collect return parameters. """
+    context = {
+               "entity":    "Return Test",
+               "form":      None,
+               "pass_code": None,
+               "submit":    "Submit",
+               "answer":    "",
+               "school":    "<unknown school>",
+               "no_sidebarLeft": True,
+               "no_mainRight": True,
+              }
+    
+    def get(self, request, pass_code):
+        self.context["form"] = ReturnTestForm(label_suffix="")
+        self.context["pass_code"] = pass_code
+        
+        schoolName = schoolNameFromPassCode(pass_code)
+        if schoolName is None:
+            return tryAgain(request, msg="Invalid team passcode: {}".format(pass_code), title="Invalid Passcode")
+        else:
+            self.context["school"] = schoolName
+            
+        jparams = Setting.objects.get(name="RETURN_TEST_DATA").value
+        params = json.loads(jparams)
+        
+        # Squirrel away values in hidden fields so we can get them back in POST
+        self.context["form"].fields["params"].initial = ",".join(params[schoolName])
+        self.context["form"].fields["school"].initial = schoolName
+        return render(request, "dbkeeper/returntest_team.html", self.context)
+    
+    def post(self, request, pass_code):
+        form = ReturnTestForm(request.POST, label_suffix="")
+        self.context["form"] = form
+        self.context["pass_code"] = pass_code
+
+        if form.is_valid():
+            values = [ form.cleaned_data["value1"],
+                       form.cleaned_data["value2"],
+                       form.cleaned_data["value3"],
+                       form.cleaned_data["value4"],
+                       form.cleaned_data["value5"],
+                       form.cleaned_data["value6"],
+                     ]
+            params = form.cleaned_data["params"].split(",")
+            match = reduce(operator.__and__, [a==b for a,b in zip(values, params)])
+            if match:
+                self.context["answer"] = "Correct!"
+            else:
+                self.context["answer"] = "Incorrect"
+        else:
+            self.context["answer"] = "Each value must be exactly 2 decimal digits"
+        return render(request, "dbkeeper/returntest_team.html", self.context)
+        
 
 #----------------------------------------------------------------------------
 def station_status(request):
