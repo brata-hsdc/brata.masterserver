@@ -163,7 +163,7 @@ class ReturnTestTeam(View):
         params = json.loads(jparams)
         
         # Squirrel away values in hidden fields so we can get them back in POST
-        self.context["form"].fields["params"].initial = ",".join(params[schoolName])
+        self.context["form"].fields["params"].initial = json.dumps(params[schoolName])
         self.context["form"].fields["school"].initial = schoolName
         return render(request, "dbkeeper/returntest_team.html", self.context)
     
@@ -180,7 +180,9 @@ class ReturnTestTeam(View):
                        form.cleaned_data["value5"],
                        form.cleaned_data["value6"],
                      ]
-            params = form.cleaned_data["params"].split(",")
+            reverse = form.cleaned_data["reverse"]
+            params = json.loads(form.cleaned_data["params"])[1 if reverse else 0]
+
             match = reduce(operator.__and__, [a==b for a,b in zip(values, params)])
             if match:
                 self.context["answer"] = "Correct!"

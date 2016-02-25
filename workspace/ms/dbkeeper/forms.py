@@ -397,5 +397,6 @@ class ReturnTestForm(forms.Form):
     value4 = forms.CharField(label="4 =", max_length=2, initial="00", validators=[twoDigitValidator])
     value5 = forms.CharField(label="5 =", max_length=2, initial="00", validators=[twoDigitValidator])
     value6 = forms.CharField(label="6 =", max_length=2, initial="00", validators=[twoDigitValidator])
-    params = forms.CharField(max_length=50, widget=forms.HiddenInput())
-    school = forms.CharField(max_length=50, widget=forms.HiddenInput())
+    params = forms.CharField(max_length=200, widget=forms.HiddenInput(), required=False)
+    school = forms.CharField(max_length=100, widget=forms.HiddenInput(), required=False)
+    reverse = forms.BooleanField(label="Measured in reverse direction", required=False, initial=False)
