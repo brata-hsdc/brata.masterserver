@@ -39,6 +39,11 @@ tr.inputRow td {
   text-align: right;
   padding-right: 1em;
 }
+tr.checkRow td {
+  text-align: center;
+  font-size: 14pt;
+  padding-top: 2em;
+}
 .submitRow td {
   text-align: center;
 }
@@ -86,6 +91,9 @@ div.table {
             <td class="numfield {% if form.value4.errors %}invalid{% endif %}">{{ form.value4.label_tag }}{{ form.value4 }}</td>
             <td class="numfield {% if form.value5.errors %}invalid{% endif %}">{{ form.value5.label_tag }}{{ form.value5 }}</td>
             <td class="numfield {% if form.value6.errors %}invalid{% endif %}">{{ form.value6.label_tag }}{{ form.value6 }}</td>
+          </tr>
+          <tr class="checkRow">
+            <td colspan="6">{{ form.reverse.label_tag }}{{ form.reverse }}</td>
           </tr>
           <tr class="submitRow">
             <td colspan="6"><input type="submit" value="{{ submit }}" /></td>
