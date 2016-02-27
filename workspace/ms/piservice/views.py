@@ -364,7 +364,7 @@ class LibraryTest(View):
     """ Display the QR Code test page.
     
     Lets the user first choose a station and hit submit.
-    Returns a page containing QR codes specific to the run the
+    Returns a page containing QR codes specific to running the
     challenge on the chosen station.
     """
     MS_BASE_URL = "http://97.102.189.170:80/piservice"
@@ -1889,7 +1889,7 @@ class Submit_2015(JSONHandlerView):
 class QRCode(JSONHandlerView):
     def get(self, request, *args, **kwargs):
         """ Handle a GET message """
-        # note this tries to figure out the data automagiclaly
+        # note this tries to figure out the data automagically
         # so provide a URL and will set the qrcode type to URL if just text you get text
         strToEncode = request.GET.get('chl', '')
         # version 1 is the smallest possible goes up to 40

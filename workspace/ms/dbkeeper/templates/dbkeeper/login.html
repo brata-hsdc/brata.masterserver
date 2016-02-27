@@ -1,0 +1,23 @@
+{% extends "dbkeeper/base.html" %}
+
+{% block title  %}Admin Log In{% endblock %}
+{% block header %}Admin Log In{% endblock %}
+
+{% block main %}
+<p>This is the maintenance entry to the Master Server.</p>
+<p>Please return to the <a href="/hsdc">Main Page</a>.</p><br/>
+<br/>
+<form action="{% url 'login' %}" method="post" accept-charset="utf-8">
+    {% csrf_token %}
+    {% for field in form %}
+        <label>{{ field.label }}</label>
+        {% if field.errors %}
+            {{ field.errors }}
+        {% endif %}
+        {{ field }}
+        <br />
+    {% endfor %}
+    <input type="hidden" name="next" value="{{ next }}" />
+    <input class="button small" type="submit" value="Submit"/>
+</form>
+{% endblock %}
