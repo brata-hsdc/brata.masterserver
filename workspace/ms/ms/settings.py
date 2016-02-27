@@ -65,6 +65,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'ms.urls'
+LOGIN_URL = '/admin/login/'
 
 TEMPLATES = [
     {
