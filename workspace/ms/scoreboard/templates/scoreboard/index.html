@@ -62,16 +62,16 @@
 
        var rowId = "team-" + value.team_name;
        var newRow = "<tr id='" + rowId + "'>"
-              + "<td>" + "TODO rank" + "</td>"
-              + "<td><img width=\"50%\" height=\"50%\" src=\"" + value.team_icon + "\" /></td>"
-              + "<td>" + value.team_name + " (" + value.organization + ")</td>"
-              + '<td><div class="glyphicon glyphicon-' + value.registered_icon + '" style="color:' + value.registered_color + '" /></td>' // TODO Link to glyphicons in footer
-              + "<td>" + value.launch_score + " (" + value.launch_duration + ")</td>"
-              + "<td>" + value.dock_score + " (" + value.dock_duration + ")</td>"
-              + "<td>" + value.secure_score + " (" + value.secure_duration + ")</td>"
-              + "<td>" + value.return_score + " (" + value.return_duration + ")</td>"
-              + "<td align=\"center\"><b>" + value.total_score + "</b></td>"
-              + "<td align=\"center\"><b>" + value.total_duration + "</b></td>"
+              + "<td align=\"center\" valign=\"middle\">" + "TODO rank" + "</td>"
+              + "<td align=\"center\" valign=\"middle\"><img width=\"50%\" height=\"50%\" src=\"" + value.team_icon + "\" /></td>"
+              + "<td align=\"left\"   valign=\"middle\">" + value.team_name + " (" + value.organization + ")</td>"
+              + '<td align=\"center\" valign=\"middle\"><div class="glyphicon glyphicon-' + value.registered_icon + '" style="color:' + value.registered_color + '" /></td>' // TODO Link to glyphicons in footer
+              + "<td align=\"center\" valign=\"middle\">" + value.launch_score + " (" + value.launch_duration + ")</td>"
+              + "<td align=\"center\" valign=\"middle\">" + value.dock_score + " (" + value.dock_duration + ")</td>"
+              + "<td align=\"center\" valign=\"middle\">" + value.secure_score + " (" + value.secure_duration + ")</td>"
+              + "<td align=\"center\" valign=\"middle\">" + value.return_score + " (" + value.return_duration + ")</td>"
+              + "<td align=\"center\" valign=\"middle\"><b>" + value.total_score + "</b></td>"
+              + "<td align=\"center\" valign=\"middle\"><b>" + value.total_duration + "</b></td>"
               + "</tr>";
 
        $('tbody').append(newRow);
@@ -145,16 +145,16 @@
     <table class="container-fluid table-striped table-hover">
       <thead>
         <tr>
-           <th class="col-md-1">Position</th>
-           <th class="col-md-1"></th>
-           <th class="col-md-1">Team Name</th>
-           <th class="col-md-1"></th>
-           <th class="col-md-1">Launch</th>
-           <th class="col-md-1">Dock</th>
-           <th class="col-md-1">Secure</th>
-           <th class="col-md-1">RTE</th>
-           <th class="col-md-1">Total Score</th>
-           <th class="col-md-1">Total Duration</th>
+           <th align=\"center\" valign=\"top\" class="col-md-1">Position</th>
+           <th align=\"center\" valign=\"top\" class="col-md-1"></th>
+           <th align=\"left\"   valign=\"top\" class="col-md-1">Team Name</th>
+           <th align=\"center\" valign=\"top\" class="col-md-1"></th>
+           <th align=\"center\" valign=\"top\" class="col-md-1">Launch</th>
+           <th align=\"center\" valign=\"top\" class="col-md-1">Dock</th>
+           <th align=\"center\" valign=\"top\" class="col-md-1">Secure</th>
+           <th align=\"center\" valign=\"top\" class="col-md-1">RTE</th>
+           <th align=\"center\" valign=\"top\" class="col-md-1">Total Score</th>
+           <th align=\"center\" valign=\"top\" class="col-md-1">Total Duration</th>
         </tr>
       </thead>
 

@@ -60,7 +60,7 @@ class ScoreboardStatus(View):
         ]
     """
     def __init__(self):
-        logging.debug('Entered ScoreboardStatus.__init__')
+        pass
 
 
     #---------------------------------------------------------------------------
@@ -80,8 +80,6 @@ class ScoreboardStatus(View):
     def _getEvents(team_name,
                    station_type,
                    now):
-        logging.debug('Entered ScoreboardStatus._getEvents({})'.format(team_name))
-
         team_events = PiEvent.objects.filter(
             team__name=team_name
         ).filter(
@@ -99,7 +97,6 @@ class ScoreboardStatus(View):
             score = 1
             start_time = start_challenge_events[0].time
 
-        logging.debug('Exiting ScoreboardStatus._getEvents()')
         return (team_events, start_challenge_events, score, start_time)
 
 
@@ -270,8 +267,6 @@ class ScoreboardStatus(View):
                         max_submit_events,
                         calc_current_attempt_score,
                         now):
-        logging.debug('Entered ScoreboardStatus._recomputeScore({})'.format(team_name))
-
         (team_events, start_challenge_events, score, start_time) = ScoreboardStatus._getEvents(team_name, station_type, now)
 
         params = {}
@@ -289,7 +284,7 @@ class ScoreboardStatus(View):
 
         while not params['time_to_exit']:
             attempt_num = i + 1
-            logging.debug('Not yet time to exit; processing attempt {} of {} for team {}'.format(attempt_num, start_challenge_events.count(), team_name))
+            #logging.debug('Not yet time to exit; processing attempt {} of {} for team {}'.format(attempt_num, start_challenge_events.count(), team_name))
 
             if i < start_challenge_events.count():
                 logging.debug('Examining more START_CHALLENGE events')
@@ -350,20 +345,17 @@ class ScoreboardStatus(View):
 
                 i += 1
             else:
-                logging.debug('Challenge complete; time to exit')
+                #logging.debug('Challenge complete; time to exit')
                 params['time_to_exit'] = True
                 params['end_time'] = now
 
         duration_s = (params['end_time'] - start_time).total_seconds() + params['docking_time_s']
 
-        logging.debug('Exiting ScoreboardStatus._recomputeScore()')
         return (params['score'], duration_s)
 
     #---------------------------------------------------------------------------
     @staticmethod
     def _recomputeTeamScore(team_name):
-        logging.debug('Entered ScoreboardStatus._recomputeTeamScore')
-
         now = datetime.utcnow().replace(tzinfo=utc)
 
         (launch_score, launch_duration_s) = ScoreboardStatus._recomputeScore(ScoreboardStatus._computeLaunch,
@@ -407,7 +399,6 @@ class ScoreboardStatus(View):
             total_duration_s=total_duration_s
         )
 
-        logging.debug('Exiting ScoreboardStatus._recomputeTeamScore')
         return result
 
 
@@ -415,7 +406,6 @@ class ScoreboardStatus(View):
     """ A REST request to get scores from the database for the leaderboard """
     def get(self, request):
         """ Retrieve score information from the database and return it """
-        logging.debug('Entered ScoreboardStatus.get')
 
         teams = Team.objects.all()
         teamList = []
@@ -464,7 +454,6 @@ class ScoreboardStatus(View):
 
         result = HttpResponse(json.dumps(teamList), content_type="application/json", status=200)
 
-        logging.debug('Exiting ScoreboardStatus.get')
         return result
 
 
