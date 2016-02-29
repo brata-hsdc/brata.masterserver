@@ -77,7 +77,7 @@ class regtest(View):
               }
     
     def get(self, request):
-        teams = Team.objects.all().order_by("organization","name")
+        teams = Team.objects.all().order_by("organization__name","name")
         #self.context["table"] = teams
         
         # Join the teams with the launch test points for each school
