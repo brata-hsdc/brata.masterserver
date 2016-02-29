@@ -119,7 +119,7 @@ example uses a file called `initial_content.sql`, but there will probably
 be multiple of these files:  some for testing, and some for actual deployment.
 
 ```
-# sudo -u psql postgres -d msdb < db_backup.sql
+# sudo -u postgres psql -d msdb < db_backup.sql
 ```
 
 `initial_content.sql` would be a file created using the `pg_dump` command
