@@ -34,27 +34,61 @@ $ sudo sync
 Eject SD card, insert into device, and power up.
 
 Log-in when prompted.
+type the following to change the password from the default of raspberry
+THIS IS VERY IMPORTANT or your Pi will likely be hacked in less than 24 hrs if on a public network
+```sh
+# passwd
+```
 
+### If using wired skip this, otherwise if using a wifi dongle you will need to join your network first
+```sh
+# sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+```
+Add to the bottom of the file
+```sh
+network={
+  ssid="YOUR_SSID"
+  psk="YOUR_NETWORK_PASSWORD"
+}
+```
+Save the file Ctrl-x and yes. Then reboot.
+```sh
+sudo reboot
+```
 
-TODO - config
-TODO - raspi-config to expand SD card
-
+Next fix some of the basic settings
+```sh
+# sudo raspi-config
+```
+Here you need to select to:
+1) Expand the file system
+2) Use option 5 and then option I1 to change the local to en_US.UTF-8 and change it to the default
+3) Use option 5 again and then I2 to select your time zone
+4) Use option 5 again and then I3 here:
+   Leave it at the default keyboard it came up with but on the nex page after selecting it go to other instead of the UK options.  This way you can then select English (US) and then select all the defaults afte that.
+5) Select option 9 for advanced options and change your host name to something standardized by yoru group which includes the station type and number, such as ms01, return01, dock01, secure01, then increase for each duplicated station type.
+6) If/When the team decides it is needed use option 4 to enable wait for network at boot.
+Upon exit the pi will restart and enable the selected changes.
 
 ### Update Repositories and in case remote QRCode generation goes down add QRCode generation support
-
+### NOTE The first install line goes all the way out and ends with python-tk so when you copy keep scrolling over
 ```sh
 # sudo apt-get update
 # sudo apt-get upgrade
-# sudo apt-get install libtiff4-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.5-dev tk8.5-dev python-tk
+# sudo apt-get install libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.5-dev tk8.5-dev python-tk
+# sudo apt-get install git
+# sudo apt-get install python-imaging
+# sudo apt-get install python-pip
 # sudo pip install pillow
 # sudo pip install qrcode
 ```
 
-### Install Python
+### Install Python dev to enable mod_wsgi install
+```sh
+# sudo apt-get install python-dev
+```
 
-N/A Python already installed and upgraded.
-
-Ah crud need to reinstall python from source with --enabled-shared? This error came from mod_wsgi install.  Suggests there will be major performance and memory hit if not done.
+Ah crud need to reinstall python from source with --enabled-shared? This error came from mod_wsgi install.  Suggests there will be major performance and memory hit if not done. NOTE I could not find the details of this, whomever put it in if it could please be clarified?
 
 ### Install the Apache Web Server
 ```sh
@@ -69,7 +103,6 @@ Ah crud need to reinstall python from source with --enabled-shared? This error c
 # sudo a2enmod wsgi <TBD is this really needed?>
 ```
 
-
 ### Install Gunicorn
 
 [*Gunicorn*](http://gunicorn.org/) is a lightweight Python-based web server that can be used in place of the Apache server.
@@ -82,26 +115,13 @@ sudo pip install gunicorn
 #### Make Gunicorn run at boot
 TO DO:  add instructions
 
-#### Stop Apache and start Gunicorn
-
-First stop the Apache service if it is running, then
-start Gunicorn and have it listen on the interface specified by <ip addr> (the server's IP address) port 80.
-
-```sh
-sudo service apache2 stop
-cd /opt/designchallenge2016/brata.masterserver/workspace/ms
-sudo gunicorn -b <ip addr>:80 --workers=3 ms.wsgi
-```
-
 #### Serving static files with Gunicorn
-
 Gunicorn can't serve the static files for our Django apps.
 Django can be configured to serve them up, or we can set up [*Nginx*](http://nginx.org/).
 
-
 ### Install PostgreSQL
 ```sh
-sudo apt-get install postgresql-9.1
+sudo apt-get install postgresql-9.4
 ```
 
 ### Install psycopg2
@@ -142,7 +162,7 @@ a more user-friendly command line structure, and colorful syntax highlighting.  
 ### Create the database
 Create a new PostgreSQL database called `msdb`.
 ```sh
-# cd /usr/lib/postgresql/9.1/bin
+# cd /usr/lib/postgresql/9.4/bin
 # sudo -u postgres psql
 # create database msdb;
 # create user pi password '<get from team>';
@@ -160,12 +180,22 @@ Create a new PostgreSQL database called `msdb`.
 
 ### Modify the Apache configuration
 ```sh
-# sudo nano /etc/apache2/sites-enabled/000-default
+# sudo nano /etc/apache2/sites-enabled/000-default.conf
 ```
-Add
+replace
+DocumentRoot /var/www/html
+with
 ```sh
+Alias /static/ /opt/designchallenge2016/brata.masterserver/workspace/ms/static/
+
+<Directory /opt/designchallenge2016/brata.masterserver/workspace/ms/static>
+<Files wsgi.py>
+Order deny,allow
+Allow from all
+</Files>
+</Directory>
+
 WSGIScriptAlias / /opt/designchallenge2016/brata.masterserver/workspace/ms/ms/wsgi.py
-WSGIPythonPath /opt/designchallenge2016/brata.masterserver/workspace/ms
 <Directory /opt/designchallenge2016/brata.masterserver/workspace/ms/ms>
 <Files wsgi.py>
 Order deny,allow
@@ -174,16 +204,12 @@ Allow from all
 </Directory>
 ```
 
+### Install the hidden configuration files
+
 ### Install the ms Django project
 First change the default password from the source to match the one you set above for the pi postgres user.
 ```sh
-# cd brata.masterserver/workspace/ms/ms
-# nano settings.py
-```
-Find raspberry (the default pi password) and change it to your password. Save and exit the file.
-Then:
-```sh
-# cd ..
+# cd /opt/designchallenge2016/brata.masterserver/workspace/ms/ms
 # python manage.py migrate
 ```
 
@@ -192,7 +218,7 @@ Then:
    # Edit /opt/.../workspace/ms/ms/settings.py and set HOST to localhost in order to get migrate to run successfully. 
    # Edit /etc/apache2/envvars to change APACHE_RUN_USER and APACHE_RUN_GROUP from www-data to the development user; restart apache2.
    # In the /etc/apache2/sites-enabled/000-default.conf, added after "Allow from all", then restarted Apache:
-   # In the /etc/apache2/sites-enabled/000-default.conf, I currently hard-coded the following just for scorekeeper; don't know what Jaron has planned for a more robust solution though Ellery did mention the installation script copying all statics to a central location, so settings.py might need a STATIC_ROOT set:
+   # In the /etc/apache2/sites-enabled/000-default.conf, I currently hard-coded the following just for scorekeeper; don't know what Jaron has planned for a more robust solution though Ellery did mention the installation script copying all statics to a central location, so settings.py might need a STATIC_ROOT set  TODO Houston we have a problem as there is already a static alias which was missing and has been added in, but it was different then the one here, so now we have two static sitest to server one will need to be changed.  Although with the improvement from gunicorn they both should be migrated to however we chose to do it the new way:
 
       Alias /static/ /opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/static/
       <Directory /opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/static>
@@ -206,6 +232,18 @@ Require all granted
 **Note:** (JIA 1/6/2016) I had to make the following edits. FYI this was for a Debian Jessie VM running on a laptop:
 
    # Edit /etc/postgresql/9.4/main/pg_hba.conf to change "peer" to "md5" on the local/all/all line.
+
+#### Stop Apache and start Gunicorn
+
+First stop the Apache service if it is running, then
+start Gunicorn and have it listen on the interface specified by <ip addr> (the server's IP address) port 80.
+NOTE TODO we need to get rid of this once we figure out starting it as a service. 
+
+```sh
+sudo service apache2 stop
+cd /opt/designchallenge2016/brata.masterserver/workspace/ms
+sudo gunicorn -b <ip addr>:80 --workers=3 ms.wsgi
+```
 
 ## Test
 
