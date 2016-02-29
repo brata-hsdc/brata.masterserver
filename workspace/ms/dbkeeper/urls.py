@@ -20,7 +20,7 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.index, name="index"),
-    url(r'^index.html$', views.index, name="index"),
+    url(r'^index.html$', views.index, name="dbkeeper_index"),
     url(r'^remotetest/$', views.regtest.as_view(), name="regtest"), # thisis the student main test page already advertised
     url(r'^test/$', views.regtest.as_view(), name="regtest"), # this is the student test main page (we should remove or rename test.html)
     url(r'^regtest_team/(?P<pass_code>[^/]+)/$', views.regtest_team.as_view(), name="regtest_team"),
