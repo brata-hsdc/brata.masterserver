@@ -22,12 +22,13 @@ there are four Django apps:
 
 ### Install and Set Up Raspbian
 
-Download Raspbian Jessie Lite released 2015-11-21 from https://www.raspberrypi.org/downloads/raspbian/.
-
+Download Raspbian Jessie Lite released 2016-02-09 from https://www.raspberrypi.org/downloads/raspbian/.
+Note that for this next step the memory you use will make a big difference on the performance of your server.  After research and testing for 2016 the following card was selected as the best balance of write speed, read speed and cost: SanDisk Extreme 16GB microSDHC UHS-1 Card with Adapter (SDSQXNE-016G-GN6MA).
+It is also suggested to run the server on a Pi 2 as the extra CPU power will definitely help.
 Unzip the zip file to get the raw SD card image. Write the raw image file to the SD card:
 
 ```sh
-$ sudo dd if=2015-11-21-raspbian-jessie-lite.img of=/dev/sdX bs=4M
+$ sudo dd if=2016-02-09-raspbian-jessie-lite.img of=/dev/sdX bs=4M
 $ sudo sync
 ```
 
@@ -206,11 +207,12 @@ Allow from all
 
 ### Install the hidden configuration files
 
-### Install the ms Django project
-First change the default password from the source to match the one you set above for the pi postgres user.
+### Install the ms Django project and initialize the DB
+### TODO Note this backup file currently throws errors because it is the only way to create a full backup with the current circular dependency. After the dependency issue is fixed this should be resnapshotted with data only and no longer throw errors.  At that time we will also need to add the user creation here.
 ```sh
 # cd /opt/designchallenge2016/brata.masterserver/workspace/ms/ms
 # python manage.py migrate
+# sudo -u postgres psql -d msdb < db_backup.sql
 ```
 
 **Note:** (JIA 12/17/2015) I had to make the following edits. FYI this was for a Debian Jessie VM running on a laptop:
