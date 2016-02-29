@@ -38,12 +38,12 @@ Log-in when prompted.
 type the following to change the password from the default of raspberry
 THIS IS VERY IMPORTANT or your Pi will likely be hacked in less than 24 hrs if on a public network
 ```sh
-# passwd
+$ passwd
 ```
 
 ### If using wired skip this, otherwise if using a wifi dongle you will need to join your network first
 ```sh
-# sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
+$ sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
 ```
 Add to the bottom of the file
 ```sh
@@ -54,12 +54,12 @@ network={
 ```
 Save the file Ctrl-x and yes. Then reboot.
 ```sh
-sudo reboot
+$ sudo reboot
 ```
 
 Next fix some of the basic settings
 ```sh
-# sudo raspi-config
+$ sudo raspi-config
 ```
 Here you need to select to:
 1) Expand the file system
@@ -74,34 +74,34 @@ Upon exit the pi will restart and enable the selected changes.
 ### Update Repositories and in case remote QRCode generation goes down add QRCode generation support
 ### NOTE The first install line goes all the way out and ends with python-tk so when you copy keep scrolling over
 ```sh
-# sudo apt-get update
-# sudo apt-get upgrade
-# sudo apt-get install libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.5-dev tk8.5-dev python-tk
-# sudo apt-get install git
-# sudo apt-get install python-imaging
-# sudo apt-get install python-pip
-# sudo pip install pillow
-# sudo pip install qrcode
+$ sudo apt-get update
+$ sudo apt-get upgrade
+$ sudo apt-get install libtiff5-dev libjpeg8-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.5-dev tk8.5-dev python-tk
+$ sudo apt-get install git
+$ sudo apt-get install python-imaging
+$ sudo apt-get install python-pip
+$ sudo pip install pillow
+$ sudo pip install qrcode
 ```
 
 ### Install Python dev to enable mod_wsgi install
 ```sh
-# sudo apt-get install python-dev
+$ sudo apt-get install python-dev
 ```
 
 Ah crud need to reinstall python from source with --enabled-shared? This error came from mod_wsgi install.  Suggests there will be major performance and memory hit if not done. NOTE I could not find the details of this, whomever put it in if it could please be clarified?
 
 ### Install the Apache Web Server
 ```sh
-# sudo apt-get install apache2
+$ sudo apt-get install apache2
 ```
 
 ### Install mod_wsgi
 ```sh
-# sudo apt-get install apache2-threaded-dev
-# sudo pip install mod_wsgi
-# sudo apt-get install libapache2-mod-wsgi
-# sudo a2enmod wsgi <TBD is this really needed?>
+$ sudo apt-get install apache2-threaded-dev
+$ sudo pip install mod_wsgi
+$ sudo apt-get install libapache2-mod-wsgi
+$ sudo a2enmod wsgi <TBD is this really needed?>
 ```
 
 ### Install Gunicorn
@@ -110,7 +110,7 @@ Ah crud need to reinstall python from source with --enabled-shared? This error c
 It should perform better than Apache.  We have observed several-second delays with Apache when handling requests.
 
 ```sh
-sudo pip install gunicorn
+$ sudo pip install gunicorn
 ```
 
 #### Make Gunicorn run at boot
@@ -119,22 +119,26 @@ TO DO:  add instructions
 #### Serving static files with Gunicorn
 Gunicorn can't serve the static files for our Django apps.
 Django can be configured to serve them up, or we can set up [*Nginx*](http://nginx.org/).
+```sh
+$ sudo apt-get install nginx
+```
+TODO giving up here says installed nginx but can't start because is not configured
 
 ### Install PostgreSQL
 ```sh
-sudo apt-get install postgresql-9.4
+$ sudo apt-get install postgresql-9.4
 ```
 
 ### Install psycopg2
 ```sh
-sudo apt-get install python-psycopg2
+$ sudo apt-get install python-psycopg2
 ```
 
 TODO do we need to create a virtual environment first?
 
 ### Install Django
 ```sh
-# sudo pip install Django
+$ sudo pip install Django
 ```
 
 ### Install pytz
@@ -143,7 +147,7 @@ allows UTC datetimes to be stored in the database, but displayed in the local ti
 The local timezone is set in the Django **settings.py** file.
 
 ```sh
-# sudo pip install pytz
+$ sudo pip install pytz
 ```
 
 ### Install httpie
@@ -155,7 +159,7 @@ a more user-friendly command line structure, and colorful syntax highlighting.  
 `httpie` is written in Python, so it can be installed with `pip`, like this:
 
 ```sh
-# sudo pip install httpie
+$ sudo pip install httpie
 ```
 
 ## Setup
@@ -163,8 +167,8 @@ a more user-friendly command line structure, and colorful syntax highlighting.  
 ### Create the database
 Create a new PostgreSQL database called `msdb`.
 ```sh
-# cd /usr/lib/postgresql/9.4/bin
-# sudo -u postgres psql
+$ cd /usr/lib/postgresql/9.4/bin
+$ sudo -u postgres psql
 # create database msdb;
 # create user pi password '<get from team>';
 # grant all privileges on database msdb to pi;
@@ -173,15 +177,15 @@ Create a new PostgreSQL database called `msdb`.
 
 ### Clone this repository
 ```sh
-# sudo mkdir /opt/designchallenge2016
-# sudo chown pi:pi /opt/designchallenge2016
-# cd /opt/designchallenge2016
-# git clone https://github.com/brata-hsdc/brata.masterserver.git
+$ sudo mkdir /opt/designchallenge2016
+$ sudo chown pi:pi /opt/designchallenge2016
+$ cd /opt/designchallenge2016
+$ git clone https://github.com/brata-hsdc/brata.masterserver.git
 ```
 
 ### Modify the Apache configuration
 ```sh
-# sudo nano /etc/apache2/sites-enabled/000-default.conf
+$ sudo nano /etc/apache2/sites-enabled/000-default.conf
 ```
 replace
 DocumentRoot /var/www/html
@@ -210,9 +214,9 @@ Allow from all
 ### Install the ms Django project and initialize the DB
 ### TODO Note this backup file currently throws errors because it is the only way to create a full backup with the current circular dependency. After the dependency issue is fixed this should be resnapshotted with data only and no longer throw errors.  At that time we will also need to add the user creation here.
 ```sh
-# cd /opt/designchallenge2016/brata.masterserver/workspace/ms/ms
-# python manage.py migrate
-# sudo -u postgres psql -d msdb < db_backup.sql
+$ cd /opt/designchallenge2016/brata.masterserver/workspace/ms/ms
+$ python manage.py migrate
+$ sudo -u postgres psql -d msdb < db_backup.sql
 ```
 
 **Note:** (JIA 12/17/2015) I had to make the following edits. FYI this was for a Debian Jessie VM running on a laptop:
@@ -242,9 +246,9 @@ start Gunicorn and have it listen on the interface specified by <ip addr> (the s
 NOTE TODO we need to get rid of this once we figure out starting it as a service. 
 
 ```sh
-sudo service apache2 stop
-cd /opt/designchallenge2016/brata.masterserver/workspace/ms
-sudo gunicorn -b <ip addr>:80 --workers=3 ms.wsgi
+$ sudo service apache2 stop
+$ cd /opt/designchallenge2016/brata.masterserver/workspace/ms
+$ sudo gunicorn -b <ip addr>:80 --workers=3 ms.wsgi
 ```
 
 ## Test
