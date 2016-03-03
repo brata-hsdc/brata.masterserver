@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.template import RequestContext
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.core.urlresolvers import reverse
 
 from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm,\
                    AddLaunchParamsForm, AddDockParamsForm, AddSecureParamsForm, AddReturnParamsForm,\
@@ -84,12 +85,13 @@ class regtest(View):
         launchTestPoints = json.loads(Setting.objects.get(name="LAUNCH_TEST_DATA").value)
         table = []    
         for team in teams:
-            entry = {}
-            entry["organization"] = team.organization.name  # school name
-            entry["name"] = team.name  # team name
-            entry["pass_code"] = team.pass_code
-            entry["points"] = launchTestPoints[team.organization.name]
-            table.append(entry)
+            if team.organization.name in launchTestPoints:
+                entry = {}
+                entry["organization"] = team.organization.name  # school name
+                entry["name"] = team.name  # team name
+                entry["pass_code"] = team.pass_code
+                entry["points"] = launchTestPoints[team.organization.name]
+                table.append(entry)
         self.context["table"] = table
         
         # Get the URL of the DOCK_TEST_HOST
@@ -104,6 +106,10 @@ class regtest_team(View):
               }
     
     def get(self, request, pass_code):
+        self.context["host"] = request.get_host()
+        self.context["register_url"] = reverse("register", kwargs={"team_passcode": pass_code}, current_app=request.resolver_match.app_name)
+        self.context["unregister_url"] = reverse("unregister", current_app=request.resolver_match.app_name)
+        self.context["reset_url"] = reverse("reset", kwargs={"team_passcode": pass_code}, current_app=request.resolver_match.app_name)
         self.context["pass_code"] = pass_code
         return render(request, "dbkeeper/regtest_team.html", self.context)
 
