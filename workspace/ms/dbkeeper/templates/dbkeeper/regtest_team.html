@@ -1,4 +1,4 @@
-{% extends "dbkeeper/base.html" %}
+{% extends "dbkeeper/student_test_base.html" %}
 
 {% block title  %}Register Team {{ entity|title }}{% endblock %}
 {% block header %}Register Team {{ entity|title }}{% endblock %}
@@ -11,9 +11,9 @@
 <td>Reset Team Including Registration</td>
 </tr>
 <tr>
-  <td><img src="http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F{{ host|urlencode:"" }}%2F{{ register_url|urlencode:"" }}"></td>
-  <td><img src="http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F{{ host|urlencode:"" }}%2F{{ unregister_url|urlencode:"" }}"></td>
-  <td><img src="http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F{{ host|urlencode:"" }}%2F{{ reset_url|urlencode:"" }}"></td>
+  <td><img src="http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F{{ host|urlencode:"" }}{{ register_url|urlencode:"" }}"></td>
+  <td><img src="http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F{{ host|urlencode:"" }}{{ unregister_url|urlencode:"" }}"></td>
+  <td><img src="http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F{{ host|urlencode:"" }}{{ reset_url|urlencode:"" }}"></td>
 </tr>
 </table>
 {% endblock %}
