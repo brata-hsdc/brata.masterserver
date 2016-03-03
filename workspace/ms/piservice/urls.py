@@ -22,7 +22,7 @@ urlpatterns = [
     # Browser messages
     url(r'^$', views.index, name="index"),
     url(r'^index.html$', views.index, name="index"),
-    url(r'^libraryTest/$', views.libraryTest.as_view(), name="libraryTest"),
+    url(r'^libraryTest/$', views.LibraryTest.as_view(), name="libraryTest"),
     
     # BRATA messages
     url(r'^register/(?P<team_passcode>[a-z]+[0-9]+)/$', views.Register.as_view(), name="register"),

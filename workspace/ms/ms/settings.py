@@ -35,7 +35,7 @@ SECRET_KEY = '-4@1rw9sp&emici+=!_h51y-&0wfs1n3mmd@*o4a^*_7(m^kxe'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1']
+ALLOWED_HOSTS = ['127.0.0.1', 'ms01']
 
 
 # Application definition
@@ -65,6 +65,7 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'ms.urls'
+LOGIN_URL = '/admin/login/'
 
 TEMPLATES = [
     {

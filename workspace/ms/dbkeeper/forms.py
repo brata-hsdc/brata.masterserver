@@ -1,5 +1,6 @@
 """ms.dbkeeper Form definitions """
 from django import forms
+from django.core.validators import RegexValidator
 
 import operator
 
@@ -387,4 +388,15 @@ class CompetitionEndForm(forms.Form):
 class LogMessageForm(forms.Form):
     messageText = forms.CharField(label="Message Text", widget=forms.Textarea)
 
-    
+#----------------------------------------------------------------------------
+class ReturnTestForm(forms.Form):
+    twoDigitValidator = RegexValidator(regex=r"^[0-9][0-9]$")
+    value1 = forms.CharField(label="1 =", max_length=2, initial="00", validators=[twoDigitValidator])
+    value2 = forms.CharField(label="2 =", max_length=2, initial="00", validators=[twoDigitValidator])
+    value3 = forms.CharField(label="3 =", max_length=2, initial="00", validators=[twoDigitValidator])
+    value4 = forms.CharField(label="4 =", max_length=2, initial="00", validators=[twoDigitValidator])
+    value5 = forms.CharField(label="5 =", max_length=2, initial="00", validators=[twoDigitValidator])
+    value6 = forms.CharField(label="6 =", max_length=2, initial="00", validators=[twoDigitValidator])
+    params = forms.CharField(max_length=200, widget=forms.HiddenInput(), required=False)
+    school = forms.CharField(max_length=100, widget=forms.HiddenInput(), required=False)
+    reverse = forms.BooleanField(label="Measured in reverse direction", required=False, initial=False)
