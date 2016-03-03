@@ -367,7 +367,7 @@ class LibraryTest(View):
     Returns a page containing QR codes specific to running the
     challenge on the chosen station.
     """
-    MS_BASE_URL = "http://97.102.189.170:80/piservice"
+    MS_BASE_URL = "http://localhost"
     QR_SERVICE_REQUEST_URL = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="
     context = {
                "form": None,
@@ -395,22 +395,27 @@ class LibraryTest(View):
         self.context["form"] = form
         if form.is_valid():
             stations = form.cleaned_data["stations"]
+
+            # Get the MS server external URL
+            msUrl = Setting.get("MS_EXTERNAL_HOST_ADDRESS", default=self.MS_BASE_URL) + "/piservice"
             
             # Create a table with one row of URLs for each station.
             self.context["station_table"] = []
             for station in stations:
+                # Create an arrival QR code for every station_type
                 stationRow = {"station_id": station.station_id,
-                              "urls": [self.qr("Arrive", "start_challenge", station.station_id)]
+                              "urls": [self.qr("Arrive", "start_challenge", station.station_id, msUrl)]
                              }
                 
+                # Create additional codes based on the station_type
                 if station.station_type == PiStation.DOCK_STATION_TYPE:
-                    stationRow["urls"].append(self.qr("Dock", "dock", station.station_id))
-                    stationRow["urls"].append(self.qr("Latch", "latch", station.station_id))
+                    stationRow["urls"].append(self.qr("Dock", "dock", station.station_id, msUrl))
+                    stationRow["urls"].append(self.qr("Latch", "latch", station.station_id, msUrl))
                 elif station.station_type == PiStation.SECURE_STATION_TYPE:
-                    stationRow["urls"].append(self.qr("Open", "open", station.station_id))
-                    stationRow["urls"].append(self.qr("Secure", "secure", station.station_id))
+                    stationRow["urls"].append(self.qr("Open", "open", station.station_id, msUrl))
+                    stationRow["urls"].append(self.qr("Secure", "secure", station.station_id, msUrl))
                 elif station.station_type == PiStation.RETURN_STATION_TYPE:
-                    stationRow["urls"].append(self.qr("Return", "return", station.station_id))
+                    stationRow["urls"].append(self.qr("Return", "return", station.station_id, msUrl))
                     
                 self.context["station_table"].append(stationRow)
 
@@ -418,9 +423,9 @@ class LibraryTest(View):
         else:
             return render(request, "piservice/libraryTest.html", self.context)
     
-    def qr(self, label, path, stationId):
+    def qr(self, label, path, stationId, baseUrl):
         """ Build the QR service request URL """
-        url = self.QR_SERVICE_REQUEST_URL + urlquote("{}/{}/{}/".format(self.MS_BASE_URL, path, stationId))
+        url = self.QR_SERVICE_REQUEST_URL + urlquote("{}/{}/{}/".format(baseUrl, path, stationId))
         return {"label": label, "url": url }
     
 #----------------------------------------------------------------------------
