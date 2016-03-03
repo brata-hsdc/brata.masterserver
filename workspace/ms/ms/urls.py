@@ -28,9 +28,9 @@ urlpatterns = [
     url(r'^hsdc/login/$', auth_views.login, {'template_name': 'dbkeeper/login.html'}, name='login'),
     
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^piservice/', include(piservice_urls)),
     url(r'^serve_pi/', include(piservice_urls)),  # appetizing alias for piservice
     url(r'^m/', include(piservice_urls)),  # alias for 2015 backward compatibility
+    url(r'^piservice/', include(piservice_urls)),
     url(r'^dbkeeper/', include(dbkeeper_urls)),
     url(r'^hsdc/', include(dbkeeper_urls)), # alias for dbkeeper for student test pages
     url(r'^scoreboard/', include(scoreboard_urls)),
