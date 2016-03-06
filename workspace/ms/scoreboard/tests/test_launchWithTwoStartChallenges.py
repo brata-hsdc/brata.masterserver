@@ -7,10 +7,6 @@ from dbkeeper.models import Organization, Team, Setting
 from piservice.models import PiStation, PiEvent
 import scoreboard.views as target
 
-def _mocked_utcNow():
-    return datetime(2001, 1, 1, 0, 0, 0).replace(tzinfo=utc)
-
-
 #class ScoreboardStatusLaunchTestCase(TestCase):
     # Don't bother with this. For Launch, the teams will only get one pass
     # through the course; they will get multiple attempts during the pass.
