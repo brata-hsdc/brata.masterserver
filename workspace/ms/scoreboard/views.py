@@ -160,7 +160,58 @@ def _getDataField(submit_message,
 def _getEvents(team_name,
                station_type,
                now):
-    team_events = PiEvent.objects.filter(
+    valid_events = PiEvent.objects.all()
+
+    # We only care about the events between EVENT_STARTED_MSG_TYPE and
+    # EVENT_CONCLUDED_MSG_TYPE.
+
+    start_events = PiEvent.objects.filter(
+        type=PiEvent.EVENT_STARTED_MSG_TYPE
+    )
+
+    if start_events.count() > 0:
+        start_event = start_events[0]
+
+        if start_events.count() > 1:
+            logging.warning("Multiple EVENT_STARTED_MSG_TYPEs encountered; taking the latest one only")
+            start_event = start_events[-1]
+
+        t = start_event.time
+
+        end_events = PiEvent.objects.filter(
+            type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
+        )
+    
+        if end_events.count() > 0:
+            end_event = end_events[0]
+    
+            if end_events.count() > 1:
+                logging.warning("Multiple EVENT_CONCLUDED_MSG_TYPEs encountered; taking the latest one")
+                end_event = end_events[-1]
+    
+            u = end_event.time
+
+            _trace('Processing events for Team "{}" from {}..{}'.format(team_name, t, u))
+
+            # get all events within t..u range
+            valid_events = valid_events.filter(
+                Q(time__gte=t),
+                Q(time__lte=u)
+            )
+        else:
+            _trace('Competition still going. Processing events for Team "{}" beginning at {}'.format(team_name, t))
+
+            # get all events starting at t
+            valid_events = valid_events.filter(
+                Q(time__gte=t)
+            )
+    else:
+        _trace("Competition not yet started, no events to consider")
+        valid_events = valid_events.filter(
+            type=PiEvent.EVENT_STARTED_MSG_TYPE
+        )
+
+    team_events = valid_events.filter(
         team__name=team_name
     ).filter(
         pi__station_type=station_type
@@ -190,7 +241,7 @@ def _getNextEventTimestamp(attempt_num,
         logging.debug('More attempts for team follow')
         result = start_challenge_events[attempt_num].time # timestamp of following event
     else:
-        logging.debug('No more attempts for team or event concluded')
+        logging.debug('Either no more attempts for team or event concluded')
         game_over_events = PiEvent.objects.filter(
             type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
         ).order_by('time')
@@ -265,11 +316,7 @@ def _recomputeScore(algorithm,
             params['cur_attempt_score'] = 5
 
             if calc_current_attempt_score:
-                params['cur_attempt_score'] = (2 * num_success_events) + (1 * num_fail_events)
-
-                if params['cur_attempt_score'] < 1:
-                    params['cur_attempt_score'] = 1
-
+                params['cur_attempt_score'] = (2 * num_success_events) + (1 * num_fail_events) + 1
                 _trace('Current attempt score computed: (cur_attempt_score, score) = ({}, {})'.format(params['cur_attempt_score'], params['score']))
 
             if params['submit_events'].count() < max_submit_events:
