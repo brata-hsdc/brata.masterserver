@@ -110,6 +110,7 @@ def _computeSecureOrReturn(team_name,
     num_fail_events = params['fail_events'].count()
 
     if num_success_events > 0:
+        _trace("Success event(s) found")
         if params['submit_events'].count() > max_submit_events:
             logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
 
@@ -122,16 +123,18 @@ def _computeSecureOrReturn(team_name,
             logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
 
         params['num_failed_attempts'] += 1
+        params['score'] = 5
+        _trace("Failure event(s) found: num_failed_attempts = {}".format(params['num_failed_attempts']))
 
         if params['num_failed_attempts'] > 3:
-            params['score'] = 5
+            _trace("Max failure events found")
             params['time_to_exit'] = True
             params['end_time'] = params['fail_events'].reverse()[0].time # timestamp of final FAIL_STATUS
 
     else:
         logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
-    logging.debug('Exiting _computeSecureOrReturn')
+    logging.debug('Exiting _computeSecureOrReturn: score = {}'.format(params['score']))
 
 
 #---------------------------------------------------------------------------
