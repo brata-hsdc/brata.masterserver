@@ -1180,7 +1180,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.SUCCESS_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 9
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1234,7 +1234,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 9
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1281,7 +1281,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.FAIL_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 8
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1335,7 +1335,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 8
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1382,7 +1382,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.SUCCESS_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 8
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1436,7 +1436,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 8
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1483,7 +1483,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.FAIL_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 7
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1537,7 +1537,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 7
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1584,7 +1584,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.SUCCESS_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 8
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1638,7 +1638,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 8
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1685,7 +1685,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.FAIL_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 7
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1739,7 +1739,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 7
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1786,7 +1786,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.SUCCESS_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 7
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1840,7 +1840,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 7
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1887,7 +1887,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.FAIL_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 6
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1941,7 +1941,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 6
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -1988,7 +1988,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.SUCCESS_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 8
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2042,7 +2042,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 8
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2089,7 +2089,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.FAIL_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 7
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2143,7 +2143,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 7
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2190,7 +2190,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.SUCCESS_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 7
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2244,7 +2244,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 7
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2291,7 +2291,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.FAIL_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 6
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2345,7 +2345,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 6
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2392,7 +2392,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.SUCCESS_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 7
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2446,7 +2446,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 7
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2493,7 +2493,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.FAIL_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 6
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2547,7 +2547,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 6
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2594,7 +2594,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.SUCCESS_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 6
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2648,7 +2648,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 6
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2695,7 +2695,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             status = PiEvent.FAIL_STATUS
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 5
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)
@@ -2749,7 +2749,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             pi = self.launchStation
         )
 
-        # 4th success/fail stops the attempt; time does not continue ticking???
+        # 4th success/fail stops the attempt; time does not continue ticking
         expectedScore = 5
         expectedDuration_s = 7
         self._verify(expectedScore, expectedDuration_s)

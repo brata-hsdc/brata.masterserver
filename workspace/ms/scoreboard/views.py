@@ -74,7 +74,6 @@ def _computeLaunch(team_name,
 
     params['score'] = params['cur_attempt_score']
     params['time_to_exit'] = True
-    params['end_time'] = params['submit_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
 
     #logging.debug('Exiting _computeLaunch')
 
@@ -318,6 +317,10 @@ def _recomputeScore(algorithm,
 
             params['cur_attempt_score'] = 5
 
+            if 'end_time' in params:
+                # Didn't make it through to the end since the last loop iteration; clear the end_time so we don't mess up the value for this time
+                params.pop('end_time', None)
+
             if calc_current_attempt_score:
                 params['cur_attempt_score'] = (2 * num_success_events) + (1 * num_fail_events) + 1
                 _trace('Current attempt score computed: (cur_attempt_score, score) = ({}, {})'.format(params['cur_attempt_score'], params['score']))
@@ -350,13 +353,15 @@ def _recomputeScore(algorithm,
                           max_submit_events,
                           params,
                           now)
-                _trace('Custom logic complete: (score, cur_attempt_score)=({}, {})'.format(params['score'], params['cur_attempt_score']))
+                params['end_time'] = params['submit_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
+                _trace('Custom logic complete: (score, cur_attempt_score, end_time)=({}, {}, {})'.format(params['score'], params['cur_attempt_score'], params['end_time']))
 
             i += 1
         else:
-            _trace('Challenge complete; time to exit: (score)=({})'.format(params['score']))
             params['time_to_exit'] = True
-            params['end_time'] = now
+            if not 'end_time' in params:
+                params['end_time'] = now
+            _trace('Challenge complete; time to exit: (score, end_time)=({}, {})'.format(params['score'], params['end_time']))
 
     duration_s = (params['end_time'] - start_time).total_seconds() + params['docking_time_s']
     _trace('{}.{}: (duration_s, start_time, end_time, docking_time_s) = ({}, {}, {}, {})'.format(
