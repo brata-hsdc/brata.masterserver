@@ -186,6 +186,10 @@ $ git clone https://github.com/brata-hsdc/brata.masterserver.git
 ```sh
 $ sudo nano /etc/apache2/sites-enabled/000-default.conf
 ```
+add to the top of the file 
+```sh
+WSGIPythonPath /opt/designchallenge2016/brata.masterserver/workspace/ms
+```
 replace
 DocumentRoot /var/www/html
 with
@@ -193,19 +197,24 @@ with
 Alias /static/ /opt/designchallenge2016/brata.masterserver/workspace/ms/static/
 
 <Directory /opt/designchallenge2016/brata.masterserver/workspace/ms/static>
-<Files wsgi.py>
-Order deny,allow
-Allow from all
-</Files>
+Require all granted 
 </Directory>
 
 WSGIScriptAlias / /opt/designchallenge2016/brata.masterserver/workspace/ms/ms/wsgi.py
 <Directory /opt/designchallenge2016/brata.masterserver/workspace/ms/ms>
 <Files wsgi.py>
-Order deny,allow
-Allow from all
+Require all granted 
 </Files>
 </Directory>
+```
+NOTE: If using Apache before 2.3 (not recommended) change 
+```sh
+Require all granted 
+```
+to
+```sh
+Order deny,allow
+Allow from all
 ```
 
 ### Install the hidden configuration files
