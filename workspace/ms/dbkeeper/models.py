@@ -328,7 +328,7 @@ class Setting(models.Model):
         except (ObjectDoesNotExist, ValueError, TypeError):
             return None
         try:
-          if station is None:
+          if station_id is None:
             return returnParams
           elif value is None:
             return returnParams[station_id]

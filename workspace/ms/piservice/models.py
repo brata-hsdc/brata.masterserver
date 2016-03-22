@@ -133,6 +133,7 @@ class PiEvent(models.Model):
     EVENT_STARTED_MSG_TYPE        = 23
     LOG_MESSAGE_MSG_TYPE          = 24
     RESET_MSG_TYPE                = 25
+    STATION_SUBMIT_MSG_TYPE       = 26
 
     TYPE_CHOICES = (
                     (UNKNOWN_TYPE,                  "Unknown"),
@@ -161,6 +162,7 @@ class PiEvent(models.Model):
                     (EVENT_STARTED_MSG_TYPE,        "Event Started"),
                     (LOG_MESSAGE_MSG_TYPE,          "Log Message"),
                     (RESET_MSG_TYPE,                "Reset Team"),
+                    (STATION_SUBMIT_MSG_TYPE,       "Station Submit"),
                    )
     
     MSG_TYPES_2015 = (REGISTER_2015_MSG_TYPE,
