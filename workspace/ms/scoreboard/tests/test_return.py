@@ -194,7 +194,7 @@ class ScoreboardStatusReturnTestCase(TestCase):
         )
 
         expectedScore = 9
-        expectedDuration_s = 10
+        expectedDuration_s = 6
         self._verify(expectedScore, expectedDuration_s)
 
     @mock.patch('scoreboard.views._utcNow', side_effect=_mocked_utcNow)
@@ -222,7 +222,7 @@ class ScoreboardStatusReturnTestCase(TestCase):
         )
 
         expectedScore = 9
-        expectedDuration_s = 8
+        expectedDuration_s = 6
         self._verify(expectedScore, expectedDuration_s)
 
     @mock.patch('scoreboard.views._utcNow', side_effect=_mocked_utcNow)
@@ -271,7 +271,7 @@ class ScoreboardStatusReturnTestCase(TestCase):
         )
 
         expectedScore = 5
-        expectedDuration_s = 8
+        expectedDuration_s = 6
         self._verify(expectedScore, expectedDuration_s)
 
     @mock.patch('scoreboard.views._utcNow', side_effect=_mocked_utcNow)
@@ -298,9 +298,11 @@ class ScoreboardStatusReturnTestCase(TestCase):
             pi = self.returnStation
         )
 
-        expectedScore = 5
+        expectedScore = 1 # Mike said this should be 1, not 5.
         expectedDuration_s = 14
         self._verify(expectedScore, expectedDuration_s)
+
+    # TODO Mike said to add tests to check for after the challenge is logically complete. Look for a 2nd success or 4th failure (or more of either)
 
     @mock.patch('scoreboard.views._utcNow', side_effect=_mocked_utcNow)
     def test_recomputeReturnScore_twoStartChallengeEventsEarlierTimestampFailSuccessNoConclude(self, mock_utcNow):

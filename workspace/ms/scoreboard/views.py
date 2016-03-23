@@ -58,6 +58,7 @@ def _computeDock(team_name,
     else:
         logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
+    params['end_time'] = params['submit_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
     #logging.debug('Exiting _computeDock')
 
 
@@ -74,6 +75,7 @@ def _computeLaunch(team_name,
 
     params['score'] = params['cur_attempt_score']
     params['time_to_exit'] = True
+    params['end_time'] = params['submit_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
 
     #logging.debug('Exiting _computeLaunch')
 
@@ -353,8 +355,7 @@ def _recomputeScore(algorithm,
                           max_submit_events,
                           params,
                           now)
-                params['end_time'] = params['submit_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
-                _trace('Custom logic complete: (score, cur_attempt_score, end_time)=({}, {}, {})'.format(params['score'], params['cur_attempt_score'], params['end_time']))
+                _trace('Custom logic complete: (score, cur_attempt_score)=({}, {})'.format(params['score'], params['cur_attempt_score']))
 
             i += 1
         else:
