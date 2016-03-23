@@ -1,35 +1,177 @@
 {% extends "dbkeeper/student_test_base.html" %}
 
-{% block title  %}Test Links {{ entity|title }}{% endblock %}
-{% block header %}Test Links {{ entity|title }}{% endblock %}
+{% block title  %}Team Testing Links {{ entity|title }}{% endblock %}
+{% block header %}Team Testing Links {{ entity|title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+table.desc_table * {
+  padding: 0;
+  margin: 0;
+}
+table.desc_table thead {
+  text-align: left;
+  font-weight: bold;
+}
+table.desc_table tbody {
+  display: block;
+  border-collapse: collapse;
+}
+.desc_table .test_name {
+  font-weight: bold;
+  text-align: right;
+  vertical-align: top;
+  border-top: 1em solid #dddddd;
+  border-left: 3em solid #dddddd;
+  display: table-cell;
+}
+.desc_table .test_desc {
+  border-top: 1em solid #dddddd;
+  display: table-cell;
+  padding-left: 1em;
+}
+.desc_table .test_desc span {
+  font-size: 80%;
+}
+.desc_table .test_desc {
+  max-width: 30em;
+}
+.desc_table .space_row {
+  height: 1em;
+}
+#test_table * {
+  padding: 0;
+  margin: 0;
+}
+#test_table {
+  border-collapse: separate;
+  display: block;
+}
+#test_table .school_row {
+  background-color: black;
+  color: #ee8800;
+  font-weight: bold;
+  height: 2em;
+  font-size: 150%;
+}
+#test_table .school_row td {
+  padding-left: 2em;
+  vertical-align: bottom;
+}
+#test_table .team_row {
+}
+#test_table .indent {
+  width: 4em;
+}
+#test_table .team_name {
+  font-weight: bold;
+}
+#test_table .test {
+  background-color: #dddddd;
+  border: 1px solid #888888;
+  width: 15%;
+  text-align: center;
+}
+#test_table .test:hover {
+  background-color: #ee8800;
+}
+#test_table a:link {
+  text-decoration: none;
+  font-weight: bold; 
+}
+</style>
+{% endblock %}
 
 {% block main %}
-    {# Include the visible fields #}
-    <table class="fieldWrapper" border="1">
-       <tr>
+    <p>These are team specific testing links.  The various tests are described <a href="#test_descriptions">below</a>.</p>
+    <table id="test_table" class="fieldWrapper">
+      <!-- 
+      <thead>
+        <tr>
           <th>School</th>
           <th>Team</th>
           <th>Registration</th>
-          <!--<th>Launch Test</th>-->
+          <th>Navigation Test</th>
           <th>Dock Test</th>
-          <!--<td style="text-align: left;">Dock Test</td>-->
-       </tr>
-       <tbody>
-         {% for team in table %}
-         <tr>
-            <td style="text-align: left;">{{ team.organization }}</td>
-            <td style="text-align: left;">{{ team.name }}</td>
-            <td style="text-align: left;">
-             <a href="../regtest_team/{{team.pass_code}}/">Reg QRs</a></td>
-            <!--<td style="text-align: left;">
-             <a href="../navtest_team/{{team.pass_code}}/{{team.points.0.0}}/{{team.points.0.1}}/{{team.points.1.0}}/{{team.points.1.1}}/{{team.points.2.0}}/{{team.points.2.1}}/{{team.points.3.0}}/{{team.points.3.1}}/{{team.organization}}/">Map Points</a></td>
-            -->
-          <td><a href="{{ dock_test_host }}/dock">Dock Sim Evaluator</a></td>
-          <!--<td style="text-align: left;">
-           <a href="../docktest_team/{{team.pass_code}}/">Dock QRs</a></td>-->
-         </tr>
-         {% endfor %}
-       </tbody>
+          <th>Return Test</th>
+        </tr>
+      </thead>
+       -->
+      <tbody>
+        {% regroup table by organization as schools %}
+        {% for school in schools %}
+          <tr class="school_row"><td colspan=6>{{ school.grouper }}</td></tr>
+          {% for team in school.list %}
+            <tr class="team_row">
+              <td class="indent"></td>
+              <td class="team_name">{{ team.name }}</td>
+              <td class="test">
+                <a href="{% url 'regtest_team' pass_code=team.pass_code %}">Reg</a>
+              </td>
+              <td class="test">
+                <a href="{% url 'navtest_team' team.pass_code team.points.0.0 team.points.0.1 team.points.1.0 team.points.1.1 team.points.2.0 team.points.2.1 team.points.3.0 team.points.3.1 team.organization %}">Nav</a>
+              </td>
+              <td class="test"><a href="{{ dock_test_host }}/dock">Dock</a></td>
+              <td class="test"><a href="{% url 'returntest_team' pass_code=team.pass_code %}">Return</a></td>
+            </tr>
+          {% endfor %}
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <br />
+    <br />
+    
+    <h4><a name="test_descriptions">Test Descriptions</a></h4>
+    <table class="desc_table">
+      <!--
+      <thead>
+        <tr>
+          <th>Test</th><th>Description</th>
+        </tr>
+      </thead>
+      -->
+      <tbody>
+        <tr>
+          <td class="test_name">Reg</td>
+          <td class="test_desc">
+            <span>Selecting this link will generate QR codes that you can use to Register and Unregister
+            your BRATA device.  You will need to register your device for the competition on Competition Day.
+            </span>
+          </td>
+        </tr>
+        <tr class="space_row"><td colspan=2></td></tr>
+        <tr>
+        <td class="test_name">Nav</td>
+        <td class="test_desc">
+          <span>Selecting this link will display a map showing specific locations at your school.
+          Use your BRATA to navigate to the coordinates that are given.  Then select the color
+          of the marker at those coordinates to verify that your navigation is accurate.
+          </span>
+        </td>
+        </tr>
+        <tr class="space_row"><td colspan=2></td></tr>
+        <tr>
+        <td class="test_name">Dock</td>
+        <td class="test_desc">
+          <span>Selecting this link will display a Docking computer simulation parameter entry form.
+          Use this form to enter specific docking flight parameters.  The simulation will evaluate
+          your parameters and tell you the results of your docking maneuver.
+          </span>
+        </td>
+        </tr>
+        <tr class="space_row"><td colspan=2></td></tr>
+        <tr>
+        <td class="test_name">Return</td>
+        <td class="test_desc">
+          <span>Selecting this link will display a form that allows you to enter the Return parameter values
+          that you compute from the angles measured on the HSDC wooden prop, then submit them to see
+          whether your measurements and computations were correct.
+          </span>
+        </td>
+        </tr>
+        <tr class="space_row"><td colspan=2></td></tr>
+      </tbody>
     </table>
 
 {% endblock %}

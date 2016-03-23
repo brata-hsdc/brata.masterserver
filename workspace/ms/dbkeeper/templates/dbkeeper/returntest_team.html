@@ -1,0 +1,109 @@
+{% extends "dbkeeper/student_test_base.html" %}
+
+{% block title  %}{{ entity|title }}{% endblock %}
+{% block header %}{{ entity|title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+html, body {
+  height: 100%;
+}
+#map {
+  width: 80%;
+  height: 80%;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+#quiz {
+  text-align: center;
+  font-size: 24pt;
+  max-width: 30em;
+}
+#table {
+  margin-left: auto;
+  margin-right: auto;
+  display: table;
+  font-size: 24pt;
+}
+input {
+  font-size: 24pt;
+}
+.answer_button {
+  font-size: 24pt;
+}
+.numfield input {
+  width: 2em;
+}
+tr.inputRow td {
+  text-align: right;
+  padding-right: 1em;
+}
+tr.checkRow td {
+  text-align: center;
+  font-size: 14pt;
+  padding-top: 2em;
+}
+.submitRow td {
+  text-align: center;
+}
+.answerRow td {
+  text-align: center;
+  font-size: 32pt;
+  font-weight: bold;
+  padding: 1em;
+  color: green;
+}
+.invalid input {
+  color: red;
+}
+div.table {
+  text-align: center;
+}
+@media only screen and (min-device-width : 768px) {
+
+}
+</style>
+{% endblock %}
+
+{% block main %}
+  <div id="table">
+  <div id="quiz">
+    <h4>Return Challenge for {{ form.school.value }}</h4>
+    <p>Enter the 6 guidance computer parameters in the fields below:</p>
+  </div>
+  <div>
+    <form action="/dbkeeper/returntest_team/{{ pass_code }}/" method="post">
+      {% csrf_token %}
+      {# Include the hidden fields #}
+      {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+      {% endfor %}
+      {# Include the visible fields #}
+      <table style="margin-left: auto; margin-right: auto;" >
+        <tbody>
+          <tr class="inputRow">
+            <td class="numfield {% if form.value1.errors %}invalid{% endif %}">{{ form.value1.label_tag }}{{ form.value1 }}</td>
+            <td class="numfield {% if form.value2.errors %}invalid{% endif %}">{{ form.value2.label_tag }}{{ form.value2 }}</td>
+            <td class="numfield {% if form.value3.errors %}invalid{% endif %}">{{ form.value3.label_tag }}{{ form.value3 }}</td>
+          </tr>
+          <tr class="inputRow">
+            <td class="numfield {% if form.value4.errors %}invalid{% endif %}">{{ form.value4.label_tag }}{{ form.value4 }}</td>
+            <td class="numfield {% if form.value5.errors %}invalid{% endif %}">{{ form.value5.label_tag }}{{ form.value5 }}</td>
+            <td class="numfield {% if form.value6.errors %}invalid{% endif %}">{{ form.value6.label_tag }}{{ form.value6 }}</td>
+          </tr>
+          <tr class="checkRow">
+            <td colspan="6">{{ form.reverse.label_tag }}{{ form.reverse }}</td>
+          </tr>
+          <tr class="submitRow">
+            <td colspan="6"><input type="submit" value="{{ submit }}" /></td>
+          </tr>
+          <tr class="answerRow">
+            <td {% if answer != "Correct!" %}style="color: red;"{% endif %} colspan="6">{{ answer }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+    </div>
+  </div>
+{% endblock %}

@@ -15,17 +15,28 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+import django.views.static
+from django.contrib.auth import views as auth_views
+from .settings import STATIC_ROOT
 
 from piservice import urls as piservice_urls
 from dbkeeper import urls as dbkeeper_urls
 from scoreboard import urls as scoreboard_urls
 
 urlpatterns = [
+    # Authentication
+    url(r'^hsdc/login/$', auth_views.login, {'template_name': 'dbkeeper/login.html'}, name='login'),
+    
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^piservice/', include(piservice_urls)),
     url(r'^serve_pi/', include(piservice_urls)),  # appetizing alias for piservice
     url(r'^m/', include(piservice_urls)),  # alias for 2015 backward compatibility
+    url(r'^piservice/', include(piservice_urls)),
     url(r'^dbkeeper/', include(dbkeeper_urls)),
     url(r'^hsdc/', include(dbkeeper_urls)), # alias for dbkeeper for student test pages
     url(r'^scoreboard/', include(scoreboard_urls)),
+    url(r'^$', include(dbkeeper_urls)),
+    
+    # Have Django serve up the static files for Gunicorn
+    # If we don't do this we need to serve them with Nginx
+    url(r'^static/(?P<path>.*)$', django.views.static.serve, {'document_root': STATIC_ROOT, 'show_indexes':True}),
 ]

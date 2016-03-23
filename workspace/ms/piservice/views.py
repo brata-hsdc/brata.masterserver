@@ -1,6 +1,7 @@
 from django.shortcuts import render, Http404, HttpResponse, HttpResponseRedirect
 from django.views.generic import View
 from django.utils import timezone
+from django.utils.http import urlquote
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
 
 import json
@@ -11,6 +12,7 @@ from dbkeeper.models import Team, Setting
 from dbkeeper.team_code import TeamPassCode
 
 from datetime import timedelta, datetime
+import time
 
 import requests
 
@@ -320,7 +322,7 @@ class JSONHandlerView(View):
             # sort by time should provide the oldest first
             # How do we know they didn't need to restart this one because of a dead phone?
             # Doesn't matter because they still only get a total of 3 chances
-            submitRequests = PiEvent.objects.filter(status=PiEvent.INFO_STATUS, type=PiEvent.SUBMIT_MSG_TYPE, team=team, pi=station).order_by('time')
+            submitRequests = PiEvent.objects.filter(status=PiEvent.INFO_STATUS, type=PiEvent.STATION_SUBMIT_MSG_TYPE, team=team, pi=station).order_by('time')
             if not submitRequests.exists():
                 self.jsonResponse["message"] = cipher("No simulation started at this station or simulation not complete.")
                 return None, None, None, None, HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
@@ -358,9 +360,19 @@ class JSONHandlerView(View):
             self.jsonResponse["message"] = cipher(message)
             return None, None, None, None, HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
+    def getDateTime(self):
+         return datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
+
 #----------------------------------------------------------------------------
-class libraryTest(View):
-    """ Display the QR Code test page. """
+class LibraryTest(View):
+    """ Display the QR Code test page.
+    
+    Lets the user first choose a station and hit submit.
+    Returns a page containing QR codes specific to running the
+    challenge on the chosen station.
+    """
+    MS_BASE_URL = "http://localhost"
+    QR_SERVICE_REQUEST_URL = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="
     context = {
                "form": None,
                "all_stations_table":   None,
@@ -371,77 +383,55 @@ class libraryTest(View):
               }
 
     def get(self, request):
-        self.context["selected_id"] = None
+        """ Create and return a blank form. """
         self.context["form"] = AddLibraryTestForm()
-        stations = PiStation.objects.all().order_by("station_id")
-        stable = []
-        for station in stations:
-            entry = {}
-            entry["station_id"] = station.station_id
-            stable.append(entry)
-            self.context["all_station_table"] = stable
         return render(request, "piservice/libraryTest.html", self.context)
 
     def post(self, request):
-        serverIP = "97.102.189.170"
-        self.context["server_ip"] = serverIP
-        self.context["selected_id"] = None
-        self.context["form"] = AddLibraryTestForm(request.POST)
-        form = self.context["form"]
-        stations = PiStation.objects.all().order_by("station_id")
-        stable = []
-        for station in stations:
-            entry = {}
-            entry["station_id"] = station.station_id
-            stable.append(entry)
-            self.context["all_station_table"] = stable
+        """ Create QR codes that can be used to run the requested station.
+        
+        First, construct the URLs that the Brata will need to send to the
+        MS.  Then create requests to the QR service to get the QR code
+        graphic for each URL.  Then insert them into the web page template
+        for display.
+        """
+        form = AddLibraryTestForm(request.POST)
+        self.context["form"] = form
         if form.is_valid():
-            station = form.cleaned_data["station"]
-            #self.context["selected_id"] = id
-            #if PiStation.objects.filter(station_id=id).count() > 0:
-            table = []
-            #    for station in stations:
-            entry = {}
-            entry["station_id"] = station.station_id
-            table.append(entry)
-            self.context["station_table"] = table
-            utable = []
-            entry = {}
-            base = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F"
-            entry["url"] = "{}{}%3A80%2Fpiservice%2Fstart_challenge%2F".format(base, serverIP)
-            entry["label"] = "Arrive"
-            utable.append(entry)
-            if station.station_type == PiStation.DOCK_STATION_TYPE:
-                entry2 = {}
-                entry2["url"] = "{}{}%3A80%2Fpiservice%2Fdock%2F".format(base, serverIP)
-                entry2["label"] = "Dock"
-                utable.append(entry2)
-                entry3 = {}
-                entry3["url"] = "{}{}%3A80%2Fpiservice%2Flatch%2F".format(base, serverIP)
-                entry3["label"] = "Latch"
-                utable.append(entry3)
-                self.context["url_table"] = utable
-                return render(request, "piservice/station.html", self.context)
-            if station.station_type == PiStation.SECURE_STATION_TYPE:
-                entry2 = {}
-                entry2["url"] = "{}{}%3A80%2Fpiservice%2Fopen%2F".format(base, serverIP)
-                entry2["label"] = "Open"
-                utable.append(entry2)
-                entry3 = {}
-                entry3["url"] = "{}{}%3A80%2Fpiservice%2Fsecure%2F".format(base, serverIP)
-                entry3["label"] = "Secure"
-                utable.append(entry3)
-                self.context["url_table"] = utable
-                return render(request, "piservice/station.html", self.context)
-            if station.station_type == PiStation.RETURN_STATION_TYPE:
-                entry2 = {}
-                entry2["url"] = "{}{}%3A80%2Fpiservice%2Freturn%2F".format(base, serverIP)
-                entry2["label"] = "Return"
-                utable.append(entry2)
-                self.context["url_table"] = utable
-                return render(request, "piservice/station.html", self.context)
-        return render(request, "piservice/libraryTest.html", self.context)
-     
+            stations = form.cleaned_data["stations"]
+
+            # Get the MS server external URL
+            msUrl = Setting.get("MS_EXTERNAL_HOST_ADDRESS", default=self.MS_BASE_URL) + "/piservice"
+            
+            # Create a table with one row of URLs for each station.
+            self.context["station_table"] = []
+            for station in stations:
+                # Create an arrival QR code for every station_type
+                stationRow = {"station_id": station.station_id,
+                              "urls": [self.qr("Arrive", "start_challenge", station.station_id, msUrl)]
+                             }
+                
+                # Create additional codes based on the station_type
+                if station.station_type == PiStation.DOCK_STATION_TYPE:
+                    stationRow["urls"].append(self.qr("Dock", "dock", station.station_id, msUrl))
+                    stationRow["urls"].append(self.qr("Latch", "latch", station.station_id, msUrl))
+                elif station.station_type == PiStation.SECURE_STATION_TYPE:
+                    stationRow["urls"].append(self.qr("Open", "open", station.station_id, msUrl))
+                    stationRow["urls"].append(self.qr("Secure", "secure", station.station_id, msUrl))
+                elif station.station_type == PiStation.RETURN_STATION_TYPE:
+                    stationRow["urls"].append(self.qr("Return", "return", station.station_id, msUrl))
+                    
+                self.context["station_table"].append(stationRow)
+
+            return render(request, "piservice/station.html", self.context)
+        else:
+            return render(request, "piservice/libraryTest.html", self.context)
+    
+    def qr(self, label, path, stationId, baseUrl):
+        """ Build the QR service request URL """
+        url = self.QR_SERVICE_REQUEST_URL + urlquote("{}/{}/{}/".format(baseUrl, path, stationId))
+        return {"label": label, "url": url }
+    
 #----------------------------------------------------------------------------
 class Register(JSONHandlerView):
     """ A class-based view to handle a BRATA Register message.
@@ -907,9 +897,10 @@ class AtWaypoint(JSONHandlerView):
             return response
         
         # TODO:  Add message processing
-        
-        # Succeeded:  Record the transaction and update the station record
-        event = self.addEvent(data=request.body,
+        # SUBMIT_MSG_TYPE is used for success for failure tracking for scoring
+        event = PiEvent.addEvent(type=PiEvent.SUBMIT_MSG_TYPE,
+                              team=team,        
+                              data=request.body,
                               status=PiEvent.SUCCESS_STATUS,
                               message="AtWaypoint ({}, {}) msg received from {}".format(lat, lon, m.reg_code),
                              )
@@ -975,7 +966,7 @@ class StartChallenge(JSONHandlerView):
         elif station.station_type == "Dock":
             jsonData = json.dumps({
                  "message_version": "0",
-                 "message_timestamp": "2014-09-15 14:08:59",
+                 "message_timestamp": self.getDateTime(),
                  "team_name": team.name,
                })
             # Get random parameters
@@ -1004,7 +995,7 @@ class StartChallenge(JSONHandlerView):
             lock, tone = Setting.getSecureParams()
             jsonData = json.dumps({
                  "message_version": "0",
-                 "message_timestamp": "2014-09-15 14:08:59",
+                 "message_timestamp": self.getDateTime(),
                  "secure_tone_pattern": tone,
                    })
             startData = json.dumps({
@@ -1014,15 +1005,16 @@ class StartChallenge(JSONHandlerView):
         elif station.station_type == "Return":
             # Get parameters for this particular station
             params = Setting.getReturnParams(station_id=station.station_id)
-            if params is None:
+            if not (params is None):
               jsonData = json.dumps({
                  "message_version": "0",
-                 "message_timestamp": "2014-09-15 14:08:59",
+                 "message_timestamp": self.getDateTime(),
                  "return_guidance_pattern": [params[0], params[1], params[2], params[3], params[4], params[5]],
                    })
               startData = jsonData
               message="Measure return angle, determine guidance computer parameters, then enter them into the guidance computer. Scan Return QR Code when done."
             else:
+              shouldCallStation = False
               status = PiEvent.WARNING_STATUS
               startData = ""
               message="Invalid StationID {}. Contact a competition official.".format(station.station_id)
@@ -1260,7 +1252,9 @@ class Latch(JSONHandlerView):
            })
         data = jsonTime
         
-        event = self.addEvent(team=team,
+        # SUBMIT_MSG_TYPE is used for success for failure tracking for scoring
+        event = PiEvent.addEvent(type=PiEvent.SUBMIT_MSG_TYPE,
+                              team=team,
                               pi=station,
                               data=data,
                               status=status,
@@ -1293,7 +1287,7 @@ class Latch(JSONHandlerView):
             headers = { "Content-type": "application/json", "Accept": "application.json" }
 	    jsonData = json.dumps({
                  "message_version": "0",
-                 "message_timestamp": "2014-09-15 14:08:59",
+                 "message_timestamp": self.getDateTime(),
                  "team_name": team.name,
                })
 
@@ -1372,7 +1366,7 @@ class Open(JSONHandlerView):
         headers = { "Content-type": "application/json", "Accept": "application.json" }
         data = json.dumps({
                  "message_version": "0",
-                 "message_timestamp": "2014-09-15 14:08:59",
+                 "message_timestamp": self.getDateTime(),
                  "secure_pulse_pattern": lock,
                  "secure_max_pulse_width": "100",
                  "secure_max_gap": "10",
@@ -1424,8 +1418,6 @@ class Secure(JSONHandlerView):
         m,response = self.validateJSONFields(request, ("reg_code","message",))
         if m is None:
             return response
-        
-        # TODO:  Add message processing
 
         team, response = self.getTeamFromRegCode(m.reg_code, request.body)
         if team is None:
@@ -1453,11 +1445,22 @@ class Secure(JSONHandlerView):
                 url = "{}/start_challenge".format(station.url)
                 headers = { "Content-type": "application/json", "Accept": "application.json" }
                 # Go back to generating tones they had before by extracting from their previous start_challenge params
+                try:
+                    startRequests = PiEvent.objects.filter(type=PiEvent.START_CHALLENGE_MSG_TYPE, pi=station, team=team).order_by('-time')[:1]
+                except:
+                    message = "No start found at this station"
+                    # TODO handle error
+                data = json.loads(startRequests[0].data)
+                if data is None:
+                    # TODO make error message
+                    return response
+
+                tone = data["tone"]
                 # TODO
                 data = json.dumps({
                     "message_version": "0",
-                    "message_timestamp": "2014-09-15 14:08:59",
-                    "secure_tone_pattern": [0, 1, 2, 3, 4, 5, 6, 7, 4],
+                    "message_timestamp": self.getDateTime(),
+                    "secure_tone_pattern": tone,
                    })
                 response = requests.post(url, data=data, headers=headers)
                 if response.status_code != 200:
@@ -1465,8 +1468,9 @@ class Secure(JSONHandlerView):
             else:
                 message = "Failed! Go to the next Challenge!"
 
-        # Store the right event to the DB
-        event = self.addEvent(team=team,
+        # SUBMIT_MSG_TYPE is used for success for failure tracking for scoring
+        event = PiEvent.addEvent(type=PiEvent.SUBMIT_MSG_TYPE,
+                              team=team,
                               pi=station,
                               data=request.body,
                               status=status,
@@ -1521,11 +1525,11 @@ class ReturnToEarth(JSONHandlerView):
         if m is None:
             return response
 
-        team, response = self.getTeamFromRegCode(self, m.reg_code, request.body)
+        team, response = self.getTeamFromRegCode(m.reg_code, request.body)
         if team is None:
            return response
 
-        station, response = self.getStationFromStationId(self, station_id, request.body)
+        station, response = self.getStationFromStationId(station_id, request.body)
         if station is None:
             return response
 
@@ -1549,8 +1553,9 @@ class ReturnToEarth(JSONHandlerView):
                 status=PiEvent.FAIL_STATUS
                 message = "Failed! Too bad but all done."
 
-        # Store the event to the DB for score keeping
-        event = self.addEvent(team=team,
+        # SUBMIT_MSG_TYPE is used for success for failure tracking for scoring
+        event = PiEvent.addEvent(type=PiEvent.SUBMIT_MSG_TYPE,
+                              team=team,
                               pi=station,
                               data=request.body,
                               status=status,
@@ -1564,7 +1569,7 @@ class ReturnToEarth(JSONHandlerView):
             if params is None:
               jsonData = json.dumps({
                  "message_version": "0",
-                 "message_timestamp": "2014-09-15 14:08:59",
+                 "message_timestamp": self.getDateTime(),
                  "return_guidance_pattern": [params[0], params[1], params[2], params[3], params[4], params[5]],
                    })
               startData = jsonData
@@ -1623,7 +1628,7 @@ class Submit(JSONHandlerView):
         }
     """
     def __init__(self):
-        super(Submit, self).__init__(PiEvent.SUBMIT_MSG_TYPE, methods=[self.POST])
+        super(Submit, self).__init__(PiEvent.STATION_SUBMIT_MSG_TYPE, methods=[self.POST])
     
     def post(self, request, *args, **kwargs):
         """ Handle the POST message and update the database """
@@ -1908,7 +1913,7 @@ class Submit_2015(JSONHandlerView):
 class QRCode(JSONHandlerView):
     def get(self, request, *args, **kwargs):
         """ Handle a GET message """
-        # note this tries to figure out the data automagiclaly
+        # note this tries to figure out the data automagically
         # so provide a URL and will set the qrcode type to URL if just text you get text
         strToEncode = request.GET.get('chl', '')
         # version 1 is the smallest possible goes up to 40

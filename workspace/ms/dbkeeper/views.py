@@ -2,10 +2,14 @@ from django.shortcuts import render, HttpResponseRedirect, HttpResponse, Http404
 from django.views.generic import View
 from django.contrib.auth.models import User
 from django.template import RequestContext
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.core.urlresolvers import reverse
 
 from .forms import AddOrganizationForm, AddUserForm, AddTeamForm, CheckInTeamForm,\
                    AddLaunchParamsForm, AddDockParamsForm, AddSecureParamsForm, AddReturnParamsForm,\
-                   LoadSettingsForm, CompetitionStartForm, CompetitionEndForm, LogMessageForm
+                   LoadSettingsForm, CompetitionStartForm, CompetitionEndForm, LogMessageForm,\
+                   ReturnTestForm
 from .models import Organization, MSUser, Team, Setting
 from piservice.models import PiEvent
 from .team_code import TeamPassCode
@@ -13,10 +17,16 @@ from .team_code import TeamPassCode
 import json
 import random
 import csv
+import operator
 from datetime import date as Date
 from cStringIO import StringIO
 
-# Create your views here.
+
+#-------------------------
+# Useful helper functions
+#-------------------------
+
+#----------------------------------------------------------------------------
 def tryAgain(request, msg=None, url=None, buttonText=None,
              title=None):
     """ Helper function that provides a simple "Try Again"
@@ -35,8 +45,24 @@ def tryAgain(request, msg=None, url=None, buttonText=None,
                "button_text": buttonText,
                "title": title}
     return render(request, "dbkeeper/try_again.html", context)
-    
+
 #----------------------------------------------------------------------------
+def schoolNameFromPassCode(pass_code):
+    """ Given a team pass_code, return the school name.
+    
+        Returns:  the school name, or None if not found.
+    """
+    try:
+        return Team.objects.get(pass_code=pass_code).organization.name
+    except Team.DoesNotExist:
+        return None
+
+#-------------------------
+# Create your views here.
+#-------------------------
+
+#----------------------------------------------------------------------------
+@login_required
 def index(request):
     """ Display the dbkeeper home page. """
     return render(request, "dbkeeper/index.html")
@@ -52,19 +78,20 @@ class regtest(View):
               }
     
     def get(self, request):
-        teams = Team.objects.all().order_by("organization","name")
+        teams = Team.objects.all().order_by("organization__name","name")
         #self.context["table"] = teams
         
         # Join the teams with the launch test points for each school
         launchTestPoints = json.loads(Setting.objects.get(name="LAUNCH_TEST_DATA").value)
         table = []    
         for team in teams:
-            entry = {}
-            entry["organization"] = team.organization.name  # school name
-            entry["name"] = team.name  # team name
-            entry["pass_code"] = team.pass_code
-            entry["points"] = launchTestPoints[team.organization.name]
-            table.append(entry)
+            if team.organization.name in launchTestPoints:
+                entry = {}
+                entry["organization"] = team.organization.name  # school name
+                entry["name"] = team.name  # team name
+                entry["pass_code"] = team.pass_code
+                entry["points"] = launchTestPoints[team.organization.name]
+                table.append(entry)
         self.context["table"] = table
         
         # Get the URL of the DOCK_TEST_HOST
@@ -79,6 +106,10 @@ class regtest_team(View):
               }
     
     def get(self, request, pass_code):
+        self.context["host"] = request.get_host()
+        self.context["register_url"] = reverse("register", kwargs={"team_passcode": pass_code}, current_app=request.resolver_match.app_name)
+        self.context["unregister_url"] = reverse("unregister", current_app=request.resolver_match.app_name)
+        self.context["reset_url"] = reverse("reset", kwargs={"team_passcode": pass_code}, current_app=request.resolver_match.app_name)
         self.context["pass_code"] = pass_code
         return render(request, "dbkeeper/regtest_team.html", self.context)
 
@@ -114,6 +145,65 @@ class NavTestTeam(View):
         return render(request, "dbkeeper/navtest_team.html", self.context)
 
 #----------------------------------------------------------------------------
+class ReturnTestTeam(View):
+    """ Display a page to collect return parameters. """
+    context = {
+               "entity":    "Return Test",
+               "form":      None,
+               "pass_code": None,
+               "submit":    "Submit",
+               "answer":    "",
+               "school":    "<unknown school>",
+               "no_sidebarLeft": True,
+               "no_mainRight": True,
+              }
+    
+    def get(self, request, pass_code):
+        self.context["form"] = ReturnTestForm(label_suffix="")
+        self.context["pass_code"] = pass_code
+        
+        schoolName = schoolNameFromPassCode(pass_code)
+        if schoolName is None:
+            return tryAgain(request, msg="Invalid team passcode: {}".format(pass_code), title="Invalid Passcode")
+        else:
+            self.context["school"] = schoolName
+            
+        jparams = Setting.objects.get(name="RETURN_TEST_DATA").value
+        params = json.loads(jparams)
+        
+        # Squirrel away values in hidden fields so we can get them back in POST
+        self.context["form"].fields["params"].initial = json.dumps(params[schoolName])
+        self.context["form"].fields["school"].initial = schoolName
+        return render(request, "dbkeeper/returntest_team.html", self.context)
+    
+    def post(self, request, pass_code):
+        form = ReturnTestForm(request.POST, label_suffix="")
+        self.context["form"] = form
+        self.context["pass_code"] = pass_code
+
+        if form.is_valid():
+            values = [ form.cleaned_data["value1"],
+                       form.cleaned_data["value2"],
+                       form.cleaned_data["value3"],
+                       form.cleaned_data["value4"],
+                       form.cleaned_data["value5"],
+                       form.cleaned_data["value6"],
+                     ]
+            reverse = form.cleaned_data["reverse"]
+            params = json.loads(form.cleaned_data["params"])[1 if reverse else 0]
+
+            match = reduce(operator.__and__, [a==b for a,b in zip(values, params)])
+            if match:
+                self.context["answer"] = "Correct!"
+            else:
+                self.context["answer"] = "Incorrect"
+        else:
+            self.context["answer"] = "Each value must be exactly 2 decimal digits"
+        return render(request, "dbkeeper/returntest_team.html", self.context)
+        
+
+#----------------------------------------------------------------------------
+@login_required
 def station_status(request):
     """ Home page view for piservice.  Since this is a service, we could
         return 404, or we could put up a helpful page with some options.
@@ -130,10 +220,12 @@ class AddOrganization(View):
                "submit": "Add",
               }
     
+    @method_decorator(login_required)
     def get(self, request):
         self.context["form"] = AddOrganizationForm()
         return render(request, "dbkeeper/add.html", self.context)
     
+    @method_decorator(login_required)
     def post(self, request):
         self.context["form"] = AddOrganizationForm(request.POST)
         form = self.context["form"]
@@ -172,11 +264,13 @@ class AddUser(View):
                "submit": "Add",
               }
     
+    @method_decorator(login_required)
     def get(self, request):
         """ Handle an add/user GET request (URL coming from another page) """
         self.context["form"] = AddUserForm()
         return render(request, "dbkeeper/add.html", self.context)
     
+    @method_decorator(login_required)
     def post(self, request):
         """ Handle an add/user POST request (form submit or resubmit) """
         self.context["form"] = AddUserForm(request.POST)
@@ -231,10 +325,12 @@ class AddTeam(View):
                "submit": "Add",
               }
     
+    @method_decorator(login_required)
     def get(self, request):
         self.context["form"] = AddTeamForm()
         return render(request, "dbkeeper/add.html", self.context)
     
+    @method_decorator(login_required)
     def post(self, request):
         self.context["form"] = AddTeamForm(request.POST)
         form = self.context["form"]
@@ -284,11 +380,13 @@ class CheckInTeam(View):
                "submit": "Add",
               }
     
+    @method_decorator(login_required)
     def get(self, request):
         """ Handle an add/user GET request (URL coming from another page) """
         self.context["form"] = CheckInTeamForm()
         return render(request, "dbkeeper/check_in.html", self.context)
         
+    @method_decorator(login_required)
     def post(self, request):
         """ Handle an add/user POST request (form submit or resubmit) """
         self.context["form"] = CheckInTeamForm(request.POST)
@@ -333,6 +431,7 @@ class AddLaunchParams(View):
                "submit": "Done",
               }
     
+    @method_decorator(login_required)
     def get(self, request):
         """ Display the Add form with the AddLaunchParams fields """
         try:
@@ -356,6 +455,7 @@ class AddLaunchParams(View):
 
         return render(request, "dbkeeper/add_launch_params.html", self.context)
     
+    @method_decorator(login_required)
     def post(self, request):
         self.context["form"] = AddLaunchParamsForm(request.POST)
         form = self.context["form"]
@@ -397,6 +497,7 @@ class AddDockParams(View):
                "submit": "Done",
               }
     
+    @method_decorator(login_required)
     def get(self, request):
         """ Display the Add form with the AddDockParams fields """
 #         self.context["form"] = AddDockParamsForm()
@@ -418,6 +519,7 @@ class AddDockParams(View):
         self.context["form"] = form
         return render(request, "dbkeeper/add_dock_params.html", self.context)
     
+    @method_decorator(login_required)
     def post(self, request):
         form = AddDockParamsForm()
         form.setFixedFields()
@@ -450,6 +552,7 @@ class AddSecureParams(View):
                "submit": "Done",
               }
     
+    @method_decorator(login_required)
     def get(self, request):
         """ Display the Add form with the AddSecureParams fields """
         form = AddSecureParamsForm()
@@ -462,6 +565,7 @@ class AddSecureParams(View):
         self.context["form"] = form
         return render(request, "dbkeeper/add_secure_params.html", self.context)
     
+    @method_decorator(login_required)
     def post(self, request):
         form = AddSecureParamsForm(request.POST)
         #form.setFixedFields()
@@ -493,6 +597,7 @@ class AddReturnParams(View):
                "submit": "Done",
               }
     
+    @method_decorator(login_required)
     def get(self, request):
         """ Display the add_return_params form.
         
@@ -516,6 +621,7 @@ class AddReturnParams(View):
             self.context["form"] = AddReturnParamsForm()
         return render(request, "dbkeeper/add_return_params.html", self.context)
     
+    @method_decorator(login_required)
     def post(self, request):
         self.context["form"] = AddReturnParamsForm(request.POST)
         form = self.context["form"]
@@ -538,11 +644,13 @@ class AddReturnParams(View):
         return render(request, "dbkeeper/add_return_params.html", self.context)
 
 #----------------------------------------------------------------------------
+@login_required
 def SaveSettings(request):
     """ Display the save_settings page. """
     return render(request, "dbkeeper/save_settings.html")
 
 #----------------------------------------------------------------------------
+@login_required
 def SaveSettingsConfirmed(request):
     """ Send back the CSV file """
     # Create a response object to send back the data
@@ -566,12 +674,14 @@ class LoadSettings(View):
                "submit": "Upload CSV",
               }
 
+    @method_decorator(login_required)
     def get(self, request):
         """ Display the form """
         self.context["form"] = LoadSettingsForm()
         self.context["upload"] = True
         return render(request, "dbkeeper/load_settings.html", self.context)
     
+    @method_decorator(login_required)
     def post(self, request):
         if hasattr(request, "FILES") and "loadFile" in request.FILES:
             form = LoadSettingsForm(request.POST, request.FILES)
@@ -650,11 +760,13 @@ class CompetitionStart(View):
                "submit": "Let the Games Begin!",
               }
 
+    @method_decorator(login_required)
     def get(self, request):
         """ Display the form """
         self.context["form"] = CompetitionStartForm()
         return render(request, "dbkeeper/competition_start.html", self.context)
     
+    @method_decorator(login_required)
     def post(self, request):
         form = CompetitionStartForm(request.POST)
         if form.is_valid():
@@ -692,11 +804,13 @@ class CompetitionEnd(View):
                "submit": "The Games are Concluded!",
               }
 
+    @method_decorator(login_required)
     def get(self, request):
         """ Display the form """
         self.context["form"] = CompetitionEndForm()
         return render(request, "dbkeeper/competition_end.html", self.context)
     
+    @method_decorator(login_required)
     def post(self, request):
         form = CompetitionEndForm(request.POST)
         if form.is_valid():
@@ -716,11 +830,13 @@ class LogMessage(View):
                "submit": "Insert Message",
               }
 
+    @method_decorator(login_required)
     def get(self, request):
         """ Display the form """
         self.context["form"] = LogMessageForm()
         return render(request, "dbkeeper/log_msg.html", self.context)
     
+    @method_decorator(login_required)
     def post(self, request):
         form = LogMessageForm(request.POST)
         if form.is_valid():
