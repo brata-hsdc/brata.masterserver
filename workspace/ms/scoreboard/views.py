@@ -96,7 +96,7 @@ def _computeRunningTimeDelta(submit_message):
     # Time watching the animation
     watching_time_s = min(flying_time_s, dock_sim_playback_time_s)
 
-    return flying_time_s - watching_time_s
+    return float(flying_time_s) - float(watching_time_s)
 
 
 #---------------------------------------------------------------------------
