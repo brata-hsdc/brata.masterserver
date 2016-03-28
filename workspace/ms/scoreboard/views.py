@@ -82,10 +82,10 @@ def _computeLaunch(team_name,
 
 #---------------------------------------------------------------------------
 def _computeRunningTimeDelta(submit_message):
-    dock_sim_playback_time_s = ScoreboardStatus.getSetting('DOCK_SIM_PLAYBACK_TIME_S', -6000)
-    dnf_time_penalty_factor = ScoreboardStatus.getSetting('DNF_TIME_PENALTY_FACTOR', -8000)
-    actual_time_s = _getDataField(submit_message, 'candidate_answer')
-    fail_message = _getDataField(submit_message, 'fail_message')
+    dock_sim_playback_time_s = float(ScoreboardStatus.getSetting('DOCK_SIM_PLAYBACK_TIME_S', -6000))
+    dnf_time_penalty_factor = float(ScoreboardStatus.getSetting('DNF_TIME_PENALTY_FACTOR', -8000))
+    actual_time_s = float(_getDataField(submit_message, 'candidate_answer'))
+    fail_message = float(_getDataField(submit_message, 'fail_message'))
 
     # Time charged for the actual docking flight maneuver
     if fail_message == "OUTCOME_DNF":
