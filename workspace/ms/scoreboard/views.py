@@ -423,7 +423,7 @@ def _recomputeTeamScore(team_name):
 
 #---------------------------------------------------------------------------
 def _trace(message):
-    if True:
+    if False:
         logging.debug(message)
 
 
