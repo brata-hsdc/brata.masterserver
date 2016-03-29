@@ -39,7 +39,7 @@ def _computeDock(team_name,
 
         params['score'] = 9
         params['time_to_exit'] = True
-        params['end_time'] = latch_event_timestamp + params['total_run_time_delta_s']
+        params['end_time'] = latch_event_timestamp + timedelta(0, float(params['total_run_time_delta_s']))
 
     elif num_fail_events > 0:
         if params['submit_events'].count() > max_submit_events:
