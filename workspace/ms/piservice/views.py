@@ -1247,8 +1247,10 @@ class Latch(JSONHandlerView):
 
         # figure out if actual docking time requires penalty
         # TODO change the reported time in data            
+        failMessage = json.loads(lastAttemptData)["fail_message"]
 	jsonTime = json.dumps({
-             "time": lastAnswer,
+             "candidate_answer": lastAnswer,
+             "fail_message": failMessage,
            })
         data = jsonTime
         
