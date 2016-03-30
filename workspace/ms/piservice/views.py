@@ -1109,7 +1109,10 @@ class Dock(JSONHandlerView):
         except:
             message = "No start found at this station"
             # TODO handle error
-        data = json.loads(startRequests[0].data)
+        try:
+            data = json.loads(startRequests[0].data)
+        except:
+            message = "problem loading start request data"
         if data is None:
             # TODO make error message
             return response
@@ -1568,7 +1571,7 @@ class ReturnToEarth(JSONHandlerView):
         if retry:
             # Get parameters for this particular station
             params = Setting.getReturnParams(station_id=station.station_id)
-            if params is None:
+            if not (params is None):
               jsonData = json.dumps({
                  "message_version": "0",
                  "message_timestamp": self.getDateTime(),
@@ -1648,7 +1651,7 @@ class Submit(JSONHandlerView):
         # figure out which team is at that station based on the last transation for that station
         # TODO
         try:
-            startRequests = PiEvent.objects.filter(type=PiEvent.START_CHALLENGE_MSG_TYPE, pi=station).order_by('time')[:1]
+            startRequests = PiEvent.objects.filter(type=PiEvent.START_CHALLENGE_MSG_TYPE, pi=station).order_by('-time')[:1]
         except:
             message = "No start found at this station"
         team = startRequests[0].team        

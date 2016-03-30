@@ -32,7 +32,7 @@ def _computeDock(team_name,
 
     if num_success_events > 0:
         if params['submit_events'].count() > max_submit_events:
-            logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+            logging.error('[1] More than one SUBMIT events ({}) encountered for attempt #{} by Team {} ({}..{})'.format(max_submit_events, attempt_num, team_name, params['t'], params['u']))
 
         submit_message = params['submit_events'][attempt_num - 1]
         params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
@@ -43,14 +43,18 @@ def _computeDock(team_name,
 
     elif num_fail_events > 0:
         if params['submit_events'].count() > max_submit_events:
-            logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+            numberOfSubmitEvents = params['submit_events'].count()
+            logging.error('[2] More than one ({}) SUBMIT events ({}) encountered for attempt #{} by Team {} ({}..{})'.format(numberOfSubmitEvents, max_submit_events, attempt_num, team_name, params['t'], params['u']))
+            logging.error('[2] More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
 
         params['num_failed_attempts'] += 1
 
-        submit_message = params['submit_events'][attempt_num - 1]
-        params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
+        submit_message = None
+        if not params['submit_events'].exists():
+           submit_message = params['submit_events'][attempt_num - 1]
+           params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
 
-        if params['num_failed_attempts'] > 3:
+        if params['num_failed_attempts'] > 2:
             params['score'] = 5
             params['time_to_exit'] = True
             params['end_time'] = latch_event_timestamp + params['total_run_time_delta_s']
@@ -114,7 +118,7 @@ def _computeSecureOrReturn(team_name,
     if num_success_events > 0:
         _trace("Success event(s) found")
         if params['submit_events'].count() > max_submit_events:
-            logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+            logging.error('[3] More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
 
         params['score'] = 9
         params['time_to_exit'] = True
@@ -122,7 +126,7 @@ def _computeSecureOrReturn(team_name,
 
     elif num_fail_events > 0:
         if params['submit_events'].count() > max_submit_events:
-            logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+            logging.error('[4] More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
 
         params['num_failed_attempts'] += 1
         params['score'] = 5
