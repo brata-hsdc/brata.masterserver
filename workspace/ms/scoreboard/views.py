@@ -19,38 +19,50 @@ def _computeDock(team_name,
                  max_submit_events,
                  params,
                  now):
-    #logging.debug('Entered _computeDock({})'.format(team_name))
+    _trace('Entered _computeDock({})'.format(team_name))
 
     num_success_events = params['success_events'].count()
     num_fail_events = params['fail_events'].count()
 
     if params['latch_events'].count() > 0:
-        latch_event_timestamp = params['latch_events'].reverse()[0].time # timestamp of final LATCH
+        latch_event_timestamp = float(params['latch_events'].reverse()[0].time) # timestamp of final LATCH
     else:
         # team hasn't scanned the LATCH QR code yet 
         latch_event_timestamp = now
 
     if num_success_events > 0:
-        if params['submit_events'].count() > max_submit_events:
-            logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+        # TODO Integration: copy this code to other places to get "x of y" in the log
+        num_submit_events = params['submit_events'].count()
+        if num_submit_events > max_submit_events:
+            logging.error('[1] More than one SUBMIT events ({} of {}) encountered for attempt #{} by Team {} ({}..{})'.format(num_submit_events, max_submit_events, attempt_num, team_name, params['t'], params['u']))
 
         submit_message = params['submit_events'][attempt_num - 1]
         params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
 
         params['score'] = 9
         params['time_to_exit'] = True
-        params['end_time'] = latch_event_timestamp + params['total_run_time_delta_s']
+        params['end_time'] = latch_event_timestamp + timedelta(0, float(params['total_run_time_delta_s']))
 
     elif num_fail_events > 0:
-        if params['submit_events'].count() > max_submit_events:
-            logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+        num_submit_events = params['submit_events'].count()
+        if num_submit_events > max_submit_events:
+            logging.error('[2] More than one SUBMIT events ({} of {}) encountered for attempt #{} by Team {} ({}..{})'.format(num_submit_events, max_submit_events, attempt_num, team_name, params['t'], params['u']))
 
         params['num_failed_attempts'] += 1
 
-        submit_message = params['submit_events'][attempt_num - 1]
-        params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
+        # TODO: Modified during integration
+        # ---- BEFORE
+        #submit_message = params['submit_events'][attempt_num - 1]
+        #params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
+        # ---- NOW
+        submit_message = None
+        if not params['submit_events'].exists():
+           submit_message = params['submit_events'][attempt_num - 1]
+           params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
+        # ---- END
 
-        if params['num_failed_attempts'] > 3:
+        # TODO Integration change below. if params['num_failed_attempts'] > 3:
+        if params['num_failed_attempts'] > 2:
             params['score'] = 5
             params['time_to_exit'] = True
             params['end_time'] = latch_event_timestamp + params['total_run_time_delta_s']
@@ -59,7 +71,7 @@ def _computeDock(team_name,
         logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
     params['end_time'] = params['submit_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
-    #logging.debug('Exiting _computeDock')
+    _trace('Exiting _computeDock')
 
 
 #---------------------------------------------------------------------------
@@ -68,7 +80,7 @@ def _computeLaunch(team_name,
                    max_submit_events,
                    params,
                    now):
-    #logging.debug('Entered _computeLaunch({})'.format(team_name))
+    _trace('Entered _computeLaunch({})'.format(team_name))
 
     if params['submit_events'].count() > max_submit_events:
         logging.error('More than four SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
@@ -77,7 +89,7 @@ def _computeLaunch(team_name,
     params['time_to_exit'] = True
     params['end_time'] = params['submit_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
 
-    #logging.debug('Exiting _computeLaunch')
+    _trace('Exiting _computeLaunch')
 
 
 #---------------------------------------------------------------------------
@@ -106,23 +118,25 @@ def _computeSecureOrReturn(team_name,
                            max_submit_events,
                            params,
                            now):
-    logging.debug('Entered _computeSecureOrReturn({})'.format(team_name))
+    _trace('Entered _computeSecureOrReturn({})'.format(team_name))
 
     num_success_events = params['success_events'].count()
     num_fail_events = params['fail_events'].count()
 
     if num_success_events > 0:
         _trace("Success event(s) found")
-        if params['submit_events'].count() > max_submit_events:
-            logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+        num_submit_events = params['submit_events'].count()
+        if num_submit_events > max_submit_events:
+            logging.error('[3] More than one SUBMIT events ({} of {}) encountered for attempt #{} by Team {} ({}..{})'.format(num_submit_events, max_submit_events, attempt_num, team_name, params['t'], params['u']))
 
         params['score'] = 9
         params['time_to_exit'] = True
         params['end_time'] = params['success_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS
 
     elif num_fail_events > 0:
-        if params['submit_events'].count() > max_submit_events:
-            logging.error('More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+        num_submit_events = params['submit_events'].count()
+        if num_submit_events > max_submit_events:
+            logging.error('[4] More than one SUBMIT events ({} of {}) encountered for attempt #{} by Team {} ({}..{})'.format(num_submit_events, max_submit_events, attempt_num, team_name, params['t'], params['u']))
 
         params['num_failed_attempts'] += 1
         params['score'] = 5
@@ -136,7 +150,7 @@ def _computeSecureOrReturn(team_name,
     else:
         logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
-    logging.debug('Exiting _computeSecureOrReturn: score = {}'.format(params['score']))
+    _trace('Exiting _computeSecureOrReturn: score = {}'.format(params['score']))
 
 
 #---------------------------------------------------------------------------
@@ -243,19 +257,19 @@ def _getNextEventTimestamp(attempt_num,
                            start_challenge_events,
                            team_events):
     if attempt_num < start_challenge_events.count():
-        logging.debug('More attempts for team follow')
+        _trace_trace('More attempts for team follow')
         result = start_challenge_events[attempt_num].time # timestamp of following event
     else:
-        logging.debug('Either no more attempts for team or event concluded')
+        _trace('Either no more attempts for team or event concluded')
         game_over_events = PiEvent.objects.filter(
             type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
         ).order_by('time')
 
         if game_over_events.count() > 0:
-            logging.debug('Detected game over - event concluded')
+            _trace('Detected game over - event concluded')
             result = game_over_events[0].time
         else:
-            logging.debug('No more attempts for team')
+            _trace('No more attempts for team')
             result = team_events.reverse()[0].time # get last event timestamp
 
     return result
@@ -438,7 +452,7 @@ def index(request):
     """ Display the scoreboard page. Updating is driven by the page making
         REST requests.
     """
-    logging.debug('Entered scoreboard.views.index')
+    _trace('Entered scoreboard.views.index')
 
     refreshInterval_ms = ScoreboardStatus.getSetting('SCOREBOARD_STATUS_REFRESH_INTERVAL_MS', 5000)
 
@@ -448,7 +462,7 @@ def index(request):
 
     result = render(request, "scoreboard/index.html", context)
 
-    logging.debug('Exiting scoreboard.views.index')
+    _trace('Exiting scoreboard.views.index')
     return result
 
 
@@ -486,11 +500,11 @@ class ScoreboardStatus(View):
     #---------------------------------------------------------------------------
     @staticmethod
     def getSetting(key,
-                   ridiculous_default):
-        result = Setting.get(key, ridiculous_default)
+                   default_value):
+        result = Setting.get(key, default_value)
 
-        if result == ridiculous_default:
-            logging.warning("No {} key found in the Settings table. Proceeding with value {}".format(key, ridiculous_default))
+        if result == default_value:
+            logging.warning("No {} key found in the Settings table. Proceeding with value {}".format(key, default_value))
 
         return result
 
@@ -578,14 +592,14 @@ class TeamIcon(View):
         ]
     """
     def __init__(self):
-        logging.debug('Entered TeamIcon.__init__')
+        _trace('Entered TeamIcon.__init__')
 
 
     #---------------------------------------------------------------------------
     """ TODO A REST request to get scores from the database for the leaderboard """
     def get(self, request, team_name):
         """ TODO Retrieve score information from the database and return it """
-        logging.debug('Entered TeamIcon.get(' + team_name + ')')
+        _trace('Entered TeamIcon.get(' + team_name + ')')
 
         team_initial = team_name[0]
         text = team_initial.upper()
@@ -627,5 +641,5 @@ class TeamIcon(View):
         result = HttpResponse(content_type="image/png", status=200)
         img.save(result, "PNG")
 
-        logging.debug('Exiting TeamIcon.get')
+        _trace('Exiting TeamIcon.get')
         return result

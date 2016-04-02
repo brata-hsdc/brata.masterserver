@@ -41,6 +41,8 @@ class ScoreboardStatusLaunchTestCase(TestCase):
 
         self._serialNum += 1
 
+        self.station = self.launchStation
+
     def _setUpTeams(self):
         org = Organization.objects.create(
             name = "School 1",
@@ -93,14 +95,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -116,13 +118,13 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
-            pi = self.launchStation,
+            pi = self.station,
             team = self.team1,
             status = PiEvent.SUCCESS_STATUS
         )
@@ -142,7 +144,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2001, 1, 1, 0, 0, 0).replace(tzinfo=utc),
             type = PiEvent.REGISTER_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -156,7 +158,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2001, 1, 1, 0, 0, 0).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 1
@@ -169,7 +171,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 1
@@ -182,14 +184,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -203,14 +205,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -218,7 +220,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 3
@@ -231,14 +233,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -252,14 +254,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -267,7 +269,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 2
@@ -280,14 +282,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 57, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -295,7 +297,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -309,14 +311,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 57, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -324,7 +326,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -332,7 +334,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 5
@@ -347,14 +349,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -362,7 +364,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -377,14 +379,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -392,7 +394,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -400,7 +402,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 4
@@ -414,14 +416,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -429,7 +431,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -444,14 +446,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -459,7 +461,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -467,7 +469,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 3
@@ -481,14 +483,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -496,7 +498,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -504,7 +506,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -519,14 +521,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -534,7 +536,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -542,7 +544,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -550,7 +552,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 7
@@ -564,14 +566,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -579,7 +581,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -587,7 +589,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -602,14 +604,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -617,7 +619,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -625,7 +627,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -633,7 +635,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 6
@@ -647,14 +649,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -662,7 +664,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -670,7 +672,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -685,14 +687,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -700,7 +702,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -708,7 +710,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -716,7 +718,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 6
@@ -730,14 +732,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -745,7 +747,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -753,7 +755,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -768,14 +770,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -783,7 +785,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -791,7 +793,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -799,7 +801,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 5
@@ -813,14 +815,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -828,7 +830,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -836,7 +838,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -851,14 +853,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -866,7 +868,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -874,7 +876,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -882,7 +884,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 6
@@ -896,14 +898,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -911,7 +913,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -919,7 +921,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -934,14 +936,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -949,7 +951,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -957,7 +959,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -965,7 +967,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 5
@@ -979,14 +981,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -994,7 +996,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1002,7 +1004,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1017,14 +1019,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1032,7 +1034,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1040,7 +1042,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1048,7 +1050,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 5
@@ -1062,14 +1064,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1077,7 +1079,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1085,7 +1087,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1100,14 +1102,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1115,7 +1117,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1123,7 +1125,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1131,7 +1133,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         expectedScore = 4
@@ -1145,14 +1147,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1160,7 +1162,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1168,7 +1170,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1176,7 +1178,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1192,14 +1194,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1207,7 +1209,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1215,7 +1217,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1223,7 +1225,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1231,7 +1233,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -1246,14 +1248,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1261,7 +1263,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1269,7 +1271,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1277,7 +1279,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1293,14 +1295,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1308,7 +1310,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1316,7 +1318,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1324,7 +1326,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1332,7 +1334,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -1347,14 +1349,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1362,7 +1364,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1370,7 +1372,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1378,7 +1380,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1394,14 +1396,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1409,7 +1411,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1417,7 +1419,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1425,7 +1427,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1433,7 +1435,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -1448,14 +1450,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1463,7 +1465,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1471,7 +1473,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1479,7 +1481,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1495,14 +1497,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1510,7 +1512,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1518,7 +1520,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1526,7 +1528,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1534,7 +1536,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -1549,14 +1551,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1564,7 +1566,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1572,7 +1574,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1580,7 +1582,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1596,14 +1598,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1611,7 +1613,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1619,7 +1621,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1627,7 +1629,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1635,7 +1637,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -1650,14 +1652,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1665,7 +1667,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1673,7 +1675,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1681,7 +1683,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1697,14 +1699,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1712,7 +1714,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1720,7 +1722,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1728,7 +1730,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1736,7 +1738,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -1751,14 +1753,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1766,7 +1768,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1774,7 +1776,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1782,7 +1784,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1798,14 +1800,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1813,7 +1815,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1821,7 +1823,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1829,7 +1831,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1837,7 +1839,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -1852,14 +1854,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1867,7 +1869,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1875,7 +1877,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1883,7 +1885,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1899,14 +1901,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1914,7 +1916,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1922,7 +1924,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1930,7 +1932,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1938,7 +1940,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -1953,14 +1955,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -1968,7 +1970,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1976,7 +1978,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -1984,7 +1986,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2000,14 +2002,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2015,7 +2017,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2023,7 +2025,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2031,7 +2033,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2039,7 +2041,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -2054,14 +2056,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2069,7 +2071,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2077,7 +2079,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2085,7 +2087,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2101,14 +2103,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2116,7 +2118,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2124,7 +2126,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2132,7 +2134,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2140,7 +2142,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -2155,14 +2157,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2170,7 +2172,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2178,7 +2180,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2186,7 +2188,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2202,14 +2204,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2217,7 +2219,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2225,7 +2227,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2233,7 +2235,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2241,7 +2243,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -2256,14 +2258,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2271,7 +2273,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2279,7 +2281,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2287,7 +2289,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2303,14 +2305,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2318,7 +2320,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2326,7 +2328,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2334,7 +2336,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2342,7 +2344,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -2357,14 +2359,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2372,7 +2374,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2380,7 +2382,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2388,7 +2390,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2404,14 +2406,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2419,7 +2421,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2427,7 +2429,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2435,7 +2437,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2443,7 +2445,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -2458,14 +2460,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2473,7 +2475,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2481,7 +2483,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2489,7 +2491,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2505,14 +2507,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2520,7 +2522,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2528,7 +2530,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2536,7 +2538,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2544,7 +2546,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -2559,14 +2561,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2574,7 +2576,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2582,7 +2584,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2590,7 +2592,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2606,14 +2608,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2621,7 +2623,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2629,7 +2631,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2637,7 +2639,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.SUCCESS_STATUS
         )
 
@@ -2645,7 +2647,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
@@ -2660,14 +2662,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2675,7 +2677,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2683,7 +2685,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2691,7 +2693,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2707,14 +2709,14 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
             type = PiEvent.START_CHALLENGE_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 54).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2722,7 +2724,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 55).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2730,7 +2732,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2738,7 +2740,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 57).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation,
+            pi = self.station,
             status = PiEvent.FAIL_STATUS
         )
 
@@ -2746,7 +2748,7 @@ class ScoreboardStatusLaunchTestCase(TestCase):
             time = datetime(2000, 12, 31, 23, 59, 58).replace(tzinfo=utc),
             type = PiEvent.EVENT_CONCLUDED_MSG_TYPE,
             team = self.team1,
-            pi = self.launchStation
+            pi = self.station
         )
 
         # 4th success/fail stops the attempt; time does not continue ticking
