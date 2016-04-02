@@ -15,7 +15,6 @@ from random import randint
 # TODO Update doc comments throughout file
 #---------------------------------------------------------------------------
 def _computeDock(team_name,
-                 attempt_num,
                  max_submit_events,
                  params,
                  now):
@@ -25,7 +24,7 @@ def _computeDock(team_name,
     num_fail_events = params['fail_events'].count()
 
     if params['latch_events'].count() > 0:
-        latch_event_timestamp = float(params['latch_events'].reverse()[0].time) # timestamp of final LATCH
+        latch_event_timestamp = params['latch_events'].reverse()[0].time # timestamp of final LATCH
     else:
         # team hasn't scanned the LATCH QR code yet 
         latch_event_timestamp = now
@@ -34,9 +33,9 @@ def _computeDock(team_name,
         # TODO Integration: copy this code to other places to get "x of y" in the log
         num_submit_events = params['submit_events'].count()
         if num_submit_events > max_submit_events:
-            logging.error('[1] More than one SUBMIT events ({} of {}) encountered for attempt #{} by Team {} ({}..{})'.format(num_submit_events, max_submit_events, attempt_num, team_name, params['t'], params['u']))
+            logging.error('[1] More than one SUBMIT events ({} of {}) encountered by Team {} ({}..{})'.format(num_submit_events, max_submit_events, team_name, params['t'], params['u']))
 
-        submit_message = params['submit_events'][attempt_num - 1]
+        submit_message = params['submit_events'][0]
         params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
 
         params['score'] = 9
@@ -46,18 +45,18 @@ def _computeDock(team_name,
     elif num_fail_events > 0:
         num_submit_events = params['submit_events'].count()
         if num_submit_events > max_submit_events:
-            logging.error('[2] More than one SUBMIT events ({} of {}) encountered for attempt #{} by Team {} ({}..{})'.format(num_submit_events, max_submit_events, attempt_num, team_name, params['t'], params['u']))
+            logging.error('[2] More than one SUBMIT events ({} of {}) encountered by Team {} ({}..{})'.format(num_submit_events, max_submit_events, team_name, params['t'], params['u']))
 
         params['num_failed_attempts'] += 1
 
         # TODO: Modified during integration
         # ---- BEFORE
-        #submit_message = params['submit_events'][attempt_num - 1]
+        #submit_message = params['submit_events'][0]
         #params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
         # ---- NOW
         submit_message = None
         if not params['submit_events'].exists():
-           submit_message = params['submit_events'][attempt_num - 1]
+           submit_message = params['submit_events'][0]
            params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
         # ---- END
 
@@ -65,7 +64,7 @@ def _computeDock(team_name,
         if params['num_failed_attempts'] > 2:
             params['score'] = 5
             params['time_to_exit'] = True
-            params['end_time'] = latch_event_timestamp + params['total_run_time_delta_s']
+            params['end_time'] = latch_event_timestamp + timedelta(0, float(params['total_run_time_delta_s']))
 
     else:
         logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
@@ -76,14 +75,13 @@ def _computeDock(team_name,
 
 #---------------------------------------------------------------------------
 def _computeLaunch(team_name,
-                   attempt_num,
                    max_submit_events,
                    params,
                    now):
     _trace('Entered _computeLaunch({})'.format(team_name))
 
     if params['submit_events'].count() > max_submit_events:
-        logging.error('More than four SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+        logging.error('More than four SUBMIT events encountered by Team {} ({}..{})'.format(team_name, params['t'], params['u']))
 
     params['score'] = params['cur_attempt_score']
     params['time_to_exit'] = True
@@ -114,7 +112,6 @@ def _computeRunningTimeDelta(submit_message):
 
 #---------------------------------------------------------------------------
 def _computeSecureOrReturn(team_name,
-                           attempt_num,
                            max_submit_events,
                            params,
                            now):
@@ -127,7 +124,7 @@ def _computeSecureOrReturn(team_name,
         _trace("Success event(s) found")
         num_submit_events = params['submit_events'].count()
         if num_submit_events > max_submit_events:
-            logging.error('[3] More than one SUBMIT events ({} of {}) encountered for attempt #{} by Team {} ({}..{})'.format(num_submit_events, max_submit_events, attempt_num, team_name, params['t'], params['u']))
+            logging.error('[3] More than one SUBMIT events ({} of {}) encountered by Team {} ({}..{})'.format(num_submit_events, max_submit_events, team_name, params['t'], params['u']))
 
         params['score'] = 9
         params['time_to_exit'] = True
@@ -136,7 +133,7 @@ def _computeSecureOrReturn(team_name,
     elif num_fail_events > 0:
         num_submit_events = params['submit_events'].count()
         if num_submit_events > max_submit_events:
-            logging.error('[4] More than one SUBMIT events ({} of {}) encountered for attempt #{} by Team {} ({}..{})'.format(num_submit_events, max_submit_events, attempt_num, team_name, params['t'], params['u']))
+            logging.error('[4] More than one SUBMIT events ({} of {}) encountered by Team {} ({}..{})'.format(num_submit_events, max_submit_events, team_name, params['t'], params['u']))
 
         params['num_failed_attempts'] += 1
         params['score'] = 5
@@ -363,10 +360,9 @@ def _recomputeScore(algorithm,
                 else:
                     _trace('Phone probably died and need to start over, or challenge still in-progress: (score)=({})'.format(params['score']))
             else:
-                _trace('Running logic custom to the challenge: (num_success_events, num_fail_events) = ({}, {})'.format(
-                    num_success_events, num_fail_events))
+                _trace('Running logic custom to the challenge: (num_success_events, num_fail_events, attempt_num) = ({}, {}, {})'.format(
+                    num_success_events, num_fail_events, attempt_num))
                 algorithm(team_name,
-                          attempt_num,
                           max_submit_events,
                           params,
                           now)
