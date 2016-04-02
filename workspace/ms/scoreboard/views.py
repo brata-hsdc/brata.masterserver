@@ -60,8 +60,7 @@ def _computeDock(team_name,
            params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
         # ---- END
 
-        # TODO Integration change below. if params['num_failed_attempts'] > 3:
-        if params['num_failed_attempts'] > 2:
+        if params['num_failed_attempts'] > 2: # i.e. on the 3rd attempt now and it's a failure
             params['score'] = 5
             params['time_to_exit'] = True
             params['end_time'] = latch_event_timestamp + timedelta(0, float(params['total_run_time_delta_s']))
@@ -136,11 +135,12 @@ def _computeSecureOrReturn(team_name,
             logging.error('[4] More than one SUBMIT events ({} of {}) encountered by Team {} ({}..{})'.format(num_submit_events, max_submit_events, team_name, params['t'], params['u']))
 
         params['num_failed_attempts'] += 1
-        params['score'] = 5
+        params['score'] = 1
         _trace("Failure event(s) found: num_failed_attempts = {}".format(params['num_failed_attempts']))
 
-        if params['num_failed_attempts'] > 3:
+        if params['num_failed_attempts'] > 2: # i.e. on the 3rd attempt now and it's a failure
             _trace("Max failure events found")
+            params['score'] = 5
             params['time_to_exit'] = True
             params['end_time'] = params['fail_events'].reverse()[0].time # timestamp of final FAIL_STATUS
 
@@ -372,7 +372,23 @@ def _recomputeScore(algorithm,
         else:
             params['time_to_exit'] = True
             if not 'end_time' in params:
-                params['end_time'] = now
+                _trace('End time not yet set. There might be an EVENT CONCLUDED message')
+                if i > 0:
+                    params['t'] = start_challenge_events[i-1].time # timestamp of previous START_CHALLENGE event
+                    events = team_events.filter(
+                        type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
+                    ).filter(
+                        Q(time__gte=params['t'])
+                    )
+
+                    if events.count() > 0:
+                        params['end_time'] = events[0].time
+                    else:
+                        params['end_time'] = now
+                else:
+                    params['end_time'] = now
+
+                _trace('End time set to {}.'.format(params['end_time']))
             _trace('Challenge complete; time to exit: (score, end_time)=({}, {})'.format(params['score'], params['end_time']))
 
     duration_s = (params['end_time'] - start_time).total_seconds() + params['docking_time_s']

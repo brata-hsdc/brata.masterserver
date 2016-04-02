@@ -374,7 +374,7 @@ class ScoreboardStatusDockTestCase(TestCase):
         )
 
         expectedScore = 1
-        expectedDuration_s = 6 - self._watchingTime_s + actualTime_s
+        expectedDuration_s = 8 - self._watchingTime_s + actualTime_s
         self._verify(expectedScore, expectedDuration_s)
 
     @mock.patch('scoreboard.views._utcNow', side_effect=_mocked_utcNow)
@@ -1202,7 +1202,7 @@ class ScoreboardStatusDockTestCase(TestCase):
             data = json.dumps({"candidate_answer": actualTime4_s, "fail_message": "OUTCOME_SUCCESS"}, separators=(',',':'))
         )
 
-        expectedScore = 9
+        expectedScore = 5
         expectedDuration_s = 10 - self._watchingTime_s + actualTime1_s - self._watchingTime_s + actualTime2_s - self._watchingTime_s + actualTime3_s # ignore actualTime4_s
         self._verify(expectedScore, expectedDuration_s)
 
