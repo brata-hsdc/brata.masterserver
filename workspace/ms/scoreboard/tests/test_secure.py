@@ -273,7 +273,7 @@ class ScoreboardStatusSecureTestCase(TestCase):
         )
 
         expectedScore = 1
-        expectedDuration_s = 6
+        expectedDuration_s = 8
         self._verify(expectedScore, expectedDuration_s)
 
     @mock.patch('scoreboard.views._utcNow', side_effect=_mocked_utcNow)
@@ -1023,7 +1023,7 @@ class ScoreboardStatusSecureTestCase(TestCase):
             status = PiEvent.SUCCESS_STATUS
         )
 
-        expectedScore = 9
+        expectedScore = 5
         expectedDuration_s = 10
         self._verify(expectedScore, expectedDuration_s)
 
