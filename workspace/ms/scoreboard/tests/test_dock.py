@@ -85,8 +85,8 @@ class ScoreboardStatusDockTestCase(TestCase):
 
         self._watchingTime_s = 45
 
-        Setting.objects.create('DNF_TIME_PENALTY_FACTOR', -2000)
-        Setting.objects.create('DOCK_SIM_PLAYBACK_TIME_S', self._watchingTime_s)
+        Setting.objects.create(name = 'DNF_TIME_PENALTY_FACTOR', value = str(-2000))
+        Setting.objects.create(name = 'DOCK_SIM_PLAYBACK_TIME_S', value = str(self._watchingTime_s))
 
     def test_recomputeDockScore_noEvents(self):
         PiEvent.objects.all().delete()
@@ -244,7 +244,7 @@ class ScoreboardStatusDockTestCase(TestCase):
         dnfPenalty = 2
 
         Setting.objects.all().delete()
-        Setting.objects.create('DNF_TIME_PENALTY_FACTOR', -1000 * dnfPenalty)
+        Setting.objects.create(name = 'DNF_TIME_PENALTY_FACTOR', value = str(-1000 * dnfPenalty))
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
@@ -272,7 +272,7 @@ class ScoreboardStatusDockTestCase(TestCase):
         dnfPenalty = 3
 
         Setting.objects.all().delete()
-        Setting.objects.create('DNF_TIME_PENALTY_FACTOR', -1000 * dnfPenalty)
+        Setting.objects.create(name = 'DNF_TIME_PENALTY_FACTOR', value = str(-1000 * dnfPenalty))
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
@@ -300,7 +300,7 @@ class ScoreboardStatusDockTestCase(TestCase):
         dnfPenalty = 8
 
         Setting.objects.all().delete()
-        Setting.objects.create('DNF_TIME_PENALTY_FACTOR', -1000 * dnfPenalty)
+        Setting.objects.create(name = 'DNF_TIME_PENALTY_FACTOR', value = str(-1000 * dnfPenalty))
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),

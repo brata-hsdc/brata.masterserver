@@ -257,7 +257,7 @@ def _getNextEventTimestamp(attempt_num,
                            start_challenge_events,
                            team_events):
     if attempt_num < start_challenge_events.count():
-        _trace_trace('More attempts for team follow')
+        _trace('More attempts for team follow')
         result = start_challenge_events[attempt_num].time # timestamp of following event
     else:
         _trace('Either no more attempts for team or event concluded')
