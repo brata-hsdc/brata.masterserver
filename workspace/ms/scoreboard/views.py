@@ -10,6 +10,7 @@ from dbkeeper.models import Organization, Team, Setting
 from PIL import Image, ImageDraw, ImageFont
 from piservice.models import PiEvent, PiStation
 from random import randint
+from django.contrib.auth.decorators import login_required
 
 
 # TODO Update doc comments throughout file
@@ -475,6 +476,7 @@ def _utcNow():
 
 
 #-------------------------------------------------------------------------------
+@login_required
 def index(request):
     """ Display the scoreboard page. Updating is driven by the page making
         REST requests.
