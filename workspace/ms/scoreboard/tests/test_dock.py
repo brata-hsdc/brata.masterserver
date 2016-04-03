@@ -83,9 +83,9 @@ class ScoreboardStatusDockTestCase(TestCase):
         self._setUpTeams()
         self._setUpEvents()
 
-        self._watchingTime_s = 45
+        self._watchingTime_s = 45.0
 
-        Setting.objects.create(name = 'DNF_TIME_PENALTY_FACTOR', value = str(-2000))
+        Setting.objects.create(name = 'DNF_TIME_PENALTY_FACTOR', value = str(2.0))
         Setting.objects.create(name = 'DOCK_SIM_PLAYBACK_TIME_S', value = str(self._watchingTime_s))
 
     def test_recomputeDockScore_noEvents(self):
@@ -241,10 +241,10 @@ class ScoreboardStatusDockTestCase(TestCase):
 
     @mock.patch('scoreboard.views._utcNow', side_effect=_mocked_utcNow)
     def test_recomputeDockScore_onlyOneStartChallengeEventEarlierTimestampFailOutcomeDnf2xPenaltyNoConclude(self, mock_utcNow):
-        dnfPenalty = 2
+        dnfPenalty = 2.0
 
         Setting.objects.all().delete()
-        Setting.objects.create(name = 'DNF_TIME_PENALTY_FACTOR', value = str(-1000 * dnfPenalty))
+        Setting.objects.create(name = 'DNF_TIME_PENALTY_FACTOR', value = str(dnfPenalty))
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
@@ -269,10 +269,10 @@ class ScoreboardStatusDockTestCase(TestCase):
 
     @mock.patch('scoreboard.views._utcNow', side_effect=_mocked_utcNow)
     def test_recomputeDockScore_onlyOneStartChallengeEventEarlierTimestampFailOutcomeDnf3xPenaltyNoConclude(self, mock_utcNow):
-        dnfPenalty = 3
+        dnfPenalty = 3.0
 
         Setting.objects.all().delete()
-        Setting.objects.create(name = 'DNF_TIME_PENALTY_FACTOR', value = str(-1000 * dnfPenalty))
+        Setting.objects.create(name = 'DNF_TIME_PENALTY_FACTOR', value = str(dnfPenalty))
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
@@ -297,10 +297,10 @@ class ScoreboardStatusDockTestCase(TestCase):
 
     @mock.patch('scoreboard.views._utcNow', side_effect=_mocked_utcNow)
     def test_recomputeDockScore_onlyOneStartChallengeEventEarlierTimestampFailOutcomeDnf8xPenaltyNoConclude(self, mock_utcNow):
-        dnfPenalty = 8
+        dnfPenalty = 8.0
 
         Setting.objects.all().delete()
-        Setting.objects.create(name = 'DNF_TIME_PENALTY_FACTOR', value = str(-1000 * dnfPenalty))
+        Setting.objects.create(name = 'DNF_TIME_PENALTY_FACTOR', value = str(dnfPenalty))
 
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 50).replace(tzinfo=utc),
