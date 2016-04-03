@@ -372,7 +372,8 @@ class LibraryTest(View):
     challenge on the chosen station.
     """
     MS_BASE_URL = "http://localhost"
-    QR_SERVICE_REQUEST_URL = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="
+    #QR_SERVICE_REQUEST_URL = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="
+    QR_SERVICE_REQUEST_URL = "http://10.120.65.104/piservice/qrcode?chl="
     context = {
                "form": None,
                "all_stations_table":   None,
@@ -1926,16 +1927,20 @@ class QRCode(JSONHandlerView):
         # NOTE we tried for fun error correct up one level to M DO NOT DO IT!  It will kill the Pi.
         # per the spec need to leave a border of at least 4 units
         # size we used 350 in the past but seems to be taking long as well
-        qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=5, border=4, image_factory=qrcode.image.svg.SvgImage)
+        #if true:
+        qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=5, border=4)
         qr.add_data(strToEncode)
-        #qr.make(fit=True)
-        #image = qr.make_image()
-        #response = HttpResponse(content_type="image/png")
-        #image.save(response, "PNG")
-        # TODO seems it would be more efficient to make this SVG
-        image = qr.make(fit=True)
-        #image = qr.make(strToEncode, image_factory=qrcode.image.svg.SvgImage)
-        response = HttpResponse(content_type="image/svg+xml")
-        response['Content-Disposition'] = 'out.svg'
-        response.write(image)
+        qr.make(fit=True)
+        image = qr.make_image()
+        response = HttpResponse(content_type="image/png")
+        image.save(response, "PNG")
+        #else:
+            # TODO seems it would be more efficient to make this SVG
+        #    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=5, border=4, image_factory=qrcode.image.svg.SvgImage)
+        #    qr.add_data(strToEncode)
+        #    qr.make(fit=True)
+        #    image = qr.make_image()    
+        #    response = HttpResponse(content_type="image/svg+xml")
+            #response['Content-Disposition'] = 'out.svg'
+        #    image.save(response, "XML")
         return response
