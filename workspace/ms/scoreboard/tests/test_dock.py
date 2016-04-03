@@ -1210,58 +1210,6 @@ class ScoreboardStatusDockTestCase(TestCase):
     def test_recomputeDockScore_onlyOneStartChallengeEventLaterTimestamp(self, mock_utcNow):
         pass # Don't worry about later timestamps
 
-# TODO
-"""
-[Wed Mar 30 11:47:11.797470 2016] [wsgi:error] [pid 649:tid 1938814000] Internal Server Error: /scoreboard/scoreboard_status/
-[Wed Mar 30 11:47:11.798282 2016] [wsgi:error] [pid 649:tid 1938814000] Traceback (most recent call last):
-[Wed Mar 30 11:47:11.798657 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/usr/local/lib/python2.7/dist-packages/django/core/handlers/base.py", line 149, in get_response
-[Wed Mar 30 11:47:11.798973 2016] [wsgi:error] [pid 649:tid 1938814000]     response = self.process_exception_by_middleware(e, request)
-[Wed Mar 30 11:47:11.799340 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/usr/local/lib/python2.7/dist-packages/django/core/handlers/base.py", line 147, in get_response
-[Wed Mar 30 11:47:11.799633 2016] [wsgi:error] [pid 649:tid 1938814000]     response = wrapped_callback(request, *callback_args, **callback_kwargs)
-[Wed Mar 30 11:47:11.799906 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/usr/local/lib/python2.7/dist-packages/django/views/generic/base.py", line 68, in view
-[Wed Mar 30 11:47:11.800181 2016] [wsgi:error] [pid 649:tid 1938814000]     return self.dispatch(request, *args, **kwargs)
-[Wed Mar 30 11:47:11.800442 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/usr/local/lib/python2.7/dist-packages/django/views/generic/base.py", line 88, in dispatch
-[Wed Mar 30 11:47:11.800711 2016] [wsgi:error] [pid 649:tid 1938814000]     return handler(request, *args, **kwargs)
-[Wed Mar 30 11:47:11.800920 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/views.py", line 507, in get
-[Wed Mar 30 11:47:11.801131 2016] [wsgi:error] [pid 649:tid 1938814000]     s = _recomputeTeamScore(t.name)
-[Wed Mar 30 11:47:11.801335 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/views.py", line 392, in _recomputeTeamScore
-[Wed Mar 30 11:47:11.801824 2016] [wsgi:error] [pid 649:tid 1938814000]     now)
-[Wed Mar 30 11:47:11.802105 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/views.py", line 358, in _recomputeScore
-[Wed Mar 30 11:47:11.802380 2016] [wsgi:error] [pid 649:tid 1938814000]     now)
-[Wed Mar 30 11:47:11.802584 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/views.py", line 50, in _computeDock
-[Wed Mar 30 11:47:11.802799 2016] [wsgi:error] [pid 649:tid 1938814000]     submit_message = params['submit_events'][attempt_num - 1]
-[Wed Mar 30 11:47:11.803218 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/usr/local/lib/python2.7/dist-packages/django/db/models/query.py", line 297, in __getitem__
-[Wed Mar 30 11:47:11.803496 2016] [wsgi:error] [pid 649:tid 1938814000]     return list(qs)[0]
-[Wed Mar 30 11:47:11.803760 2016] [wsgi:error] [pid 649:tid 1938814000] IndexError: list index out of range
-[Wed Mar 30 11:47:11.805178 2016] [wsgi:error] [pid 649:tid 1938814000] ERROR    Internal Server Error: /scoreboard/scoreboard_status/
-[Wed Mar 30 11:47:11.805639 2016] [wsgi:error] [pid 649:tid 1938814000] Traceback (most recent call last):
-[Wed Mar 30 11:47:11.805950 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/usr/local/lib/python2.7/dist-packages/django/core/handlers/base.py", line 149, in get_response
-[Wed Mar 30 11:47:11.806265 2016] [wsgi:error] [pid 649:tid 1938814000]     response = self.process_exception_by_middleware(e, request)
-[Wed Mar 30 11:47:11.806535 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/usr/local/lib/python2.7/dist-packages/django/core/handlers/base.py", line 147, in get_response
-[Wed Mar 30 11:47:11.806806 2016] [wsgi:error] [pid 649:tid 1938814000]     response = wrapped_callback(request, *callback_args, **callback_kwargs)
-[Wed Mar 30 11:47:11.807152 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/usr/local/lib/python2.7/dist-packages/django/views/generic/base.py", line 68, in view
-[Wed Mar 30 11:47:11.807453 2016] [wsgi:error] [pid 649:tid 1938814000]     return self.dispatch(request, *args, **kwargs)
-[Wed Mar 30 11:47:11.807669 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/usr/local/lib/python2.7/dist-packages/django/views/generic/base.py", line 88, in dispatch
-[Wed Mar 30 11:47:11.807880 2016] [wsgi:error] [pid 649:tid 1938814000]     return handler(request, *args, **kwargs)
-[Wed Mar 30 11:47:11.808283 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/views.py", line 507, in get
-[Wed Mar 30 11:47:11.808565 2016] [wsgi:error] [pid 649:tid 1938814000]     s = _recomputeTeamScore(t.name)
-[Wed Mar 30 11:47:11.808772 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/views.py", line 392, in _recomputeTeamScore
-[Wed Mar 30 11:47:11.809294 2016] [wsgi:error] [pid 649:tid 1938814000]     now)
-[Wed Mar 30 11:47:11.809565 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/views.py", line 358, in _recomputeScore
-[Wed Mar 30 11:47:11.809837 2016] [wsgi:error] [pid 649:tid 1938814000]     now)
-[Wed Mar 30 11:47:11.810093 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/opt/designchallenge2016/brata.masterserver/workspace/ms/scoreboard/views.py", line 50, in _computeDock
-[Wed Mar 30 11:47:11.810360 2016] [wsgi:error] [pid 649:tid 1938814000]     submit_message = params['submit_events'][attempt_num - 1]
-[Wed Mar 30 11:47:11.810618 2016] [wsgi:error] [pid 649:tid 1938814000]   File "/usr/local/lib/python2.7/dist-packages/django/db/models/query.py", line 297, in __getitem__
-[Wed Mar 30 11:47:11.810881 2016] [wsgi:error] [pid 649:tid 1938814000]     return list(qs)[0]
-[Wed Mar 30 11:47:11.811086 2016] [wsgi:error] [pid 649:tid 1938814000] IndexError: list index out of range
-"""
-
-
-# TODO Jaron sent three failures, score was 1 instead of 5 after 3rd failure.
-
-# TOOD Jaron finished all three attempts but clock still kept going
-
-
 
 # Scoreboard
 # 1. absent/present Registered indicator
