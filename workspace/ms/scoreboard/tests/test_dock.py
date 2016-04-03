@@ -195,7 +195,7 @@ class ScoreboardStatusDockTestCase(TestCase):
             pi = self.station
         )
 
-        actualTime_s = 10
+        actualTime_s = 100
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 56).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
@@ -882,7 +882,7 @@ class ScoreboardStatusDockTestCase(TestCase):
             pi = self.station
         )
 
-        actualTime1_s = 32
+        actualTime1_s = 37 # this is less than 45 sec, so watchingTime will be used instead
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 48).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
@@ -927,7 +927,7 @@ class ScoreboardStatusDockTestCase(TestCase):
         )
 
         expectedScore = 5
-        expectedDuration_s = 10 - self._watchingTime_s + actualTime1_s - self._watchingTime_s + actualTime2_s - self._watchingTime_s + actualTime3_s
+        expectedDuration_s = 10 - self._watchingTime_s + self._watchingTime_s - self._watchingTime_s + actualTime2_s - self._watchingTime_s + actualTime3_s
         self._verify(expectedScore, expectedDuration_s)
 
     @mock.patch('scoreboard.views._utcNow', side_effect=_mocked_utcNow)
@@ -939,7 +939,7 @@ class ScoreboardStatusDockTestCase(TestCase):
             pi = self.station
         )
 
-        actualTime1_s = 23
+        actualTime1_s = 23 # use watchTime_s instead since this is less than 45 sec
         e = PiEvent.objects.create(
             time = datetime(2000, 12, 31, 23, 59, 48).replace(tzinfo=utc),
             type = PiEvent.SUBMIT_MSG_TYPE,
@@ -991,7 +991,7 @@ class ScoreboardStatusDockTestCase(TestCase):
         )
 
         expectedScore = 5
-        expectedDuration_s = 10 - self._watchingTime_s + actualTime1_s - self._watchingTime_s + actualTime2_s - self._watchingTime_s + actualTime3_s
+        expectedDuration_s = 10 - self._watchingTime_s + self._watchingTime_s - self._watchingTime_s + actualTime2_s - self._watchingTime_s + actualTime3_s
         self._verify(expectedScore, expectedDuration_s)
 
     @mock.patch('scoreboard.views._utcNow', side_effect=_mocked_utcNow)
