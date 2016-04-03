@@ -93,8 +93,8 @@ def _computeLaunch(team_name,
 #---------------------------------------------------------------------------
 def _computeRunningTimeDelta(submit_message):
     # TODO are all these floats needed?
-    dock_sim_playback_time_s = float(ScoreboardStatus.getSetting('DOCK_SIM_PLAYBACK_TIME_S', -6000))
-    dnf_time_penalty_factor = float(ScoreboardStatus.getSetting('DNF_TIME_PENALTY_FACTOR', -8000))
+    dock_sim_playback_time_s = float(ScoreboardStatus.getSetting('DOCK_SIM_PLAYBACK_TIME_S', 45.0))
+    dnf_time_penalty_factor = float(ScoreboardStatus.getSetting('DNF_TIME_PENALTY_FACTOR', 2.0))
     actual_time_s = float(_getDataField(submit_message, 'candidate_answer'))
     fail_message = _getDataField(submit_message, 'fail_message')
 
@@ -465,7 +465,7 @@ def _recomputeTeamScore(team_name):
 
 #---------------------------------------------------------------------------
 def _trace(message):
-    if True:
+    if False:
         logging.debug(message)
 
 
