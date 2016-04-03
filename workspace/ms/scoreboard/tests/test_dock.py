@@ -1212,15 +1212,15 @@ class ScoreboardStatusDockTestCase(TestCase):
 
 
 # Scoreboard
-# 1. absent/present Registered indicator
-# 2. make title larger and change to "Leaderboard"
-# 3. fill width 100%
-# 4. make 30 teams fit on the same page with roughly 20-30 chars
-# 5. header row multiple lines--all text doesn't show up
-# 6. don't need to show page footer; find another place for the attribution
-# 7. put "Harris Design Challenge 2016" along the left-hand side
-# 8. ranking
-# 11. remove team logo if not implementing this time
+# [o] 1. absent/present Registered indicator
+# [x] 2. make title larger and change to "Leaderboard"
+# [x] 3. fill width 100%
+# [ ] 4. make 30 teams fit on the same page with roughly 20-30 chars
+# [x] 5. header row multiple lines--all text doesn't show up
+# [ ] 6. don't need to show page footer; find another place for the attribution
+# [ ] 7. put "Harris Design Challenge 2016" along the left-hand side
+# [ ] 8. ranking
+# [ ] 11. remove team logo if not implementing this time
 
 # TODO Page has two jquery <script> tags--one looks WRONG_ARGUMENTS
 
