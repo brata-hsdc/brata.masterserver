@@ -549,7 +549,7 @@ class ScoreboardStatus(View):
         for t in teams:
             s = _recomputeTeamScore(t.name)
 
-            if t.registered == None:
+            if (t.registered == None) or (not t.registered):
                 registered_icon = "hourglass"
                 registered_color = "yellow"
             else:
