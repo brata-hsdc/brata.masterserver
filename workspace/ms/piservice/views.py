@@ -373,7 +373,7 @@ class LibraryTest(View):
     """
     MS_BASE_URL = "http://localhost"
     #QR_SERVICE_REQUEST_URL = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="
-    QR_SERVICE_REQUEST_URL = "http://10.120.65.104/piservice/qrcode?chl="
+    QR_SERVICE_REQUEST_URL = Setting.get("MS_EXTERNAL_HOST_ADDRESS", default=MS_BASE_URL)+"/piservice/qrcode?chl="
     context = {
                "form": None,
                "all_stations_table":   None,
