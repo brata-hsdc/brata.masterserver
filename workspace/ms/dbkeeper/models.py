@@ -308,20 +308,25 @@ class Setting(models.Model):
     def getReturnParams(station_id=None, value=None):
         """ Return the whole data structure, a station, or a value.
         
-        Stations are indexed by the station_id.
+        Stations are indexed by the station_id (case-sensitive).
         Values are indexed 0-5.
         
         The structure is as follows:
-        [station0, station1, ..., station5]
+            {
+              "return01": station1,
+              "return02": station2,
+               ...,
+              "return06": station6
+            }
         
         where stationn is:
-        [value1, value2, ..., value6]
+            [value1, value2, ..., value6]
         
         Returns:
-            the entire RETURN_PARAMS data structure if station is None
-            the data for a station if station is not None and value is None
-            an individual data value if station and value are not None
-        """
+            the entire RETURN_PARAMS data structure if station_id is None
+            the data for a station if station_id is not None and value is None
+            an individual data value if station_id and value are not None
+        """ 
         try:
             returnParams = Setting.objects.get(name="RETURN_PARAMS").value
             returnParams = json.loads(returnParams)

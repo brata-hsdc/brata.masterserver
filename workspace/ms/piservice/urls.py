@@ -62,3 +62,4 @@ urlpatterns = [
 # http --json POST :8000/piservice/register/ Content-type:application/json Accept:application/json team_id="Dev Team" brata_version="01"
 # http --json POST :8000/piservice/join/ Content-type:application/json Accept:application/json host="First RPi Station" pi_type="B+" station_type=1
 # http --json POST :8000/piservice/leave/ Content-type:application/json Accept:application/json station_id="8:8b14"
+# http GET localhost/piservice/qrcode?chl="This is some text"
