@@ -34,6 +34,9 @@
     function processData(index, value) {
        logT('Entered ' + arguments.callee.name + '(' + index + ', ' + value.team_name + ')');
 
+/*     
+ * We don't need the update code because we rebuild the table each time
+ *
        var numRows = $("tbody").find("tr").length;
        logD('numRows=' + numRows);
 
@@ -56,6 +59,7 @@
              return true;
           }
        }
+ */
 
        logD('Adding new row for index ' + index);
 
@@ -83,6 +87,8 @@
        // Handle the data returned from the Ajax call
        var tableBody = "";
        data.sort(function(a,b){ if (b.total_score != a.total_score) { return b.total_score - a.total_score; } return a.total_duration_s - b.total_duration_s; });
+
+       $("tbody > tr").remove();
 
        $.each(data, processData);
 
