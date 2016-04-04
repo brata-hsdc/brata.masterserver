@@ -45,15 +45,14 @@
           if(id == ('team-' + value.team_name)) {
              var elem = $("tbody").find("tr:nth-child(" + i + ")");
              elem.find("td:nth-child( 1)").html(value.rank)
-             elem.find("td:nth-child( 2)").html('<!--img width=\"50%\" height=\"50%\" src=\"' + value.team_icon + '" /-->')
-             elem.find("td:nth-child( 3)").html(value.team_name + " (" + value.organization + ")")
-             elem.find("td:nth-child( 4)").html('<div class="glyphicon glyphicon-' + value.registered_icon + '" style="color:' + value.registered_color + '" />')
-             elem.find("td:nth-child( 5)").html(value.launch_score + " (" + value.launch_duration + ")")
-             elem.find("td:nth-child( 6)").html(value.dock_score + " (" + value.dock_duration + ")")
-             elem.find("td:nth-child( 7)").html(value.secure_score + " (" + value.secure_duration + ")")
-             elem.find("td:nth-child( 8)").html(value.return_score + " (" + value.return_duration + ")")
-             elem.find("td:nth-child( 9)").html('<b>' + value.total_score + '</b>')
-             elem.find("td:nth-child(10)").html('<b>' + value.total_duration + '</b>')
+             elem.find("td:nth-child( 2)").html(value.team_name + " (" + value.organization + ")")
+             elem.find("td:nth-child( 3)").html('<div class="glyphicon glyphicon-' + value.registered_icon + '" style="color:' + value.registered_color + '" />')
+             elem.find("td:nth-child( 4)").html(value.launch_score + " (" + value.launch_duration + ")")
+             elem.find("td:nth-child( 5)").html(value.dock_score + " (" + value.dock_duration + ")")
+             elem.find("td:nth-child( 6)").html(value.secure_score + " (" + value.secure_duration + ")")
+             elem.find("td:nth-child( 7)").html(value.return_score + " (" + value.return_duration + ")")
+             elem.find("td:nth-child( 8)").html('<b>' + value.total_score + '</b>')
+             elem.find("td:nth-child( 9)").html('<b>' + value.total_duration + '</b>')
              return true;
           }
        }
@@ -62,8 +61,7 @@
 
        var rowId = "team-" + value.team_name;
        var newRow = "<tr id='" + rowId + "'>"
-              + "<td align=\"center\" valign=\"middle\">" + "TODO rank" + "</td>"
-              + "<td align=\"center\" valign=\"middle\"><!--img width=\"50%\" height=\"50%\" src=\"" + value.team_icon + "\" /--></td>"
+              + "<td align=\"center\" valign=\"middle\">" + "&nbsp;" + "</td>"
               + "<td align=\"left\"   valign=\"middle\">" + value.team_name + " (" + value.organization + ")</td>"
               + '<td align=\"center\" valign=\"middle\"><div class="glyphicon glyphicon-' + value.registered_icon + '" style="color:' + value.registered_color + '" /></td>' // TODO Link to glyphicons in footer
               + "<td align=\"center\" valign=\"middle\">" + value.launch_score + " (" + value.launch_duration + ")</td>"
@@ -84,7 +82,7 @@
 
        // Handle the data returned from the Ajax call
        var tableBody = "";
-       data.sort(function(a,b){ return a.id - b.id; });
+       data.sort(function(a,b){ if (b.total_score != a.total_score) { return b.total_score - a.total_score; } return a.total_duration_s - b.total_duration_s; });
 
        $.each(data, processData);
 
@@ -142,13 +140,12 @@
 {% block main %}
   <div id="stationTable">
     <!--table class="table table-striped table-hover "-->
-    <table class="container-fluid table-striped table-hover"
+    <table class="container-fluid table-striped table-hover scoreboard"
            width="1225">
       <thead>
         <tr>
            <th align=\"center\" valign=\"bottom\" class="col-md-1">Position</th>
-           <th align=\"center\" valign=\"bottom\" class="col-md-1"><!-- Team Image --></th>
-           <th align=\"left\"   valign=\"bottom\" class="col-md-1">Team Name</th>
+           <th align=\"left\"   valign=\"bottom\" class="col-md-1" style="width: 50%">Team Name</th>
            <th align=\"center\" valign=\"bottom\" class="col-md-1"><!-- Registered --></th>
            <th align=\"center\" valign=\"bottom\" class="col-md-1">Launch</th>
            <th align=\"center\" valign=\"bottom\" class="col-md-1">Dock</th>

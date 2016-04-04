@@ -40,15 +40,18 @@
    font-size: 50px !important;
 }
 
-table thead
+table.scoreboard thead
 {
    height: 70px
 }
 
-table tr
-{
-   height: 30px
+table.scoreboard { counter-reset: line-number; }
+table.scoreboard td:first-child:before {
+   content: counter(line-number);
+   counter-increment: line-number;
+   padding-right: 0.3em;
 }
+
 </style>
 
 <body>
