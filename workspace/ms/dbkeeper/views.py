@@ -106,7 +106,10 @@ class regtest_team(View):
               }
     
     def get(self, request, pass_code):
-        self.context["host"] = request.get_host()
+        msBaseUrl = request.get_host()
+        #QR_SERVICE_REQUEST_URL = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="
+        self.context["qr_service_url"] = Setting.get("MS_EXTERNAL_HOST_ADDRESS", default=msBaseUrl)+"/piservice/qrcode?chl="      
+        self.context["host"] = Setting.get("MS_EXTERNAL_HOST_ADDRESS", default=msBaseUrl)
         self.context["register_url"] = reverse("register", kwargs={"team_passcode": pass_code}, current_app=request.resolver_match.app_name)
         self.context["unregister_url"] = reverse("unregister", current_app=request.resolver_match.app_name)
         self.context["reset_url"] = reverse("reset", kwargs={"team_passcode": pass_code}, current_app=request.resolver_match.app_name)

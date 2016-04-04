@@ -374,7 +374,8 @@ class LibraryTest(View):
     challenge on the chosen station.
     """
     MS_BASE_URL = "http://localhost"
-    QR_SERVICE_REQUEST_URL = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="
+    #QR_SERVICE_REQUEST_URL = "http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl="
+    QR_SERVICE_REQUEST_URL = Setting.get("MS_EXTERNAL_HOST_ADDRESS", default=MS_BASE_URL)+"/piservice/qrcode?chl="
     context = {
                "form": None,
                "all_stations_table":   None,
@@ -1111,7 +1112,10 @@ class Dock(JSONHandlerView):
         except:
             message = "No start found at this station"
             # TODO handle error
-        data = json.loads(startRequests[0].data)
+        try:
+            data = json.loads(startRequests[0].data)
+        except:
+            message = "problem loading start request data"
         if data is None:
             # TODO make error message
             return response
@@ -1570,7 +1574,7 @@ class ReturnToEarth(JSONHandlerView):
         if retry:
             # Get parameters for this particular station
             params = Setting.getReturnParams(station_id=station.station_id)
-            if params is None:
+            if not (params is None):
               jsonData = json.dumps({
                  "message_version": "0",
                  "message_timestamp": self.getDateTime(),
@@ -1650,7 +1654,7 @@ class Submit(JSONHandlerView):
         # figure out which team is at that station based on the last transation for that station
         # TODO
         try:
-            startRequests = PiEvent.objects.filter(type=PiEvent.START_CHALLENGE_MSG_TYPE, pi=station).order_by('time')[:1]
+            startRequests = PiEvent.objects.filter(type=PiEvent.START_CHALLENGE_MSG_TYPE, pi=station).order_by('-time')[:1]
         except:
             message = "No start found at this station"
         team = startRequests[0].team        
@@ -1912,6 +1916,38 @@ class Submit_2015(JSONHandlerView):
         # Send a success response
         self.jsonResponse["message"] = "Your results for the challenge at station {} have been submitted".format(station_id)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
+
+#----------------------------------------------------------------------------
+class QRCodeOld(JSONHandlerView):
+    def get(self, request, *args, **kwargs):
+        """ Handle a GET message
+            Create a QR code and display it in a web page.
+            
+            Return an HttpResponse object.
+        """
+        # note this tries to figure out the data automagically
+        # so provide a URL and will set the qrcode type to URL if just text you get text
+        strToEncode = request.GET.get('chl', '')
+        image = self.makeQrCodeImage(strToEncode)
+        html = self.makeInlineImageTag(image)
+        
+        #if true:
+        qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=5, border=4)
+        qr.add_data(strToEncode)
+        qr.make(fit=True)
+        image = qr.make_image()
+        response = HttpResponse(content_type="image/png")
+        image.save(response, "PNG")
+        #else:
+            # TODO seems it would be more efficient to make this SVG
+        #    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=5, border=4, image_factory=qrcode.image.svg.SvgImage)
+        #    qr.add_data(strToEncode)
+        #    qr.make(fit=True)
+        #    image = qr.make_image()    
+        #    response = HttpResponse(content_type="image/svg+xml")
+            #response['Content-Disposition'] = 'out.svg'
+        #    image.save(response, "XML")
+        return response
 
 #----------------------------------------------------------------------------
 class QRCode(JSONHandlerView):

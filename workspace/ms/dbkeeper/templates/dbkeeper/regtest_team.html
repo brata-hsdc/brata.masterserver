@@ -11,9 +11,15 @@
 <td>Reset Team Including Registration</td>
 </tr>
 <tr>
+<!--
   <td><img src="http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F{{ host|urlencode:"" }}{{ register_url|urlencode:"" }}"></td>
   <td><img src="http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F{{ host|urlencode:"" }}{{ unregister_url|urlencode:"" }}"></td>
   <td><img src="http://zxing.org/w/chart?cht=qr&chs=350x350&chld=L&choe=UTF-8&chl=http%3A%2F%2F{{ host|urlencode:"" }}{{ reset_url|urlencode:"" }}"></td>
+-->
+<!-- TODO make this use master servers IP -->
+  <td><img src="{{ qr_service_url }}{{ host|urlencode:"" }}{{ register_url|urlencode:"" }}"></td>
+  <td><img src="{{ qr_service_url }}{{ host|urlencode:"" }}{{ unregister_url|urlencode:"" }}"></td>
+  <td><img src="{{ qr_service_url }}{{ host|urlencode:"" }}{{ reset_url|urlencode:"" }}"></td>
 </tr>
 </table>
 {% endblock %}
