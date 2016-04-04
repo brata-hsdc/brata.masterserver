@@ -86,7 +86,7 @@
 
        // Handle the data returned from the Ajax call
        var tableBody = "";
-       data.sort(function(a,b){ if (b.total_score != a.total_score) { return b.total_score - a.total_score; } return a.total_duration_s - b.total_duration_s; });
+       data.sort(function(a,b){ if (b.total_score != a.total_score) { return b.total_score - a.total_score; } if (a.total_duration_s != b.total_duration_s) { return a.total_duration_s - b.total_duration_s; } return a.team_name.toLowerCase().localeCompare(b.team_name.toLowerCase()); } );
 
        $("tbody > tr").remove();
 
