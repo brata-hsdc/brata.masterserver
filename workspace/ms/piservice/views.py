@@ -30,6 +30,8 @@ import random
 import qrcode
 import qrcode.image.svg
 import io
+import base64
+import cStringIO
 
 # Create your views here.
 
@@ -1913,8 +1915,36 @@ class Submit_2015(JSONHandlerView):
 
 #----------------------------------------------------------------------------
 class QRCode(JSONHandlerView):
+#     def get(self, request, *args, **kwargs):
+#         """ Handle a GET message """
+#         # note this tries to figure out the data automagically
+#         # so provide a URL and will set the qrcode type to URL if just text you get text
+#         strToEncode = request.GET.get('chl', '')
+#         # version 1 is the smallest possible goes up to 40
+#         # default error correct is L for up to 7% errors, it is what we used before so no reason to go higher
+#         # NOTE we tried for fun error correct up one level to M DO NOT DO IT!  It will kill the Pi.
+#         # per the spec need to leave a border of at least 4 units
+#         # size we used 350 in the past but seems to be taking long as well
+#         qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=5, border=4, image_factory=qrcode.image.svg.SvgImage)
+#         qr.add_data(strToEncode)
+#         #qr.make(fit=True)
+#         #image = qr.make_image()
+#         #response = HttpResponse(content_type="image/png")
+#         #image.save(response, "PNG")
+#         # TODO seems it would be more efficient to make this SVG
+#         image = qr.make(fit=True)
+#         #image = qr.make(strToEncode, image_factory=qrcode.image.svg.SvgImage)
+#         response = HttpResponse(content_type="image/svg+xml")
+#         response['Content-Disposition'] = 'out.svg'
+#         response.write(image)
+#         return response
+
     def get(self, request, *args, **kwargs):
-        """ Handle a GET message """
+        """ Handle a GET message
+            Create a QR code and display it in a web page.
+            
+            Return an HttpResponse object.
+        """
         # note this tries to figure out the data automagically
         # so provide a URL and will set the qrcode type to URL if just text you get text
         strToEncode = request.GET.get('chl', '')
@@ -1923,16 +1953,40 @@ class QRCode(JSONHandlerView):
         # NOTE we tried for fun error correct up one level to M DO NOT DO IT!  It will kill the Pi.
         # per the spec need to leave a border of at least 4 units
         # size we used 350 in the past but seems to be taking long as well
-        qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=5, border=4, image_factory=qrcode.image.svg.SvgImage)
+        qr = qrcode.QRCode(version=None,
+                           error_correction=qrcode.constants.ERROR_CORRECT_L,
+                           box_size=5,
+                           border=4)
         qr.add_data(strToEncode)
-        #qr.make(fit=True)
-        #image = qr.make_image()
-        #response = HttpResponse(content_type="image/png")
-        #image.save(response, "PNG")
-        # TODO seems it would be more efficient to make this SVG
-        image = qr.make(fit=True)
-        #image = qr.make(strToEncode, image_factory=qrcode.image.svg.SvgImage)
-        response = HttpResponse(content_type="image/svg+xml")
-        response['Content-Disposition'] = 'out.svg'
-        response.write(image)
+        qr.make(fit=True)
+        image = qr.make_image().convert("RGB")
+        
+        # Generate a simple HTML page containing a centered QR code image
+        # with centered text below it
+        response = HttpResponse(content_type="text/html")
+        response.write("<html><head></head><body>")
+        response.write('<div style="text-align: center;">')
+        response.write(self.makeInlineImageTag(image))
+        response.write('</div><div style="text-align: center;">')
+        response.write(strToEncode)
+        response.write("</div></body></html>")
         return response
+
+    def makeInlineImageTag(self, pilImage, altText="embedded image", imgType="png"):
+        """ Create an <img ...> tag with an inline data URL that contains an image.
+            The tag that is created looks like this:
+                <img src="data:image/png;base64,iVBORw0KGg ... kJgxg==" alt="embedded image" />
+            The image data are contained in the URL, so it does not do a server access.
+            
+            Return a string containing the HTML tag
+        """
+        # Serialize the image data to a memory buffer
+        imgdata = cStringIO.StringIO()
+        pilImage.save(imgdata, format=imgType)
+        imgdata.seek(0) # rewind to start of image data
+        
+        # Encode the binary string
+        b64Image = base64.b64encode(imgdata.getvalue())
+        imgdata.close() # free the buffer
+        
+        return '<img src="data:image/{};base64,{}" alt="{}" />'.format(imgType, b64Image, altText)
