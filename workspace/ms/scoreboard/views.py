@@ -584,6 +584,7 @@ class ScoreboardStatus(View):
                 "return_duration" : _formatSeconds(return_duration_s),
                 "total_score"     : total_score,
                 "total_duration"  : _formatSeconds(total_duration_s),
+		"total_duration_s": total_duration_s
             }
 
             teamList.append(team)
