@@ -1948,6 +1948,27 @@ class QRCode(JSONHandlerView):
         # note this tries to figure out the data automagically
         # so provide a URL and will set the qrcode type to URL if just text you get text
         strToEncode = request.GET.get('chl', '')
+        image = self.makeQrCodeImage(strToEncode)
+        html = self.makeInlineImageTag(image)
+        
+        # Generate a simple HTML page containing a centered QR code image
+        # with centered text below it
+        response = HttpResponse(content_type="text/html")
+        response.write("<html><head></head><body>")
+        response.write('<div style="text-align: center;">')
+        response.write(html)
+        response.write('</div><div style="text-align: center;">')
+        response.write(strToEncode)
+        response.write("</div></body></html>")
+        return response
+
+    def makeQrCodeImage(self, text, rgb=False, boxSizePx=5):
+        """ Create a QR code image representing 'text'.
+            If rgb is True, convert the resulting image from
+            black-and-white to RGB.
+            
+            Return a PIL image.
+        """
         # version 1 is the smallest possible goes up to 40
         # default error correct is L for up to 7% errors, it is what we used before so no reason to go higher
         # NOTE we tried for fun error correct up one level to M DO NOT DO IT!  It will kill the Pi.
@@ -1955,22 +1976,14 @@ class QRCode(JSONHandlerView):
         # size we used 350 in the past but seems to be taking long as well
         qr = qrcode.QRCode(version=None,
                            error_correction=qrcode.constants.ERROR_CORRECT_L,
-                           box_size=5,
+                           box_size=boxSizePx,
                            border=4)
-        qr.add_data(strToEncode)
+        qr.add_data(text)
         qr.make(fit=True)
-        image = qr.make_image().convert("RGB")
-        
-        # Generate a simple HTML page containing a centered QR code image
-        # with centered text below it
-        response = HttpResponse(content_type="text/html")
-        response.write("<html><head></head><body>")
-        response.write('<div style="text-align: center;">')
-        response.write(self.makeInlineImageTag(image))
-        response.write('</div><div style="text-align: center;">')
-        response.write(strToEncode)
-        response.write("</div></body></html>")
-        return response
+        img = qr.make_image()
+        if rgb:
+            img = img.convert("RGB")
+        return img
 
     def makeInlineImageTag(self, pilImage, altText="embedded image", imgType="png"):
         """ Create an <img ...> tag with an inline data URL that contains an image.
