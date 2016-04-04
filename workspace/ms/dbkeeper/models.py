@@ -326,7 +326,7 @@ class Setting(models.Model):
             the entire RETURN_PARAMS data structure if station_id is None
             the data for a station if station_id is not None and value is None
             an individual data value if station_id and value are not None
-        """ 
+        """
         try:
             returnParams = Setting.objects.get(name="RETURN_PARAMS").value
             returnParams = json.loads(returnParams)

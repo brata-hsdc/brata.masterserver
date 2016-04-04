@@ -10,85 +10,92 @@ from dbkeeper.models import Organization, Team, Setting
 from PIL import Image, ImageDraw, ImageFont
 from piservice.models import PiEvent, PiStation
 from random import randint
+from django.contrib.auth.decorators import login_required
 
 
 # TODO Update doc comments throughout file
 #---------------------------------------------------------------------------
 def _computeDock(team_name,
-                 attempt_num,
                  max_submit_events,
                  params,
                  now):
-    #logging.debug('Entered _computeDock({})'.format(team_name))
+    _trace('Entered _computeDock({})'.format(team_name))
 
     num_success_events = params['success_events'].count()
     num_fail_events = params['fail_events'].count()
+    num_latch_events = params['latch_events'].count()
+    _trace('(num_success_events, num_fail_events, num_latch_events) = ({}, {}, {})'.format(num_success_events, num_fail_events, num_latch_events))
 
-    if params['latch_events'].count() > 0:
-        latch_event_timestamp = params['latch_events'].reverse()[0].time # timestamp of final LATCH
+    if num_latch_events > 0:
+        latch_event_timestamp = params['latch_events'].reverse()[0].time
+        _trace('Timestamp of final LATCH is {}'.format(latch_event_timestamp))
     else:
-        # team hasn't scanned the LATCH QR code yet 
         latch_event_timestamp = now
+        _trace('Team hasn\'t scanned the LATCH QR code yet at {}'.format(latch_event_timestamp))
 
     if num_success_events > 0:
-        if params['submit_events'].count() > max_submit_events:
-            logging.error('[1] More than one SUBMIT events ({}) encountered for attempt #{} by Team {} ({}..{})'.format(max_submit_events, attempt_num, team_name, params['t'], params['u']))
+        # TODO Integration: copy this code to other places to get "x of y" in the log
+        num_submit_events = params['submit_events'].count()
+        _trace('Found {} success events out of {} submit events'.format(num_success_events, num_submit_events))
+        if num_submit_events > max_submit_events:
+            logging.error('[1] More than one SUBMIT events ({} of {}) encountered by Team {} ({}..{})'.format(num_submit_events, max_submit_events, team_name, params['t'], params['u']))
 
-        submit_message = params['submit_events'][attempt_num - 1]
+        submit_message = params['submit_events'][0]
         params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
 
         params['score'] = 9
         params['time_to_exit'] = True
-        params['end_time'] = latch_event_timestamp + timedelta(0, float(params['total_run_time_delta_s']))
+        params['end_time'] = latch_event_timestamp
+        _trace('end_time (1) = {}'.format(params['end_time']))
 
     elif num_fail_events > 0:
-        if params['submit_events'].count() > max_submit_events:
-            numberOfSubmitEvents = params['submit_events'].count()
-            logging.error('[2] More than one ({}) SUBMIT events ({}) encountered for attempt #{} by Team {} ({}..{})'.format(numberOfSubmitEvents, max_submit_events, attempt_num, team_name, params['t'], params['u']))
-            logging.error('[2] More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+        num_submit_events = params['submit_events'].count()
+        _trace('Found no success events; found {} fail events out of {} submit events'.format(num_fail_events, num_submit_events))
+        if num_submit_events > max_submit_events:
+            logging.error('[2] More than one SUBMIT events ({} of {}) encountered by Team {} ({}..{})'.format(num_submit_events, max_submit_events, team_name, params['t'], params['u']))
 
         params['num_failed_attempts'] += 1
+        _trace('num_failed_attempts is now {}'.format(params['num_failed_attempts']))
 
-        submit_message = None
-        if not params['submit_events'].exists():
-           submit_message = params['submit_events'][attempt_num - 1]
-           params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
+        submit_message = params['submit_events'][0]
+        params['total_run_time_delta_s'] += _computeRunningTimeDelta(submit_message)
+        _trace('total_run_time_delta_s = {}'.format(params['total_run_time_delta_s']))
 
-        if params['num_failed_attempts'] > 2:
-            params['score'] = 5
-            params['time_to_exit'] = True
-            params['end_time'] = latch_event_timestamp + params['total_run_time_delta_s']
+        if params['num_failed_attempts'] > 2: # i.e. on the 3rd attempt now and it's a failure
+           params['score'] = 5
+           params['time_to_exit'] = True
+           params['end_time'] = latch_event_timestamp
+           _trace('end_time (2) = {}'.format(params['end_time']))
 
     else:
         logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
     params['end_time'] = params['submit_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
-    #logging.debug('Exiting _computeDock')
+    _trace('Exiting _computeDock(end_time = {})'.format(params['end_time']))
 
 
 #---------------------------------------------------------------------------
 def _computeLaunch(team_name,
-                   attempt_num,
                    max_submit_events,
                    params,
                    now):
-    #logging.debug('Entered _computeLaunch({})'.format(team_name))
+    _trace('Entered _computeLaunch({})'.format(team_name))
 
     if params['submit_events'].count() > max_submit_events:
-        logging.error('More than four SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+        logging.error('More than four SUBMIT events encountered by Team {} ({}..{})'.format(team_name, params['t'], params['u']))
 
     params['score'] = params['cur_attempt_score']
     params['time_to_exit'] = True
     params['end_time'] = params['submit_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS or FAIL_STATUS event
 
-    #logging.debug('Exiting _computeLaunch')
+    _trace('Exiting _computeLaunch')
 
 
 #---------------------------------------------------------------------------
 def _computeRunningTimeDelta(submit_message):
     # TODO are all these floats needed?
-    dock_sim_playback_time_s = float(ScoreboardStatus.getSetting('DOCK_SIM_PLAYBACK_TIME_S', -6000))
-    dnf_time_penalty_factor = float(ScoreboardStatus.getSetting('DNF_TIME_PENALTY_FACTOR', -8000))
+    dock_sim_playback_time_s = float(ScoreboardStatus.getSetting('DOCK_SIM_PLAYBACK_TIME_S', 45.0))
+    dnf_time_penalty_factor = float(ScoreboardStatus.getSetting('DNF_TIME_PENALTY_FACTOR', 2.0))
     actual_time_s = float(_getDataField(submit_message, 'candidate_answer'))
     fail_message = _getDataField(submit_message, 'fail_message')
 
@@ -101,46 +108,50 @@ def _computeRunningTimeDelta(submit_message):
     # Time watching the animation
     watching_time_s = min(flying_time_s, dock_sim_playback_time_s)
 
-    return flying_time_s - watching_time_s
+    delta_s = flying_time_s - watching_time_s
+    _trace('Computed running time delta {} (flying_time_s = {}, watching_time_s = {}, dock_sim_playback_time_s = {}, actual_time_s = {})'.format(delta_s, flying_time_s, watching_time_s, dock_sim_playback_time_s, actual_time_s))
+    return delta_s
 
 
 #---------------------------------------------------------------------------
 def _computeSecureOrReturn(team_name,
-                           attempt_num,
                            max_submit_events,
                            params,
                            now):
-    logging.debug('Entered _computeSecureOrReturn({})'.format(team_name))
+    _trace('Entered _computeSecureOrReturn({})'.format(team_name))
 
     num_success_events = params['success_events'].count()
     num_fail_events = params['fail_events'].count()
 
     if num_success_events > 0:
         _trace("Success event(s) found")
-        if params['submit_events'].count() > max_submit_events:
-            logging.error('[3] More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+        num_submit_events = params['submit_events'].count()
+        if num_submit_events > max_submit_events:
+            logging.error('[3] More than one SUBMIT events ({} of {}) encountered by Team {} ({}..{})'.format(num_submit_events, max_submit_events, team_name, params['t'], params['u']))
 
         params['score'] = 9
         params['time_to_exit'] = True
         params['end_time'] = params['success_events'].reverse()[0].time # timestamp of final SUCCESS_STATUS
 
     elif num_fail_events > 0:
-        if params['submit_events'].count() > max_submit_events:
-            logging.error('[4] More than one SUBMIT events encountered for attempt #{} by Team {} ({}..{})'.format(attempt_num, team_name, params['t'], params['u']))
+        num_submit_events = params['submit_events'].count()
+        if num_submit_events > max_submit_events:
+            logging.error('[4] More than one SUBMIT events ({} of {}) encountered by Team {} ({}..{})'.format(num_submit_events, max_submit_events, team_name, params['t'], params['u']))
 
         params['num_failed_attempts'] += 1
-        params['score'] = 5
+        params['score'] = 1
         _trace("Failure event(s) found: num_failed_attempts = {}".format(params['num_failed_attempts']))
 
-        if params['num_failed_attempts'] > 3:
+        if params['num_failed_attempts'] > 2: # i.e. on the 3rd attempt now and it's a failure
             _trace("Max failure events found")
+            params['score'] = 5
             params['time_to_exit'] = True
             params['end_time'] = params['fail_events'].reverse()[0].time # timestamp of final FAIL_STATUS
 
     else:
         logging.error('SUBMIT event encountered that is not a SUCCESS nor a FAIL status; skipping')
 
-    logging.debug('Exiting _computeSecureOrReturn: score = {}'.format(params['score']))
+    _trace('Exiting _computeSecureOrReturn: score = {}'.format(params['score']))
 
 
 #---------------------------------------------------------------------------
@@ -247,19 +258,19 @@ def _getNextEventTimestamp(attempt_num,
                            start_challenge_events,
                            team_events):
     if attempt_num < start_challenge_events.count():
-        logging.debug('More attempts for team follow')
+        _trace('More attempts for team follow')
         result = start_challenge_events[attempt_num].time # timestamp of following event
     else:
-        logging.debug('Either no more attempts for team or event concluded')
+        _trace('Either no more attempts for team or event concluded')
         game_over_events = PiEvent.objects.filter(
             type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
         ).order_by('time')
 
         if game_over_events.count() > 0:
-            logging.debug('Detected game over - event concluded')
+            _trace('Detected game over - event concluded')
             result = game_over_events[0].time
         else:
-            logging.debug('No more attempts for team')
+            _trace('No more attempts for team')
             result = team_events.reverse()[0].time # get last event timestamp
 
     return result
@@ -281,7 +292,6 @@ def _recomputeScore(algorithm,
     params['time_to_exit'] = False
     params['num_failed_attempts'] = 0
     params['current_run_time'] = 0
-    params['docking_time_s'] = 0
     params['total_run_time_delta_s'] = 0.0
     params['latch_events'] = team_events.filter(
         type=PiEvent.LATCH_MSG_TYPE
@@ -353,10 +363,9 @@ def _recomputeScore(algorithm,
                 else:
                     _trace('Phone probably died and need to start over, or challenge still in-progress: (score)=({})'.format(params['score']))
             else:
-                _trace('Running logic custom to the challenge: (num_success_events, num_fail_events) = ({}, {})'.format(
-                    num_success_events, num_fail_events))
+                _trace('Running logic custom to the challenge: (num_success_events, num_fail_events, attempt_num) = ({}, {}, {})'.format(
+                    num_success_events, num_fail_events, attempt_num))
                 algorithm(team_name,
-                          attempt_num,
                           max_submit_events,
                           params,
                           now)
@@ -366,12 +375,41 @@ def _recomputeScore(algorithm,
         else:
             params['time_to_exit'] = True
             if not 'end_time' in params:
-                params['end_time'] = now
+                _trace('End time not yet set. There might be an EVENT CONCLUDED message')
+                if i > 0:
+                    params['t'] = start_challenge_events[i-1].time # timestamp of previous START_CHALLENGE event
+                    events = team_events.filter(
+                        type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
+                    ).filter(
+                        Q(time__gte=params['t'])
+                    )
+
+                    if events.count() > 0:
+                        params['end_time'] = events[0].time
+                    else:
+                        params['end_time'] = now
+                else:
+                    params['end_time'] = now
+
+                _trace('End time set to {}.'.format(params['end_time']))
+            else:
+                params['t'] = params['end_time']
+                events = team_events.filter(
+                    type=PiEvent.EVENT_CONCLUDED_MSG_TYPE
+                ).filter(
+                    Q(time__gte=params['t'])
+                )
+
+                if events.count() > 0:
+                    params['end_time'] = events[0].time
+                else:
+                    params['end_time'] = now
+
             _trace('Challenge complete; time to exit: (score, end_time)=({}, {})'.format(params['score'], params['end_time']))
 
-    duration_s = (params['end_time'] - start_time).total_seconds() + params['docking_time_s']
-    _trace('{}.{}: (duration_s, start_time, end_time, docking_time_s) = ({}, {}, {}, {})'.format(
-        team_name, station_type, duration_s, start_time, params['end_time'], params['docking_time_s']))
+    duration_s = (params['end_time'] - start_time).total_seconds() + params['total_run_time_delta_s']
+    _trace('{}.{}: (duration_s, start_time, end_time, total_run_time_delta_s) = ({}, {}, {}, {})'.format(
+        team_name, station_type, duration_s, start_time, params['end_time'], params['total_run_time_delta_s']))
 
     _trace('Exiting _recomputeScore[{}, {}]: (score, duration_s) = ({}, {})'.format(team_name, station_type, params['score'], duration_s))
     return (params['score'], duration_s)
@@ -438,11 +476,12 @@ def _utcNow():
 
 
 #-------------------------------------------------------------------------------
+@login_required
 def index(request):
     """ Display the scoreboard page. Updating is driven by the page making
         REST requests.
     """
-    logging.debug('Entered scoreboard.views.index')
+    _trace('Entered scoreboard.views.index')
 
     refreshInterval_ms = ScoreboardStatus.getSetting('SCOREBOARD_STATUS_REFRESH_INTERVAL_MS', 5000)
 
@@ -452,7 +491,7 @@ def index(request):
 
     result = render(request, "scoreboard/index.html", context)
 
-    logging.debug('Exiting scoreboard.views.index')
+    _trace('Exiting scoreboard.views.index')
     return result
 
 
@@ -490,11 +529,11 @@ class ScoreboardStatus(View):
     #---------------------------------------------------------------------------
     @staticmethod
     def getSetting(key,
-                   ridiculous_default):
-        result = Setting.get(key, ridiculous_default)
+                   default_value):
+        result = Setting.get(key, default_value)
 
-        if result == ridiculous_default:
-            logging.warning("No {} key found in the Settings table. Proceeding with value {}".format(key, ridiculous_default))
+        if result == default_value:
+            logging.warning("No {} key found in the Settings table. Proceeding with value {}".format(key, default_value))
 
         return result
 
@@ -510,7 +549,7 @@ class ScoreboardStatus(View):
         for t in teams:
             s = _recomputeTeamScore(t.name)
 
-            if t.registered == None:
+            if (t.registered == None) or (not t.registered):
                 registered_icon = "hourglass"
                 registered_color = "yellow"
             else:
@@ -582,14 +621,14 @@ class TeamIcon(View):
         ]
     """
     def __init__(self):
-        logging.debug('Entered TeamIcon.__init__')
+        _trace('Entered TeamIcon.__init__')
 
 
     #---------------------------------------------------------------------------
     """ TODO A REST request to get scores from the database for the leaderboard """
     def get(self, request, team_name):
         """ TODO Retrieve score information from the database and return it """
-        logging.debug('Entered TeamIcon.get(' + team_name + ')')
+        _trace('Entered TeamIcon.get(' + team_name + ')')
 
         team_initial = team_name[0]
         text = team_initial.upper()
@@ -631,5 +670,5 @@ class TeamIcon(View):
         result = HttpResponse(content_type="image/png", status=200)
         img.save(result, "PNG")
 
-        logging.debug('Exiting TeamIcon.get')
+        _trace('Exiting TeamIcon.get')
         return result

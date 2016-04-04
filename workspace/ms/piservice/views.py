@@ -1920,15 +1920,17 @@ class Submit_2015(JSONHandlerView):
 #----------------------------------------------------------------------------
 class QRCodeOld(JSONHandlerView):
     def get(self, request, *args, **kwargs):
-        """ Handle a GET message """
+        """ Handle a GET message
+            Create a QR code and display it in a web page.
+            
+            Return an HttpResponse object.
+        """
         # note this tries to figure out the data automagically
         # so provide a URL and will set the qrcode type to URL if just text you get text
         strToEncode = request.GET.get('chl', '')
-        # version 1 is the smallest possible goes up to 40
-        # default error correct is L for up to 7% errors, it is what we used before so no reason to go higher
-        # NOTE we tried for fun error correct up one level to M DO NOT DO IT!  It will kill the Pi.
-        # per the spec need to leave a border of at least 4 units
-        # size we used 350 in the past but seems to be taking long as well
+        image = self.makeQrCodeImage(strToEncode)
+        html = self.makeInlineImageTag(image)
+        
         #if true:
         qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=5, border=4)
         qr.add_data(strToEncode)
