@@ -1210,9 +1210,10 @@ class ScoreboardStatusDockTestCase(TestCase):
     def test_recomputeDockScore_onlyOneStartChallengeEventLaterTimestamp(self, mock_utcNow):
         pass # Don't worry about later timestamps
 
-
+#TODO - Remaining items...
+#
 # Scoreboard
-# [o] 1. absent/present Registered indicator
+# [x] 1. absent/present Registered indicator
 # [x] 2. make title larger and change to "Leaderboard"
 # [x] 3. fill width 100%
 # [ ] 4. make 30 teams fit on the same page with roughly 20-30 chars
@@ -1221,10 +1222,9 @@ class ScoreboardStatusDockTestCase(TestCase):
 # [ ] 7. put "Harris Design Challenge 2016" along the left-hand side
 # [ ] 8. ranking
 # [ ] 11. remove team logo if not implementing this time
-
-# TODO Page has two jquery <script> tags--one looks WRONG_ARGUMENTS
-
-
+# [ ] 12. Page has two jquery <script> tags--one looks WRONG_ARGUMENTS
+#
+#
 # Enhancements
-# 9. Change color (darker) for the ones that are zero (not started)
-# 10. Set color brighter to stand out for the ones that are done
+# [ ] 9. Change color (darker) for the ones that are zero (not started)
+# [ ] 10. Set color brighter to stand out for the ones that are done
