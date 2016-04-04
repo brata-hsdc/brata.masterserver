@@ -1918,7 +1918,7 @@ class Submit_2015(JSONHandlerView):
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
-class QRCodeOld(JSONHandlerView):
+class QRCode(JSONHandlerView):
     def get(self, request, *args, **kwargs):
         """ Handle a GET message
             Create a QR code and display it in a web page.
@@ -1928,8 +1928,8 @@ class QRCodeOld(JSONHandlerView):
         # note this tries to figure out the data automagically
         # so provide a URL and will set the qrcode type to URL if just text you get text
         strToEncode = request.GET.get('chl', '')
-        image = self.makeQrCodeImage(strToEncode)
-        html = self.makeInlineImageTag(image)
+        #image = self.makeQrCodeImage(strToEncode)
+        #html = self.makeInlineImageTag(image)
         
         #if true:
         qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=5, border=4)
@@ -1950,7 +1950,7 @@ class QRCodeOld(JSONHandlerView):
         return response
 
 #----------------------------------------------------------------------------
-class QRCode(JSONHandlerView):
+class QRCodeNew(JSONHandlerView):
 #     def get(self, request, *args, **kwargs):
 #         """ Handle a GET message """
 #         # note this tries to figure out the data automagically
