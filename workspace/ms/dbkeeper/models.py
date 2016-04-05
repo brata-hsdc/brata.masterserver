@@ -278,13 +278,13 @@ class Setting(models.Model):
         tones = [0]*9  # a list of 9 zeroes
         tones[0] = lockDigits[0]
         tones[1] = lockDigits[1]
-        tones[2] = 7 - (tones[0] + tones[1]) % 7
+        tones[2] = (7 - (tones[0] + tones[1])) % 7
         tones[3] = lockDigits[2]
         tones[4] = lockDigits[3]
-        tones[5] = 7 - (tones[3] + tones[4]) % 7
-        tones[6] = 7 - (tones[0] + tones[3]) % 7
-        tones[7] = 7 - (tones[1] + tones[4]) % 7
-        tones[8] = 7 - (tones[2] + tones[5]) % 7
+        tones[5] = (7 - (tones[3] + tones[4])) % 7
+        tones[6] = (7 - (tones[0] + tones[3])) % 7
+        tones[7] = (7 - (tones[1] + tones[4])) % 7
+        tones[8] = (7 - (tones[2] + tones[5])) % 7
         
         # Try to retrieve error injection values from the Setting table
         try:
@@ -298,7 +298,7 @@ class Setting(models.Model):
         while numErrors:
             errorDigit = random.choice(unused)  # choose one of the intact tone values to mess up
             change = random.choice(errorValues)  # choose an amount to perturb it by
-            tones[errorDigit] = (tones[errorDigit] + change) % 7  # add the corruption
+            tones[errorDigit] = (tones[errorDigit] + change) % 8  # add the corruption
             unused.remove(errorDigit)  # don't choose the same one twice
             numErrors -= 1
         
