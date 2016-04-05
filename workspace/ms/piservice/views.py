@@ -1915,52 +1915,42 @@ class Submit_2015(JSONHandlerView):
 
 #----------------------------------------------------------------------------
 class QRCode(JSONHandlerView):
-#     def get(self, request, *args, **kwargs):
-#         """ Handle a GET message """
-#         # note this tries to figure out the data automagically
-#         # so provide a URL and will set the qrcode type to URL if just text you get text
-#         strToEncode = request.GET.get('chl', '')
-#         # version 1 is the smallest possible goes up to 40
-#         # default error correct is L for up to 7% errors, it is what we used before so no reason to go higher
-#         # NOTE we tried for fun error correct up one level to M DO NOT DO IT!  It will kill the Pi.
-#         # per the spec need to leave a border of at least 4 units
-#         # size we used 350 in the past but seems to be taking long as well
-#         qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L,box_size=5, border=4, image_factory=qrcode.image.svg.SvgImage)
-#         qr.add_data(strToEncode)
-#         #qr.make(fit=True)
-#         #image = qr.make_image()
-#         #response = HttpResponse(content_type="image/png")
-#         #image.save(response, "PNG")
-#         # TODO seems it would be more efficient to make this SVG
-#         image = qr.make(fit=True)
-#         #image = qr.make(strToEncode, image_factory=qrcode.image.svg.SvgImage)
-#         response = HttpResponse(content_type="image/svg+xml")
-#         response['Content-Disposition'] = 'out.svg'
-#         response.write(image)
-#         return response
-
     def get(self, request, *args, **kwargs):
         """ Handle a GET message
-            Create a QR code and display it in a web page.
+            Create a QR code and return an image.
             
-            Return an HttpResponse object.
+            Return an HttpResponse object containing the image.
         """
         # note this tries to figure out the data automagically
         # so provide a URL and will set the qrcode type to URL if just text you get text
         strToEncode = request.GET.get('chl', '')
         image = self.makeQrCodeImage(strToEncode)
-        html = self.makeInlineImageTag(image)
         
-        # Generate a simple HTML page containing a centered QR code image
-        # with centered text below it
-        response = HttpResponse(content_type="text/html")
-        response.write("<html><head></head><body>")
-        response.write('<div style="text-align: center;">')
-        response.write(html)
-        response.write('</div><div style="text-align: center;">')
-        response.write(strToEncode)
-        response.write("</div></body></html>")
+        # Serialize the image data to a memory buffer
+        imgdata = cStringIO.StringIO()
+        imgType = "png"
+        image.save(imgdata, format=imgType)
+        imgdata.seek(0) # rewind to start of image data
+
+        response = HttpResponse(content_type="image/" + imgType)
+        response.write(imgdata.read())
+        
+#         # Include the following tag to cause the browser to display the Save dialog
+#         response['Content-Disposition'] = "out." + imgType 
         return response
+
+#         # Generate a simple HTML page containing a centered QR code image
+#         # with centered text below it
+#         html = self.makeInlineImageTag(image)
+#         
+#         response = HttpResponse(content_type="text/html")
+#         response.write("<html><head></head><body>")
+#         response.write('<div style="text-align: center;">')
+#         response.write(html)
+#         response.write('</div><div style="text-align: center;">')
+#         response.write(strToEncode)
+#         response.write("</div></body></html>")
+#         return response
 
     def makeQrCodeImage(self, text, rgb=False, boxSizePx=5):
         """ Create a QR code image representing 'text'.
@@ -1990,6 +1980,8 @@ class QRCode(JSONHandlerView):
             The tag that is created looks like this:
                 <img src="data:image/png;base64,iVBORw0KGg ... kJgxg==" alt="embedded image" />
             The image data are contained in the URL, so it does not do a server access.
+            
+            See: http://www.websiteoptimization.com/speed/tweak/inline-images/
             
             Return a string containing the HTML tag
         """
