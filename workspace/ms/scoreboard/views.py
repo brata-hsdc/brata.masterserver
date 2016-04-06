@@ -280,6 +280,8 @@ def _getNextEventTimestamp(attempt_num,
 def _recomputeScore(algorithm,
                     team_name,
                     station_type,
+                    scoreScaleFactorKey,
+                    timeScaleFactorKey,
                     max_submit_events,
                     calc_current_attempt_score,
                     now):
@@ -412,7 +414,12 @@ def _recomputeScore(algorithm,
         team_name, station_type, duration_s, start_time, params['end_time'], params['total_run_time_delta_s']))
 
     _trace('Exiting _recomputeScore[{}, {}]: (score, duration_s) = ({}, {})'.format(team_name, station_type, params['score'], duration_s))
-    return (params['score'], duration_s)
+
+    scoreScaleFactor = float(ScoreboardStatus.getSetting(scoreScaleFactorKey, 1.0))
+    timeScaleFactor = float(ScoreboardStatus.getSetting(timeScaleFactorKey, 1.0))
+
+    return (params['score'] * scoreScaleFactor,
+            duration_s * timeScaleFactor)
 
 
 #---------------------------------------------------------------------------
@@ -423,24 +430,32 @@ def _recomputeTeamScore(team_name):
     (launch_score, launch_duration_s) = _recomputeScore(_computeLaunch,
                                                         team_name,
                                                         PiStation.LAUNCH_STATION_TYPE,
+                                                        'SCORING_SCALE_FACTOR_LAUNCH_SCORE',
+                                                        'SCORING_SCALE_FACTOR_LAUNCH_TIME',
                                                         4,
                                                         True,
                                                         now)
     (dock_score,   dock_duration_s)   = _recomputeScore(_computeDock,
                                                         team_name,
                                                         PiStation.DOCK_STATION_TYPE,
+                                                        'SCORING_SCALE_FACTOR_DOCK_SCORE',
+                                                        'SCORING_SCALE_FACTOR_DOCK_TIME',
                                                         1,
                                                         False,
                                                         now)
     (secure_score, secure_duration_s) = _recomputeScore(_computeSecureOrReturn,
                                                         team_name,
                                                         PiStation.SECURE_STATION_TYPE,
+                                                        'SCORING_SCALE_FACTOR_SECURE_SCORE',
+                                                        'SCORING_SCALE_FACTOR_SECURE_TIME',
                                                         1,
                                                         False,
                                                         now)
     (return_score, return_duration_s) = _recomputeScore(_computeSecureOrReturn,
                                                         team_name,
                                                         PiStation.RETURN_STATION_TYPE,
+                                                        'SCORING_SCALE_FACTOR_RETURN_SCORE',
+                                                        'SCORING_SCALE_FACTOR_RETURN_TIME',
                                                         1,
                                                         False,
                                                         now)
