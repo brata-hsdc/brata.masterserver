@@ -415,8 +415,8 @@ def _recomputeScore(algorithm,
 
     _trace('Exiting _recomputeScore[{}, {}]: (score, duration_s) = ({}, {})'.format(team_name, station_type, params['score'], duration_s))
 
-    scoreScaleFactor = float(ScoreboardStatus.getSetting(scoreScaleFactorKey, 99.9))
-    timeScaleFactor = float(ScoreboardStatus.getSetting(timeScaleFactorKey, 99.9))
+    scoreScaleFactor = float(ScoreboardStatus.getSetting(scoreScaleFactorKey, 1.0))
+    timeScaleFactor = float(ScoreboardStatus.getSetting(timeScaleFactorKey, 1.0))
 
     return (params['score'] * scoreScaleFactor,
             duration_s * timeScaleFactor)
