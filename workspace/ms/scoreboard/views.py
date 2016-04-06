@@ -193,8 +193,8 @@ def _getEvents(team_name,
         start_event = start_events[0]
 
         if start_events.count() > 1:
-            logging.warning("Multiple EVENT_STARTED_MSG_TYPEs encountered; taking the latest one only")
-            start_event = start_events[-1]
+            _trace("Multiple EVENT_STARTED_MSG_TYPEs encountered; taking the latest one only")
+            start_event = list(start_events)[-1]
 
         t = start_event.time
 
