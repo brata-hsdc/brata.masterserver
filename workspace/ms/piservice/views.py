@@ -890,7 +890,7 @@ class AtWaypoint(JSONHandlerView):
     def __init__(self):
         super(AtWaypoint, self).__init__(PiEvent.AT_WAYPOINT_MSG_TYPE, methods=[self.POST])
     
-    def post(self, request, lat, lon, *args, **kwargs):
+    def post(self, request, station_id, vertex, *args, **kwargs):
         """ Handle the POST message and update the database """
         super(AtWaypoint, self).post(request, *args, **kwargs)
 
@@ -898,18 +898,108 @@ class AtWaypoint(JSONHandlerView):
         m,response = self.validateJSONFields(request, ("reg_code",))
         if m is None:
             return response
-        
-        # TODO:  Add message processing
+
+        message="StartChallenge msg received from {}".format(m.reg_code)
+
+        # Get the station from the station_id
+        station, response = self.getStationFromStationId(station_id, request.body)
+        if station is None:
+            return response
+
+        team, response = self.getTeamFromRegCode(m.reg_code, request.body)
+        if team is None:
+            return response
+
+        # get the initial parameters from the start_challenge event
+        # find the event and get the parameters out of the JSON data
+        try:
+            startRequests = PiEvent.objects.filter(
+                Q(type=PiEvent.START_CHALLENGE_MSG_TYPE, pi=station, team=team)|
+                Q(type=PiEvent.SUBMIT_MSG_TYPE, pi=station, team=team)|
+                Q(type=PiEvent.STATION_SUBMIT_CHALLENGE_MSG_TYPE, pi=station, team=team)
+                ).order_by('-time')[:1]
+        except:
+            message = "No start found at this station"
+            # TODO handle error
+        try:
+            data = json.loads(startRequests[0].data)
+        except:
+            message = "problem loading start request data"
+        if data is None:
+            # TODO make error message
+            return response
+
+        launchParams = data["LAUNCH_PARAMS"]
+        currentVertexNumber = data["CURRENT_VERTEX_NUMBER"]
+        attemptNumber = data["ATTEMPT_NUMBER"]
+        currentVertex = launchParams[attemptNumber]
+
+        # Todo determine if wasCorrect and if three retries have been made for this coordinate
+        wasCorrect = true
+        if currentVertex[0] != vertex:
+            wasCorrect = false
+            if false: # TODO establish if even in the right area
+                wrongVertex = false # they are in completely the wrong place not just a decoy
+        retry = true
+        if attemptNumber == 2: # in other words there were already 2 attempts so this is the third
+           retry = false
+        # Assume is a retry case
+        type=PiEvent.STATION_SUBMIT_MSG_TYPE
+        status = PiEvent.INFO_STATUS
+
+        # Need to make sure these status make it in the log and back to the user regardless of station coms
+        # this is what the scoring is based on
+        if wasCorrect:
+            # Succeeded:  Record the transaction and update the station record
+            status = PiEvent.SUCCESS_STATUS
+            type=PiEvent.SUBMIT_MSG_TYPE
+            if currentVertexNumber == 0 or currentVertex == 1:
+                message = "Correct! Continue to the next vertex"
+            elif currentVertexNumber == 2:
+                message = "Correct! Continue to the center"
+            else: # currentVertexNumber == 3:
+                message = "Correct! Continue to the next Challenge"
+            currentVertexNumber += 1
+            attemptNumber = 0
+        elif retry:
+            message = "Decoy, try again!"
+            #TODO alternative retries
+            if wrongVertex and currentVertexNumber == 0:
+                message = "Sorry, not the Origin; Go to the Origin"
+            elif wrongVertex and (currentVertexNumber == 1 or currentVertexNumber == 2):
+                message = "Sorry, not a vertex; Go to the right vertex"
+            elif wrongVertex:
+                message = "Sorry, not the Center; Go to the Center"
+            attemptNumber += 1
+        else:
+            # Post failures so scoring can keep track of them
+            status = PiEvent.FAIL_STATUS
+            type=PiEvent.SUBMIT_MSG_TYPE
+            if currentVertexNumber == 0 or currentVertex == 1:
+                message = "Sorry, go to the next vertex"
+            elif currentVertexNumber == 2:
+                message = "Sorry, go to the center"
+            else: # currentVertexNumber == 3:
+                #This is the final signal it is completely over
+                message = "Sorry, go to the next Challenge"
+            currentVertexNumber += 1
+            attemptNumber = 0
+
+        startData = json.dumps({
+                "CURRENT_VERTEX_NUMBER": currentVertexNumber,
+                "ATTEMPT_NUMBER": attemptNumber,
+            })
+
         # SUBMIT_MSG_TYPE is used for success for failure tracking for scoring
-        event = PiEvent.addEvent(type=PiEvent.SUBMIT_MSG_TYPE,
-                              team=team,        
-                              data=request.body,
-                              status=PiEvent.SUCCESS_STATUS,
-                              message="AtWaypoint ({}, {}) msg received from {}".format(lat, lon, m.reg_code),
+        event = PiEvent.addEvent(type=type,
+                              pi=station,
+                              data=startData,
+                              status=status,
+                              message=message,
                              )
         
         # Send a success response
-        self.jsonResponse["message"] = "You have successfully navigated to ...."
+        self.jsonResponse["message"] = cipher(message)
         return HttpResponse(json.dumps(self.jsonResponse), content_type="application/json", status=200)
 
 #----------------------------------------------------------------------------
@@ -962,10 +1052,28 @@ class StartChallenge(JSONHandlerView):
 
         if station.station_type == "Launch":
             # Get set of random parameters
-            # TODO
             # Randomly select a triangle from the next group of triangles by color
+            launchParamsList = Setting.getLaunchParams()
+            # Pick at random
+            launchParams=random.choice(launchParamsList)
             shouldCallStation = False
-            message = "Layout the launch site at [LAT=+dd.ddddd] [LON=-dd.ddddd] [ROT=ddd.d] [SIDE=dd.d] [COLOR=c]"
+            currentVertexNumber = 0
+            attemptNumber = 0
+            startData = json.dumps({
+                    "LAUNCH_PARAMS": launchParams,
+                    "CURRENT_VERTEX_NUMBER": currentVertexNumber,
+                    "ATTEMPT_NUMBER": attemptNumber,
+                })
+            origin = launchParams[0]
+            lat = origin[1]
+            lon = origin[2]
+            angle = origin[3]
+            side = launchParams[3][1]
+            tmpList = []
+            tmpList.append(origin[0])
+            color = tmpList[0]
+            # TODO fix leading zeros and verify final format matches spec
+            message = "Layout the launch site at [LAT={0:+.05f}] [LON={0:+.05f}] [ROT={0:.01f}] [SIDE={0:0.1f}] [COLOR={}]".format(lat, lon, angle, side, color)
         elif station.station_type == "Dock":
             jsonData = json.dumps({
                  "message_version": "0",
