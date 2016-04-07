@@ -3,6 +3,7 @@ from django.views.generic import View
 from django.utils import timezone
 from django.utils.http import urlquote
 from django.core.exceptions import ObjectDoesNotExist, MultipleObjectsReturned
+from django.db.models import Q
 
 import json
 
@@ -913,14 +914,23 @@ class AtWaypoint(JSONHandlerView):
         # get the initial parameters from the start_challenge event
         # find the event and get the parameters out of the JSON data
         try:
-            startRequests = PiEvent.objects.filter(
-                Q(type=PiEvent.START_CHALLENGE_MSG_TYPE, pi=station, team=team)|
-                Q(type=PiEvent.SUBMIT_MSG_TYPE, pi=station, team=team)|
-                Q(type=PiEvent.STATION_SUBMIT_CHALLENGE_MSG_TYPE, pi=station, team=team)
+            startRequests = PiEvent.objects.filter((
+                Q(type=PiEvent.START_CHALLENGE_MSG_TYPE)|
+                Q(type=PiEvent.SUBMIT_MSG_TYPE)|
+                Q(type=PiEvent.STATION_SUBMIT_MSG_TYPE)) &
+                Q(pi=station) &
+                Q(team=team)
                 ).order_by('-time')[:1]
         except:
             message = "No start found at this station"
             # TODO handle error
+            event = PiEvent.addEvent(type=PiEvent.AT_WAYPOINT_MSG_TYPE,
+                              pi=station,
+                              data=json.dumps({"station":station_id,"reg_code":m.reg_code}),
+                              status=PiEvent.INFO_STATUS,
+                              message=message,
+                             )
+
         try:
             data = json.loads(startRequests[0].data)
         except:
@@ -932,17 +942,18 @@ class AtWaypoint(JSONHandlerView):
         launchParams = data["LAUNCH_PARAMS"]
         currentVertexNumber = data["CURRENT_VERTEX_NUMBER"]
         attemptNumber = data["ATTEMPT_NUMBER"]
-        currentVertex = launchParams[attemptNumber]
+        currentVertex = launchParams[currentVertexNumber]
 
         # Todo determine if wasCorrect and if three retries have been made for this coordinate
-        wasCorrect = true
+        wasCorrect = True
+        wrongVertex = False
         if currentVertex[0] != vertex:
-            wasCorrect = false
-            if false: # TODO establish if even in the right area
-                wrongVertex = false # they are in completely the wrong place not just a decoy
-        retry = true
+            wasCorrect = False
+            if False: # TODO establish if even in the right area
+                wrongVertex = True # they are in completely the wrong place not just a decoy
+        retry = True
         if attemptNumber == 2: # in other words there were already 2 attempts so this is the third
-           retry = false
+           retry = False
         # Assume is a retry case
         type=PiEvent.STATION_SUBMIT_MSG_TYPE
         status = PiEvent.INFO_STATUS
@@ -986,12 +997,14 @@ class AtWaypoint(JSONHandlerView):
             attemptNumber = 0
 
         startData = json.dumps({
+                "LAUNCH_PARAMS": launchParams,
                 "CURRENT_VERTEX_NUMBER": currentVertexNumber,
                 "ATTEMPT_NUMBER": attemptNumber,
             })
 
         # SUBMIT_MSG_TYPE is used for success for failure tracking for scoring
         event = PiEvent.addEvent(type=type,
+                              team=team,
                               pi=station,
                               data=startData,
                               status=status,
@@ -1072,8 +1085,8 @@ class StartChallenge(JSONHandlerView):
             tmpList = []
             tmpList.append(origin[0])
             color = tmpList[0]
-            # TODO fix leading zeros and verify final format matches spec
-            message = "Layout the launch site at [LAT={0:+.05f}] [LON={0:+.05f}] [ROT={0:.01f}] [SIDE={0:0.1f}] [COLOR={}]".format(lat, lon, angle, side, color)
+            # NOTE this is just text
+            message = "Layout the launch site at [LAT={}] [LON={}] [ROT={}] [SIDE={}] [COLOR={}]".format(lat, lon, angle, side, color)
         elif station.station_type == "Dock":
             jsonData = json.dumps({
                  "message_version": "0",
@@ -1152,7 +1165,8 @@ class StartChallenge(JSONHandlerView):
                 data = response
 
                 # Record the transaction status
-                event = self.addEvent(team=team,
+                event = self.addEvent(
+                              team=team,
                               pi=station,
                               data=data,
                               status=status,

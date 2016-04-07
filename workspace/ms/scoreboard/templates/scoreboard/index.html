@@ -10,6 +10,8 @@
 {% block body_start %}
   <script type="text/javascript">
     var VERBOSE = false;
+    var time_max = {{ PAGE_REFRESH_INTERVAL }};
+    var cur_time = time_max;
 
     function logE(message) {
        VERBOSE && console.error(message);
@@ -125,17 +127,33 @@
           top += el.outerHeight();
        });
 */
-
-       // Now that we've completed the request, schedule the next one
-       setTimeout(getScoreboardStatus, {{ PAGE_REFRESH_INTERVAL }});
+//       setTimeout(timeUpdate, 1000);
     }
 
     function getScoreboardStatus() {
        $.getJSON('/scoreboard/scoreboard_status/', handleScoreboardStatus);
+       $('.timelbl').text("Getting data...");
+
+       // Now that we've submitted the request, schedule the next one
+//       setTimeout(getScoreboardStatus, {{ PAGE_REFRESH_INTERVAL }});
     }
 
     function onReady(event) {
        getScoreboardStatus();
+       timeUpdate();
+    }
+
+    function timeUpdate() {
+       cur_time -= 1000;
+       if (cur_time <= 0) 
+       {
+          getScoreboardStatus();
+          cur_time = time_max;
+//          return;
+       }
+
+       $('.timelbl').text("Refresh in " + (cur_time / 1000) + "s");
+       setTimeout(timeUpdate, 1000);
     }
 
     $(document).ready(onReady);
