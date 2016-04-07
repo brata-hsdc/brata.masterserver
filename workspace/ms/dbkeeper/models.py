@@ -187,19 +187,17 @@ class Setting(models.Model):
         """ Return the whole data structure, triangle, or 1 vertex.
         
         The structure is as follows:
-        [triangle0, triangle1, triangle2]
+        [triangle0, triangle1, ..., triangle8]
         
-        where trianglen is:
-        [vertex0, vertex1, vertex2, vertex3]
-        
-        where vertex0..2 are:
-        [name, lat, lon, angle]
-        
-        and vertex3 (the center and triangle side length) is:
-        [name, sidelength]
-        
-        (sidelength is really not associated with the center
-        point, but is stored there for convenience.)
+        where trianglen is a dict:
+        { "tname": "R-T1",
+          "zone": "R",
+          "side": "46.8",
+          "rot": "100.7",
+          "origin": { "vname": "R113", "lat": "28.033031", "lon": "-80.600761" },
+          "v2":     { "vname": "R725", "lat": "28.032953", "lon": "-80.600347" },
+          "v3":     { "vname": "R330", "lat": "28.032634", "lon": "-80.600622" },
+          "center": { "vname": "R947", "lat": "28.032873", "lon": "-80.600577" } }        
         
         Returns:
             the entire LAUNCH_PARAMS data structure if tri is None
@@ -215,10 +213,15 @@ class Setting(models.Model):
         
         if tri is None:
             return launchParams
+        elif tri > len(launchParams) - 1:
+            return None
         elif vert is None:
             return launchParams[tri]
+        elif vert > 3:
+            return None
         else:
-            return launchParams[tri][vert]
+            p = launchParams[tri]
+            return [p["origin"], p["v2"], p["v3"], p["center"]][vert]
     
     @staticmethod
     def getDockParams():
