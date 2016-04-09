@@ -96,41 +96,6 @@
 
        $.each(data, processData);
 
-
-// TODO...
-/*
-       // Reorder the table to sort by descending rank
-       var numRows = $("tbody").find("tr").length;
-       var top = 26;
-
-       for (var i = 1; i <= numRows; ++i) {
-          var elem = $("tbody").find("tr:nth-child(" + i + ")");
-          var id = elem.attr('id');
-          var rank = elem.find("td:nth-child( 1)").html();
-//          logD("top=["+top+"] rank=["+rank+"] prod=["+(top*rank)+"]");
-
-          elem.animate({
-             position: 'absolute',
-             top: 0 + 'px'
-          }, 400);
-
-          top += elem.outerHeight();
-       }
-*/
-
-/*
-       $.each(order_arr, function(idx, val) {
-          var el = $('tbody tr#user-' + val);
-
-          el.animate({
-             position: 'absolute',
-             top: top + 'px'
-          }, 400);
-          top += el.outerHeight();
-       });
-*/
-//       setTimeout(timeUpdate, 1000);
-
        is_updating = 0;
     }
 
@@ -140,9 +105,6 @@
 
        $.getJSON('/scoreboard/scoreboard_status/', handleScoreboardStatus);
        $('.timelbl').text("Getting data...");
-
-       // Now that we've submitted the request, schedule the next one
-//       setTimeout(getScoreboardStatus, {{ PAGE_REFRESH_INTERVAL }});
     }
 
     function onReady(event) {
