@@ -12,6 +12,8 @@
     var VERBOSE = false;
     var time_max = {{ PAGE_REFRESH_INTERVAL }};
     var cur_time = time_max;
+    var is_updating = 0;
+    var update_time = 0;
 
     function logE(message) {
        VERBOSE && console.error(message);
@@ -128,9 +130,14 @@
        });
 */
 //       setTimeout(timeUpdate, 1000);
+
+       is_updating = 0;
     }
 
     function getScoreboardStatus() {
+       is_updating = 1;
+       update_time = 0;
+
        $.getJSON('/scoreboard/scoreboard_status/', handleScoreboardStatus);
        $('.timelbl').text("Getting data...");
 
@@ -144,15 +151,25 @@
     }
 
     function timeUpdate() {
-       cur_time -= 1000;
-       if (cur_time <= 0) 
-       {
-          getScoreboardStatus();
-          cur_time = time_max;
-//          return;
+       if (is_updating) {
+          update_time += 1;
+          $('.timelbl').text("Geting data (" + (update_time) + "s)...");
+          // if we've gone 300 seconds without an update, try again
+          if (update_time > 300) getScoreboardStatus();
        }
-
-       $('.timelbl').text("Refresh in " + (cur_time / 1000) + "s");
+       else
+       {
+          cur_time -= 1000;
+          if (cur_time <= 0) 
+          {
+             getScoreboardStatus();
+             cur_time = time_max;
+          }
+          else
+          {
+             $('.timelbl').text("Refresh in " + (cur_time / 1000) + "s");
+          }
+       }
        setTimeout(timeUpdate, 1000);
     }
 
