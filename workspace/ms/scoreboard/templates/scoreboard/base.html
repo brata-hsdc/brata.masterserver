@@ -40,9 +40,18 @@
    font-size: 50px !important;
 }
 
-table.scoreboard thead
+table.scoreboard th
 {
-   height: 70px
+   height: 70px;
+}
+
+table.scoreboard th {
+   font-size: large;
+   vertical-align: bottom;
+}
+
+table.scoreboard td {
+   font-size: larger;
 }
 
 table.scoreboard { counter-reset: line-number; }
@@ -70,6 +79,7 @@ table.scoreboard td:first-child:before {
       <div class="navbar-collapse collapse" id="navbar-main">
         <ul class="nav navbar-nav navbar-right">
         </ul>
+        <div class="timelbl" id="timediv" style="float: right;">Refresh</div>
       </div>
     </div>
   </div>
