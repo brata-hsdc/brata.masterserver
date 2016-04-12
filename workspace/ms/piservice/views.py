@@ -944,7 +944,7 @@ class AtWaypoint(JSONHandlerView):
         attemptNumber = data["ATTEMPT_NUMBER"]
         currentVertex = launchParams[currentVertexNumber]
 
-        # Todo determine if wasCorrect and if three retries have been made for this coordinate
+        # Determine if wasCorrect and if three retries have been made for this coordinate
         wasCorrect = True
         wrongVertex = False
         if currentVertex[0] != vertex:
