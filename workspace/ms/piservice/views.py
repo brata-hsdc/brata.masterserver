@@ -942,16 +942,42 @@ class AtWaypoint(JSONHandlerView):
         launchParams = data["LAUNCH_PARAMS"]
         currentVertexNumber = data["CURRENT_VERTEX_NUMBER"]
         attemptNumber = data["ATTEMPT_NUMBER"]
-        currentVertex = launchParams[currentVertexNumber]
-
+        thirdVertexName = data["THIRD_VERTEX_NAME"]
+ 
         # Determine if wasCorrect and if three retries have been made for this coordinate
         wasCorrect = True
         wrongVertex = False
-        if currentVertex[0] != vertex:
-            wasCorrect = False
-            if False: # TODO establish if even in the right area
-                wrongVertex = True # they are in completely the wrong place not just a decoy
-        retry = True
+        if currentVertexNumber == 0:
+            currentVertexName = launchParams["origin"]["vname"]
+            if currentVertexName != vertex:
+                wasCorrect = False
+        if currentVertexNumber == 1:
+            currentVertexName = launchParams["v2"]["vname"]
+            if currentVertexName != vertex:
+                # maybe the went the other way around
+                currentVertexName = launchParams["v3"]["vname"]
+                if currentVertexName != vertex:
+                    # Neither v2 nor v3 so wa a fail
+                    wasCorrect = False
+                else:
+                    # we need to store the fact that v2 was visited
+                    thirdVertexName = launchParams["v2"]["vname"]
+            else:
+                # we need to store the fact that v2 was visited
+                thirdVertexName = launchParams["v3"]["vname"]
+        if currentVertexNumber == 2:
+            currentVertexName = thirdVertexName
+            if currentVertexName != vertex:
+                wasCorrect = False
+        if currentVertexNumber == 3:
+            currentVertexName = launchParams["center"]["vname"]
+            if currentVertexName != vertex:
+                wasCorrect = False
+
+        #if False: # TODO establish if even in the right area
+        #wrongVertex = True # they are in completely the wrong place not just a decoy
+ 
+       retry = True
         if attemptNumber == 2: # in other words there were already 2 attempts so this is the third
            retry = False
         # Assume is a retry case
@@ -1000,6 +1026,7 @@ class AtWaypoint(JSONHandlerView):
                 "LAUNCH_PARAMS": launchParams,
                 "CURRENT_VERTEX_NUMBER": currentVertexNumber,
                 "ATTEMPT_NUMBER": attemptNumber,
+                "THIRD_VERTEX_NAME": thirdVertexName,
             })
 
         # SUBMIT_MSG_TYPE is used for success for failure tracking for scoring
@@ -1076,15 +1103,16 @@ class StartChallenge(JSONHandlerView):
                     "LAUNCH_PARAMS": launchParams,
                     "CURRENT_VERTEX_NUMBER": currentVertexNumber,
                     "ATTEMPT_NUMBER": attemptNumber,
+                    "THIRD_VERTEX_NAME": "",
                 })
-            origin = launchParams[0]
-            lat = origin[1]
-            lon = origin[2]
-            angle = origin[3]
-            side = launchParams[3][1]
-            tmpList = []
-            tmpList.append(origin[0])
-            color = tmpList[0]
+            origin = launchParams["origin"]
+            lat = origin["lat"]
+            lon = origin["lon"]
+            angle = launchParams["rot"]
+            side = launchParams["side"]
+            #tmpList = []
+            #tmpList.append(origin[0])
+            color = launchParams["zone"]
             # NOTE this is just text
             message = "Layout the launch site at [LAT={}] [LON={}] [ROT={}] [SIDE={}] [COLOR={}]".format(lat, lon, angle, side, color)
         elif station.station_type == "Dock":
