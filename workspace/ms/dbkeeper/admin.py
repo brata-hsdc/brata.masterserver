@@ -25,7 +25,7 @@ class TeamAdmin(admin.ModelAdmin):
     list_display = ("name", "organization", "pass_code", "wordCode", "reg_code", "registered")
     ordering = ("name",)
     search_fields = ("name", "pass_code", "reg_code")
-    readonly_fields = ("pass_code", "reg_code", "registered")
+    #readonly_fields = ("pass_code", "reg_code", "registered")
     show_full_result_count = True
     
     def wordCode(self, team):
