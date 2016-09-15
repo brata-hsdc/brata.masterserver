@@ -942,15 +942,60 @@ class AtWaypoint(JSONHandlerView):
         launchParams = data["LAUNCH_PARAMS"]
         currentVertexNumber = data["CURRENT_VERTEX_NUMBER"]
         attemptNumber = data["ATTEMPT_NUMBER"]
-        currentVertex = launchParams[currentVertexNumber]
-
-        # Todo determine if wasCorrect and if three retries have been made for this coordinate
+        thirdVertexName = data["THIRD_VERTEX_NAME"]
+ 
+        # Determine if wasCorrect and if three retries have been made for this coordinate
         wasCorrect = True
         wrongVertex = False
-        if currentVertex[0] != vertex:
-            wasCorrect = False
-            if False: # TODO establish if even in the right area
-                wrongVertex = True # they are in completely the wrong place not just a decoy
+        # extract the dummy values for check if at wrong vertex
+        dummyVertexNumber1 = vertex[1:2]
+        dummyVertexNumber2 = vertex[3:4]
+        if currentVertexNumber == 1:
+            currentVertexName = launchParams["origin"]["vname"]
+            currentVertexNumberLabel = currentVertexName[2:3]
+            if currentVertexName != vertex:
+                wasCorrect = False
+                if not (currentVertexNumberLabel == dummyVertexNumber1 or 
+                    currentVertexNumberLabel == dummyVertexNumber2):
+                    wrongVertex = True
+        if currentVertexNumber == 2:
+            currentVertexName = launchParams["v2"]["vname"]
+            currentVertexNumberLabel = currentVertexName[2:3]
+            if currentVertexName != vertex:
+                # maybe the went the other way around
+                currentVertexName = launchParams["v3"]["vname"]
+                altVertexNumberLabel = currentVertexName[2:3]
+                if currentVertexName != vertex:
+                    # Neither v2 nor v3 so wa a fail
+                    wasCorrect = False
+                    if not (currentVertexNumberLabel == dummyVertexNumber1 or 
+                        currentVertexNumberLabel == dummyVertexNumber2 or
+                        altVertexNumberLabel == dummyVertexNumber1 or 
+                        altVertexNumberLabel == dummyVertexNumber2):
+                        wrongVertex = True
+                else:
+                    # we need to store the fact that v2 was visited
+                    thirdVertexName = launchParams["v2"]["vname"]
+            else:
+                # we need to store the fact that v2 was visited
+                thirdVertexName = launchParams["v3"]["vname"]
+        if currentVertexNumber == 3:
+            currentVertexName = thirdVertexName
+            currentVertexNumberLabel = currentVertexName[2:3]
+            if currentVertexName != vertex:
+                wasCorrect = False
+                if not (currentVertexNumberLabel == dummyVertexNumber1 or 
+                    currentVertexNumberLabel == dummyVertexNumber2):
+                    wrongVertex = True
+        if currentVertexNumber == 4:
+            currentVertexName = launchParams["center"]["vname"]
+            currentVertexNumberLabel = currentVertexName[2:3]
+            if currentVertexName != vertex:
+                wasCorrect = False
+                if not (currentVertexNumberLabel == dummyVertexNumber1 or 
+                    currentVertexNumberLabel == dummyVertexNumber2):
+                    wrongVertex = True
+ 
         retry = True
         if attemptNumber == 2: # in other words there were already 2 attempts so this is the third
            retry = False
@@ -964,20 +1009,20 @@ class AtWaypoint(JSONHandlerView):
             # Succeeded:  Record the transaction and update the station record
             status = PiEvent.SUCCESS_STATUS
             type=PiEvent.SUBMIT_MSG_TYPE
-            if currentVertexNumber == 0 or currentVertex == 1:
+            if currentVertexNumber == 1 or currentVertexNumber == 2:
                 message = "Correct! Continue to the next vertex"
-            elif currentVertexNumber == 2:
+            elif currentVertexNumber == 3:
                 message = "Correct! Continue to the center"
-            else: # currentVertexNumber == 3:
+            else: # currentVertexNumber == 4:
                 message = "Correct! Continue to the next Challenge"
             currentVertexNumber += 1
             attemptNumber = 0
         elif retry:
             message = "Decoy, try again!"
             #TODO alternative retries
-            if wrongVertex and currentVertexNumber == 0:
+            if wrongVertex and currentVertexNumber == 1:
                 message = "Sorry, not the Origin; Go to the Origin"
-            elif wrongVertex and (currentVertexNumber == 1 or currentVertexNumber == 2):
+            elif wrongVertex and (currentVertexNumber == 2 or currentVertexNumber == 3):
                 message = "Sorry, not a vertex; Go to the right vertex"
             elif wrongVertex:
                 message = "Sorry, not the Center; Go to the Center"
@@ -986,11 +1031,11 @@ class AtWaypoint(JSONHandlerView):
             # Post failures so scoring can keep track of them
             status = PiEvent.FAIL_STATUS
             type=PiEvent.SUBMIT_MSG_TYPE
-            if currentVertexNumber == 0 or currentVertex == 1:
+            if currentVertexNumber == 1 or currentVertexNumber == 2:
                 message = "Sorry, go to the next vertex"
-            elif currentVertexNumber == 2:
+            elif currentVertexNumber == 3:
                 message = "Sorry, go to the center"
-            else: # currentVertexNumber == 3:
+            else: # currentVertexNumber == 4:
                 #This is the final signal it is completely over
                 message = "Sorry, go to the next Challenge"
             currentVertexNumber += 1
@@ -1000,6 +1045,7 @@ class AtWaypoint(JSONHandlerView):
                 "LAUNCH_PARAMS": launchParams,
                 "CURRENT_VERTEX_NUMBER": currentVertexNumber,
                 "ATTEMPT_NUMBER": attemptNumber,
+                "THIRD_VERTEX_NAME": thirdVertexName,
             })
 
         # SUBMIT_MSG_TYPE is used for success for failure tracking for scoring
@@ -1070,21 +1116,22 @@ class StartChallenge(JSONHandlerView):
             # Pick at random
             launchParams=random.choice(launchParamsList)
             shouldCallStation = False
-            currentVertexNumber = 0
+            currentVertexNumber = 1
             attemptNumber = 0
             startData = json.dumps({
                     "LAUNCH_PARAMS": launchParams,
                     "CURRENT_VERTEX_NUMBER": currentVertexNumber,
                     "ATTEMPT_NUMBER": attemptNumber,
+                    "THIRD_VERTEX_NAME": "",
                 })
-            origin = launchParams[0]
-            lat = origin[1]
-            lon = origin[2]
-            angle = origin[3]
-            side = launchParams[3][1]
-            tmpList = []
-            tmpList.append(origin[0])
-            color = tmpList[0]
+            origin = launchParams["origin"]
+            lat = origin["lat"]
+            lon = origin["lon"]
+            angle = launchParams["rot"]
+            side = launchParams["side"]
+            #tmpList = []
+            #tmpList.append(origin[0])
+            color = launchParams["zone"]
             # NOTE this is just text
             message = "Layout the launch site at [LAT={}] [LON={}] [ROT={}] [SIDE={}] [COLOR={}]".format(lat, lon, angle, side, color)
         elif station.station_type == "Dock":
